@@ -1,10 +1,10 @@
 # Disable 'Post-Process Only Verified Jobs' in Sabnzbd.
 # Set up Watcher server info.
 conf = {
-    'watcherkey': 'b9c139de470e62f7d0c1fa3b48ce153a',
+    'watcherkey': '',
     'watcherhost': 'localhost',
     'watcherport': '9090',
-    'sabkey': '30d0729ea1e30098f0f79347e988b3a4',
+    'sabkey': '',
     'sabhost': 'localhost',
     'sabport': '8080'
 }

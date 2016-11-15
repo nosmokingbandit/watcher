@@ -74,20 +74,18 @@ class App(object):
         return self.ajax.test_downloader_connection(mode, data)
 
 if __name__ == '__main__':
+    # set up config file on first launch
+    conf = config.Config()
+    if not os.path.isfile('config.cfg'):
+        print 'Config file not found. Creating new basic config. Please review settings.'
+        conf.new_config()
+    else:
+        print 'Config file found.'
+
     # set up logging
     log.start()
     import logging
     logging = logging.getLogger(__name__)
-
-
-    # set up config file on first launch
-    conf = config.Config()
-
-    if not os.path.isfile('config.cfg'):
-        logging.info('Config file not found. Creating new basic config. Please review settings.')
-        conf.new_config()
-    else:
-        logging.info('Config file found.')
 
     # set up db on first launch
     if not os.path.isfile('watcher.sqlite'):

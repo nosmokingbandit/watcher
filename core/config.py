@@ -13,6 +13,7 @@ class Config():
         self.config.optionxform = str
 
         self.file = 'config.cfg'
+        self.base_file = 'core/base_config.cfg'
 
     def __getitem__(self, h):
         with open(self.file) as c:
@@ -37,8 +38,8 @@ class Config():
 
         self.config.readfp(open(self.file))
 
-        self.config.set('Search', 'SearchTimeHr', str(random.randint(0, 23)).zfill(2) )
-        self.config.set('Search', 'SearchTimeMin', str(random.randint(0, 59)).zfill(2) )
+        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2) )
+        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
 
         apikey = "%06x" % random.randint(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         self.config.set('Server', 'apikey', apikey )

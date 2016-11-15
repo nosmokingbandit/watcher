@@ -10,6 +10,10 @@ class log(object):
 
     @staticmethod
     def start():
+        if not os.path.exists('logs'):
+            os.makedirs('logs')
+
+
         conf = config.Config()
         path = 'logs/log.txt'
         backup_days = int(conf['Server']['keeplog'])

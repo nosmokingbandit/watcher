@@ -11,6 +11,9 @@ class Poster():
     def __init__(self):
         self.poster_folder = 'static/images/posters/'
 
+        if not os.path.exists(self.poster_folder):
+            os.makedirs(self.poster_folder)
+
     def save_poster(self, imdbid, poster_url):
 
         logging.info('Grabbing poster for {}.'.format(imdbid))

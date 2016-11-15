@@ -1,5 +1,5 @@
 import ConfigParser
-from random
+import random
 import shutil
 import os
 

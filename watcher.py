@@ -16,21 +16,6 @@ class App(object):
     def __init__(self):
         self.ajax = ajax.Ajax()
 
-        if not os.path.isfile('config.cfg'):
-            logging.info('Config file not found. Creating new basic config. Please review settings.')
-            conf.new_config()
-        else:
-            logging.info('Config file found.')
-
-        if not os.path.isfile('watcher.sqlite'):
-            logging.info('SQL DB not found. Creating.')
-            sql = sqldb.SQL()
-            sql.create_database()
-            del sql
-        else:
-            logging.info('SQL DB found.')
-
-
     @cherrypy.expose
     def index(self):
         raise cherrypy.HTTPRedirect("/status")
@@ -95,8 +80,26 @@ if __name__ == '__main__':
     logging = logging.getLogger(__name__)
 
 
+    # set up config file on first launch
     conf = config.Config()
-    scheduler = SchedulerPlugin(cherrypy.engine)
+
+    if not os.path.isfile('config.cfg'):
+        logging.info('Config file not found. Creating new basic config. Please review settings.')
+        conf.new_config()
+    else:
+        logging.info('Config file found.')
+
+    # set up db on first launch
+    if not os.path.isfile('watcher.sqlite'):
+        logging.info('SQL DB not found. Creating.')
+        sql = sqldb.SQL()
+        sql.create_database()
+        del sql
+    else:
+        logging.info('SQL DB found.')
+
+
+
 
     cherry_conf = {
         '/': {
@@ -133,7 +136,7 @@ if __name__ == '__main__':
     cherrypy.log.error_log.propagate = True
     cherrypy.log.access_log.propagate = True
 
-    #log.rotate_logs()
+    scheduler = SchedulerPlugin(cherrypy.engine)
 
     root = App()
     root.add_movie = add_movie.AddMovie()
@@ -144,8 +147,6 @@ if __name__ == '__main__':
 
     if passed_args.daemon:
         Daemonizer(cherrypy.engine).subscribe()
-
-
 
     cherrypy.tree.mount(root,
                         '/',
@@ -158,7 +159,8 @@ if __name__ == '__main__':
                        )
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
-    os.chdir(cwd) # have to do this for the daemon
+    # have to do this for the daemon
+    os.chdir(cwd)
     scheduler.subscribe()
     scheduler.start()
     cherrypy.engine.block()

@@ -1,0 +1,116 @@
+ul#movie_list{
+    list-style: none;
+    clear: both;
+    padding: 0;
+    margin: 0 auto;
+    width: 60%;
+    max-width: 1024px;
+    min-width: 650px;
+}
+
+ul#movie_list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+ul#movie_list li{
+    padding: 5px;
+    font-size: 0;
+}
+
+/* Ugly hack to get rid of whitespace between elements. */
+ul#movie_list li span{
+    font-size: 16px;
+}
+
+ul#movie_list li div{
+    height: 100%;
+    width: 168px;
+    float: left;
+    padding: 6px 6px 0px 6px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+ul#movie_list li div:hover{
+    background-color: #eee;
+}
+
+ul#movie_list li div span.status{
+    height: 24px;
+    font-size: 0.75em;
+    line-height: 24px;
+    width: 100%;
+    border-width: 1px 1px 0px 1px;
+    border-style: solid;
+    border-color: #212121;
+    display: block;
+    font-size: 16px;
+    text-align: center;
+}
+
+ul#movie_list li div span.wanted{
+    background-color: #FF9800;
+}
+
+ul#movies_list li div span.searching{
+    background-color: #FFC107;
+}
+
+ul#movie_list li div span.found{
+    background-color: #CDDC39;
+}
+
+ul#movie_list li div span.snatched{
+    background-color: #00BCD4;
+}
+
+ul#movie_list li div span.finished{
+    background-color: #4CAF50;
+}
+
+ul#movie_list li div img{
+    width: 100%;
+    height: 256px;
+    margin: 0;
+    padding: 0;
+    border-width: 0px 1px 1px 1px;
+    border-color: #212121;
+    border-style: solid;
+}
+
+
+ul#movie_list li span.title_year{
+    height: 1.5em;
+    font-size: 0.75em;
+    line-height: 1.5em;
+    display: block; /* needed for width */
+    font-size: 16px;
+    text-align: center;
+}
+
+
+/* specific movie details */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: #212121;
+    z-index:1001;
+    opacity: 0.95;
+}
+
+#status_pop_up {
+    background: white;
+    border-top: 1px solid #bdbdbd;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: none;
+    z-index:1002;
+}

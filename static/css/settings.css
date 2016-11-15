@@ -1,0 +1,212 @@
+input[type='checkbox']{
+    margin: 0;
+    padding: 0;
+}
+
+
+input[type="number"]{
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
+}
+
+input[type='text']{
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
+}
+
+select{
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
+    height: 1.5em;
+    font-size: 1em;
+}
+
+button{
+    height: 2em;
+    line-height: 2em;
+    margin: 0 0 0 0;
+    background-color: white;
+    border: 1px solid #212121;
+    outline: none;
+    font-size: 1.0em;
+    cursor: pointer;
+    text-overflow: clip;
+}
+
+button:hover{
+    background-color: #212121;
+    color: #fff;
+}
+
+
+
+i{
+    margin: 0 0 0 0;
+    cursor: pointer;
+    height: 2.0em;
+}
+
+p{
+    font-size: 2em;
+    font-weight: 700;
+    margin: 0.5em 0 0.5em 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.material-icons, .icon-text {
+    vertical-align: middle;
+}
+
+div#content{
+    margin: 1.5em auto 0 auto;
+    width: 60%;
+    max-width: 768px;
+    clear: both;
+}
+
+div#content ul.wide{
+    max-width: 768px;
+    min-width: 640px;
+    margin: 0 0 2.5em 0;
+}
+
+div#content ul{
+    list-style: none;
+    padding: 0 0 0 0;
+}
+
+div#content ul li{
+    padding: 0 0 0 0;
+    line-height: 2.5em;
+}
+
+div#content ul li.bbord{
+    border-bottom: 1px solid #bdbdbd;
+}
+
+div#content ul li.rbord{
+    border-right: 1px solid #bdbdbd;
+}
+
+div#content ul li.lbord{
+    border-left: 1px solid #bdbdbd;
+}
+
+.sub_cat{
+    font-size: 1.125em;
+    font-weight: 700;
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+/* Providers */
+
+div#content ul#providers{
+    overflow: hidden;
+}
+
+div#content ul#newznab_list{
+    float: left;
+    width: 100%;
+}
+
+input#retention{
+    width: 4em;
+}
+
+.newznab_check{
+    width: 5%;
+}
+
+.newznab_url{
+    width: 40%;
+    margin: 0 2.5%;
+}
+
+.newznab_api{
+    width: 40%;
+    margin: 0 2.5%;
+}
+
+li#add_newznab_row{
+}
+
+
+/* Quality */
+
+ul#quality{
+    overflow: hidden;
+}
+
+ul#resolution{
+    width: 30%;
+    margin: 0 5% 0 0;
+    float: left;
+}
+
+ul#resolution li{
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+ul#resolution_size{
+    width: 65%;
+    float: left;
+}
+
+ul#resolution_size li span{
+    width: 3em;
+    display: inline-block;
+}
+
+div.hidden_data{
+    display: none;
+}
+
+/* downloader */
+ul#downloader{
+
+}
+
+ul#sabnzbd, ul#nzbget{
+    margin: 0 0 1em 2em;
+    display: none;
+    width: 100%;
+
+}
+
+/* post processing */
+ul#postprocessing{
+    margin-bottom: 2.5em;
+}
+
+ul#renamer, ul#mover{
+    margin: 0 0 1em 2em;
+    width: 100%;
+}
+
+ul#postprocessing li span.taglist{
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: .75em;
+}
+
+/**/
+
+span.tip{
+    font-size: 0.75em;
+    margin: 0 0.25em 0 2em;
+    height: 2.5em;
+    text-align: right;
+    float: right;
+    font-weight: 500;
+}
+
+div#footer{
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
+}

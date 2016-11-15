@@ -1,0 +1,93 @@
+input[type=checkbox]{
+    background-color: aqua;
+    border: 1px solid #bdbdbd;
+    height: 1.5em;
+    width: 1.5em;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+input[type=checkbox]:after {
+    content: " ";
+    background-color: #9FFF9D;
+    display: inline-block;
+    visibility: visible;
+}
+
+div#container{
+    padding: 1em;
+    max-width: 912px;
+    margin: 0 auto;
+}
+
+div#title p{
+    padding: 0;
+    margin: 0 0 1em 0;
+    height: 2em;
+    line-height: 2em;
+    vertical-align: middle;
+}
+
+div#title span#title{
+    font-size: 2em;
+    float: left;
+}
+
+div#title p button{
+    float: right;
+}
+
+button{
+    height: 2em;
+    line-height: 2em;
+    margin: 0 0 0 1em;
+    background-color: white;
+    border: 1px solid #212121;
+    outline: none;
+    font-size: 1.0em;
+    cursor: pointer;
+}
+
+button:hover{
+    background-color: #212121;
+    color: #fff;
+}
+
+button#submit{
+    display: none;
+}
+
+div#media{
+    margin: 0 0 1em 0;
+    overflow: hidden;
+}
+
+div#media img#poster{
+    height: 360px;
+    float: left;
+    max-width: 255px;
+}
+
+iframe#trailer{
+    float: right;
+}
+
+div#plot{
+}
+
+div#plot p{
+    font-size: 1.25em;
+}
+
+div#additional_info p{
+    padding: 0;
+    margin: 0 1em 1em 0;
+    float: left;
+}
+
+div#hidden_data{
+    display: none;
+    width: 0;
+    height: 0;
+}

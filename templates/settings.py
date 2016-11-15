@@ -210,7 +210,6 @@ class Settings():
 
 
                 p('Post-Processing')
-                span('SOME OF THIS WORKS')
                 c_s = 'Postprocessing'
                 with ul(id='postprocessing'):
                     with li():

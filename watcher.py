@@ -1,7 +1,7 @@
 import os
 import cherrypy
 import datetime
-from core import search_omdb, poster, sqldb, config, ajax, api
+from core import poster, sqldb, config, ajax, api
 from core.scheduler import SchedulerPlugin
 from core.log import log
 import argparse, time

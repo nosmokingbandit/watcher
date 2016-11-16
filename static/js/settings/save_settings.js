@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
 
 /* grab all settings and write them to the config writer */
     $("button#save_settings").click(function(e){
@@ -21,7 +21,7 @@
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width($this.width());
-        $this.text('â€¢ â€¢ â€¢');
+        $this.text('- - -');
 
         var post_list = {};
 

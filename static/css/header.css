@@ -8,6 +8,11 @@
     clear: both;
 }
 
+#header_container{
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
 #header img{
     padding-left: 8px;
 }

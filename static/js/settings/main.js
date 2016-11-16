@@ -88,7 +88,7 @@ $(document).ready(function () {
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width($this.width());
-        $this.text('• • •');
+        $this.text('- - -');
 
         // Gets entered info, even if not saved
         var data = {}

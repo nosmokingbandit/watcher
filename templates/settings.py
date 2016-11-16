@@ -232,7 +232,7 @@ class Settings():
                     with ul(id='mover'):
                         with li():
                             span('Move movie file to: ')
-                            input(type='text', style='width: 18em', value=c[c_s]['moverpath'])
+                            input(type='text', style='width: 18em', id='moverpath', value=c[c_s]['moverpath'])
                             span('Use absolute path.', cls='tip')
                             br()
                             span('Example: ')

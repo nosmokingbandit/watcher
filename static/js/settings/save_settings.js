@@ -21,7 +21,7 @@ $(document).ready(function () {
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width($this.width());
-        $this.text('• • •');
+        $this.text('â€¢ â€¢ â€¢');
 
         var post_list = {};
 
@@ -134,7 +134,10 @@ $(document).ready(function () {
         var Postprocessing = {}
         Postprocessing['renamerenabled'] = $("i#renamerenabled").attr("value");
         Postprocessing['renamerstring'] = $("input#renamerstring").val();
-        console.log(Postprocessing);
+    Postprocessing['moverenabled'] = $("i#moverenabled").attr("value");
+    Postprocessing['moverpath'] = $("input#moverpath").val();
+    Postprocessing['moverenabled'] = $("i#cleanupenabled").attr("value");
+
         post_list["Postprocessing"] = Postprocessing;
 
         // SERVER options

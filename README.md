@@ -31,6 +31,7 @@ If you do not wish to use Git, follow these steps.
 
 
 ## Options
+
 You can add the following arguments to Watcher when running the Python script.
 
 `-d` Run the server as a daemon.
@@ -41,3 +42,10 @@ You can add the following arguments to Watcher when running the Python script.
 
 `-b` Open browser on launch.
 
+## Post-Processing
+
+Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.
+
+For Sabnzb, edit the script file and add your api keys and server information. Then, in Sabnzb, disable `Post-Process Only Verified Jobs`, create a new Category using the same category name you have in Watcher. Select the post-processing script and save.
+
+For NZBGet, go to Settings and set up a Category with the same category name you have in Watcher. In `Post-Script` select the Watcher post-processing script. In the left column, select Watcher and add your server information. Save your settings and restart NZBGet.

@@ -94,8 +94,8 @@ class Settings():
                                 if n != '__name__':
                                     with li(cls='newznab_indexer'):
                                         i('check_box_outline_blank', cls='newznab_check material-icons toggle', value=c[c_s][n][2])
-                                        input(type='text', cls='newznab_url', value=c[c_s][n][0] )
-                                        input(type='text', cls='newznab_api', value=c[c_s][n][1])
+                                        input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL" )
+                                        input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
                             with li(id='add_newznab_row'):
                                 i('playlist_add', cls='material-icons', id='add_row')
                 p('Quality')

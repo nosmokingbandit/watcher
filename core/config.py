@@ -64,7 +64,11 @@ class Config():
 
         for cat in data:
             for k, v in data[cat].items():
-                if self.config.get(cat, k) != v:
+                # this will only write changed values
+                if self.config.has_option(cat, k):
+                    if self.config.get(cat, k) != v:
+                        self.config.set(cat, k, v)
+                else:
                     self.config.set(cat, k, v)
 
         with open(self.file, 'w') as cfgfile:

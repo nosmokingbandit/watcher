@@ -10,6 +10,7 @@ Watcher requires [Python 2.7](https://www.python.org/). If you are running OSX o
 It is also strongly recommended that you install [GIT](http://git-scm.com/). This will allow you to update much more easily.
 
 **Download the required files using GIT:**
+
 If you choose to use Git follow these steps.
 
 * Open a terminal and cd to the directory you in which you want to install Watcher.
@@ -18,6 +19,9 @@ If you choose to use Git follow these steps.
 * Open a browser and navigate to `localhost:9090`
 
 **Download ZIP:**
+
+If you do not wish to use Git, follow these steps.
+
 * Open your browser and go to `https://github.com/nosmokingbandit/watcher`
 * Click on the green `Clone or download` button and click `Download ZIP`
 * Once done downloading, extract the ZIP to the location in which you want Watcher installed

@@ -35,9 +35,9 @@ You can add the following arguments to Watcher when running the Python script.
 
 `-d` Run the server as a daemon.
 
-`-a` Network address to bind to.
+`-a 0.0.0.0` Network address to bind to.
 
-`-p` Port to bind to.
+`-p 9090` Port to bind to.
 
 `-b` Open browser on launch.
 

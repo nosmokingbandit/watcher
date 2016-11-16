@@ -32,6 +32,9 @@ div#title p{
 div#title span#title{
     font-size: 2em;
     float: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 div#title p button{

@@ -32,6 +32,7 @@ ul#movie_list li div{
     padding: 6px 6px 0px 6px;
     margin: 10px;
     cursor: pointer;
+    overflow: hidden;
 }
 
 ul#movie_list li div:hover{

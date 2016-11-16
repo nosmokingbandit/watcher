@@ -38,13 +38,19 @@ class ScoreResults():
         if words[0] == '':
             return
         for word in words:
-            self.results = [r for r in self.results if word not in r['title'].lower()]
+            if word == '':
+                continue
+            else:
+                self.results = [r for r in self.results if word not in r['title'].lower()]
 
     def keep_required(self, words):
         if words[0] == '':
             return
         for word in words:
-            self.results = [r for r in self.results if word in r['title'].lower()]
+            if word == '':
+                continue
+            else:
+                self.results = [r for r in self.results if word in r['title'].lower()]
 
     def retention_check(self, retention, today):
         if retention == 0:
@@ -64,9 +70,12 @@ class ScoreResults():
         if words[0] == '':
             return
         for word in words:
-            for result in self.results:
-                if word in result['title'].lower():
-                    result['score'] += 10
+            if word == '':
+                continue
+            else:
+                for result in self.results:
+                    if word in result['title'].lower():
+                        result['score'] += 10
 
     def fuzzy_title(self, title):
         l = []

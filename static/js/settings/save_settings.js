@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
 /* grab all settings and write them to the config writer */
     $("button#save_settings").click(function(e){
@@ -136,7 +136,7 @@ $(document).ready(function () {
         Postprocessing['renamerstring'] = $("input#renamerstring").val();
     Postprocessing['moverenabled'] = $("i#moverenabled").attr("value");
     Postprocessing['moverpath'] = $("input#moverpath").val();
-    Postprocessing['moverenabled'] = $("i#cleanupenabled").attr("value");
+    Postprocessing['cleanupenabled'] = $("i#cleanupenabled").attr("value");
 
         post_list["Postprocessing"] = Postprocessing;
 

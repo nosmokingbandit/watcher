@@ -9,7 +9,8 @@ from cherrypy.process.plugins import Daemonizer
 import webbrowser
 from templates import status, add_movie, settings, restart, shutdown
 
-cwd = os.getcwd()
+watcher_path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(watcher_path)
 
 class App(object):
     @cherrypy.expose
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     cherry_conf = {
         '/': {
             'tools.sessions.on': True,
-            'tools.staticdir.root': os.path.abspath(cwd)
+            'tools.staticdir.root': watcher_path
         },
         '/static': {
             'tools.staticdir.on': True,
@@ -158,7 +159,7 @@ if __name__ == '__main__':
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
     # have to do this for the daemon
-    os.chdir(cwd)
+    os.chdir(watcher_path)
     scheduler.subscribe()
     scheduler.start()
     cherrypy.engine.block()

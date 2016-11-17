@@ -161,7 +161,6 @@ $(document).ready(function () {
         })
 
         .done(function(r) {
-            console.log(r);
             if(r == 'failed'){
                 alert('Unable to save settings. Check log.')
             }

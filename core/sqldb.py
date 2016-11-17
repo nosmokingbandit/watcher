@@ -18,9 +18,8 @@ class SQL(object):
 
     def __init__(self):
         try:
-            self.engine = create_engine(DB_NAME)##turn echo off
+            self.engine = create_engine(DB_NAME)
             self.session = sessionmaker(bind = self.engine)
-            #// self.metadata = MetaData()
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
@@ -43,8 +42,7 @@ class SQL(object):
         sess.commit()
         sess.close()
 
-        # this is super slow and i don't know what to do about it.
-        # self.engine.execute(insert, DB_STRING)
+        # this can be super slow and i don't know what to do about it.
         return 'success'
 
     def write_search_results(self, LIST):

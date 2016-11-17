@@ -10,15 +10,13 @@ import sys
 import logging
 logging = logging.getLogger(__name__)
 
-
-
 DB_NAME = 'sqlite:///watcher.sqlite'
 Base = declarative_base()
 class SQL(object):
 
     def __init__(self):
         try:
-            self.engine = create_engine(DB_NAME)
+            self.engine = create_engine(DB_NAME, connect_args={'timeout': 15})
             self.session = sessionmaker(bind = self.engine)
         except (SystemExit, KeyboardInterrupt):
             raise

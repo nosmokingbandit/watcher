@@ -1,5 +1,7 @@
 #--import sqlite3
-from sqlalchemy import *
+from sqlalchemy import Table, Column, Integer, String, DateTime, Text, ForeignKey, create_engine, bindparam, column
+from sqlalchemy.orm import relationship, backref, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 import os
 import json
 from core import poster
@@ -8,210 +10,294 @@ import sys
 import logging
 logging = logging.getLogger(__name__)
 
+
+
 DB_NAME = 'sqlite:///watcher.sqlite'
+Base = declarative_base()
 class SQL(object):
 
     def __init__(self):
         try:
-            self.engine = create_engine(DB_NAME)
-            self.metadata = MetaData()
+            self.engine = create_engine(DB_NAME)##turn echo off
+            self.session = sessionmaker(bind = self.engine)
+            #// self.metadata = MetaData()
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error('Opening SQL DB.', exc_info=True)
             raise
 
-        self.MOVIES = Table('MOVIES', self.metadata,
-                            Column('imdbid', TEXT),
-                            Column('title', TEXT),
-                            Column('year', TEXT),
-                            Column('poster', TEXT),
-                            Column('plot', TEXT),
-                            Column('tomatourl', TEXT),
-                            Column('tomatorating', TEXT),
-                            Column('released', TEXT),
-                            Column('dvd', TEXT),
-                            Column('rated', TEXT),
-                            Column('status', TEXT),
-                            Column('predb', TEXT)
-                           )
-        self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
-                                   Column('score', SMALLINT),
-                                   Column('size', SMALLINT),
-                                   Column('category', TEXT),
-                                   Column('status', TEXT),
-                                   Column('pubdate', TEXT),
-                                   Column('title', TEXT),
-                                   Column('imdbid', TEXT),
-                                   Column('indexer', TEXT),
-                                   Column('date_found', TEXT),
-                                   Column('info_link', TEXT),
-                                   Column('guid', TEXT),
-                                   Column('resolution', TEXT),
-                                   Column('type', TEXT),
-                                   Column('downloader_id', TEXT)
-                                  )
-
-        self.MARKEDRESULTS = Table('MARKEDRESULTS', self.metadata,
-                                   Column('imdbid', TEXT),
-                                   Column('guid', TEXT),
-                                   Column('status', TEXT)
-                                  )
-
 
     def create_database(self):
         logging.info('Creating tables.')
-        self.metadata.create_all(self.engine)
+        Base.metadata.create_all(self.engine)
 
     # accepts str TABLE and dict DB_STRING to be written
     def write(self, TABLE, DB_STRING):
-
         logging.info('Writing data to {}'.format(TABLE))
-        if TABLE == 'MOVIES':
-            insert = self.MOVIES.insert()
-        if TABLE == 'SEARCHRESULTS':
-            insert = self.SEARCHRESULTS.insert()
-        if TABLE == 'MARKEDRESULTS':
-            insert = self.MARKEDRESULTS.insert()
+
+        TABLE = self.tablename(TABLE)
+
+        sess = self.session()
+        sess.add(TABLE(**DB_STRING))
+        sess.commit()
+        sess.close()
 
         # this is super slow and i don't know what to do about it.
-        self.engine.execute(insert, DB_STRING)
+        # self.engine.execute(insert, DB_STRING)
         return 'success'
 
     def write_search_results(self, LIST):
-        TABLE = 'SEARCHRESULTS'
-        logging.info('Writing batch into table {}'.format(TABLE))
+        logging.info('Writing batch into SEARCHRESULTS')
 
-        self.engine.execute(self.SEARCHRESULTS.insert(), LIST)
+        sess = self.session()
+
+        for i in LIST:
+            sess.add(SEARCHRESULTS(**i))
+
+        sess.commit()
+        sess.close()
+
         return 'success'
 
     def update(self, TABLE, COLUMN, VALUE, imdbid='', guid=''):
+
+        TABLE = self.tablename(TABLE)
+        sess = self.session()
+
         if imdbid:
-            idcolumn = 'imdbid'
+
+            idcol = getattr(TABLE, 'imdbid')
             idval = imdbid
         elif guid:
-            idcolumn = 'guid'
+
+            idcol = getattr(TABLE, 'guid')
             idval = guid
+        else:
+            sess.close()
+            return 'ID ERROR'
 
-        command = 'UPDATE {} SET {}="{}" WHERE {}="{}"'.format(TABLE, COLUMN, VALUE, idcolumn, idval)
+        logging.info('Updating {} to {}'.format(idcol, VALUE))
+        sess.query(TABLE).filter(idcol==idval).update({COLUMN: VALUE})
 
-        self.engine.execute(command)
+        sess.commit()
+        sess.close()
 
+    # Returns a list of dicts with all movie information
     def get_user_movies(self):
 
         logging.info('Retreving list of user\'s movies.')
-        TABLE = 'MOVIES'
+        TABLE = self.tablename('MOVIES')
+        sess = self.session()
 
-        command = 'SELECT * FROM {} ORDER BY title ASC'.format(TABLE)
-
-        movies = self.engine.execute(command).fetchall()
+        data = sess.query(TABLE).order_by(TABLE.title.asc()).all()
+        sess.close()
+        movies = []
+        for i in data:
+            movies.append(i.__dict__)
 
         return movies
 
+    # Returns dict of a single movie's information
     def get_movie_details(self, imdbid):
         logging.info('Retreving details for {}.'.format(imdbid))
+        TABLE = self.tablename('MOVIES')
+        sess = self.session()
+
         command = 'SELECT * FROM MOVIES WHERE imdbid="{}"'.format(imdbid)
-        details = self.engine.execute(command).fetchone()
-        return details
+
+        data = sess.query(TABLE).filter(TABLE.imdbid==imdbid).first()
+        sess.close()
+        return data.__dict__
 
     def get_search_results(self, imdbid):
-        TABLE = 'SEARCHRESULTS'
         logging.info('Retreving Search Results for {}.'.format(imdbid))
+        TABLE = self.tablename('SEARCHRESULTS')
+        sess = self.session()
+
+
         command ='SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
 
-        return self.engine.execute(command).fetchall()
-
-        if results:
-            return results
-        else:
-            return None
-
-    # returns a dict {guid:status, etc}
-    def get_marked_results(self, imdbid):
-        results = {}
-        TABLE = 'MARKEDRESULTS'
-        logging.info('Retreving Marked Results for {}.'.format(imdbid))
-        command ='SELECT * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
-        data = self.engine.execute(command).fetchall()
-
+        data = sess.query(TABLE).filter(TABLE.imdbid==imdbid).order_by(TABLE.score.desc()).order_by(TABLE.size.desc()).all()
+        sess.close()
+        l = []
         for i in data:
-            results[i['guid']] = i['status']
+            l.append(i.__dict__)
+        return l
+
+    # returns a dict {guid:status, guid:status, etc}
+    def get_marked_results(self, imdbid):
+        logging.info('Retreving Marked Results for {}.'.format(imdbid))
+
+        TABLE = self.tablename('MARKEDRESULTS')
+        sess = self.session()
+
+        data = sess.query(TABLE).filter(TABLE.imdbid==imdbid).all()
+        sess.close()
+
+        results = {}
+        for i in data:
+            results[i.__dict__['guid']] = i.__dict__['status']
 
         return results
 
     def remove_movie(self, imdbid):
-        TABLE = 'MOVIES'
-
-        logging.info('Removing {} from {}.'.format(imdbid, TABLE))
-        self.delete(TABLE, 'imdbid', imdbid)
+        logging.info('Removing {} from {}.'.format(imdbid, 'MOVIES'))
+        self.delete('MOVIES', 'imdbid', imdbid)
 
         logging.info('Removing any stored search results for {}.'.format(imdbid))
+
         TABLE = 'SEARCHRESULTS'
         if self.row_exists(TABLE, imdbid):
-            self.delete(TABLE, 'imdbid', imdbid)
+            self.purge_search_results(imdbid=imdbid)
 
         logging.info('{} removed.'.format(imdbid))
 
     def delete(self, TABLE, id_col, id_val):
         logging.info('Removing from {} where {} is {}.'.format(TABLE, id_col, id_val))
-        command = 'DELETE FROM {} WHERE {}="{}"'.format(TABLE, id_col, id_val)
-        self.engine.execute(command)
+
+        TABLE = self.tablename(TABLE)
+        sess = self.session()
+
+        id_col = getattr(TABLE, id_col)
+
+        sess.query(TABLE).filter(id_col==id_val).delete()
+
+        sess.commit()
+        sess.close()
 
     def purge_search_results(self, imdbid=''):
-        TABLE = 'SEARCHRESULTS'
+        TABLE = self.tablename('SEARCHRESULTS')
+        sess = self.session()
 
         if imdbid:
-            command = 'DELETE * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
+            sess.query(TABLE).filter(TABLE.imdbid==imdbid).delete()
         else:
-            command = 'DELETE FROM {}'.format(TABLE)
+            sess.query(TABLE).delete()
 
-        self.engine.execute(command)
+        sess.commit()
+        sess.close()
 
+
+    # returns a list of distinct values ['val1', 'val2', 'val3']
     def get_distinct(self, TABLE, column, id_col, id_val):
-        command = 'SELECT DISTINCT {} FROM {} WHERE {}="{}"'.format(column, TABLE, id_col, id_val)
-        data = self.engine.execute(command).fetchall()
+
+        TABLE = self.tablename(TABLE)
+        sess = self.session()
+
+        id_col = getattr(TABLE, id_col)
+        table_col = getattr(TABLE, column)
+
+        data = sess.query(table_col).filter(id_col==id_val).distinct().all()
+
+        sess.close()
 
         l = []
         for i in data:
-            l.append(i[column])
+            l.append(i[0])
         return l
 
     # returns bool if item exists in table. Used to check if we need to write new or update existing row.
     def row_exists(self, TABLE, imdbid='', guid=''):
+        logging.info('Checking if {} already exists in {}.'.format(id, TABLE))
+
+        TABLE = self.tablename(TABLE)
+        sess = self.session()
+
         if imdbid:
-            column = 'imdbid'
-            id = imdbid
+            logging.info('Checking if {} already exists in {}.'.format(imdbid, TABLE))
+            idcol = getattr(TABLE, 'imdbid')
+            idval = imdbid
         elif guid:
-            column = 'guid'
-            id = guid
+            logging.info('Checking if {} already exists in {}.'.format(guid, TABLE))
+            idcol = getattr(TABLE, 'guid')
+            idval = guid
         else:
+            sess.close()
             return 'ID ERROR'
 
-        logging.info('Checking if {}:{} already exists in {}.'.format(column, id, TABLE))
-        command = 'SELECT count(*) FROM {} WHERE {}="{}"'.format(TABLE, column, id)
+        row = sess.query(TABLE).filter(idcol==idval).all()
 
-        count = self.engine.execute(command).fetchone()
+        sess.close()
 
-        if count['count(*)'] == 0:
-            logging.info('Table {} does not contain {}:{}.'.format(TABLE, column, id))
-            return False
-        if count['count(*)'] != 0:
-            logging.info('Table {} contains {}:{}.'.format(TABLE, column, id))
+        if row:
             return True
+        else:
+            return False
+
+
 
     def get_single_search_result(self, guid):
         logging.info('Retreving search result details for {}.'.format(guid))
-        command = 'SELECT * FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)
-        details = self.engine.execute(command).fetchone()
 
-        return details
+        TABLE = self.tablename('SEARCHRESULTS')
+        sess = self.session()
+
+        result = sess.query(TABLE).filter(TABLE.guid==guid).first()
+        sess.close()
+
+        return result.__dict__
 
     def get_imdbid_from_guid(self, guid):
         logging.info('Retreving imdbid for {}.'.format(guid))
-        command = 'SELECT imdbid FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)
-        imdbid = self.engine.execute(command).fetchone()
 
-        if imdbid:
-            return imdbid[0]
-        else:
-            return None
+        TABLE = self.tablename('SEARCHRESULTS')
+        sess = self.session()
+
+        data = sess.query(TABLE).filter(TABLE.guid==guid).first().__dict__
+
+        sess.close()
+        return data['imdbid']
+
+    # takes passed string and returns corresponding table object
+    def tablename(self, TABLE):
+        for c in Base._decl_class_registry.values():
+            if hasattr(c, '__tablename__') and c.__tablename__ == TABLE:
+                return c
+
+
+
+class MOVIES(Base):
+
+    __tablename__ = 'MOVIES'
+
+    imdbid = Column(Text, primary_key=True)
+    title = Column(Text)
+    year = Column(Text)
+    poster = Column(Text)
+    plot = Column(Text)
+    tomatourl = Column(Text)
+    tomatorating = Column(Text)
+    released = Column(Text)
+    dvd = Column(Text)
+    rated = Column(Text)
+    status = Column(Text)
+    predb = Column(Text)
+
+class SEARCHRESULTS(Base):
+
+    __tablename__ = 'SEARCHRESULTS'
+
+    score = Column(Integer)
+    size = Column(Integer)
+    category = Column(Text)
+    status = Column(Text)
+    pubdate = Column(Text)
+    title = Column(Text)
+    imdbid = Column(Text)
+    indexer = Column(Text)
+    date_found = Column(Text)
+    info_link = Column(Text)
+    guid = Column(Text, primary_key=True)
+    resolution = Column(Text)
+    type = Column(Text)
+
+class MARKEDRESULTS(Base):
+
+    __tablename__ = 'MARKEDRESULTS'
+
+    imdbid = Column(Text)
+    guid = Column(Text, primary_key=True)
+    status = Column(Text)
+
+

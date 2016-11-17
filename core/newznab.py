@@ -34,15 +34,13 @@ class NewzNab():
 
             try:
                 results_xml = urllib2.urlopen(request).read()
+                nn_results = self.parse_newznab_xml(results_xml)
+                for result in nn_results:
+                    results.append(result)
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e:
                 logging.error('NewzNab search_all get xml', exc_info=True)
-
-            nn_results = self.parse_newznab_xml(results_xml)
-            for result in nn_results:
-                results.append(result)
-
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
@@ -84,15 +82,16 @@ class NewzNab():
         return d
 
     def get_resolution(self, result):
-            title = result['title']
-            if 'SD' in result['category']:
-                resolution = 'SD'
-            elif '4K' in title or 'UHD' in title:
-                resolution = '4K'
-            elif '1080' in title:
-                resolution = '1080P'
-            elif '720' in title:
-                resolution = '720P'
-            else:
-                resolution = 'Unknown'
-            return resolution
+
+        title = result['title']
+        if result['category'] and 'SD' in result['category']:
+            resolution = 'SD'
+        elif '4K' in title or 'UHD' in title:
+            resolution = '4K'
+        elif '1080' in title:
+            resolution = '1080P'
+        elif '720' in title:
+            resolution = '720P'
+        else:
+            resolution = 'Unknown'
+        return resolution

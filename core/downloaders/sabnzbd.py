@@ -75,7 +75,3 @@ class Sabnzbd():
             response = {}
             response['status'] = err
             return response
-
-
-
-

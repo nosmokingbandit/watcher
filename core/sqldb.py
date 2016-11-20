@@ -1,4 +1,3 @@
-#--import sqlite3
 from sqlalchemy import Table, Column, Integer, String, DateTime, Text, ForeignKey, create_engine, bindparam, column
 from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -295,5 +294,4 @@ class MARKEDRESULTS(Base):
     imdbid = Column(Text)
     guid = Column(Text, primary_key=True)
     status = Column(Text)
-
 

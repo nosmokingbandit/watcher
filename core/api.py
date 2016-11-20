@@ -47,7 +47,7 @@ class API(object):
         guid = urllib2.unquote(params['guid'])
         path = urllib2.unquote(params['path'])
         if params['mode'] == 'failed':
-            return self.post.failed(guid)
+            return self.post.failed(guid, path)
         if params['mode'] == 'complete':
             return self.post.complete(guid, path)
 

@@ -45,10 +45,10 @@ class API(object):
             return 'No GUID Supplied. Something went wrong with the postprocessing script.'
 
         guid = urllib2.unquote(params['guid'])
+        path = urllib2.unquote(params['path'])
         if params['mode'] == 'failed':
             return self.post.failed(guid, path)
         if params['mode'] == 'complete':
-            path = urllib2.unquote(params['path'])
             return self.post.complete(guid, path)
 
 

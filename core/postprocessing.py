@@ -16,7 +16,7 @@ class PostProcessing(object):
         self.pp_conf = self.conf['Postprocessing']
         self.sql = sqldb.SQL()
 
-    def failed(self, guid):
+    def failed(self, guid, path):
         if guid == 'None':
             return 'Success'
 

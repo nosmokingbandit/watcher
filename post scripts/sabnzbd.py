@@ -64,9 +64,9 @@ if status == 0: # finished ok.
     else:
         sys.exit(1)
 
-if status != 0: # anything less than zero is an error.
+if status != 0: # anything not zero is an error.
     mode = 'failed'
-    url = 'http://{}:{}/api/apikey={}&mode={}&guid={}'.format(watcherhost, watcherport, watcherkey, mode, guid)
+    url = 'http://{}:{}/api/apikey={}&mode={}&guid={}&path={}'.format(watcherhost, watcherport, watcherkey, mode, guid, path)
     request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
     response = urllib2.urlopen(request).read()
     if response == 'Success':

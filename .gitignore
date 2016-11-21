@@ -1,0 +1,15 @@
+#  User's Files   #
+*.sqlite
+config.cfg
+static/images/posters/*
+logs/*
+
+# Compiled #
+*.pyc
+
+# System Files #
+.Spotlight-V100
+.Trashes
+.DS_Store
+desktop.ini
+Thumbs.db

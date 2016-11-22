@@ -43,6 +43,8 @@ class API(object):
 
         if 'guid' not in params:
             return 'No GUID Supplied. Something went wrong with the postprocessing script.'
+        if 'path' not in params:
+            return 'No path Supplied. Something went wrong with the postprocessing script.'
 
         guid = urllib2.unquote(params['guid'])
         path = urllib2.unquote(params['path'])

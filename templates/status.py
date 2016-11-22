@@ -40,7 +40,6 @@ class Status():
                         self.movie_list()
 
             if core.UPDATE_STATUS != None:
-                print core.UPDATE_STATUS
                 if core.UPDATE_STATUS['status'] == 'behind':
                     commit = 'commit'
                     if core.UPDATE_STATUS['behind_count'] > 1:

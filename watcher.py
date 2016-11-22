@@ -81,7 +81,6 @@ class App(object):
         # this returns a generator that only contains the ajax response
         response = self.ajax.update_now(mode)
         for i in response:
-            print i
             return i
 
 if __name__ == '__main__':

@@ -171,7 +171,6 @@ class Ajax(object):
             statuses = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
 
             moviestatus = ''
-            print statuses
             if 'Snatched' not in statuses and 'Finished' not in statuses:
                 moviestatus = 'Found'
 
@@ -254,8 +253,6 @@ class Ajax(object):
                 logging.info('Update Failed.')
                 yield 'failed'
             elif update_status == True:
-                print 'update status'
-                print update_status
                 yield 'true'
                 logging.info('Respawning process...')
                 cherrypy.engine.stop()

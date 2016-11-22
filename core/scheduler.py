@@ -73,9 +73,7 @@ class Task(object):
         self.timer = Timer(self.delay, self.task)
 
     def task(self):
-        print 'executing {}'.format(self.func)
         self.func()
-        print 'executing {} in {} seconds'.format(self.func, self.interval)
         self.timer = Timer(self.interval, self.task)
         self.timer.start()
 

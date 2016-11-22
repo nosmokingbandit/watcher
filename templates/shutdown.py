@@ -1,6 +1,5 @@
 import dominate
 from dominate.tags import *
-from header import Header
 from cherrypy import expose
 
 

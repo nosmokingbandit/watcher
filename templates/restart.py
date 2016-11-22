@@ -1,6 +1,5 @@
 import dominate
 from dominate.tags import *
-from header import Header
 from cherrypy import expose
 
 
@@ -19,7 +18,6 @@ class Restart():
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(type='text/javascript', src='js/restart/main.js')
-
 
         with doc:
             with div(id='content'):

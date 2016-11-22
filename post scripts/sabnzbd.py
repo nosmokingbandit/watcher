@@ -31,7 +31,7 @@ sabport = conf['sabport']
 
 
 # get guid from sab history: ## why do we do this?
-name = urllib2.quote(sys.argv[3])
+name = urllib2.quote(sys.argv[3], safe='')
 url = 'http://{}:{}/sabnzbd/api?apikey={}&mode=history&output=json&search={}'.format(sabhost, sabport, sabkey, name)
 
 request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )

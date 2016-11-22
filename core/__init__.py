@@ -3,7 +3,7 @@ PROG_PATH = ''
 GIT_URL = 'https://github.com/nosmokingbandit/watcher'
 GIT_REPO = 'https://github.com/nosmokingbandit/watcher.git'
 GIT_API = 'https://api.github.com/repos/nosmokingbandit/watcher'
-GIT_BRANCH = 'testing'
+GIT_BRANCH = 'master'
 
 # Update info
 UPDATE_STATUS = None

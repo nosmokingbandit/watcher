@@ -35,7 +35,6 @@ class Nzbget():
 
             return '{}. \nPlease review your settings.'.format(e)
 
-
     @staticmethod
     def add_nzb(data):
         c = config.Config()
@@ -57,7 +56,6 @@ class Nzbget():
             url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
 
             nzbg_server = ServerProxy(url)
-
 
         filename = '{}.watcher.nzb'.format(data['title'])
         content = data['guid'].replace('http://', 'https://')

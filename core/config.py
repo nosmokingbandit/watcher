@@ -82,3 +82,8 @@ class Config():
             if ind[i][2] == 'true':
                 indexers.append(ind[i])
         return indexers
+
+    def merge_new_options(self):
+        self.config.read([self.base_file, self.file])
+        with open(self.file, 'w') as cfgfile:
+            self.config.write(cfgfile)

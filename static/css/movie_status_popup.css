@@ -6,7 +6,7 @@ a{
     font-weight: bold;
 }
 
-input[type=checkbox]{
+div#container input[type=checkbox]{
     background-color: aqua;
     border: 1px solid #bdbdbd;
     height: 1.5em;
@@ -16,7 +16,7 @@ input[type=checkbox]{
     vertical-align: middle;
 }
 
-input[type=checkbox]:after {
+div#container input[type=checkbox]:after {
     content: " ";
     background-color: #9FFF9D;
     display: inline-block;
@@ -46,21 +46,8 @@ div#title span#title{
     max-width: 75%;
 }
 
-button{
-    height: 2em;
-    line-height: 2em;
-    margin: 0 0 0 1em;
-    background-color: white;
-    border: 1px solid #212121;
-    outline: none;
-    font-size: 1.0em;
-    cursor: pointer;
+div#container button{
     float: right;
-}
-
-button:hover{
-    background-color: #212121;
-    color: #fff;
 }
 
 div#media{

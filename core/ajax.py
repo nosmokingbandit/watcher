@@ -5,7 +5,8 @@ import os
 import sys
 import datetime
 import threading
-from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler
+import core
+from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler, version
 from core.movieinfo import Omdb
 from core.downloaders import sabnzbd, nzbget
 from core.rss import predb
@@ -242,3 +243,23 @@ class Ajax(object):
         elif mode == 'online':
             return str(cherrypy.engine.state)
 
+    def update_now(self, mode):
+        if mode == 'set_true':
+            core.UPDATING = True
+            yield 'true'
+        if mode == 'update_now':
+            update_status = version.Version().manager.execute_update()
+            core.UPDATING = False
+            if update_status == False:
+                logging.info('Update Failed.')
+                yield 'failed'
+            elif update_status == True:
+                print 'update status'
+                print update_status
+                yield 'true'
+                logging.info('Respawning process...')
+                cherrypy.engine.stop()
+                python = sys.executable
+                os.execl(python, python, * sys.argv)
+        else:
+            return

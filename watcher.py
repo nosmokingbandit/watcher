@@ -1,16 +1,18 @@
 import os
+import sys
 import cherrypy
 import datetime
-from core import poster, sqldb, config, ajax, api
+import core
+from core import poster, sqldb, config, ajax, api, version
 from core.scheduler import SchedulerPlugin
 from core.log import log
 import argparse, time
 from cherrypy.process.plugins import Daemonizer
 import webbrowser
-from templates import status, add_movie, settings, restart, shutdown
+from templates import status, add_movie, settings, restart, shutdown, update
 
-watcher_path = os.path.dirname(os.path.realpath(__file__))
-os.chdir(watcher_path)
+core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
+os.chdir(core.PROG_PATH)
 
 class App(object):
     @cherrypy.expose
@@ -74,6 +76,14 @@ class App(object):
     def test_downloader_connection(self, mode, data):
         return self.ajax.test_downloader_connection(mode, data)
 
+    @cherrypy.expose
+    def update_now(self, mode):
+        # this returns a generator that only contains the ajax response
+        response = self.ajax.update_now(mode)
+        for i in response:
+            print i
+            return i
+
 if __name__ == '__main__':
     # set up config file on first launch
     conf = config.Config()
@@ -81,7 +91,8 @@ if __name__ == '__main__':
         print 'Config file not found. Creating new basic config. Please review settings.'
         conf.new_config()
     else:
-        print 'Config file found.'
+        print 'Config file found, merging any new options.'
+        conf.merge_new_options()
 
     # set up logging
     log.start()
@@ -97,19 +108,17 @@ if __name__ == '__main__':
     else:
         logging.info('SQL DB found.')
 
-
-
-
     cherry_conf = {
         '/': {
             'tools.sessions.on': True,
-            'tools.staticdir.root': watcher_path
+            'tools.staticdir.root': core.PROG_PATH
         },
         '/static': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': './static'
         }
     }
+    cherrypy.config.update({'engine.autoreload.on': False})
 
     server_conf = conf['Server']
     conf_port = server_conf['serverport']
@@ -143,6 +152,7 @@ if __name__ == '__main__':
     root.settings = settings.Settings()
     root.restart = restart.Restart()
     root.shutdown = shutdown.Shutdown()
+    root.update = update.Update()
 
     if passed_args.daemon:
         Daemonizer(cherrypy.engine).subscribe()
@@ -159,7 +169,8 @@ if __name__ == '__main__':
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
     # have to do this for the daemon
-    os.chdir(watcher_path)
+    os.chdir(core.PROG_PATH)
     scheduler.subscribe()
     scheduler.start()
+
     cherrypy.engine.block()

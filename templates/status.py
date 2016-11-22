@@ -1,16 +1,22 @@
 from cherrypy import expose
 import dominate
 from dominate.tags import *
-from core import sqldb
+import core
+from core import sqldb, version, config
 from header import Header
+import datetime
 
 class Status():
 
     def __init__(self):
+        self.version = version.Version()
+        self.config = config.Config()
         return
 
     @expose
     def index(self):
+        self.update_check()
+
         doc = dominate.document(title='Watcher')
 
         with doc.head:
@@ -33,6 +39,28 @@ class Status():
                     with ul(id='movie_list'):
                         self.movie_list()
 
+            if core.UPDATE_STATUS != None:
+                print core.UPDATE_STATUS
+                if core.UPDATE_STATUS['status'] == 'behind':
+                    commit = 'commit'
+                    if core.UPDATE_STATUS['behind_count'] > 1:
+                        commit = 'commits'
+                    message = 'Update available. You are {} {} behind.'.format(core.UPDATE_STATUS['behind_count'], commit)
+                    href = '{}/compare/{}...{}'.format(core.GIT_URL, core.UPDATE_STATUS['local_hash'], core.UPDATE_STATUS['new_hash'])
+
+                    with div(id='update_footer'):
+                        with div(id='footer_container'):
+                            a(message, href=href, target='_blank')
+                            button('Update Now', id='update_now')
+
+                elif core.UPDATE_STATUS['status'] == 'error':
+                    message = 'Error checking for updates.'
+                    err = core.UPDATE_STATUS['error']
+
+                    with div(id='update_footer'):
+                        with div(id='footer_container'):
+                            span(message, cls='errormsg')
+                            span(err, cls='errormsg')
 
             div(id='overlay')
             div(id='status_pop_up')
@@ -71,3 +99,23 @@ class Status():
                         span(title_year, cls='title_year')
 
         return doc.render()
+
+    def update_check(self):
+        if self.config['Server']['checkupdates'] == 'false':
+            return None
+
+        now = datetime.datetime.now()
+        if core.UPDATE_LAST_CHECKED != None:
+            hours_since_last = (now - core.UPDATE_LAST_CHECKED).seconds / 3600
+            if hours_since_last >= int(self.config['Server']['checkupdatefrequency']):
+                core.UPDATE_LAST_CHECKED = now
+                return self.version.manager.update_check()
+            else:
+                return None
+        else:
+            # This will happen on first open of /status
+            core.UPDATE_LAST_CHECKED = now
+            return self.version.manager.update_check()
+
+
+

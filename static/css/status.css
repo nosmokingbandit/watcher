@@ -1,3 +1,19 @@
+button{
+    height: 2em;
+    line-height: 2em;
+    margin: 0 0 0 1em;
+    background-color: white;
+    border: 1px solid #212121;
+    outline: none;
+    font-size: 1.0em;
+    cursor: pointer;
+}
+
+button:hover{
+    background-color: #212121;
+    color: #fff;
+}
+
 ul#movie_list{
     list-style: none;
     clear: both;
@@ -90,6 +106,39 @@ ul#movie_list li span.title_year{
     display: block; /* needed for width */
     font-size: 16px;
     text-align: center;
+}
+
+
+div#update_footer{
+    background-color: #eee;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-top: 1px solid #bdbdbd;
+    clear: both;
+    height: 64px;
+
+}
+
+div#footer_container{
+    margin: 0 auto;
+    max-width: 1024px;
+    text-align: center;
+}
+
+div#footer_container span{
+    font-size: 1.5em;
+    line-height: 64px;
+}
+
+div#footer_container span.errormsg{
+    font-size: 1em;
+    line-height: 32px;
+    width: 100%;
+    display: block;
 }
 
 

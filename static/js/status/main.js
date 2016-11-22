@@ -19,4 +19,11 @@ $(document).ready(function() {
         /* Don"t ask me why slide Up slides it down. I give up. It works. That is all we need to know :) */
 
     });
+
+    $("button#update_now").click(function(){
+        $.post("/update_now", {"mode": "set_true"})
+        .done(function(){
+            window.location = "/update";
+        });
+    });
 });

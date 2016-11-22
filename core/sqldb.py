@@ -15,7 +15,7 @@ class SQL(object):
 
     def __init__(self):
         try:
-            self.engine = create_engine(DB_NAME, connect_args={'timeout': 15})
+            self.engine = create_engine(DB_NAME, connect_args={'timeout': 30})
             self.session = sessionmaker(bind = self.engine)
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -219,8 +219,6 @@ class SQL(object):
         else:
             return False
 
-
-
     def get_single_search_result(self, guid):
         logging.info('Retreving search result details for {}.'.format(guid))
 
@@ -238,10 +236,13 @@ class SQL(object):
         TABLE = self.tablename('SEARCHRESULTS')
         sess = self.session()
 
-        data = sess.query(TABLE).filter(TABLE.guid==guid).first().__dict__
-
+        data = sess.query(TABLE).filter(TABLE.guid==guid).first()
         sess.close()
-        return data['imdbid']
+        if data:
+            data = data.__dict__
+            return data['imdbid']
+        else:
+            return None
 
     # takes passed string and returns corresponding table object
     def tablename(self, TABLE):
@@ -255,7 +256,7 @@ class MOVIES(Base):
 
     __tablename__ = 'MOVIES'
 
-    imdbid = Column(Text, primary_key=True)
+    imdbid = Column(Text, primary_key=True, index=True)
     title = Column(Text)
     year = Column(Text)
     poster = Column(Text)
@@ -282,7 +283,7 @@ class SEARCHRESULTS(Base):
     indexer = Column(Text)
     date_found = Column(Text)
     info_link = Column(Text)
-    guid = Column(Text, primary_key=True)
+    guid = Column(Text, primary_key=True, index=True)
     resolution = Column(Text)
     type = Column(Text)
 
@@ -291,6 +292,6 @@ class MARKEDRESULTS(Base):
     __tablename__ = 'MARKEDRESULTS'
 
     imdbid = Column(Text)
-    guid = Column(Text, primary_key=True)
+    guid = Column(Text, primary_key=True, index=True)
     status = Column(Text)
 

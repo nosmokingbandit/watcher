@@ -241,15 +241,6 @@ class Settings():
                             br()
                             i('check_box_outline_blank', id='cleanupenabled', cls='material-icons toggle', value=c[c_s]['cleanupenabled'])
                             span('Clean up after move.')
-
-
-
-                    '''
-                    with li():
-                        i('check_box_outline_blank', id='cleanupenabled', cls='material-icons toggle', value='')
-                        span('Clean up after Rename.')
-                        span('Deletes all but movie file.', cls='tip')
-                    '''
                 p('Server')
                 c_s = 'Server'
                 with ul(id='server', cls='wide'):
@@ -266,6 +257,13 @@ class Settings():
                     with li(cls='bbord'):
                         i('check_box_outline_blank', id='launchbrowser', cls='material-icons toggle', value=c[c_s]['launchbrowser'])
                         span('Open browser on launch.')
+                    with li(cls='bbord'):
+                        i('check_box_outline_blank', id='checkupdates', cls='material-icons toggle', value=c[c_s]['checkupdates'])
+                        span('Check for updates.')
+                    with li(cls='bbord'):
+                        span('Check for updates every')
+                        input(type='number', id='keeplog', value=c[c_s]['checkupdatefrequency'], style='width: 3em')
+                        span(' hours.')
                     with li(cls='bbord'):
                         span('Keep ')
                         input(type='text', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')

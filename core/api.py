@@ -23,9 +23,15 @@ class API(object):
 
     def GET(self, params):
         serverkey = self.conf['Server']['apikey']
+
         params = parse_qs(params)
+        # parse_qs parses as {key:[val]}, so we 'de-list' the values
         for k, v in params.iteritems():
             params[k] = v[0]
+
+        # then we need to reconstruct the guid
+        if 'i' in params and 'r' in params:
+            params['guid'] = '{}&i={}&r={}'.format(params['guid'], params['i'], params['r'])
 
         if serverkey != params['apikey']:
             logging.warning('Invalid API key in request.')

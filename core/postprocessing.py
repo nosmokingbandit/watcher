@@ -23,23 +23,24 @@ class PostProcessing(object):
         ajax.Ajax().mark_bad(guid)
 
         imdbid = self.sql.get_imdbid_from_guid(guid)
-        logging.info('Post-processing {} as failed'.format(imdbid))
-        try:
-            if self.conf['Search']['autograb'] == 'true':
-                s = snatcher.Snatcher()
+        if imdbid:
+            logging.info('Post-processing {} as failed'.format(imdbid))
+            try:
+                if self.conf['Search']['autograb'] == 'true':
+                    s = snatcher.Snatcher()
 
-                if s.auto_grab(imdbid) == True:
-                    # This ulitmately goes to an ajax response, so we can't return a bool
-                    return 'Success'
+                    if s.auto_grab(imdbid) == True:
+                        # This ulitmately goes to an ajax response, so we can't return a bool
+                        return 'Success'
+                    else:
+                        logging.info('Setting status of {} back to Wanted.'.format(imdbid))
+                        self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid)
+                        return 'Success'
                 else:
-                    logging.info('Setting status of {} back to Wanted.'.format(imdbid))
-                    self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid)
                     return 'Success'
-            else:
-                return 'Success'
-        except Exception, e:
-            logging.error('Post-processing failed.', exc_info=True)
-            return 'Failed'
+            except Exception, e:
+                logging.error('Post-processing failed.', exc_info=True)
+                return 'Failed'
 
     def complete(self, guid, path):
         logging.info('Post-processing {} as complete.'.format(guid))

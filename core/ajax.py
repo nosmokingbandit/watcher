@@ -181,17 +181,20 @@ class Ajax(object):
                 logging.info('Setting {} back to {}.'.format(imdbid, moviestatus))
                 self.sql.update('MOVIES', 'status', moviestatus, imdbid= imdbid)
 
-        TABLE_NAME = 'MARKEDRESULTS'
-        if self.sql.row_exists(TABLE_NAME, guid=guid):
-            self.sql.update(TABLE_NAME, 'status', 'Bad', guid=guid)
-        else:
-            DB_STRING = {}
-            DB_STRING['imdbid'] = imdbid
-            DB_STRING['guid'] = guid
-            DB_STRING['status'] = 'Bad'
-            self.sql.write(TABLE_NAME, DB_STRING)
+            TABLE_NAME = 'MARKEDRESULTS'
+            if self.sql.row_exists(TABLE_NAME, guid=guid):
+                self.sql.update(TABLE_NAME, 'status', 'Bad', guid=guid)
+            else:
+                DB_STRING = {}
+                DB_STRING['imdbid'] = imdbid
+                DB_STRING['guid'] = guid
+                DB_STRING['status'] = 'Bad'
+                self.sql.write(TABLE_NAME, DB_STRING)
 
-        return 'Marked {} as Bad.'.format(guid)
+            return 'Marked {} as Bad.'.format(guid)
+
+        else:
+            return None
 
 
     def refresh_list(self, list, imdbid=''):

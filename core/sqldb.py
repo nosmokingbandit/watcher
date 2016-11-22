@@ -193,18 +193,17 @@ class SQL(object):
         return l
 
     # returns bool if item exists in table. Used to check if we need to write new or update existing row.
-    def row_exists(self, TABLE, imdbid='', guid=''):
-        logging.info('Checking if {} already exists in {}.'.format(id, TABLE))
+    def row_exists(self, TABLENAME, imdbid='', guid=''):
 
-        TABLE = self.tablename(TABLE)
+        TABLE = self.tablename(TABLENAME)
         sess = self.session()
 
         if imdbid:
-            logging.info('Checking if {} already exists in {}.'.format(imdbid, TABLE))
+            logging.info('Checking if {} already exists in {}.'.format(imdbid, TABLENAME))
             idcol = getattr(TABLE, 'imdbid')
             idval = imdbid
         elif guid:
-            logging.info('Checking if {} already exists in {}.'.format(guid, TABLE))
+            logging.info('Checking if {} already exists in {}.'.format(guid, TABLENAME))
             idcol = getattr(TABLE, 'guid')
             idval = guid
         else:

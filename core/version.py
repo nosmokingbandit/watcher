@@ -298,6 +298,7 @@ class ZipUpdater(object):
         os.chdir(core.PROG_PATH)
         update_zip = 'update.zip'
         update_path = 'update'
+        backup_path = os.path.join(update_path, 'backup')
         new_hash = self.get_newest_hash()
 
         logging.info('Updating from Zip file.')
@@ -308,8 +309,6 @@ class ZipUpdater(object):
                 os.remove(update_zip)
             elif os.path.isdir(update_path):
                 shutil.rmtree(update_path)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not delete old update files.', exc_info=True)
             return False
@@ -322,8 +321,6 @@ class ZipUpdater(object):
             zip_response = urllib2.urlopen(request).read()
             with open(update_zip, 'wb') as f:
                 f.write(zip_response)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not download latest Zip.', exc_info=True)
             return False
@@ -332,11 +329,24 @@ class ZipUpdater(object):
         try:
             with zipfile.ZipFile(update_zip) as f:
                  f.extractall(update_path)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not extract Zip.', exc_info=True)
             return False
+
+        logging.info('Backing up user files.')
+        try:
+            if os.path.isfile('watcher.sqlite'):
+                shutil.copy2('watcher.sqlite', backup_path)
+            if os.path.isfile('config.cfg'):
+                shutil.copy2('config.cfg', backup_path)
+            if os.path.path('logs'):
+                shutil.copytree('logs', backup_path)
+            posterpath = os.path.join('static', 'images', 'posters')
+            if os.path.ispath(posterpath):
+                shutil.copytree(posterpath, backup_path)
+            except Exception, e:
+                logging.error('Could not back up user files.', exc_info=True)
+                return False
 
         # reset update status so it doesn't ask us to update again
         core.UPDATE_STATUS = None
@@ -356,18 +366,30 @@ class ZipUpdater(object):
                 elif os.path.isdir(src):
                     shutil.rmtree(dst)
                     shutil.copytree(src, dst)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not move update files.', exc_info=True)
+            return False
+
+        logging.info('Restoring user files.')
+        try:
+            for file in backup_path:
+                src = os.path.join(backup_path, file)
+                dst = file
+
+                if os.path.isfile(src):
+                    os.remove(dst)
+                    shutil.copy2(src, dst)
+                elif os.path.isdir(src):
+                    shutil.rmtree(dst)
+                    shutil.copytree(src, dst)
+        except Exception, e:
+            logging.error('Could not restore user files.', exc_info=True)
             return False
 
         logging.info('Setting new version file.')
         try:
             with open(self.version_file, 'w') as f:
                     f.write(new_hash)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not update version file.', exc_info=True)
             return False
@@ -376,8 +398,6 @@ class ZipUpdater(object):
         try:
             shutil.rmtree(update_path)
             os.remove(update_zip)
-        except (SystemExit, KeyboardInterrupt):
-            raise
         except Exception, e:
             logging.error('Could not delete temporary files.', exc_info=True)
             return False

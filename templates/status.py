@@ -49,8 +49,9 @@ class Status():
 
                     with div(id='update_footer'):
                         with div(id='footer_container'):
-                            a(message, href=href, target='_blank')
-                            button('Update Now', id='update_now')
+                            with span(cls='updatemsg'):
+                                a(message, href=href, target='_blank')
+                                button('Update Now', id='update_now')
 
                 elif core.UPDATE_STATUS['status'] == 'error':
                     message = 'Error checking for updates.'
@@ -115,6 +116,3 @@ class Status():
             # This will happen on first open of /status
             core.UPDATE_LAST_CHECKED = now
             return self.version.manager.update_check()
-
-
-

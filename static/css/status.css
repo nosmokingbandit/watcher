@@ -129,8 +129,7 @@ div#footer_container{
     text-align: center;
 }
 
-div#footer_container span{
-    font-size: 1.5em;
+div#footer_container span.updatemsg{
     line-height: 64px;
 }
 

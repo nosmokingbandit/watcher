@@ -34,7 +34,7 @@ If you do not wish to use Git, follow these steps.
 
 You can add the following arguments to Watcher when running the Python script.
 
-`-d` Run the server as a daemon.
+`-d` Run the server as a daemon (only available for *nix based operating systems).
 
 `-a 0.0.0.0` Network address to bind to.
 

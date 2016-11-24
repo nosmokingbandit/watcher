@@ -344,9 +344,9 @@ class ZipUpdater(object):
             posterpath = os.path.join('static', 'images', 'posters')
             if os.path.ispath(posterpath):
                 shutil.copytree(posterpath, backup_path)
-            except Exception, e:
-                logging.error('Could not back up user files.', exc_info=True)
-                return False
+        except Exception, e:
+            logging.error('Could not back up user files.', exc_info=True)
+            return False
 
         # reset update status so it doesn't ask us to update again
         core.UPDATE_STATUS = None

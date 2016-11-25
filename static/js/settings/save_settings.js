@@ -134,9 +134,9 @@ $(document).ready(function () {
         var Postprocessing = {}
         Postprocessing['renamerenabled'] = $("i#renamerenabled").attr("value");
         Postprocessing['renamerstring'] = $("input#renamerstring").val();
-    Postprocessing['moverenabled'] = $("i#moverenabled").attr("value");
-    Postprocessing['moverpath'] = $("input#moverpath").val();
-    Postprocessing['cleanupenabled'] = $("i#cleanupenabled").attr("value");
+        Postprocessing['moverenabled'] = $("i#moverenabled").attr("value");
+        Postprocessing['moverpath'] = $("input#moverpath").val();
+        Postprocessing['cleanupenabled'] = $("i#cleanupenabled").attr("value");
 
         post_list["Postprocessing"] = Postprocessing;
 
@@ -162,13 +162,21 @@ $(document).ready(function () {
 
         .done(function(r) {
             if(r == 'failed'){
-                alert('Unable to save settings. Check log.')
+                alert('Unable to save settings. Check log for more information.')
             }
-            else if(r == 'change alert'){
-                alert('Search criteria has changed. Search is now running on all movies to update results.')
+            else if(r == 'success'){
+                alert('Settings saved.')
+            }
+            else if(r == 'purgefail'){
+                alert('Search criteria has changed, but old search results couldn not be removed. Check log for more information.')
             }
             else {
-                alert('Settings saved.')
+                var search_confirm = confirm("Search criteria has changed and search must run for all movies to update results. The next automatic update is scheduled for "+r+". Would you like to search all movies immediately?")
+
+            }
+
+            if(search_confirm == true){
+                $.post("/search_all", {})
             }
 
             $this.css('background-color', 'white');

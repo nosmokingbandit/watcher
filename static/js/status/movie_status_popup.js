@@ -18,7 +18,11 @@ $(document).ready(function() {
         if( confirm('Remove ' + title + '? \nThis will not remove any downloaded movies.')){
             var imdbid = $('span#title').attr('imdbid');
             $.post("/remove_movie", {"imdbid":imdbid})
-            .done(function(){
+            .done(function(r){
+                if(r == 'error'){
+                    alert(title + 'could not be removed. Check logs for more information.')
+                }
+
                 refresh_list('#movie_list');
                 $('div#status_pop_up').slideUp();
                 $('div#overlay').fadeOut();
@@ -72,10 +76,10 @@ $(document).ready(function() {
             var imdbid = $('span#title').attr('imdbid')
 
             $.post("/mark_bad", {"guid":guid})
-            .done(function(response){
+            .done(function(r){
                 refresh_list('#movie_list');
                 refresh_list('#result_list', imdbid=imdbid)
-                alert(response);
+                alert(r);
             });
         };
         e.preventDefault();

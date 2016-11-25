@@ -7,6 +7,7 @@ import datetime
 import threading
 import core
 from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler, version
+from core.conversions import Conversions
 from core.movieinfo import Omdb
 from core.downloaders import sabnzbd, nzbget
 from core.rss import predb
@@ -15,6 +16,9 @@ import logging
 logging = logging.getLogger(__name__)
 
 class Ajax(object):
+    '''
+    These are all the methods that handle ajax post/get requests from the browser.
+    '''
 
     def __init__(self):
         self.omdb = Omdb()
@@ -25,13 +29,15 @@ class Ajax(object):
         self.poster = poster.Poster()
         self.snatcher = snatcher.Snatcher()
 
-
     def search_omdb(self, search_term):
-
+        '''
+        Searches OMDB for the user-supplied term.
+        Returns a json string of a list of dicts that contain omdb's data.
+        '''
         results = self.omdb.search(search_term.replace(' ', '+'))
 
         if type(results) is str:
-            logging.info('No Reulst found for {}'.format(search_term))
+            logging.info('No Results found for {}'.format(search_term))
             return None
         else:
             for i in results:
@@ -42,37 +48,47 @@ class Ajax(object):
 
 
     def movie_info_popup(self, imdbid):
+        '''
+        Simply calls on the movie_info_popup template to contruct the html for this movie.
+        Returns html.
+        '''
         mip = movie_info_popup.MovieInfoPopup()
         return mip.html(imdbid)
 
 
     def movie_status_popup(self, imdbid):
-
+        '''
+        Simply calls on the movie_status_popup template to contruct the html for this movie.
+        Returns html.
+        '''
         msp = movie_status_popup.MovieStatusPopup()
         return msp.html(imdbid)
 
     def add_wanted_movie(self, data):
-
+        '''
+        Adds a movie to the Wanted list. Takes dict data and writes it to MOVIES table.
+        Will start an automatic search and snatch if the settings allow.
+        Returns a success/fail message.
+        '''
         def thread_search_grab(data):
             imdbid = data['imdbid']
             title = data['title']
             self.predb.check_one(data)
             if self.config['Search']['searchafteradd'] == 'true':
-                self.searcher.search(imdbid, title)
-                # if we don't need to wait to grab the movie do it now.
-                if self.config['Search']['autograb'] == 'true' and self.config['Search']['waitdays'] == '0':
-                    self.snatcher.auto_grab(imdbid)
+                if self.searcher.search(imdbid, title):
+                    # if we don't need to wait to grab the movie do it now.
+                    if self.config['Search']['autograb'] == 'true' and self.config['Search']['waitdays'] == '0':
+                        self.snatcher.auto_grab(imdbid)
 
-        TABLE_NAME = 'MOVIES'
+        TABLE = 'MOVIES'
 
         data = json.loads(data)
         imdbid = data['imdbid']
         title = data['title']
 
-
         title_year = (title + data['year']).replace(' ', '_')
 
-        if self.sql.row_exists(TABLE_NAME, imdbid=imdbid):
+        if self.sql.row_exists(TABLE, imdbid=imdbid):
             logging.info('{} already exists as a wanted movie'.format(title_year, imdbid))
             return '{} is already wanted, cannot add.'.format(title_year, imdbid)
 
@@ -80,20 +96,33 @@ class Ajax(object):
             data['status'] = 'Wanted'
             data['predb'] = 'None'
             DB_STRING = data
-            self.sql.write(TABLE_NAME, DB_STRING)
+            if self.sql.write(TABLE, DB_STRING):
 
-            t2 = threading.Thread(target=self.poster.save_poster, args=(imdbid, data['poster']))
-            t2.start()
+                t2 = threading.Thread(target=self.poster.save_poster, args=(imdbid, data['poster']))
+                t2.start()
 
-            t = threading.Thread(target=thread_search_grab, args=(data,))
-            t.start()
+                t = threading.Thread(target=thread_search_grab, args=(data,))
+                t.start()
 
-            return '{} {} added to wanted list.'.format(title, data['year'])
+                title = title.replace('_', ' ')
+                return '{} {} added to wanted list.'.format(title, data['year'])
+            else:
+                return 'Could not write to database. Check logs for more information.'
 
 
     def save_settings(self, data):
-        # this lets us know if the search criteria has changed so we can start a seach again right away
+        '''
+        Saves all of the user's settings.
+        If seach criteria has changed it purges all search results.
+        Returns 'failed', 'success'
+        OR if search criteria has changed:
+        'purgefailed' (if sql.purge_search_results fails) or the human-readable datetime of the next automatic search.
+        Alert messages are handled by the javascript.
+        '''
+
         def change_alert(data):
+            ##TODO should eventually add a check to ask the user if they want to restart.
+            # this lets us know if the search criteria has changed so we can start a seach again right away if the user wants.
             new_quality = data['Quality']
             new_filters = data['Filters']
 
@@ -122,8 +151,9 @@ class Ajax(object):
         try:
             self.config.write_dict(data)
             if change_alert:
-                self.search_all(purge=True)
-                return 'change alert'
+                if not self.sql.purge_search_results():
+                    return 'purgefailed'
+                return Conversions.human_datetime(core.NEXT_SEARCH)
             else:
                 return 'success'
 
@@ -134,41 +164,69 @@ class Ajax(object):
             return 'failed'
 
     def remove_movie(self, imdbid):
+        '''
+        Deletes a movie, its seach results, and poster.
+        On error returns 'error', which is then hanlded by the javascript.
+        '''
         t = threading.Thread(target=self.poster.remove_poster, args=(imdbid,))
         t.start()
 
-        self.sql.remove_movie(imdbid)
-        return
-
+        if self.sql.remove_movie(imdbid):
+            return
+        else:
+            return 'error'
 
     def search(self, imdbid, title):
-        if self.searcher.search(imdbid, title):
-            return 'DONE'
-        else:
-            return 'Nothing found. \nIf this is inaccurate please file a bug report.'
+        '''
+        Searches for a specific movie.
+        Returns 'done' when done.
+        '''
+        self.searcher.search(imdbid, title)
+        return 'done'
 
-    def search_all(self, purge=False):
+    def search_all(self):
+        '''
+        Runs a search for every movie in its own thread.
+        '''
+        def search_all_thread(self):
+            self.searcher.auto_search_and_grab(mode='all')
 
-        if purge == True:
-            self.sql.purge_search_results()
-
-        t = threading.Thread(target=self.searcher.auto_search_and_grab, kwargs=({'mode':'all'}))
+        t = threading.Thread(target=search_all_thread, args=(self,))
         t.start()
 
+        return
+
     def manual_download(self, guid):
+        '''
+        Sends a search result to the downloader when the user clicks the Download Now button.
+        Returns an error message if the sql query fails.
+        Returns the success/fail message from Snatcher.snatch()
+        '''
         data = self.sql.get_single_search_result(guid)
-        return self.snatcher.snatch(data)
+        if data:
+            return self.snatcher.snatch(data)
+        else:
+            return 'Unable to get download information from the database. Check logs for more information.'
 
     def mark_bad(self, guid):
+        '''
+        Marks a specific search result's guid as Bad.
+        Returns either a success or failure message.
+        '''
+        TABLE = 'SEARCHRESULTS'
+        logging.info('Marking {} as bad.'.format(guid))
 
-        TABLE_NAME = 'SEARCHRESULTS'
-        if self.sql.row_exists(TABLE_NAME, guid=guid):
+        if self.sql.row_exists(TABLE, guid=guid):
             logging.info('Setting status of {} to \'Bad\''.format(guid))
-            self.sql.update(TABLE_NAME, 'status', 'Bad', guid=guid)
+            if not self.sql.update(TABLE, 'status', 'Bad', guid=guid):
+                return 'Could not update {} to Bad. Check logs for more information.'.format(guid)
 
             # Check to see if all results are bad. If so change MOVIE back to Wanted
             imdbid = self.sql.get_imdbid_from_guid(guid)
-            statuses = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
+            if imdbid:
+                statuses = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
+                if not statuses:
+                    return 'Could not set Movie status. Check logs for more information.'.format()
 
             moviestatus = ''
             if 'Snatched' not in statuses and 'Finished' not in statuses:
@@ -179,26 +237,33 @@ class Ajax(object):
 
             if moviestatus:
                 logging.info('Setting {} back to {}.'.format(imdbid, moviestatus))
-                self.sql.update('MOVIES', 'status', moviestatus, imdbid= imdbid)
+                if not self.sql.update('MOVIES', 'status', moviestatus, imdbid= imdbid):
+                    return 'Could not update {} to {}. Check logs for more information.'.format(imdbid, moviestatus)
 
-            TABLE_NAME = 'MARKEDRESULTS'
-            if self.sql.row_exists(TABLE_NAME, guid=guid):
-                self.sql.update(TABLE_NAME, 'status', 'Bad', guid=guid)
+            TABLE = 'MARKEDRESULTS'
+            if self.sql.row_exists(TABLE, guid=guid):
+                if not self.sql.update(TABLE, 'status', 'Bad', guid=guid):
+                    return 'Could not update {} to Bad. Check logs for more information.'.format(guid)
             else:
                 DB_STRING = {}
                 DB_STRING['imdbid'] = imdbid
                 DB_STRING['guid'] = guid
                 DB_STRING['status'] = 'Bad'
-                self.sql.write(TABLE_NAME, DB_STRING)
-
-            return 'Marked {} as Bad.'.format(guid)
+                if self.sql.write(TABLE, DB_STRING):
+                    return 'Marked {} as Bad.'.format(guid)
+                else:
+                    return 'Could not add {} to {}. Check logs for more information.'.format(guid, TABLE)
 
         else:
-            return None
+            logging.info('Successfully marked {} as Bad.'.format(guid))
+            return 'Successfully marked {} as Bad.'.format(guid)
 
 
     def refresh_list(self, list, imdbid=''):
-    # re-renders html for lists in /status so it can be updated when something is searched for, marked bad, snatched, etc...
+        '''
+        Re-renders html for lists in /status so it can be updated when something is searched for, marked bad, snatched, etc...
+        Returns html.
+        '''
         if list == '#movie_list':
             return status.Status.movie_list()
         if list == '#result_list':
@@ -206,6 +271,9 @@ class Ajax(object):
 
 
     def test_downloader_connection(self, mode, data):
+        '''
+        This simply fires off the staticmethod test_connection for the downloader app and returns a success/failure message.
+        '''
         data = json.loads(data)
 
         if mode == 'sabnzbd':
@@ -221,10 +289,15 @@ class Ajax(object):
 
 
     def server_status(self, mode):
+        '''
+        This is a set of methods to test or set the server status.
+        The only one that returns a value is 'online' which sends the string ENGINE.started, ENGINE.stopped, etc.
+        '''
         def server_restart():
             cwd = os.getcwd()
             cherrypy.engine.restart()
             os.chdir(cwd) # again, for the daemon
+            return
 
         def server_shutdown():
             cherrypy.engine.stop()
@@ -234,15 +307,23 @@ class Ajax(object):
         if mode == 'restart':
             logging.info('Restarting Server...')
             threading.Timer(1, server_restart).start()
+            return
 
         elif mode == 'shutdown':
             logging.info('Shutting Down Server...')
             threading.Timer(1, server_shutdown ).start()
+            return
 
         elif mode == 'online':
             return str(cherrypy.engine.state)
 
+
     def update_now(self, mode):
+        '''
+        This sets us up to update. The mode='set_true' is sent when the user clicks the Update Now button.
+        Then when the update page loads it sends mode='update_now'.
+        This way if the user goes to the update page without first setting 'set_true' it will redirect them back to status.
+        '''
         if mode == 'set_true':
             core.UPDATING = True
             yield 'true'

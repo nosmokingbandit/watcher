@@ -27,8 +27,6 @@ class Omdb():
             logging.error('OMDB search.', exc_info=True)
             return 'Search Error.'
 
-
-
     def movie_info(self, imdbid):
 
         search_string = "http://www.omdbapi.com/?i={}&plot=short&tomatoes=true&r=json".format(imdbid)
@@ -52,8 +50,6 @@ class Omdb():
 
         results_lower = {k.lower(): v for k, v in data.iteritems()}
         return results_lower
-
-
 
 
 class Trailer():

@@ -39,17 +39,27 @@ class PreDB(object):
         if self.fuzzy_match(rss_titles, test):
             logging.info('{} {} found on predb.me.'.format(title, year))
             TABLE_NAME = 'MOVIES'
-            self.sql.update(TABLE_NAME, 'predb', 'found', imdbid=imdbid)
+            if self.sql.update(TABLE_NAME, 'predb', 'found', imdbid=imdbid):
+                return True
+            else:
+                return False
 
     def search_rss(self, title_year):
         search_term = title_year.replace(' ', '+').lower()
 
         search_string = 'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
         request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'})
-        results_xml = urllib2.urlopen(request).read()
 
-        items = self.parse_predb_xml(results_xml)
-        return items
+        try:
+            results_xml = urllib2.urlopen(request).read()
+            items = self.parse_predb_xml(results_xml)
+            return items
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e:
+            logging.error('PREDB search.', exc_info=True)
+            return None
+
 
     def parse_predb_xml(self, feed):
 

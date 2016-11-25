@@ -78,7 +78,7 @@ class NewzNab():
         d['guid'] = d['link']
         del d['link']
         d['score'] = 0
-
+        d['status'] = 'Available'
         return d
 
     def get_resolution(self, result):

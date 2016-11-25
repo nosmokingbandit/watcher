@@ -53,9 +53,11 @@ class Snatcher():
 
             if response['status'] == True:
                 # set status to snatched and add downloader id
-                self.update_status_snatched(guid, imdbid)
-                logging.info('Successfully sent {} to Sabnzbd.'.format(title))
-                return 'Successfully sent to Sabnzbd.'
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info('Successfully sent {} to Sabnzbd.'.format(title))
+                    return 'Successfully sent to Sabnzbd.'
+                else:
+                    return 'Error marking result as Snatched. Check logs for more information.'
             else:
                 logging.error('SABNZBD: {}'.format(response['status']))
                 return "SABNZBD: {}".format(response['status'])
@@ -66,9 +68,11 @@ class Snatcher():
             response = nzbget.Nzbget.add_nzb(data)
 
             if type(response) == int and response > 0:
-                self.update_status_snatched(guid, imdbid)
-                logging.info('Successfully sent {} to NzbGet.'.format(title))
-                return 'Successfully sent to NzbGet.'
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info('Successfully sent {} to NzbGet.'.format(title))
+                    return 'Successfully sent to NzbGet.'
+                else:
+                    return 'Error marking result as Snatched. Check logs for more information.'
             else:
                 logging.error('NZBGET: Error # {}'.format(response))
                 return "NZBGET: Error {}.".format(response)
@@ -78,27 +82,35 @@ class Snatcher():
         # set movie status snatched
         logging.info('Setting MOVIES {} status to Snatched.'.format(imdbid))
         if self.sql.row_exists('MOVIES', imdbid=imdbid):
-            self.sql.update('MOVIES', 'status', 'Snatched', imdbid=imdbid)
+            if not self.sql.update('MOVIES', 'status', 'Snatched', imdbid=imdbid):
+                return False
         else:
             logging.error('Attempting to snatch a movie that doesn\'t exist in table MOVIES. I don\'t know how this happened.'.format(imdbid))
+            return False
 
         # set search result to snatched
         logging.info('Setting SEARCHRESULTS {} to Snatched.'.format(guid))
         TABLE_NAME = 'SEARCHRESULTS'
         if self.sql.row_exists(TABLE_NAME, guid=guid):
-            self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid )
+            if not self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid ):
+                return False
         else:
             logging.error('Trying to set {} as snatched, but it doesn\'t exist in {}.'.format(guid, TABLE_NAME))
 
         TABLE_NAME = 'MARKEDRESULTS'
         if self.sql.row_exists(TABLE_NAME, guid=guid):
-            self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid )
+            if not self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid ):
+                return False
         else:
             DB_STRING = {}
             DB_STRING['imdbid'] = imdbid
             DB_STRING['guid'] = guid
             DB_STRING['status'] = 'Snatched'
-            self.sql.write(TABLE_NAME, DB_STRING)
+            if self.sql.write(TABLE_NAME, DB_STRING):
+                logging.info('Marked {} as Snatched'.format(guid))
+                return True
+            else:
+                return False
 
 
 

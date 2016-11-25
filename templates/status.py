@@ -70,7 +70,9 @@ class Status():
     @staticmethod
     def movie_list():
         movies = sqldb.SQL().get_user_movies()
-
+        if not movies:
+            html = 'Error retrieving list of user\'s movies. Check logs for more information'
+            return html
 
         doc = dominate.document(title='Watcher')
         with doc:
@@ -92,7 +94,6 @@ class Status():
                             span('Finished', cls='status finished')
                         else:
                             span('Status Unknown', cls='status wanted')
-                            print '**INFO: Status of {} is {}, we don\'t know what that means.'.format(data['imdbid'], data['status'])
 
                         img(src=poster_path, alt='Poster for {}'.format(data['imdbid']))
 

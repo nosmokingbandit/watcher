@@ -25,6 +25,8 @@ class Searcher():
         self.predb.check_all()
         logging.info('Running automatic search.')
         movies = self.sql.get_user_movies()
+        if not movies:
+            return False
         TABLE_NAME = 'MOVIES'
 
         for movie in movies:
@@ -40,8 +42,8 @@ class Searcher():
         if auto_grab == 'true':
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
-            logging.info('MOVIES:')
-            logging.info(movies)
+            if not movies:
+                return False
             for movie in movies:
                 if movie['status'] == 'Found':
                     logging.info('Running automatic snatcher for {}.'.format(movie['title']))
@@ -60,20 +62,25 @@ class Searcher():
 
         # sets result status based off marked results table
         marked_results =  self.sql.get_marked_results(imdbid)
-        for result in scored_results:
-            if result['guid'] in marked_results:
-                result['status'] = marked_results[result['guid']]
-            else:
-                result['status'] = 'Available'
+        if marked_results:
+            for result in scored_results:
+                if result['guid'] in marked_results:
+                    result['status'] = marked_results[result['guid']]
+
 
         if scored_results:
-            self.store_results(scored_results, imdbid)
-            return True
+            if self.store_results(scored_results, imdbid):
+                return True
+            else:
+                return False
         else:
             logging.info('No acceptable results found for {}.'.format(imdbid))
             logging.info('Updating {} {} status to wanted.'.format(TABLE_NAME, imdbid))
-            self.sql.update(TABLE_NAME, 'status', 'Wanted', imdbid=imdbid )
-            return False
+            if self.sql.update(TABLE_NAME, 'status', 'Wanted', imdbid=imdbid ):
+                return True
+            else:
+                return False
+
 
     def store_results(self, results, imdbid):
         TABLE_NAME = 'SEARCHRESULTS'
@@ -100,24 +107,35 @@ class Searcher():
                 BATCH_DB_STRING.append(DB_STRING)
 
         if BATCH_DB_STRING:
-            self.sql.write_search_results(BATCH_DB_STRING)
-
-        self.update_movie_status(imdbid)
+            if self.sql.write_search_results(BATCH_DB_STRING):
+                if self.update_movie_status(imdbid):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return True
 
     # Set MOVIE status to appropriate flag
     def update_movie_status(self, imdbid):
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
+        if not result_status:
+            return False
 
         if 'Finished' in result_status:
-            logging.info('Setting MOVIES {} status to Finished.'.format(imdbid))
-            self.sql.update('MOVIES', 'status', 'Finished', imdbid=imdbid )
+            status = 'Finished'
         if 'Snatched' in result_status:
-            logging.info('Setting MOVIES {} status to Snatched.'.format(imdbid))
-            self.sql.update('MOVIES', 'status', 'Snatched', imdbid=imdbid )
+            status = 'Snatched'
         elif 'Available' in result_status:
-            logging.info('Setting MOVIES {} status to Found.'.format(imdbid))
-            self.sql.update('MOVIES', 'status', 'Found', imdbid=imdbid )
+            status = 'Found'
         else:
-            logging.info('Setting MOVIES {} status to Wanted.'.format(imdbid))
-            self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid )
+            status = 'Wanted'
+
+        logging.info('Setting MOVIES {} status to {}.'.format(imdbid, status))
+        if self.sql.update('MOVIES', 'status', status, imdbid=imdbid ):
+            return True
+        else:
+            return False
+

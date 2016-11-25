@@ -42,6 +42,8 @@ class API(object):
         if params['mode'] == 'liststatus':
             logging.info('API request movie list.')
             movies = self.sql.get_user_movies()
+            if not movies:
+                return False
             l = []
             for movie in movies:
                 l.append(dict(movie))

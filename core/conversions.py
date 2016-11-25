@@ -1,3 +1,5 @@
+import datetime
+
 class Conversions():
 
     @staticmethod
@@ -17,3 +19,7 @@ class Conversions():
             if bytes < unit:
                 return (format + ' %s') % ((base * bytes / unit), s)
         return (format + ' %s') % ((base * bytes / unit), s)
+
+    @staticmethod
+    def human_datetime(dt):
+        return dt.strftime('%A, %b %d, at %H:%M')

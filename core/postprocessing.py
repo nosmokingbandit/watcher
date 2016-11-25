@@ -34,7 +34,8 @@ class PostProcessing(object):
                         return 'Success'
                     else:
                         logging.info('Setting status of {} back to Wanted.'.format(imdbid))
-                        self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid)
+                        if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
+                            return False
                         return 'Success'
                 else:
                     return 'Success'
@@ -48,7 +49,8 @@ class PostProcessing(object):
 
         if guid != 'None':
             imdbid = self.sql.get_imdbid_from_guid(guid)
-
+            if not imdbid:
+                imdbid = None
         movie_data = self.movie_data(imdbid, path)
 
         if self.pp_conf['renamerenabled'] == 'true':
@@ -68,17 +70,22 @@ class PostProcessing(object):
 
         imdbid = movie_data['imdbid']
         try:
-            self.sql.update('MOVIES', 'status', 'Finished', imdbid=imdbid)
-            self.sql.update('SEARCHRESULTS', 'status', 'Finished', guid=guid)
+            if not self.sql.update('MOVIES', 'status', 'Finished', imdbid=imdbid):
+                return False
+            if not self.sql.update('SEARCHRESULTS', 'status', 'Finished', guid=guid):
+                return False
             if self.sql.row_exists('MARKEDRESULTS', guid=guid) and guid != 'None':
-                self.sql.update('MARKEDRESULTS', 'status', 'Finished', guid=guid)
-            else:
-                imdbid = self.sql.get_imdbid_from_guid(guid)
-                DB_STRING = {}
-                DB_STRING['imdbid'] = imdbid
-                DB_STRING['guid'] = guid
-                DB_STRING['status'] = 'Snatched'
-                self.sql.write('MARKEDRESULTS', DB_STRING)
+                if not self.sql.update('MARKEDRESULTS', 'status', 'Finished', guid=guid):
+                    return False
+
+            imdbid = self.sql.get_imdbid_from_guid(guid)
+            DB_STRING = {}
+            DB_STRING['imdbid'] = imdbid
+            DB_STRING['guid'] = guid
+            DB_STRING['status'] = 'Snatched'
+            if not self.sql.write('MARKEDRESULTS', DB_STRING):
+                return 'Fail'
+
 
             logging.info('{} postprocessing finished.'.format(imdbid))
             return 'Success'
@@ -131,14 +138,14 @@ class PostProcessing(object):
         # if we know the imdbid we'll look it up.
         if imdbid:
             localdata = self.sql.get_movie_details(imdbid)
-            data.update(localdata)
+            if localdata:
+                data.update(localdata)
 
         # If we don't know the imdbid we'll look it up at ombd and add their info to the dict. This can happen if we are post-processing a movie that wasn't snatched by Watcher.
         else:
             title = data['title']
             year = data['year']
             search_string = 'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
-
 
             request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
 

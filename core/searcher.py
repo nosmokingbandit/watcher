@@ -83,7 +83,6 @@ class Searcher():
 
 
     def store_results(self, results, imdbid):
-        TABLE_NAME = 'SEARCHRESULTS'
 
         logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
 

@@ -114,7 +114,6 @@ class SQL(object):
 
     def write_search_results(self, LIST):
         logging.info('Writing batch into SEARCHRESULTS')
-        TABLE = 'SEARCHRESULTS'
 
         INSERT = self.SEARCHRESULTS.insert()
 

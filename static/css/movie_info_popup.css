@@ -74,6 +74,7 @@ div#media img#poster{
 
 iframe#trailer{
     float: right;
+    background: url('../images/logo_bg.png') no-repeat 50% 50% #eeeeee;
 }
 
 div#plot{

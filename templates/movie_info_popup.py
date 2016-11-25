@@ -16,7 +16,10 @@ class MovieInfoPopup():
         title_date = data['title'] + ' '+  data['year']
         imdbid = data['imdbid']
         youtube_id = trailer.get_trailer(title_date)
-        trailer_embed = "https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
+        if youtube_id:
+            trailer_embed = "https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
+        else:
+            trailer_embed = ''
         if data['poster'] == 'N/A':
             data['poster'] = 'images/missing_poster.jpg'
 

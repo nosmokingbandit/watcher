@@ -66,14 +66,16 @@ class Trailer():
 
         request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
 
-        try:
-            data = urllib2.urlopen(request)
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e:
-            logging.error('Tailer get_trailer.', exc_info=True)
-            raise
+        tries = 0
+        while tries < 3:
+            try:
+                data = urllib2.urlopen(request)
+                data = json.load(data)
+                return data['items'][0]['id']['videoId']
+            except (SystemExit, KeyboardInterrupt):
+                raise
+            except Exception, e:
+                logging.error('Tailer get_trailer.', exc_info=True)
+                tries += 1
+        return None
 
-        data = json.load(data)
-
-        return data['items'][0]['id']['videoId']

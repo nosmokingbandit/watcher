@@ -9,3 +9,6 @@ GIT_BRANCH = 'master'
 UPDATE_STATUS = None
 UPDATE_LAST_CHECKED = None
 UPDATING = False
+
+# Scheduler info
+NEXT_SEARCH = None

@@ -18,6 +18,8 @@ class PreDB(object):
 
         TABLE_NAME = 'MOVIES'
         movies = self.sql.get_user_movies()
+        if not movies:
+            return False
 
         for movie in movies:
             if movie['predb'] != 'found':

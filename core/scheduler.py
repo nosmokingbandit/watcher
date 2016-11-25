@@ -2,6 +2,7 @@ import cherrypy
 from datetime import datetime
 from datetime import timedelta
 from threading import Timer
+import core
 from core import config, searcher
 from cherrypy.process import plugins
 from log import log
@@ -70,10 +71,13 @@ class Task(object):
             next += timedelta(seconds=self.interval)
 
         self.delay = (next - now).seconds
+        core.NEXT_SEARCH = now + timedelta(0, self.delay)
         self.timer = Timer(self.delay, self.task)
 
     def task(self):
         self.func()
+        now = datetime.today().replace(second=0, microsecond=0)
+        core.NEXT_SEARCH = now + timedelta(0, self.interval)
         self.timer = Timer(self.interval, self.task)
         self.timer.start()
 

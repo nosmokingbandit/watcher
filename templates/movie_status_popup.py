@@ -1,6 +1,7 @@
 import dominate
 from dominate.tags import *
 import json
+import core
 from core import sqldb
 from core.conversions import Conversions
 
@@ -13,11 +14,11 @@ class MovieStatusPopup():
     def html(self, imdbid):
 
         data = self.sql.get_movie_details(imdbid)
+        if data:
+            poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
+            title_date = data['title'] + " " + str( data['year'] )
 
-        poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
-        title_date = data['title'] + " " + str( data['year'] )
-
-        tomatoes_url = data['tomatourl']
+            tomatoes_url = data['tomatourl']
 
         doc = dominate.document(title='Watcher')
 
@@ -27,6 +28,10 @@ class MovieStatusPopup():
 
         with doc:
             with div(id='container'):
+                if not data:
+                    span('Unable to get movie information from database. Check logs for more information.')
+                    return doc.render()
+
                 with div(id='title'):
                     with p():
                         span(title_date, id='title', imdbid=imdbid)
@@ -58,7 +63,7 @@ class MovieStatusPopup():
 
             if not results:
                 li('Nothing found yet.', cls='title bold')
-                li('Next search scheduled for:', cls='title')
+                li('Next automatic search scheduled for: {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
             else:
                 for idx, res in enumerate(results):
                     info_link = res['info_link']
@@ -103,11 +108,3 @@ class MovieStatusPopup():
                         span(pubdate, cls='bold')
 
         return doc.render()
-
-'''
-
-
-{""category"": ""Movie > HD"", ""status"": ""available"", ""description"": ""How To Train Your Dragon (2010) 1080P BluRay AAC2.0 X264"", ""pubDate"": ""Sat, 12 Sep 2015 01:13:31 -0400"", ""title"": ""How To Train Your Dragon (2010) 1080P BluRay AAC2.0 X264"", ""comments"": ""http://6box.me/details/5da3df44ad0f14e9369ae0cbb5ff1dbc#comments"", ""newznab_attr"": {""category"": ""2040"", ""guid"": ""5da3df44ad0f14e9369ae0cbb5ff1dbc"", ""size"": ""1699256560""}, ""link"": ""http://6box.me/getnzb/5da3df44ad0f14e9369ae0cbb5ff1dbc.nzb&i=8410&r=c73e2d449973cd0aca769007ce4d2b51"", ""indexer"": ""6box"", ""score"": 100009010, ""guid"": ""http://6box.me/details/5da3df44ad0f14e9369ae0cbb5ff1dbc""},
-
-
-'''

@@ -20,7 +20,7 @@ class Omdb():
             if results_json['Response'] == 'False':
                 return 'Nothing Found'
             else:
-                return results_json['Search']
+                return results_json['Search'][:6]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:

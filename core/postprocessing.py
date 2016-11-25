@@ -22,6 +22,14 @@ class PostProcessing(object):
 
         ajax.Ajax().mark_bad(guid)
 
+        if self.pp_conf['cleanupfailed'] == 'true':
+            logging.info('Deleting leftover files from failed download.')
+            if os.path.ispath(path):
+                try:
+                    shutil.rmtree(path)
+                except Exception, e:
+                    logging.error('Could not delete leftover failed files.', exc_info=True)
+
         imdbid = self.sql.get_imdbid_from_guid(guid)
         if imdbid:
             logging.info('Post-processing {} as failed'.format(imdbid))

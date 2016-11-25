@@ -213,6 +213,9 @@ class Settings():
                 c_s = 'Postprocessing'
                 with ul(id='postprocessing'):
                     with li():
+                        i('check_box_outline_blank', id='cleanupfailed', cls='material-icons toggle', value=c[c_s]['cleanupfailed'])
+                        span('Delete leftover files after a failed download.')
+                    with li():
                         i('check_box_outline_blank', id='renamerenabled', cls='material-icons toggle', value=c[c_s]['renamerenabled'])
                         span('Enable Renamer')
                     with ul(id='renamer'):

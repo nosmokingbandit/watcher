@@ -132,11 +132,12 @@ $(document).ready(function () {
 
         // POSTPROCESSING options
         var Postprocessing = {}
-        Postprocessing['renamerenabled'] = $("i#renamerenabled").attr("value");
-        Postprocessing['renamerstring'] = $("input#renamerstring").val();
-        Postprocessing['moverenabled'] = $("i#moverenabled").attr("value");
-        Postprocessing['moverpath'] = $("input#moverpath").val();
-        Postprocessing['cleanupenabled'] = $("i#cleanupenabled").attr("value");
+        $("ul#postprocessing li i.toggle").each(function(){
+            Postprocessing[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("ul#postprocessing li input").not("[type=button]").each(function(){
+            Postprocessing[$(this).attr("id")] = $(this).val();
+        });
 
         post_list["Postprocessing"] = Postprocessing;
 

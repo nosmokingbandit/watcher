@@ -265,7 +265,7 @@ class Settings():
                         span('Check for updates.')
                     with li(cls='bbord'):
                         span('Check for updates every')
-                        input(type='number', id='keeplog', value=c[c_s]['checkupdatefrequency'], style='width: 3em')
+                        input(type='number', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 3em')
                         span(' hours.')
                     with li(cls='bbord'):
                         span('Keep ')

@@ -139,7 +139,7 @@ class GitUpdater(object):
 
         if self.git_available[2] == 1:
             result['status'] = 'error'
-            result['error'] = self.git.available[0]
+            result['error'] = self.git_available[0]
             core.UPDATE_STATUS = result
             return result
 

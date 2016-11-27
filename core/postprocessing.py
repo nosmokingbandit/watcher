@@ -147,6 +147,8 @@ class PostProcessing(object):
         if imdbid:
             localdata = self.sql.get_movie_details(imdbid)
             if localdata:
+		# sqlalchemy adds an instance state to the results. We need to get rid of it.
+	    	del localdata['_sa_instance_state']
                 data.update(localdata)
 
         # If we don't know the imdbid we'll look it up at ombd and add their info to the dict. This can happen if we are post-processing a movie that wasn't snatched by Watcher.

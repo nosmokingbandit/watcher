@@ -2,6 +2,7 @@ import ConfigParser
 import random
 import shutil
 import os
+import core
 
 import logging
 logging = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ class Config():
         self.config = ConfigParser.ConfigParser()
         self.config.optionxform = str
 
-        self.file = 'config.cfg'
+        self.file = core.CONF_FILE
         self.base_file = 'core/base_config.cfg'
 
     def __getitem__(self, h):

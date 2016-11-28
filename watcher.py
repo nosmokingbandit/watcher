@@ -88,21 +88,32 @@ class App(object):
         return self.ajax.update_quality_settings(quality, imdbid)
 
 if __name__ == '__main__':
-    # set up config file on first launch
-
-    ## move conf file declaration to core.__init__, have argparser assign it.
-    conf = config.Config()
-    if not os.path.isfile('config.cfg'):
-        print 'Config file not found. Creating new basic config. Please review settings.'
-        conf.new_config()
-    else:
-        print 'Config file found, merging any new options.'
-        conf.merge_new_options()
-
     # set up logging
     log.start()
     import logging
     logging = logging.getLogger(__name__)
+
+    # parse user-passed arguments
+    parser = argparse.ArgumentParser(description="Watcher Server App")
+    parser.add_argument('-d','--daemon',help='Run the server as a daemon.', action='store_true')
+    parser.add_argument('-a','--bind-address',help='Network address to bind to.')
+    parser.add_argument('-p','--port',help='Port to bind to.', type=int)
+    parser.add_argument('-b','--browser', help='Open browser on launch.',action='store_true')
+    parser.add_argument('--conf', help='Location of config file.', type=str)
+    passed_args = parser.parse_args()
+
+
+    if passed_args.conf:
+        core.CONF_FILE = passed_args.conf
+
+    # set up config file on first launch
+    conf = config.Config()
+    if not os.path.isfile(core.CONF_FILE):
+        print 'Config file not found. Creating new basic config {}. Please review settings.'.format(core.CONF_FILE)
+        conf.new_config()
+    else:
+        print 'Config file found, merging any new options.'
+        conf.merge_new_options()
 
     # set up db on first launch
     sql = sqldb.SQL()
@@ -115,6 +126,24 @@ if __name__ == '__main__':
         print 'Database found, altering if necessary.'
         sql.add_new_columns()
     del sql
+
+    # Get server settings ready
+    server_conf = conf['Server']
+    conf_port = server_conf['serverport']
+    conf_host = server_conf['serverhost']
+    conf_browser = server_conf['launchbrowser']
+
+    if passed_args.bind_address:
+        core.SERVER_ADDRESS = passed_args.bind_address
+    else:
+        core.SERVER_ADDRESS = conf_host
+
+    if passed_args.port:
+        core.SERVER_PORT = passed_args.port
+    else:
+        core.SERVER_PORT = int(conf_port)
+
+    # Set up base cherrypy config
     cherry_conf = {
         '/': {
             'tools.sessions.on': True,
@@ -125,34 +154,22 @@ if __name__ == '__main__':
             'tools.staticdir.dir': './static'
         }
     }
-    cherrypy.config.update({'engine.autoreload.on': False})
 
-    server_conf = conf['Server']
-    conf_port = server_conf['serverport']
-    conf_host = server_conf['serverhost']
-    conf_browser = server_conf['launchbrowser']
-
-    parser = argparse.ArgumentParser(description="Watcher Server App")
-    parser.add_argument('-d','--daemon',help='Run the server as a daemon.',action='store_true')
-    parser.add_argument('-a','--bind-address',help='Network address to bind to.',default=conf_host)
-    parser.add_argument('-p','--port',help='Port to bind to.',default=conf_port, type=int)
-    parser.add_argument('-b','--browser', help='Open browser on launch.',action='store_true')
-    passed_args = parser.parse_args()
-
+    # update global cherrypy configs
     cherrypy.config.update({
-        'server.socket_host':passed_args.bind_address,
-        'server.socket_port':passed_args.port
+        'engine.autoreload.on': False,
+        'server.socket_host': core.SERVER_ADDRESS,
+        'server.socket_port': core.SERVER_PORT
     })
 
-    if passed_args.browser or conf_browser == True:
-        webbrowser.open( "http://{}:{}".format(passed_args.bind_address,passed_args.port) )
-        logging.info('Launching web browser.')
-
+    # enable all cherrypy logging
     cherrypy.log.error_log.propagate = True
     cherrypy.log.access_log.propagate = True
 
+    # start up scheduler plugin
     scheduler = SchedulerPlugin(cherrypy.engine)
 
+    # assign page urls
     root = App()
     root.add_movie = add_movie.AddMovie()
     root.status = status.Status()
@@ -161,9 +178,11 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
+    # daemonize if desired
     if passed_args.daemon:
         Daemonizer(cherrypy.engine).subscribe()
 
+    # mount applications
     cherrypy.tree.mount(root,
                         '/',
                         cherry_conf
@@ -173,6 +192,13 @@ if __name__ == '__main__':
                         '/api',
                         api.API.conf
                        )
+
+    # if everything goes well so far, open the browser
+    if passed_args.browser or conf_browser == True:
+        webbrowser.open( "http://{}:{}".format(core.SERVER_ADDRESS,core.SERVER_PORT) )
+        logging.info('Launching web browser.')
+
+
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
     # have to do this for the daemon

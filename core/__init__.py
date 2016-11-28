@@ -1,9 +1,14 @@
 # Paths to various things
-PROG_PATH = ''
+PROG_PATH = None
 GIT_URL = 'https://github.com/nosmokingbandit/watcher'
 GIT_REPO = 'https://github.com/nosmokingbandit/watcher.git'
 GIT_API = 'https://api.github.com/repos/nosmokingbandit/watcher'
 GIT_BRANCH = 'master'
+CONF_FILE = 'config.cfg'
+
+# Server settings
+SERVER_ADDRESS = None
+SERVER_PORT = None
 
 # Update info
 UPDATE_STATUS = None

@@ -42,6 +42,8 @@ You can add the following arguments to Watcher when running the Python script.
 
 `-b` Open browser on launch.
 
+`--conf config.conf` Path to config file.
+
 ## Post-Processing
 
 Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.

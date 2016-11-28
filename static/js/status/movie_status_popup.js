@@ -50,11 +50,6 @@ $(document).ready(function() {
         var title = $('span#title').text();
         var $this = $(this)
 
-        $this.css('background-color', '#212121');
-        $this.css('color', 'white');
-        $this.width($this.width());
-        $this.text('- - -');
-
         if( confirm('Remove ' + title + '? \nThis will not remove any downloaded movies.')){
             var imdbid = $('span#title').attr('imdbid');
             $.post("/remove_movie", {"imdbid":imdbid})

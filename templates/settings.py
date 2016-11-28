@@ -1,6 +1,7 @@
 from cherrypy import expose
 import dominate
 from dominate.tags import *
+import core
 from core import config
 from header import Header
 import os
@@ -101,6 +102,7 @@ class Settings():
                 p('Quality')
                 c_s = 'Quality'
                 resolutions = ['4K','1080P','720P','SD']
+                span('Quality and Filters may be set separately for each movie, this is the default settings.')
                 with ul(id='quality', cls='wide'):
                     # Resolution Block
                     with ul(id='resolution', cls='sortable'):
@@ -263,6 +265,8 @@ class Settings():
                     with li(cls='bbord'):
                         i('check_box_outline_blank', id='checkupdates', cls='material-icons toggle', value=c[c_s]['checkupdates'])
                         span('Check for updates.')
+                        with span('Current version hash: ', cls='tip'):
+                            a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
                     with li(cls='bbord'):
                         span('Check for updates every')
                         input(type='number', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 3em')

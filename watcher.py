@@ -137,6 +137,9 @@ if __name__ == '__main__':
     parser.add_argument('-a','--bind-address',help='Network address to bind to.',default=conf_host)
     parser.add_argument('-p','--port',help='Port to bind to.',default=conf_port, type=int)
     parser.add_argument('-b','--browser', help='Open browser on launch.',action='store_true')
+    #Does this make sense to you I am basing this of another repository and this is what seems to connect docker to volumes
+    parser.add_argument('--config', action='store', help='Settings file to load', default="config.cfg")
+    
     passed_args = parser.parse_args()
 
     cherrypy.config.update({

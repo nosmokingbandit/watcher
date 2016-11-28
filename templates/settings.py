@@ -102,7 +102,8 @@ class Settings():
                 p('Quality')
                 c_s = 'Quality'
                 resolutions = ['4K','1080P','720P','SD']
-                span('Quality and Filters may be set separately for each movie, this is the default settings.')
+                br()
+                span('Quality and Filters may be set separately for each movie, this is the default setting.')
                 with ul(id='quality', cls='wide'):
                     # Resolution Block
                     with ul(id='resolution', cls='sortable'):

@@ -2,7 +2,7 @@ import dominate
 from dominate.tags import *
 import json
 import core
-from core import sqldb
+from core import sqldb, config
 from core.conversions import Conversions
 
 
@@ -20,10 +20,13 @@ class MovieStatusPopup():
 
             tomatoes_url = data['tomatourl']
 
+        quality_settings = self.get_quality_settings(data)
+
         doc = dominate.document(title='Watcher')
 
         with doc.head:
             base(href="/static/")
+
             script(src='js/status/movie_status_popup.js')
 
         with doc:
@@ -35,8 +38,11 @@ class MovieStatusPopup():
                 with div(id='title'):
                     with p():
                         span(title_date, id='title', imdbid=imdbid)
-                        button('CLOSE', id='close')
-                        button('SEARCH NOW', id='search_now', imdbid=data['imdbid'], title=data['title'])
+                        i('close', cls='material-icons', id='close')
+                        i('search', cls='material-icons', id='search_now', imdbid=data['imdbid'], title=data['title'])
+                        i('delete_forever', cls='material-icons', id='remove')
+                        i('settings_applications', cls='material-icons', id='change_quality')
+                        i('playlist_add_check', cls='material-icons', id='save_quality')
                 with div(id='media'):
                     img(id='poster', src=poster_path)
                     with div(id='search_results'):
@@ -45,6 +51,43 @@ class MovieStatusPopup():
                              self.result_list(imdbid)
                         div(id='results_thinker')
 
+                        # Panel that swaps in with quality adjustments
+                        resolutions = ['4K','1080P','720P','SD']
+                        with ul(id='quality', cls='wide'):
+                            # Resolution Block
+                            with ul(id='resolution', cls='sortable'):
+                                span('Resolutions', cls='sub_cat not_sortable')
+
+                                for res in resolutions:
+                                    prior = '{}priority'.format(res)
+                                    with li(cls='rbord', id=prior, sort=quality_settings['Quality'][res][1]):
+                                        i('drag_handle', cls='material-icons')
+                                        i('check_box_outline_blank', id=res, cls='material-icons toggle', value=quality_settings['Quality'][res][0])
+                                        span(res)
+
+                            # Size restriction block
+                            with ul(id='resolution_size'):
+                                with li('Size Restrictions (MB)', cls='sub_cat'):
+
+                                    for res in resolutions:
+                                        min = '{}min'.format(res)
+                                        max = '{}max'.format(res)
+                                        with li():
+                                            span(res)
+                                            input(type='number', id=min, value=quality_settings['Quality'][res][2], min='0', style='width: 7.5em')
+                                            input(type='number', id=max, value=quality_settings['Quality'][res][3], min='0', style='width: 7.5em')
+
+                            with ul(id='filters', cls='wide'):
+                                with li(cls='bbord'):
+                                    span('Required words:')
+                                    input(type='text', id='requiredwords', value=quality_settings['Filters']['requiredwords'], style='width: 16em')
+                                with li(cls='bbord'):
+                                    span('Preferred words:')
+                                    input(type='text', id='preferredwords', value=quality_settings['Filters']['preferredwords'], style='width: 16em')
+                                with li():
+                                    span('Ignored words:')
+                                    input(type='text', id='ignoredwords', value=quality_settings['Filters']['ignoredwords'], style='width: 16em')
+
                 with div(id='plot'):
                     p(data['plot'])
                 with div(id='additional_info'):
@@ -52,7 +95,6 @@ class MovieStatusPopup():
                         span('Rotten Tomatoes Rating: {}'.format(data['tomatorating']) )
                     span('Theatrical Release Date: {}'.format(data['released']))
                     span('DVD Release Date: {}'.format(data['dvd']))
-                    button('REMOVE', id='remove')
 
         return doc.render()
 
@@ -108,3 +150,32 @@ class MovieStatusPopup():
                         span(pubdate, cls='bold')
 
         return doc.render()
+
+    def get_quality_settings(self, data):
+        '''
+        TAG REMOVE
+        Actually we want to modif this.
+        We will ALWAYS have quality data in the table, so no more getting quality from config
+        '''
+        if data['quality']:
+            quality = json.loads(data['quality'])
+        else:
+            self.config = config.Config()
+            quality = {}
+            quality['Quality'] = self.config['Quality']
+            quality['Filters'] = self.config['Filters']
+            for i in quality['Filters']:
+                quality['Filters'][i] = ','.join(quality['Filters'][i])
+        # converts comma delimited values into lists
+        for section in quality:
+            if section == 'Quality':
+                for key in quality[section]:
+                    value = quality[section][key]
+                    if ',' in value:
+                        quality[section][key] = value.split(',')
+            elif section == 'Filters':
+                for key in quality[section]:
+                    value = quality[section][key]
+                    if ',' in value:
+                        quality[section][key] = value.replace(',', ', ')
+        return quality

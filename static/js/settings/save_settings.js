@@ -168,17 +168,6 @@ $(document).ready(function () {
             else if(r == 'success'){
                 alert('Settings saved.')
             }
-            else if(r == 'purgefail'){
-                alert('Search criteria has changed, but old search results couldn not be removed. Check log for more information.')
-            }
-            else {
-                var search_confirm = confirm("Search criteria has changed and search must run for all movies to update results. The next automatic update is scheduled for "+r+". Would you like to search all movies immediately?")
-
-            }
-
-            if(search_confirm == true){
-                $.post("/search_all", {})
-            }
 
             $this.css('background-color', 'white');
             $this.css('color', '#212121');

@@ -110,6 +110,7 @@ $(document).ready(function () {
         })
     });
 
+    /* Generate new api key */
     $('i#generate_new_key').click(function(){
         var key = new_api_key(32);
         $('input#apikey').val(key);
@@ -124,7 +125,7 @@ $(document).ready(function () {
         return text;
     }
 
-    // shutdown/restart buttons
+    /* shutdown / restart */
 
     $('button#restart').click(function(){
         console.log('restarting');

@@ -83,8 +83,14 @@ class App(object):
         for i in response:
             return i
 
+    @cherrypy.expose
+    def update_quality_settings(self, quality, imdbid):
+        return self.ajax.update_quality_settings(quality, imdbid)
+
 if __name__ == '__main__':
     # set up config file on first launch
+
+    ## move conf file declaration to core.__init__, have argparser assign it.
     conf = config.Config()
     if not os.path.isfile('config.cfg'):
         print 'Config file not found. Creating new basic config. Please review settings.'
@@ -99,14 +105,16 @@ if __name__ == '__main__':
     logging = logging.getLogger(__name__)
 
     # set up db on first launch
+    sql = sqldb.SQL()
     if not os.path.isfile('watcher.sqlite'):
         logging.info('SQL DB not found. Creating.')
         sql = sqldb.SQL()
         sql.create_database()
-        del sql
     else:
         logging.info('SQL DB found.')
-
+        print 'Database found, altering if necessary.'
+        sql.add_new_columns()
+    del sql
     cherry_conf = {
         '/': {
             'tools.sessions.on': True,

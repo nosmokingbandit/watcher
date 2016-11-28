@@ -57,7 +57,7 @@ class Searcher():
         TABLE_NAME = 'MOVIES'
 
         newznab_results = self.nn.search_all(imdbid)
-        scored_results = self.score.score(newznab_results, title, 'nzb')
+        scored_results = self.score.score(newznab_results, imdbid, 'nzb')
         ## eventually add search for torrents
 
         # sets result status based off marked results table

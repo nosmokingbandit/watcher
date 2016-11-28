@@ -14,6 +14,16 @@ button:hover{
     color: #fff;
 }
 
+div#content{
+    margin: 0 0 64px 0; /* to clear update footer */
+}
+
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 ul#movie_list{
     list-style: none;
     clear: both;

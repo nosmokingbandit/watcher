@@ -12,7 +12,6 @@ import zipfile
 # get local hash  # git rev-parse HEAD
 # Hash history    # git rev-list @{u}
 
-
 import logging
 logging = logging.getLogger(__name__)
 
@@ -92,6 +91,7 @@ class GitUpdater(object):
 
         if self.git_available[2] == 0:
             self.current_hash = self.git.get_current_hash()
+            core.CURRENT_HASH = self.current_hash[0]
         return
 
     def check_git_available(self):
@@ -208,6 +208,8 @@ class ZipUpdater(object):
         If there is a version file in core we read the hash from it.
 
         If there is no version file then this is the first time Watcher is running. Since we don't know what version a zip from github is we'll just have to assume that it is the newest version for now.
+
+        Sets core.CURRENT_HASH so we can access it everywhere.
         '''
         if os.path.isfile(self.version_file):
             with open(self.version_file, 'r') as f:
@@ -218,7 +220,7 @@ class ZipUpdater(object):
             if hash:
                 with open(self.version_file, 'w') as f:
                     f.write(hash)
-
+        core.CURRENT_HASH = hash
         return hash
 
 

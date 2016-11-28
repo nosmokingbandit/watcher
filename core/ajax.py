@@ -114,49 +114,16 @@ class Ajax(object):
         '''
         Saves all of the user's settings.
         If seach criteria has changed it purges all search results.
-        Returns 'failed', 'success'
-        OR if search criteria has changed:
-        'purgefailed' (if sql.purge_search_results fails) or the human-readable datetime of the next automatic search.
+        Returns 'failed' or 'success'
         Alert messages are handled by the javascript.
         '''
-
-        def change_alert(data):
-            ##TODO should eventually add a check to ask the user if they want to restart.
-            # this lets us know if the search criteria has changed so we can start a seach again right away if the user wants.
-            new_quality = data['Quality']
-            new_filters = data['Filters']
-
-            old_quality = {}
-            for i in self.config['Quality']:
-                old_quality[i] = (',').join(self.config['Quality'][i])
-
-            for i in new_quality:
-                if new_quality[i] != old_quality[i]:
-                    return True
-
-            old_filters = {}
-            for i in self.config['Filters']:
-                old_filters[i] = (',').join(self.config['Filters'][i])
-
-            for i in new_filters:
-                if new_filters[i] != old_filters[i]:
-                    return True
-            return False
 
         logging.info('Saving settings.')
         data = json.loads(data)
 
-        change_alert = change_alert(data)
-
         try:
             self.config.write_dict(data)
-            if change_alert:
-                if not self.sql.purge_search_results():
-                    return 'purgefailed'
-                return Conversions.human_datetime(core.NEXT_SEARCH)
-            else:
-                return 'success'
-
+            return 'success'
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
@@ -341,3 +308,35 @@ class Ajax(object):
                 os.execl(python, python, * sys.argv)
         else:
             return
+
+    def update_quality_settings(self, quality, imdbid):
+        '''
+        This takes the information from /movie_status_popup's quality change dialog and update the database entry. quality is the json database string, and imdbid is the imdbid for the target movie.
+
+        Returns 'same' if there is no change (which the javascript ignores), returns the next automatic search time if the criteria has changed, or a failure message. Javascript constructs the alert message for the user if the results are changed.
+        '''
+
+        tabledata = self.sql.get_movie_details(imdbid)
+
+        if tabledata == False:
+            return 'Could not get existing information from sql table. Check logs for more information.'
+        else:
+            tabledata = tabledata['quality']
+
+        # check if we need to purge old results and alert the user.
+        if tabledata == quality:
+            return 'same'
+
+        else:
+            logging.info('Updating quality for {}.'.format(imdbid))
+            if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
+                return 'Could not save quality to database. Check logs for more information. '
+            else:
+                if not self.sql.purge_search_results(imdbid):
+                    return 'Search criteria has changed, but old search results could not be purged. Check logs for more information.'
+                if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
+                    return 'Search criteria has changed, old search results have been purged, but the movie status could not be set. Check logs for more information.'
+                else:
+                    return Conversions.human_datetime(core.NEXT_SEARCH)
+
+

@@ -37,7 +37,8 @@ class SQL(object):
                               Column('dvd', TEXT),
                               Column('rated', TEXT),
                               Column('status', TEXT),
-                              Column('predb', TEXT)
+                              Column('predb', TEXT),
+                              Column('quality', TEXT)
                              )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                      Column('score', SMALLINT),
@@ -52,8 +53,7 @@ class SQL(object):
                                      Column('info_link', TEXT),
                                      Column('guid', TEXT),
                                      Column('resolution', TEXT),
-                                     Column('type', TEXT),
-                                     Column('downloader_id', TEXT)
+                                     Column('type', TEXT)
                                     )
         self.MARKEDRESULTS = Table('MARKEDRESULTS', self.metadata,
                                      Column('imdbid', TEXT),
@@ -138,7 +138,10 @@ class SQL(object):
 
         logging.info('Updating {} to {} in {}.'.format(idval, VALUE, TABLE))
 
-        command = 'UPDATE {} SET {}="{}" WHERE {}="{}"'.format(TABLE, COLUMN, VALUE, idcol, idval)
+        sql = 'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
+        vals = (VALUE, idval)
+
+        command = [sql, vals]
 
         if self.execute(command):
             return True
@@ -309,3 +312,72 @@ class SQL(object):
             return imdbid.fetchone()[0]
         else:
             return False
+
+    '''
+    TAG REMOVE
+    These next methods are for adding columns to tables. It will run at program start.
+
+    _get_existing_columns gathers a dict of existing tables and columns:
+    {'TABLENAME': ['col1', 'col2', 'col3'], 'TABLENAME2': ['col1', 'col2', 'col3']}
+
+    _get_intended_schema gets a dict of tables, columns, and types that we want to have in the table:
+
+    {'TABLENAME': {'col1': 'TEXT', 'col2': 'SMALLINT', 'col3': 'TEXT'},'TABLENAME2': {'col1': 'TEXT', 'col2': 'SMALLINT', 'col3': 'TEXT'}}
+
+    Then we find what is in 'intended' that *isnt* in existing and add it.
+
+    This should be removed before going public. This is just for adding to the table schema on the fly while testing and adding features.
+
+    '''
+
+    def _get_existing_columns(self):
+        table_dict = {}
+
+        # get list of tables in db:
+        command = 'SELECT name FROM sqlite_master WHERE type="table"'
+        tables = self.execute(command)
+
+        if not tables:
+            return False
+
+        for i in tables:
+            i = i[0]
+            command = 'PRAGMA table_info({})'.format(i)
+            columns = self.execute(command)
+            if not columns:
+                return False
+            l = []
+            for col in columns:
+                l.append(col['name'])
+            table_dict[i] = l
+
+        return table_dict
+
+    def _get_intended_schema(self):
+        d = {}
+        for table in self.metadata.tables.keys():
+            selftable = getattr(self, table)
+            d2 = {}
+            for i in selftable.c:
+                d2[i.name] = str(i.type)
+            d[table] = d2
+        return d
+
+    def add_new_columns(self):
+        existing = self._get_existing_columns()
+        intended = self._get_intended_schema()
+
+        if not existing or not intended:
+            raise ValueError('Could not parse database schema.')
+
+        tables = existing.keys()
+
+        for TABLE in tables:
+            existing_columns = existing[TABLE]
+            intended_columns = intended[TABLE]
+            for i in intended_columns:
+                if i not in existing_columns:
+                    command = 'ALTER TABLE {} ADD COLUMN {} {}'.format(TABLE, i, intended_columns[i])
+                    if not self.execute(command):
+                        raise ValueError('Could not alter database. {}'.format(command))
+        return

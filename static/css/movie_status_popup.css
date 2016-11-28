@@ -1,9 +1,20 @@
-a{
-    text-decoration: none;
+i{
+    margin: 0 0.2em;
 }
 
 .bold{
     font-weight: bold;
+}
+
+input[type='checkbox']{
+    margin: 0;
+    padding: 0;
+}
+
+input[type="number"], input[type="text"]{
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
 }
 
 div#container input[type=checkbox]{
@@ -27,6 +38,7 @@ div#container{
     padding: 1em;
     max-width: 912px;
     margin: 0 auto;
+    overflow: hidden;
 }
 
 div#title p{
@@ -46,8 +58,12 @@ div#title span#title{
     max-width: 75%;
 }
 
-div#container button{
+div#title i{
     float: right;
+}
+
+i#save_quality{
+    display: none;
 }
 
 div#media{
@@ -65,16 +81,22 @@ div#search_results {
     float: right;
     width: 640px;
     height: 360px;
-    border: 1px solid #bdbdbd;
+    position: relative;
 }
 
 ul#result_list{
+    border: 1px solid #bdbdbd;
     list-style: none;
     padding: 0;
     margin: 0;
     font-size: .9em;
     overflow-y: scroll;
     height: 360px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 99%;
+    width: 100%;
 }
 
 ul#result_list li{
@@ -140,6 +162,62 @@ div#results_thinker{
     animation: sk-scaleout 1.0s infinite ease-in-out;
     border-radius: 50%;
 }
+
+/* Quality slide in panel */
+.material-icons, .icon-text {
+    vertical-align: middle;
+}
+
+ul#quality{
+    display: none;
+    position: absolute;
+    width: 640px;
+    height: 360px;
+    top: 0px;
+    left: 1em;
+    clear: none;
+}
+
+ul#quality i{
+    margin: 0 0 0 0;
+    height: 2.0em;
+}
+
+ul#quality li{
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+ul#quality li.rbord{
+    border-right: 1px solid #bdbdbd;
+}
+
+ul#quality .sub_cat{
+    line-height: 2.5em;
+}
+
+ul#resolution{
+    width: 30%;
+    margin: 0 5% 0 0;
+    float: left;
+}
+
+ul#resolution_size{
+    width: 65%;
+    float: right;
+}
+
+ul#resolution_size li span{
+    width: 3em;
+    display: inline-block;
+}
+
+
+ul#filters{
+    clear: both;
+    padding: 1em 0 0 0;
+}
+
 
 @-webkit-keyframes sk-scaleout {
     0% { -webkit-transform: scale(0) }

@@ -1,6 +1,7 @@
-from core import config
+from core import config, sqldb
 from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
+import json
 
 import logging
 logging = logging.getLogger(__name__)
@@ -8,15 +9,28 @@ logging = logging.getLogger(__name__)
 class ScoreResults():
 
     def __init__(self):
+        self.sql = sqldb.SQL()
+        self.config = config.Config()
         return
 
     # returns list of dictionary results after filtering and scoring
-    def score(self, results, title, type):
+    def score(self, results, imdbid, type):
+
         self.results = results
-        c = config.Config()
-        filters = c['Filters']
-        qualities = c['Quality']
-        retention = int(c['Search']['retention'])
+
+        tableresults = self.sql.get_movie_details(imdbid)
+
+        title = tableresults['title']
+
+        if tableresults['quality']:
+            quality_dict = json.loads(tableresults['quality'])
+            qualities = quality_dict['Quality']
+            filters = quality_dict['Filters']
+        else:
+            qualities = self.config['Quality']
+            filters = self.config['Filters']
+
+        retention = int(self.config['Search']['retention'])
         required = filters['requiredwords'].lower().split(',')
         preferred = filters['preferredwords'].lower().split(',')
         ignored = filters['ignoredwords'].lower().split(',')
@@ -30,12 +44,10 @@ class ScoreResults():
         self.fuzzy_title(title)
         self.score_preferred(preferred)
 
-
-
         return self.results
 
     def remove_ignored(self, words):
-        if words[0] == '':
+        if not words:
             return
         for word in words:
             if word == '':
@@ -44,7 +56,7 @@ class ScoreResults():
                 self.results = [r for r in self.results if word not in r['title'].lower()]
 
     def keep_required(self, words):
-        if words[0] == '':
+        if not words:
             return
         for word in words:
             if word == '':
@@ -67,7 +79,7 @@ class ScoreResults():
         self.results = l
 
     def score_preferred(self, words):
-        if words[0] == '':
+        if not words:
             return
         for word in words:
             if word == '':
@@ -83,7 +95,7 @@ class ScoreResults():
             title = title.replace(' ', '.').replace(':', '.').lower()
             test = result['title'].replace(' ', '.').lower()
             match = fuzz.partial_ratio(title, test)
-            if match > 50:
+            if match > 60:
                 result['score'] += (match / 20)
                 l.append(result)
         self.results = l

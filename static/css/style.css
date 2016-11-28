@@ -20,6 +20,18 @@ body {
     overflow-y: scroll;
 }
 
+a{
+    text-decoration: none;
+}
+
+i{
+    cursor: pointer;
+}
+
+button{
+    border-radius: 4px;
+}
+
 ::selection {
   background: #f4693b; /* WebKit/Blink Browsers */
 }

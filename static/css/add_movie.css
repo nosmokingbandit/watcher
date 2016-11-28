@@ -14,6 +14,7 @@ input#search_input{
     margin: 0;
     border-style: solid;
     border-color:  #212121;
+    background-color: #ffffff;
     border-width: 1px 0px 1px 1px;
     outline: none;
 }
@@ -49,10 +50,8 @@ button#search_button:hover{
 
 ul{
     list-style: none;
-    clear: both;
     padding: 0;
     margin: 0;
-
 }
 
 ul#movie_list{

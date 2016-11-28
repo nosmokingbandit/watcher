@@ -1,18 +1,12 @@
-input[type=checkbox]{
-    background-color: aqua;
-    border: 1px solid #bdbdbd;
-    height: 1.5em;
-    width: 1.5em;
+input[type='checkbox']{
     margin: 0;
     padding: 0;
-    vertical-align: middle;
 }
 
-input[type=checkbox]:after {
-    content: " ";
-    background-color: #9FFF9D;
-    display: inline-block;
-    visibility: visible;
+input[type="number"], input[type="text"]{
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
 }
 
 div#container{
@@ -37,7 +31,7 @@ div#title span#title{
     text-overflow: ellipsis;
 }
 
-div#title p button{
+div#title p i{
     float: right;
 }
 
@@ -57,7 +51,7 @@ button:hover{
     color: #fff;
 }
 
-button#submit{
+i#button_submit{
     display: none;
 }
 
@@ -72,11 +66,80 @@ div#media img#poster{
     max-width: 255px;
 }
 
-iframe#trailer{
+div#trailer_container{
     float: right;
+    position: relative;
+
+}
+
+iframe#trailer{
+    position: absolute;
+    top: 0px;
+    right: 0px;
     background: url('../images/logo_bg.png') no-repeat 50% 50% #eeeeee;
 }
 
+/* Quality slide in panel */
+i{
+    margin: 0 0 0 0;
+    height: 2.0em;
+}
+
+.material-icons, .icon-text {
+    vertical-align: middle;
+}
+
+ul#quality{
+    position: absolute;
+    width: 640px;
+    height: 360px;
+    top: 0px;
+    right: 0px;
+    display: none;
+    clear: none;
+}
+ul#quality li{
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+ul#quality li.rbord{
+    border-right: 1px solid #bdbdbd;
+}
+
+ul#quality .sub_cat{
+    line-height: 2.5em;
+}
+
+ul#resolution{
+    width: 30%;
+    margin: 0 5% 0 0;
+    float: left;
+}
+
+ul#resolution_size{
+    width: 65%;
+    float: right;
+}
+
+ul#resolution_size li span{
+    width: 3em;
+    display: inline-block;
+}
+
+
+ul#filters{
+    clear: both;
+    padding: 1em 0 0 0;
+}
+
+
+
+div.hidden_data{
+    display: none;
+}
+
+/* Bottom row info */
 div#plot{
 }
 

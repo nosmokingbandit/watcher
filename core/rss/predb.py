@@ -36,6 +36,9 @@ class PreDB(object):
 
         rss_titles = self.search_rss(title_year)
 
+        if not rss_titles:
+            return False
+
         test = title_year.replace(' ', '.').lower()
 
         if self.fuzzy_match(rss_titles, test):

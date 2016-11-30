@@ -38,6 +38,7 @@ div#title span#title{
 
 div#title i{
     float: right;
+    margin-left: 0.5em;
 }
 
 i#save_quality{

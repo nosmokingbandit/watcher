@@ -88,10 +88,6 @@ class App(object):
         return self.ajax.update_quality_settings(quality, imdbid)
 
 if __name__ == '__main__':
-    # set up logging
-    log.start()
-    import logging
-    logging = logging.getLogger(__name__)
 
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")
@@ -114,6 +110,11 @@ if __name__ == '__main__':
     else:
         print 'Config file found, merging any new options.'
         conf.merge_new_options()
+
+    # set up logging now that the config is ready
+    log.start()
+    import logging
+    logging = logging.getLogger(__name__)
 
     # set up db on first launch
     sql = sqldb.SQL()

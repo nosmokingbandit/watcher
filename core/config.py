@@ -34,7 +34,7 @@ class Config():
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error('Moving base_config.', exc_info=True)
+            print 'Could not move base_config.'
             raise
 
         self.config.readfp(open(self.file))

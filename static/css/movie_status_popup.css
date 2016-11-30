@@ -1,37 +1,15 @@
 i{
-    margin: 0 0.2em;
+    font-size: 1.5em;
 }
 
 .bold{
     font-weight: bold;
 }
 
-input[type='checkbox']{
-    margin: 0;
-    padding: 0;
-}
-
 input[type="number"], input[type="text"]{
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
-}
-
-div#container input[type=checkbox]{
-    background-color: aqua;
-    border: 1px solid #bdbdbd;
-    height: 1.5em;
-    width: 1.5em;
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-}
-
-div#container input[type=checkbox]:after {
-    content: " ";
-    background-color: #9FFF9D;
-    display: inline-block;
-    visibility: visible;
 }
 
 div#container{
@@ -55,7 +33,7 @@ div#title span#title{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 75%;
+    max-width: 80%;
 }
 
 div#title i{
@@ -123,11 +101,10 @@ ul#result_list li span.buttons{
 }
 
 ul#result_list li i{
-    margin: 0;
+    margin: 0 0 0 .25em;
     padding: 0;
-    cursor: pointer;
-    vertical-align: middle;
-    font-size: 1.25em;
+    width: 1em;
+    font-size: 1em;
 }
 
 ul#result_list li.data{
@@ -164,10 +141,6 @@ div#results_thinker{
 }
 
 /* Quality slide in panel */
-.material-icons, .icon-text {
-    vertical-align: middle;
-}
-
 ul#quality{
     display: none;
     position: absolute;
@@ -176,11 +149,6 @@ ul#quality{
     top: 0px;
     left: 1em;
     clear: none;
-}
-
-ul#quality i{
-    margin: 0 0 0 0;
-    height: 2.0em;
 }
 
 ul#quality li{

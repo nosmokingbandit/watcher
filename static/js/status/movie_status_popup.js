@@ -18,22 +18,25 @@ $(document).ready(function() {
     });
 
     /* set default state for pseudo checkboxes */
-    $('i.toggle').each(function(){
+    $('i.checkbox').each(function(){
        if ( $(this).attr("value") == "true" ){
-           $(this).text('check_box');
+           $(this).removeClass('fa-square-o')
+           $(this).addClass('fa-check-square-o');
        }
     });
 
     /* toggle check box status */
-    $('i.toggle').click(function(){
+    $('i.checkbox').click(function(){
         // turn on
         if( $(this).attr("value") == "false" ){
             $(this).attr("value", "true");
-            $(this).text('check_box');
+            $(this).removeClass('fa-square-o');
+            $(this).addClass('fa-check-square-o');
         // turn off
         } else if ( $(this).attr("value") == "true" ){
             $(this).attr("value", "false");
-            $(this).text('check_box_outline_blank');
+            $(this).removeClass('fa-check-square-o')
+            $(this).addClass('fa-square-o');
         }
     });
 
@@ -50,30 +53,39 @@ $(document).ready(function() {
         var title = $('span#title').text();
         var $this = $(this)
 
-        if( confirm('Remove ' + title + '? \nThis will not remove any downloaded movies.')){
+        swal({
+            title: "Remove " + title +"?",
+            text: "This will not remove any downloaded movies.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#F44336",
+            confirmButtonText: "Remove It",
+            closeOnConfirm: false
+        }, function(){
             var imdbid = $('span#title').attr('imdbid');
             $.post("/remove_movie", {"imdbid":imdbid})
             .done(function(r){
-                if(r == 'error'){
-                    alert(title + 'could not be removed. Check logs for more information.')
+                if(r == "error"){
+                    var message = title + ' could not be removed. Check logs for more information.';
+                    swal("Error", message, "error");
+                } else {
+                    swal.close();
+                    refresh_list('#movie_list');
+                    $('div#status_pop_up').slideUp();
+                    $('div#overlay').fadeOut();
                 }
-
-                refresh_list('#movie_list');
-                $('div#status_pop_up').slideUp();
-                $('div#overlay').fadeOut();
             });
-            e.preventDefault();
-        } else {
-            return
-        }
+        });
     });
 
     $('i#search_now').click(function(e) {
-        var imdbid = $(this).attr('imdbid');
-        var title = $(this).attr('title');
+        var $this = $(this);
+        var imdbid = $this.attr('imdbid');
+        var title = $this.attr('title');
 
         $('ul#result_list').hide();
         $('div#results_thinker').show();
+        $this.addClass('fa-circle-o-notch fa-spin');
 
         $.post("/search", {"imdbid":imdbid, "title":title})
         .done(function(r){
@@ -81,6 +93,8 @@ $(document).ready(function() {
             refresh_list('#movie_list')
 
             $('div#results_thinker').hide();
+            $this.removeClass('fa-circle-o-notch fa-spin');
+
         });
         e.preventDefault();
     });
@@ -95,19 +109,22 @@ $(document).ready(function() {
 
     $('i#save_quality').click(function(){
         $this = $(this);
+        $this.addClass('fa-circle-o-notch fa-spin');
 
         /* gather information */
-        quality_dict = {}
+        var quality_dict = {}
         // QUALITY options. This has a lot of data, so this wil get messy.
         var Quality = {},
             tmp = {};
         var q_list = []
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             q_list.push( $(this).attr("id") );
         });
 
+        console.log(q_list);
+
         // enabled resolutions
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
         });
         // order of resolutions
@@ -127,6 +144,7 @@ $(document).ready(function() {
                 min = v + "min",
                 max = v + "max";
             var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
+            console.log(dt);
             Quality[v] = dt.join();
         });
 
@@ -140,17 +158,17 @@ $(document).ready(function() {
         });
         quality_dict["Filters"] = Filters;
 
-        quality = JSON.stringify(quality_dict);
+        var quality_dict = JSON.stringify(quality_dict);
 
-        var imdbid = $('span#title').attr('imdbid')
-        var title = $('i#search_now').attr('title')
+        var imdbid = $('span#title').attr('imdbid');
+        var title = $('i#search_now').attr('title');
 
-        $.post("/update_quality_settings", {"quality": quality, "imdbid": imdbid})
+        console.log(quality_dict);
+        $.post("/update_quality_settings", {"quality": quality_dict, "imdbid": imdbid})
         .done(function(r){
-            $this.hide();
 
             if(r == 'same'){
-                console.log(r);
+                //do nothing
             }
             // if criteria has changed we get passed a time
             else if(r.includes(':')){
@@ -158,19 +176,29 @@ $(document).ready(function() {
                 refresh_list('#result_list', imdbid=imdbid);
                 refresh_list('#movie_list');
 
-                var search_confirm = confirm("Search criteria has changed and search must run to update search results. The next automatic search is scheduled for "+r+". Would you like to search immediately?")
-
-                if(search_confirm == true){
+                swal({
+                    title: "Search Now?",
+                    text: "Search criteria has changed and search must run to update results. <br/> The next automatic search is scheduled for "+r+". Would you like to search immediately?",
+                    html: true,
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: "Wait",
+                    confirmButtonColor: "#F44336",
+                    confirmButtonText: "Search Now",
+                    closeOnConfirm: true
+                }, function(){
                     $.post("/search", {"imdbid": imdbid, "title":title})
-                }
+                })
             }
             // if we get an error message
             else{
                 refresh_list('#result_list', imdbid=imdbid);
                 refresh_list('#movie_list');
-
-                alert(r);
+                swal("Error", r, "error");
             }
+
+            $this.removeClass('fa-circle-o-notch fa-spin');
+            $this.hide();
 
             $('i#change_quality').show();
             $('ul#result_list').fadeIn();
@@ -182,7 +210,7 @@ $(document).ready(function() {
 
 
 /* search result actions */
-    $('ul#result_list').on('click', 'i.manual_download', function(e){
+    $('ul#result_list').on('click', 'i#manual_download', function(e){
         var $this = $(this);
         var download = $this.attr('download');
         var type = $this.attr('type');
@@ -190,31 +218,48 @@ $(document).ready(function() {
         var title = $this.attr('title');
         var imdbid = $('span#title').attr('imdbid')
 
+        $this.addClass('fa-circle-o-notch fa-spin');
+
         $.post("/manual_download", {"guid":guid})
         .done(function(r){
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
-            alert(r);
+            swal("", r, "success");
+            $this.removeClass('fa-square fa-spin');
         });
         e.preventDefault();
     });
 
-    $('ul#result_list').on('click', 'i.mark_bad', function(e) {
+    $('ul#result_list').on('click', 'i#mark_bad', function(e) {
         var $this = $(this);
 
-        if( confirm('Mark result as Bad?')){
+        swal({
+            title: "Mark result as Bad?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#F44336",
+            confirmButtonText: "Mark Bad",
+            closeOnConfirm: false
+            }, function(){
+                $this.addClass('fa-circle-o-notch fa-spin');
+                var guid = $this.attr('guid');
+                var imdbid = $('span#title').attr('imdbid')
 
-            var guid = $this.attr('guid');
-            var imdbid = $('span#title').attr('imdbid')
-
-            $.post("/mark_bad", {"guid":guid})
-            .done(function(r){
-                refresh_list('#movie_list');
-                refresh_list('#result_list', imdbid=imdbid)
-                alert(r);
-            });
-        };
-        e.preventDefault();
+                $.post("/mark_bad", {"guid":guid})
+                .done(function(r){
+                    refresh_list('#movie_list');
+                    refresh_list('#result_list', imdbid=imdbid);
+                    console.log(r);
+                    if (r.includes("Success")){
+                        swal("", r, "success");
+                    } else {
+                        swal("", r, "error");
+                    };
+                    $this.removeClass('fa-circle-o-notch fa-spin');
+                });
+            }
+        );
     });
 
     function refresh_list(list, imdbid = ''){

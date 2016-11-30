@@ -18,22 +18,25 @@ $(document).ready(function() {
     });
 
     /* set default state for pseudo checkboxes */
-    $('i.toggle').each(function(){
+    $('i.checkbox').each(function(){
        if ( $(this).attr("value") == "true" ){
-           $(this).text('check_box');
+           $(this).removeClass('fa-square-o');
+           $(this).addClass('fa-check-square-o');
        }
     });
 
     /* toggle check box status */
-    $('i.toggle').click(function(){
+    $('i.checkbox').click(function(){
         // turn on
         if( $(this).attr("value") == "false" ){
             $(this).attr("value", "true");
-            $(this).text('check_box');
+            $(this).removeClass('fa-square-o');
+            $(this).addClass('fa-check-square-o');
         // turn off
         } else if ( $(this).attr("value") == "true" ){
             $(this).attr("value", "false");
-            $(this).text('check_box_outline_blank');
+            $(this).removeClass('fa-check-square-o');
+            $(this).addClass('fa-square-o');
         }
     });
 
@@ -42,10 +45,9 @@ $(document).ready(function() {
         $this = $(this);
         $this.hide()
 
-
-        $('iframe').slideUp();
-        $('ul#quality').slideDown();
-        $('i#button_submit').show()
+        $('iframe').fadeOut();
+        $('ul#quality').fadeIn();
+        $('i#button_submit').show();
         e.preventDefault();
     });
 
@@ -56,12 +58,12 @@ $(document).ready(function() {
         var Quality = {},
             tmp = {};
         var q_list = []
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             q_list.push( $(this).attr("id") );
         });
 
         // enabled resolutions
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
         });
         // order of resolutions
@@ -105,10 +107,15 @@ $(document).ready(function() {
 
         $.post("/add_wanted_movie", {"data": data})
         .done(function(r){
-            alert(r);
-            $this.css('background-color', 'white');
-            $this.css('color', '#212121');
-            $this.text('Add');
+
+            if(r.includes('added')){
+                swal("", r, 'success');
+            } else {
+                swal("", r, 'error');
+            };
+            $('i#button_submit').hide();
+            $('iframe').fadeIn();
+            $('ul#quality').fadeOut();
 
         });
 

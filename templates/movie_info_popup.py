@@ -55,10 +55,8 @@ class MovieInfoPopup():
                 with div(id='title'):
                     with p():
                         span(title_date, id='title')
-                        #button('ADD', id='button_add', imdbid=imdbid)
-                        i('add', cls='material-icons', id='button_add')
-                        #button('SUBMIT', id='button_submit', imdbid=imdbid)
-                        i('playlist_add_check', cls='material-icons', id='button_submit', imdbid=imdbid)
+                        i(cls='fa fa-plus', id='button_add')
+                        i(cls='fa fa-floppy-o', id='button_submit', imdbid=imdbid)
                 with div(id='media'):
                     img(id='poster', src=data['poster'])
                     with div(id='trailer_container'):
@@ -74,8 +72,8 @@ class MovieInfoPopup():
                                 for res in resolutions:
                                     prior = '{}priority'.format(res)
                                     with li(cls='rbord', id=prior, sort=self.c['Quality'][res][1]):
-                                        i('drag_handle', cls='material-icons')
-                                        i('check_box_outline_blank', id=res, cls='material-icons toggle', value=self.c['Quality'][res][0])
+                                        i(cls='fa fa-bars')
+                                        i(id=res, cls='fa fa-square-o checkbox', value=self.c['Quality'][res][0])
                                         span(res)
 
                             # Size restriction block

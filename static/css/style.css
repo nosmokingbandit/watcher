@@ -1,5 +1,4 @@
 @import url("header.css");
-@import url("../font/material-icons.css");
 
 html{
     padding-bottom: 3em;
@@ -26,6 +25,7 @@ a{
 
 i{
     cursor: pointer;
+    vertical-align: middle;
 }
 
 button{

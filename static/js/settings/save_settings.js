@@ -2,6 +2,11 @@ $(document).ready(function () {
 
 /* grab all settings and write them to the config writer */
     $("button#save_settings").click(function(e){
+        $this = $(this);
+        $this.css('background-color', '#212121');
+        $this.css('color', 'white');
+        $this.width('2.5em');
+        $this.text('').addClass('fa-circle-o-notch fa-spin');
 
         //check if only one downloader is active:
         var enabled = 0
@@ -13,15 +18,9 @@ $(document).ready(function () {
         });
 
         if(enabled > 1){
-            alert('Please enable only one downloader.')
+            swal("", "Please enable only one downloader.", "warning");
             return
         }
-
-        $this = $(this);
-        $this.css('background-color', '#212121');
-        $this.css('color', 'white');
-        $this.width($this.width());
-        $this.text('- - -');
 
         var post_list = {};
 
@@ -48,7 +47,7 @@ $(document).ready(function () {
 
                 // check if one field is blank and both are not blank
                 if ( (url == "" || api == "") && (url + api !=="") ){
-                    alert("Please complete or clear out incomplete providers.");
+                    swal("", "Please complete or clear out incomplete providers.", "warning");
                     Indexers = {}
                     return
                 }
@@ -163,15 +162,14 @@ $(document).ready(function () {
 
         .done(function(r) {
             if(r == 'failed'){
-                alert('Unable to save settings. Check log for more information.')
+                swal("Error", "Unable to save settings. Check log for more information.", "error")
             }
             else if(r == 'success'){
-                alert('Settings saved.')
+                swal("Settings Saved", "", "success")
             }
 
-            $this.css('background-color', 'white');
-            $this.css('color', '#212121');
-            $this.text('Save Settings');
+            $this.removeAttr('style');
+            $this.text('Save Settings').removeClass('fa fa-circle-o-notch fa-spin');
         });
 
         e.preventDefault();

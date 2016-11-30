@@ -37,13 +37,15 @@ class Settings():
             link(rel='stylesheet', href='css/style.css')
             link(rel='stylesheet', href='css/settings.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
+            link(rel='stylesheet', href='font-awesome/css/font-awesome.css')
+            link(rel='stylesheet', href='js/sweetalert-master/dist/sweetalert.css')
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
-
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-
             script(type='text/javascript', src='js/settings/main.js')
+            script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
             script(type='text/javascript', src='js/settings/save_settings.js')
+
 
         with doc:
             Header.insert_header(current="settings")
@@ -54,11 +56,11 @@ class Settings():
                 c_s = 'Search'
                 with ul(id='search', cls='wide'):
                     with li(cls='bbord'):
-                        i('check_box_outline_blank', id='searchafteradd', cls='material-icons toggle', value=c[c_s]['searchafteradd'])
+                        i(id='searchafteradd', cls='fa fa-square-o checkbox', value=c[c_s]['searchafteradd'])
                         span('Search immediately after adding movie.')
                         span('Skips wait until next scheduled search.', cls='tip')
                     with li(cls='bbord'):
-                        i('check_box_outline_blank', id='autograb', cls='material-icons toggle', value=c[c_s]['autograb'])
+                        i(id='autograb', cls='fa fa-square-o checkbox', value=c[c_s]['autograb'])
                         span('Automatically grab best result.')
                         span('Will still wait X days if set.', cls='tip')
                     with li(cls='bbord'):
@@ -94,11 +96,11 @@ class Settings():
                             for n in c[c_s]:
                                 if n != '__name__':
                                     with li(cls='newznab_indexer'):
-                                        i('check_box_outline_blank', cls='newznab_check material-icons toggle', value=c[c_s][n][2])
+                                        i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
                                         input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL" )
                                         input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
                             with li(id='add_newznab_row'):
-                                i('playlist_add', cls='material-icons', id='add_row')
+                                i(cls='fa fa-plus-square', id='add_row')
                 p('Quality')
                 c_s = 'Quality'
                 resolutions = ['4K','1080P','720P','SD']
@@ -112,8 +114,8 @@ class Settings():
                         for res in resolutions:
                             prior = '{}priority'.format(res)
                             with li(cls='rbord', id=prior, sort=c[c_s][res][1]):
-                                i('drag_handle', cls='material-icons')
-                                i('check_box_outline_blank', id=res, cls='material-icons toggle', value=c[c_s][res][0])
+                                i(cls='fa fa-bars')
+                                i(id=res, cls='fa fa-square-o checkbox', value=c[c_s][res][0])
                                 span(res)
 
                     # Size restriction block
@@ -152,7 +154,7 @@ class Settings():
                 with ul(id='downloader'):
                     c_s = 'Sabnzbd'
                     with li(cls='bbord'):
-                        i('radio_button_unchecked', id='sabenabled', cls='material-icons radio', tog='sabnzbd', value=c[c_s]['sabenabled'])
+                        i(id='sabenabled', cls='fa fa-circle-o radio', tog='sabnzbd', value=c[c_s]['sabenabled'])
                         span('Sabnzbd', cls='sub_cat')
                     # I'm not 100% sure it is valid to do a ul>ul, but it only work this way so deal with it.
                     with ul(id='sabnzbd'):
@@ -176,10 +178,11 @@ class Settings():
                                         option(o, value=o)
 
                         with li():
-                            button('Test Connection', cls='test_connection', mode='sabnzbd')
+                            with button(cls='test_connection', mode='sabnzbd'):
+                                span('Test Connection')
                     c_s = 'NzbGet'
                     with li():
-                        i('radio_button_unchecked', id='nzbgenabled', cls='material-icons radio', tog='nzbget', value=c[c_s]['nzbgenabled'])
+                        i(id='nzbgenabled', cls='fa fa-circle-o radio', tog='nzbget', value=c[c_s]['nzbgenabled'])
                         span('NZBGet', cls='sub_cat')
                     with ul(id='nzbget'):
                         with li('Host & Port: ', cls='bbord'):
@@ -204,22 +207,21 @@ class Settings():
                                     else:
                                         option(o, value=o)
                         with li(cls='bbord'):
-                            i('check_box_outline_blank', id='nzbgaddpaused', cls='material-icons toggle', value=c[c_s]['nzbgaddpaused'])
+                            i(id='nzbgaddpaused', cls='fa fa-square-o checkbox', value=c[c_s]['nzbgaddpaused'])
                             span('Add Paused')
 
                         with li():
-                            button('Test Connection', cls='test_connection', mode='nzbget')
-
-
+                            with button(cls='test_connection', mode='nzbget'):
+                                span('Test Connection')
 
                 p('Post-Processing')
                 c_s = 'Postprocessing'
                 with ul(id='postprocessing'):
                     with li():
-                        i('check_box_outline_blank', id='cleanupfailed', cls='material-icons toggle', value=c[c_s]['cleanupfailed'])
+                        i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupfailed'])
                         span('Delete leftover files after a failed download.')
                     with li():
-                        i('check_box_outline_blank', id='renamerenabled', cls='material-icons toggle', value=c[c_s]['renamerenabled'])
+                        i(id='renamerenabled', cls='fa fa-square-o checkbox', value=c[c_s]['renamerenabled'])
                         span('Enable Renamer')
                     with ul(id='renamer'):
                         with li():
@@ -233,7 +235,7 @@ class Settings():
                             span('{title} {year} - {videocodec} = How to Train Your Dragon 2010 - x264.mkv',  cls='taglist')
 
                     with li():
-                        i('check_box_outline_blank', id='moverenabled', cls='material-icons toggle', value=c[c_s]['moverenabled'])
+                        i(id='moverenabled', cls='fa fa-square-o checkbox', value=c[c_s]['moverenabled'])
                         span('Enable Mover')
                     with ul(id='mover'):
                         with li():
@@ -245,7 +247,7 @@ class Settings():
                             br()
                             span('/home/user/movies/{title} {year} = /home/user/movies/Black Swan 2010/',  cls='taglist')
                             br()
-                            i('check_box_outline_blank', id='cleanupenabled', cls='material-icons toggle', value=c[c_s]['cleanupenabled'])
+                            i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupenabled'])
                             span('Clean up after move.')
                 p('Server')
                 c_s = 'Server'
@@ -258,13 +260,13 @@ class Settings():
                     with li('API Key: ', cls='bbord'):
                         input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 50%')
                         with span(cls='tip'):
-                            i('autorenew', id='generate_new_key', cls='material-icons')
+                            i(id='generate_new_key', cls='fa fa-refresh')
                             span('Generate new key.')
                     with li(cls='bbord'):
-                        i('check_box_outline_blank', id='launchbrowser', cls='material-icons toggle', value=c[c_s]['launchbrowser'])
+                        i(id='launchbrowser', cls='fa fa-square-o checkbox', value=c[c_s]['launchbrowser'])
                         span('Open browser on launch.')
                     with li(cls='bbord'):
-                        i('check_box_outline_blank', id='checkupdates', cls='material-icons toggle', value=c[c_s]['checkupdates'])
+                        i(id='checkupdates', cls='fa fa-square-o checkbox', value=c[c_s]['checkupdates'])
                         span('Check for updates.')
                         with span('Current version hash: ', cls='tip'):
                             a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))

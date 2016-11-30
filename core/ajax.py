@@ -211,19 +211,22 @@ class Ajax(object):
             if self.sql.row_exists(TABLE, guid=guid):
                 if not self.sql.update(TABLE, 'status', 'Bad', guid=guid):
                     return 'Could not update {} to Bad. Check logs for more information.'.format(guid)
+                else:
+                    return 'Successfully marked result as Bad.'.format(guid)
+
             else:
                 DB_STRING = {}
                 DB_STRING['imdbid'] = imdbid
                 DB_STRING['guid'] = guid
                 DB_STRING['status'] = 'Bad'
                 if self.sql.write(TABLE, DB_STRING):
-                    return 'Marked {} as Bad.'.format(guid)
+                    return 'Successfully marked result as Bad.'.format(guid)
                 else:
                     return 'Could not add {} to {}. Check logs for more information.'.format(guid, TABLE)
 
         else:
             logging.info('Successfully marked {} as Bad.'.format(guid))
-            return 'Successfully marked {} as Bad.'.format(guid)
+            return 'Successfully marked result as Bad.'.format(guid)
 
 
     def refresh_list(self, list, imdbid=''):

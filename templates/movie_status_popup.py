@@ -38,11 +38,11 @@ class MovieStatusPopup():
                 with div(id='title'):
                     with p():
                         span(title_date, id='title', imdbid=imdbid)
-                        i('close', cls='material-icons', id='close')
-                        i('search', cls='material-icons', id='search_now', imdbid=data['imdbid'], title=data['title'])
-                        i('delete_forever', cls='material-icons', id='remove')
-                        i('settings_applications', cls='material-icons', id='change_quality')
-                        i('playlist_add_check', cls='material-icons', id='save_quality')
+                        i(cls='fa fa-times', id='close')
+                        i(cls='fa fa-trash', id='remove')
+                        i(cls='fa fa-cog', id='change_quality')
+                        i(cls='fa fa-save', id='save_quality')
+                        i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title=data['title'])
                 with div(id='media'):
                     img(id='poster', src=poster_path)
                     with div(id='search_results'):
@@ -61,8 +61,8 @@ class MovieStatusPopup():
                                 for res in resolutions:
                                     prior = '{}priority'.format(res)
                                     with li(cls='rbord', id=prior, sort=quality_settings['Quality'][res][1]):
-                                        i('drag_handle', cls='material-icons')
-                                        i('check_box_outline_blank', id=res, cls='material-icons toggle', value=quality_settings['Quality'][res][0])
+                                        i(cls='fa fa-bars')
+                                        i(id=res, cls='fa fa-square-o checkbox', value=quality_settings['Quality'][res][0])
                                         span(res)
 
                             # Size restriction block
@@ -124,12 +124,9 @@ class MovieStatusPopup():
                         span(res['title'], cls='name')
                         with span(cls='buttons'):
                             with a(href=info_link, target='_blank'):
-                                i('info_outline', cls='material-icons')
-
-                            i('file_download', cls='material-icons manual_download', imdbid=imdbid, guid=guid)
-
-                            i('delete_forever', cls='material-icons mark_bad', guid=guid)
-
+                                i(cls='fa fa-info-circle')
+                            i(cls='fa fa-download', id='manual_download', imdbid=imdbid, guid=guid)
+                            i(cls='fa fa-ban', id='mark_bad', guid=guid)
                     with li(cls='data '+ bbord):
                         span(' Status: ')
                         if status == 'Snatched':

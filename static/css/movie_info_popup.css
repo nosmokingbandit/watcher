@@ -1,6 +1,5 @@
-input[type='checkbox']{
-    margin: 0;
-    padding: 0;
+i{
+    font-size: 1.5em;
 }
 
 input[type="number"], input[type="text"]{
@@ -80,15 +79,6 @@ iframe#trailer{
 }
 
 /* Quality slide in panel */
-i{
-    margin: 0 0 0 0;
-    height: 2.0em;
-}
-
-.material-icons, .icon-text {
-    vertical-align: middle;
-}
-
 ul#quality{
     position: absolute;
     width: 640px;

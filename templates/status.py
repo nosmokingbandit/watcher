@@ -26,11 +26,12 @@ class Status():
             link(rel='stylesheet', href='css/status.css')
             link(rel='stylesheet', href='css/movie_status_popup.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
+            link(rel='stylesheet', href='font-awesome/css/font-awesome.css')
+            link(rel='stylesheet', href='js/sweetalert-master/dist/sweetalert.css')
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
-
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-
+            script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
             script(type='text/javascript', src='js/status/main.js')
 
 

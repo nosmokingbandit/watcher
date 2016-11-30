@@ -23,7 +23,6 @@ button#search_button{
     float: right;
     width: 48px;
     height: 50px;
-    line-height: 50px;
     padding: 0;
     margin: 0;
     background-color: white;
@@ -31,12 +30,18 @@ button#search_button{
     border-color:  #212121;
     border-width: 1px 1px 1px 0px;
     outline: none;
-    cursor: pointer;
+    border-radius: 0px;
+    vertical-align: inherit;
+    line-height: 50px;
 }
 
 button#search_button:hover{
     background-color: #212121;
     color: #fff;
+}
+
+button#search_button i{
+    vertical-align: inherit;
 }
 
 /* results fade-in */

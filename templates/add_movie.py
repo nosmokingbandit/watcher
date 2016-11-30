@@ -15,19 +15,20 @@ class AddMovie():
             link(rel='stylesheet', href='css/add_movie.css')
             link(rel='stylesheet', href='css/movie_info_popup.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
+            link(rel='stylesheet', href='font-awesome/css/font-awesome.css')
+            link(rel='stylesheet', href='js/sweetalert-master/dist/sweetalert.css')
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js")
-
+            script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
             script(type='text/javascript', src='js/add_movie/main.js')
-
 
         with doc:
             Header.insert_header(current="add_movie")
             with div(id='search_box'):
                 input(id='search_input',type="text", placeholder="Search...", name="search_term")
                 with button(id="search_button"):
-                    i('search', cls='material-icons')
+                    i(cls='fa fa-search')
 
             div(id='thinker')
 

@@ -27,7 +27,7 @@ class Sabnzbd():
             raise
         except Exception, e:
             logging.error('Sabnzbd test_connection', exc_info=True)
-            return '{}. \nPlease review your settings.'.format(e.reason)
+            return '{}. \n\n Please review your settings.'.format(e.reason)
 
     # returns dict {'status': <>, 'nzo_ids': [<>] }
     @staticmethod

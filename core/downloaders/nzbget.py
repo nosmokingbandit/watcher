@@ -32,8 +32,7 @@ class Nzbget():
             raise
         except Exception, e:
             logging.error('Nzbget test_connection', exc_info=True)
-
-            return '{}. \nPlease review your settings.'.format(e)
+            return '{}. \n\n Please review your settings.'.format(e)
 
     @staticmethod
     def add_nzb(data):

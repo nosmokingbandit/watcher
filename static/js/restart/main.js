@@ -13,7 +13,6 @@ $(document).ready(function () {
                 mode: "online",
             })
             .done(function(r){
-                console.log(r);
                 if(r == "states.STARTED"){
                     window.location = "/";
                 }

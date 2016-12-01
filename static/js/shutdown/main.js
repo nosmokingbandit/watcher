@@ -11,7 +11,7 @@ $(document).ready(function () {
             "mode": "online",
         })
         .done(function(r){
-            console.log(r);
+            //do nothing
         })
         .fail(function(r){
             $("span.msg").fadeOut();

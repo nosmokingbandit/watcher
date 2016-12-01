@@ -11,7 +11,6 @@ $(document).ready(function () {
         //check if only one downloader is active:
         var enabled = 0
         $('ul#downloader > li > i.toggle').each(function(){
-            console.log($(this).attr('value'));
             if($(this).attr('value') == 'true'){
                 enabled++;
             }

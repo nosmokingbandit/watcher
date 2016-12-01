@@ -121,8 +121,6 @@ $(document).ready(function() {
             q_list.push( $(this).attr("id") );
         });
 
-        console.log(q_list);
-
         // enabled resolutions
         $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
@@ -144,7 +142,6 @@ $(document).ready(function() {
                 min = v + "min",
                 max = v + "max";
             var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
-            console.log(dt);
             Quality[v] = dt.join();
         });
 
@@ -163,7 +160,6 @@ $(document).ready(function() {
         var imdbid = $('span#title').attr('imdbid');
         var title = $('i#search_now').attr('title');
 
-        console.log(quality_dict);
         $.post("/update_quality_settings", {"quality": quality_dict, "imdbid": imdbid})
         .done(function(r){
 
@@ -250,7 +246,6 @@ $(document).ready(function() {
                 .done(function(r){
                     refresh_list('#movie_list');
                     refresh_list('#result_list', imdbid=imdbid);
-                    console.log(r);
                     if (r.includes("Success")){
                         swal("", r, "success");
                     } else {

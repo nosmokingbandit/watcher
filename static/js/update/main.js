@@ -8,7 +8,6 @@ $(document).ready(function () {
         "mode": "update_now"
     })
     .done(function(r){
-        console.log(r);
         if(r == "failed"){
             $("#thinker").fadeOut();
             $("span.msg").text("Update failed. Check logs for more information.");
@@ -20,7 +19,6 @@ $(document).ready(function () {
                     "mode": "online"
                 })
                 .done(function(r){
-                    console.log(r);
                     if(r == "states.STARTED"){
                         $("span.msg").text("Update successful!");
                         setTimeout(function() {window.location = "/";},3000);

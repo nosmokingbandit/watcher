@@ -103,8 +103,6 @@ $(document).ready(function() {
         data['quality'] = quality;
         data = JSON.stringify(data);
 
-        console.log(data);
-
         $.post("/add_wanted_movie", {"data": data})
         .done(function(r){
 

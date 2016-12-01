@@ -3,15 +3,14 @@ $(document).ready(function () {
 /* grab all settings and write them to the config writer */
     $("button#save_settings").click(function(e){
         $this = $(this);
-        $this_span = $this.children(':first');
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width('2.5em');
-        $this_span.text('').addClass('fa-circle-o-notch fa-spin');
+        $this.text('').addClass('fa-circle-o-notch fa-spin');
 
         //check if only one downloader is active:
         var enabled = 0
-        $('ul#downloader > li > i.toggle').each(function(){
+        $('ul#downloader > li > i.checkbox').each(function(){
             if($(this).attr('value') == 'true'){
                 enabled++;
             }
@@ -26,7 +25,7 @@ $(document).ready(function () {
 
         // SEARCH options
         var Search = {};
-        $("ul#search i.toggle").each(function(){
+        $("ul#search i.checkbox").each(function(){
             Search[$(this).attr("id")] = $(this).attr("value");
         })
         $("ul#search :input").each(function(){
@@ -66,12 +65,12 @@ $(document).ready(function () {
             tmp = {};
 
         var q_list = []
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             q_list.push( $(this).attr("id") );
         });
 
         // enabled resolutions
-        $("ul#resolution i.toggle").each(function(){
+        $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
         });
         // order of resolutions
@@ -117,7 +116,7 @@ $(document).ready(function () {
 
         var NzbGet = {};
         NzbGet["nzbgenabled"] = $("i#nzbgenabled").attr("value");
-        $("ul#nzbget li i.toggle").each(function(){
+        $("ul#nzbget li i.checkbox").each(function(){
             NzbGet[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#nzbget li input").not("[type=button]").each(function(){
@@ -131,7 +130,7 @@ $(document).ready(function () {
 
         // POSTPROCESSING options
         var Postprocessing = {}
-        $("ul#postprocessing li i.toggle").each(function(){
+        $("ul#postprocessing li i.checkbox").each(function(){
             Postprocessing[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#postprocessing li input").not("[type=button]").each(function(){
@@ -142,7 +141,7 @@ $(document).ready(function () {
 
         // SERVER options
         var Server = {}
-        $("#server i.toggle").each(function(){
+        $("#server i.checkbox").each(function(){
             Server[$(this).attr("id")] = $(this).attr("value");
         });
         $("#server :input").each(function(){
@@ -169,7 +168,7 @@ $(document).ready(function () {
             }
 
             $this.removeAttr('style');
-            $this_span.text('Save Settings').removeClass('fa fa-circle-o-notch fa-spin');
+            $this.text('Save Settings').removeClass('fa fa-circle-o-notch fa-spin');
         });
 
         e.preventDefault();

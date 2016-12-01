@@ -15,6 +15,13 @@ class ScoreResults():
 
     # returns list of dictionary results after filtering and scoring
     def score(self, results, imdbid, type):
+        '''
+        Accepts list of dicts 'results'
+        type is 'nzb' or 'torrent'
+
+        Returns list of dicts with unwanted releases removed and scores added.
+
+        '''
 
         self.results = results
 

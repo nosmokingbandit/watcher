@@ -50,7 +50,7 @@ class Ajax(object):
     def movie_info_popup(self, imdbid):
         '''
         Simply calls on the movie_info_popup template to contruct the html for this movie.
-        Returns html.
+        Returns html string.
         '''
         mip = movie_info_popup.MovieInfoPopup()
         return mip.html(imdbid)
@@ -59,14 +59,14 @@ class Ajax(object):
     def movie_status_popup(self, imdbid):
         '''
         Simply calls on the movie_status_popup template to contruct the html for this movie.
-        Returns html.
+        Returns html string.
         '''
         msp = movie_status_popup.MovieStatusPopup()
         return msp.html(imdbid)
 
     def add_wanted_movie(self, data):
         '''
-        Adds a movie to the Wanted list. Takes dict data and writes it to MOVIES table.
+        Adds a movie to the Wanted list. Takes dict 'data' and writes it to MOVIES table.
         Will start an automatic search and snatch if the settings allow.
         Returns a success/fail message.
         '''
@@ -112,8 +112,7 @@ class Ajax(object):
 
     def save_settings(self, data):
         '''
-        Saves all of the user's settings.
-        If seach criteria has changed it purges all search results.
+        Saves *all* of the user's settings.
         Returns 'failed' or 'success'
         Alert messages are handled by the javascript.
         '''
@@ -150,18 +149,6 @@ class Ajax(object):
         '''
         self.searcher.search(imdbid, title)
         return 'done'
-
-    def search_all(self):
-        '''
-        Runs a search for every movie in its own thread.
-        '''
-        def search_all_thread(self):
-            self.searcher.auto_search_and_grab(mode='all')
-
-        t = threading.Thread(target=search_all_thread, args=(self,))
-        t.start()
-
-        return
 
     def manual_download(self, guid):
         '''

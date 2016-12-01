@@ -37,9 +37,16 @@ class Version(object):
 
 
 class Git(object):
+    '''
+    Class used to execute all GIT commands.
+    '''
 
-    # runs git commands, returns tuple (output, error message, exit_status)
     def runner(self, args):
+        '''
+        Runs all git commmands.
+        Returns tuple (output, error message, exit_status).
+
+        '''
         command = ['git']
         for i in args.split(' '):
             command.append(i)
@@ -67,6 +74,9 @@ class Git(object):
         return (output, error, status)
 
     def available(self):
+        '''
+        Checks to see if we can execute git.
+        '''
         command = 'version'
         output, error, status = self.runner(command)
         output = output.splitlines()
@@ -205,7 +215,7 @@ class ZipUpdater(object):
 
     def get_current_hash(self):
         '''
-        If there is a version file in core we read the hash from it.
+        If there is a version file in watcher/core we read the hash from it.
 
         If there is no version file then this is the first time Watcher is running. Since we don't know what version a zip from github is we'll just have to assume that it is the newest version for now.
 

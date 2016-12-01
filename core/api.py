@@ -8,6 +8,10 @@ import logging
 logging = logging.getLogger(__name__)
 
 class API(object):
+    '''
+    A simple GET/POST api. Used for post-processing and other remote interactions.
+    This still needs work.
+    '''
     conf = {
         '/': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher()

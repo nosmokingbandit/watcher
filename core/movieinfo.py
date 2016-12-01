@@ -5,8 +5,10 @@ import logging
 logging = logging.getLogger(__name__)
 
 class Omdb():
-    # returns a list of movies result dicts that match search_term
     def search(self, search_term ):
+        '''
+        Returns a list of dicts that contain OMDB's movie info for the supplied search_term.
+        '''
 
         search_term = search_term.replace(" ", "+")
 
@@ -28,6 +30,10 @@ class Omdb():
             return 'Search Error.'
 
     def movie_info(self, imdbid):
+        '''
+        Returns specific details for supplied imdbid. Gives more information than search(), but only for one movie.
+
+        '''
 
         search_string = "http://www.omdbapi.com/?i={}&plot=short&tomatoes=true&r=json".format(imdbid)
 
@@ -54,6 +60,11 @@ class Omdb():
 
 class Trailer():
     def get_trailer(self, title_date):
+        '''
+        Gets the embed video link from youtube.
+        title_date is 'movie title 2016'
+        '''
+
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
 
         k = 'AIzaSyCOu5KhaS9WcTfNvnRKzzJMf6z-6NGb28M'

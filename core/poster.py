@@ -15,6 +15,11 @@ class Poster():
             os.makedirs(self.poster_folder)
 
     def save_poster(self, imdbid, poster_url):
+        '''
+        Saves poster to self.poster_folder
+        as imdbid.jpg
+        Does not return.
+        '''
 
         logging.info('Grabbing poster for {}.'.format(imdbid))
 
@@ -48,6 +53,9 @@ class Poster():
             logging.info('{} already exists.'.format(new_poster_path))
 
     def remove_poster(self, imdbid):
+        '''
+        Deletes poster for given imdbid
+        '''
         logging.info('Removing poster for {}'.format(imdbid))
         path = '{}{}.jpg'.format(self.poster_folder, imdbid)
         if os.path.exists(path):
@@ -55,8 +63,11 @@ class Poster():
         else:
             logging.info('{} doesn\'t seem to exist.'.format(path))
 
-    # vestigial method to parse yahoo results for a poster. I'll keep it just in case
     def find_poster(self, search_term):
+        '''
+        Searches yahoo and returns poster image link.
+        I don't use this any more, but it doesn't hurt to keep it around.
+        '''
         lParser = parseImages()
 
         search_term = search_term.replace(" ","+")
@@ -71,8 +82,10 @@ class Poster():
 
         return lParser.imgs[1]
 
-
 class parseImages(HTMLParser):
+    '''
+    Used to parse image links from yahoo search.
+    '''
 
     def handle_starttag(self, tag, attrs):
         if tag == 'img':

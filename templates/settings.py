@@ -76,7 +76,7 @@ class Settings():
                         span('Once releases are available according to predb.me. Requires Restart.', cls='tip')
                     with li(cls='bbord'):
                         span('Wait ')
-                        input(type='number', min='0', max='14', id='waitdays', style='width: 2.5em', value=c[c_s]['waitdays'])
+                        input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                         span(' days for best release.')
                         span('After results are found, wait to snatch in case better match is found.', cls='tip')
                     with li():
@@ -267,13 +267,11 @@ class Settings():
                         span('Open browser on launch.')
                     with li(cls='bbord'):
                         i(id='checkupdates', cls='fa fa-square-o checkbox', value=c[c_s]['checkupdates'])
-                        span('Check for updates.')
-                        with span('Current version hash: ', cls='tip'):
-                            a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
-                    with li(cls='bbord'):
-                        span('Check for updates every')
+                        span('Check for updates every ')
                         input(type='number', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 3em')
                         span(' hours.')
+                        with span('Current version hash: ', cls='tip'):
+                            a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
                     with li(cls='bbord'):
                         span('Keep ')
                         input(type='text', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')

@@ -54,6 +54,11 @@ class Searcher():
 
     # searches indexer for movies. Returns bool if found
     def search(self, imdbid, title):
+        '''
+        Search for releases for the imdbid and title supplied.
+        Returns True of False if movie is found.
+        '''
+
         TABLE_NAME = 'MOVIES'
 
         newznab_results = self.nn.search_all(imdbid)
@@ -83,6 +88,9 @@ class Searcher():
 
 
     def store_results(self, results, imdbid):
+        '''
+        Stores search results in SEARCHRESULTS. Doesn't over-write existing results so we know then the movie was first found.
+        '''
 
         logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
 
@@ -118,6 +126,10 @@ class Searcher():
 
     # Set MOVIE status to appropriate flag
     def update_movie_status(self, imdbid):
+        '''
+        Updates status based on search results.
+        Changes MOVIES to reflect highest level of search result status.
+        '''
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
         if not result_status:

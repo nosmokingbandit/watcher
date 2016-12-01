@@ -13,6 +13,11 @@ class NewzNab():
 
     # Returns a list of results stored as dicts
     def search_all(self, imdbid):
+        '''
+        Searched every enabled indexer for the supplied imdbid.
+        Returns a list of dicts with download information.
+        '''
+
         indexers = self.conf.get_indexers()
 
         self.imdbid = imdbid
@@ -45,6 +50,11 @@ class NewzNab():
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
     def parse_newznab_xml(self, feed):
+        '''
+        Used to parse the xml response from newznab indexers.
+        Returns a dictionary of relevant information.
+        Some indexers won't return JSON even if you ask nicely, so we have to do this.
+        '''
 
         root = ET.fromstring(feed)
 
@@ -62,6 +72,10 @@ class NewzNab():
         return res_list
 
     def make_item_dict(self, item):
+        '''
+        Helper function for parse_newznab_xml().
+        Takes filtered xml and returns dict.
+        '''
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate')
         d = {}
         for ic in item:
@@ -82,6 +96,10 @@ class NewzNab():
         return d
 
     def get_resolution(self, result):
+        '''
+        Helper function for parse_newznab_xml().
+        Returns str resolution gathered from category or title.
+        '''
 
         title = result['title']
         if result['category'] and 'SD' in result['category']:

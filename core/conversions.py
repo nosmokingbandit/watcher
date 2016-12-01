@@ -1,6 +1,9 @@
 import datetime
 
 class Conversions():
+    '''
+    Coverts data to human-readable formats.
+    '''
 
     @staticmethod
     def human_file_size(value, format='%.1f'):

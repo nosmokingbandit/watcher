@@ -52,9 +52,19 @@ class PostProcessing(object):
                 return 'Failed'
 
     def complete(self, guid, path):
+        '''
+        Processed completed downloads.
+        Will mark guid as 'Finished' in MARKEDRESULTS
+        Get imdbid from guid and marks movie as 'Finished' in MOVIES.
+        If the guid is not from Watcher it searches OMDB to find the imdbid. see movie_data().
+        Will rename and move is renamerenabled and moverenabled are 'true'
+
+        Updates SEARCHRESULTS row to have correct finished date
+        '''
         logging.info('Post-processing {} as complete.'.format(guid))
         imdbid = None
 
+        # if we get a guid get the imdbid from SEARCHRESULTS. Can set imdbid None.
         if guid != 'None':
             imdbid = self.sql.get_imdbid_from_guid(guid)
             if not imdbid:
@@ -94,7 +104,6 @@ class PostProcessing(object):
             if not self.sql.write('MARKEDRESULTS', DB_STRING):
                 return 'Fail'
 
-
             logging.info('{} postprocessing finished.'.format(imdbid))
             return 'Success'
         except Exception, e:
@@ -102,9 +111,16 @@ class PostProcessing(object):
             return 'Fail'
 
 
-    def movie_data(self, imdbid, path):
-        #this is out base dict. We declare everything here in case we can't find a value later on. We'll still have the key in the dict, so we don't need to check if a key exists every time we want to use one. This MUST match all of the options the user is able to select in Settings.
+    def movie_data(self, imdbid, path, guid):
+        '''
+        Gathers neccesary data for post-processing.
+        Will search OMBD if Watcher doesn't have info for the guid.
+        Returns dict as described below.
+        '''
 
+        '''
+        This is out base dict. We declare everything here in case we can't find a value later on. We'll still have the key in the dict, so we don't need to check if a key exists every time we want to use one. This MUST match all of the options the user is able to select in Settings.
+        '''
         data = {
             'title':'',
             'year':'',
@@ -136,7 +152,7 @@ class PostProcessing(object):
         # this key can sometimes be a list, which is a pain to deal with later. We don't ever need it, so del
         if 'excess' in titledata:
             titledata.pop('excess')
-        # Make sure this matches our keys
+        # Make sure this matches our key names
         if 'codec' in titledata:
             titledata['videocodec'] = titledata.pop('codec')
         if 'audio' in titledata:
@@ -181,6 +197,10 @@ class PostProcessing(object):
 
 
     def renamer(self, data):
+        '''
+        Renames movie file based on renamerstring
+        Returns new file name.
+        '''
         renamer_string = self.pp_conf['renamerstring']
 
         existing_file_path = os.path.join(data['path'], data['filename'] + data['ext'])
@@ -203,6 +223,10 @@ class PostProcessing(object):
 
 
     def mover(self, data):
+        '''
+        Moves movie file to moverpath
+        Returns True on success
+        '''
         movie_file = os.path.join(data['path'], data['filename'] + data['ext'])
 
         mover_path = self.pp_conf['moverpath']
@@ -227,6 +251,9 @@ class PostProcessing(object):
         return True
 
     def cleanup(self, data):
+        '''
+        For a failed download, deletes data['path']
+        '''
         remove_path = data['path']
         logging.info('Clean Up. Removing {}.'.format(remove_path))
         try:

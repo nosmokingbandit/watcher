@@ -12,6 +12,11 @@ class Snatcher():
         self.config = config.Config()
 
     def auto_grab(self, imdbid):
+        '''
+        Grabs the best scoring result that isn't 'Bad'
+        Returns True or False if movie is snatched
+        '''
+
         logging.info('Selecting best result for {}'.format(imdbid))
         search_results = self.sql.get_search_results(imdbid)
         if not search_results:
@@ -40,6 +45,12 @@ class Snatcher():
         return False
 
     def snatch(self, data):
+        '''
+        Takes single result dict and sends it to the active downloader.
+        Returns response from download.
+        Marks release and movie as 'Snatched'
+        '''
+
         # Send to active downloaders
         guid = data['guid']
         imdbid = data['imdbid']
@@ -78,6 +89,10 @@ class Snatcher():
                 return "NZBGET: Error {}.".format(response)
 
     def update_status_snatched(self, guid, imdbid):
+        '''
+        Updates MOVIES, SEARCHRESULTS, and MARKEDRESULTS to 'Snatched'
+        Returns True or False on success.
+        '''
 
         # set movie status snatched
         logging.info('Setting MOVIES {} status to Snatched.'.format(imdbid))

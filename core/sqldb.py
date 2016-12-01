@@ -38,7 +38,9 @@ class SQL(object):
                               Column('rated', TEXT),
                               Column('status', TEXT),
                               Column('predb', TEXT),
-                              Column('quality', TEXT)
+                              Column('quality', TEXT),
+                              Column('finisheddate', TEXT),
+                              Column('finishedscore', SMALLINT)
                              )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                      Column('score', SMALLINT),
@@ -52,6 +54,7 @@ class SQL(object):
                                      Column('date_found', TEXT),
                                      Column('info_link', TEXT),
                                      Column('guid', TEXT),
+                                     Column('torrentfile', TEXT),
                                      Column('resolution', TEXT),
                                      Column('type', TEXT)
                                     )
@@ -91,10 +94,12 @@ class SQL(object):
         # all tries exhausted
         return False
 
-
-
-    # accepts str TABLE and dict DB_STRING to be written
     def write(self, TABLE, DB_STRING):
+        '''
+        Takes dict DB_STRING and writes to TABLE.
+        DB_STRING must have key:val matching Column:Value in table.
+        Returns Bool on success.
+        '''
         logging.info('Writing data to {}'.format(TABLE))
 
         cols = ', '.join(DB_STRING.keys())
@@ -113,6 +118,10 @@ class SQL(object):
             return False
 
     def write_search_results(self, LIST):
+        '''
+        Takes list of dicts to write into SEARCHRESULTS.
+        '''
+
         logging.info('Writing batch into SEARCHRESULTS')
 
         INSERT = self.SEARCHRESULTS.insert()
@@ -126,6 +135,12 @@ class SQL(object):
             return False
 
     def update(self, TABLE, COLUMN, VALUE, imdbid='', guid=''):
+        '''
+        Updates single value in existing table row.
+        Selects row to update from imdbid or guid.
+        Sets COLUMN to VALUE.
+        Returns Bool.
+        '''
 
         if imdbid:
             idcol = 'imdbid'
@@ -149,8 +164,11 @@ class SQL(object):
             logging.error('EXECUTE SQL.UPDATE FAILED.')
             return False
 
-    # Returns a list of dicts with all movie information
     def get_user_movies(self):
+        '''
+        Returns list of dicts with all information in MOVIES
+        '''
+
         logging.info('Retreving list of user\'s movies.')
         TABLE = 'MOVIES'
 
@@ -165,6 +183,11 @@ class SQL(object):
             return False
 
     def get_movie_details(self, imdbid):
+        '''
+        Returns dict of single movie details from MOVIES.
+        Selects by imdbid.
+        '''
+
         logging.info('Retreving details for {}.'.format(imdbid))
 
         command = 'SELECT * FROM MOVIES WHERE imdbid="{}"'.format(imdbid)
@@ -177,6 +200,10 @@ class SQL(object):
             return False
 
     def get_search_results(self, imdbid):
+        '''
+        Returns list of dicts for all SEARCHRESULTS that match imdbid
+        '''
+
         logging.info('Retreving Search Results for {}.'.format(imdbid))
         TABLE = 'SEARCHRESULTS'
 
@@ -189,8 +216,11 @@ class SQL(object):
         else:
             return False
 
-    # returns a dict {guid:status, guid:status, etc}
     def get_marked_results(self, imdbid):
+        '''
+        Returns dict of MARKEDRESULTS
+        {guid:status, guid:status, etc}
+        '''
         logging.info('Retreving Marked Results for {}.'.format(imdbid))
 
         TABLE = 'MARKEDRESULTS'
@@ -209,6 +239,11 @@ class SQL(object):
             return False
 
     def remove_movie(self, imdbid):
+        '''
+        Doesn't access sql directly, but instructs other methods to delete all information that matches imdbid.
+        Removes from MOVIE, SEARCHRESULTS, and deletes poster.
+        Keeps MARKEDRESULTS.
+        '''
         logging.info('Removing {} from {}.'.format(imdbid, 'MOVIES'))
 
         if not self.delete('MOVIES', 'imdbid', imdbid):
@@ -224,6 +259,11 @@ class SQL(object):
         return True
 
     def delete(self, TABLE, idcol, idval):
+        '''
+        Deletes row where idcol == idval
+        Returns Bool.
+        '''
+
         logging.info('Removing from {} where {} is {}.'.format(TABLE, idcol, idval))
 
         command = 'DELETE FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
@@ -251,8 +291,12 @@ class SQL(object):
         else:
             return False
 
-    # returns a list of distinct values ['val1', 'val2', 'val3']
     def get_distinct(self, TABLE, column, idcol, idval):
+        '''
+        Returns list of dictinct values from TABLE where idcol == idval.
+        ['val1', 'val2', 'val3']
+        '''
+
         logging.info('Getting distinct values for {} in {}'.format(idval, TABLE))
 
         command = 'SELECT DISTINCT {} FROM {} WHERE {}="{}"'.format(column, TABLE, idcol, idval)
@@ -268,8 +312,14 @@ class SQL(object):
             logging.error('EXECUTE SQL.GET_DISTINCT FAILED.')
             return False
 
-    # returns bool if item exists in table. Used to check if we need to write new or update existing row.
     def row_exists(self, TABLE, imdbid='', guid=''):
+        '''
+        Checks TABLE for imdbid or guid.
+        Returns Bool if found.
+
+        Used to determine if we need to add a row or update existing row.
+        '''
+
         if imdbid:
             idcol = 'imdbid'
             idval = imdbid
@@ -290,6 +340,10 @@ class SQL(object):
             return True
 
     def get_single_search_result(self, guid):
+        '''
+        Returns dict from SEARCHRESULTS for single row.
+        '''
+
         logging.info('Retreving search result details for {}.'.format(guid))
 
         command = 'SELECT * FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)
@@ -302,6 +356,13 @@ class SQL(object):
             return False
 
     def get_imdbid_from_guid(self, guid):
+        '''
+        Mainly used for post-processing.
+
+        Takes guid and looks in SEARCHRESULTS for matching row.
+        If found, returns string imdbid.
+        '''
+
         logging.info('Retreving imdbid for {}.'.format(guid))
 
         command = 'SELECT imdbid FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)

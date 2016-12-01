@@ -23,7 +23,9 @@ class App(object):
     def index(self):
         raise cherrypy.HTTPRedirect("/status")
 
-    # Ajax Requests
+    '''
+    From here down just forward requests to ajax.Ajax()
+    '''
     @cherrypy.expose
     def search_omdb(self, search_term):
         return self.ajax.search_omdb(search_term)
@@ -69,16 +71,19 @@ class App(object):
         return self.ajax.search(imdbid, title)
 
     @cherrypy.expose
-    def search_all(self, purge=False):
-        return self.ajax.search_all(purge=purge)
-
-    @cherrypy.expose
     def test_downloader_connection(self, mode, data):
         return self.ajax.test_downloader_connection(mode, data)
 
     @cherrypy.expose
     def update_now(self, mode):
-        # this returns a generator that only contains the ajax response
+        '''
+        Executes update method from version.Version()
+
+        The ajax response is a generator that will contain only the success/fail message.
+
+        We do this so the message can be passed to the ajax request in the browser while cherrypy restarts.
+        '''
+
         response = self.ajax.update_now(mode)
         for i in response:
             return i

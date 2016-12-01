@@ -20,12 +20,16 @@ $(document).ready(function () {
     /* add new newznab row */
     $('i#add_row').click(function (e){
 
-        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' URL' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'>\n</li>"
-
-        $('ul#newznab_list li:nth-last-child(2)').after(row);
+        add_newznab_row();
 
         e.preventDefault();
     });
+
+    function add_newznab_row(){
+        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' URL' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'>\n</li>"
+
+        $('ul#newznab_list li:nth-last-child(2)').after(row);
+    }
 
     /* set default state for pseudo checkboxes */
     $('i.checkbox').each(function(){
@@ -37,16 +41,18 @@ $(document).ready(function () {
 
     /* toggle check box status */
     $('i.checkbox').click(function(){
+        $this = $(this);
         // turn on
-        if( $(this).attr("value") == "false" ){
-            $(this).attr("value", "true");
-            $(this).removeClass('fa-square-o')
-            $(this).addClass('fa-check-square-o');
+        if( $this.attr("value") == "false" ){
+            $this.removeAttr("value");
+            $this.attr("value", "true");
+            $this.removeClass('fa-square-o')
+            $this.addClass('fa-check-square-o');
         // turn off
-        } else if ( $(this).attr("value") == "true" ){
-            $(this).attr("value", "false");
-            $(this).removeClass('fa-check-square-o');
-            $(this).addClass('fa-square-o')
+        } else if ( $this.attr("value") == "true" ){
+            $this.attr("value", "false");
+            $this.removeClass('fa-check-square-o');
+            $this.addClass('fa-square-o')
         }
     });
 

@@ -53,6 +53,9 @@ $(document).ready(function() {
 
 
     $('i#button_submit').click(function(e){
+        $this = $(this);
+        $this.addClass('fa-circle-o-notch fa-spin');
+
         quality_dict = {}
         // QUALITY options. This has a lot of data, so this wil get messy.
         var Quality = {},
@@ -111,7 +114,9 @@ $(document).ready(function() {
             } else {
                 swal("", r, 'error');
             };
-            $('i#button_submit').hide();
+
+            $this.removeClass('fa-circle-o-notch fa-spin');
+            $this.hide();
             $('iframe').fadeIn();
             $('ul#quality').fadeOut();
 

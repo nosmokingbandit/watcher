@@ -3,10 +3,11 @@ $(document).ready(function () {
 /* grab all settings and write them to the config writer */
     $("button#save_settings").click(function(e){
         $this = $(this);
+        $this_span = $this.children(':first');
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width('2.5em');
-        $this.text('').addClass('fa-circle-o-notch fa-spin');
+        $this_span.text('').addClass('fa-circle-o-notch fa-spin');
 
         //check if only one downloader is active:
         var enabled = 0
@@ -168,7 +169,7 @@ $(document).ready(function () {
             }
 
             $this.removeAttr('style');
-            $this.text('Save Settings').removeClass('fa fa-circle-o-notch fa-spin');
+            $this_span.text('Save Settings').removeClass('fa fa-circle-o-notch fa-spin');
         });
 
         e.preventDefault();

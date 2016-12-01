@@ -284,5 +284,6 @@ class Settings():
                             button('Shut Down', id='shutdown')
 
             with div(id='footer'):
-                button('Save Changes', id='save_settings')
+                with button(id='save_settings'):
+                    span('Save Changes')
         return doc.render()

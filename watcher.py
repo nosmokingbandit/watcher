@@ -135,7 +135,7 @@ if __name__ == '__main__':
     del sql
 
     # Get server settings ready
-    server_conf = conf['Server']
+    server_conf = core.CONFIG['Server']
     conf_port = server_conf['serverport']
     conf_host = server_conf['serverhost']
     conf_browser = server_conf['launchbrowser']

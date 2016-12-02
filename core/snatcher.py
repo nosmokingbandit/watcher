@@ -1,4 +1,5 @@
-from core import sqldb, config
+import core
+from core import sqldb
 from core.downloaders import sabnzbd, nzbget
 from datetime import datetime
 
@@ -9,7 +10,7 @@ class Snatcher():
 
     def __init__(self):
         self.sql = sqldb.SQL()
-        self.config = config.Config()
+        return
 
     def auto_grab(self, imdbid):
         '''
@@ -24,7 +25,7 @@ class Snatcher():
             return False
 
         # Check if we are past the 'waitdays'
-        wait_days = int(self.config['Search']['waitdays'])
+        wait_days = int(core.CONFIG['Search']['waitdays'])
 
         earliest_found = min([x['date_found'] for x in search_results])
         date_found = datetime.strptime(earliest_found, '%Y-%m-%d')
@@ -56,7 +57,7 @@ class Snatcher():
         imdbid = data['imdbid']
         title = data['title']
 
-        sab_conf = self.config['Sabnzbd']
+        sab_conf = core.CONFIG['Sabnzbd']
         if sab_conf['sabenabled'] == 'true' and data['type'] == 'nzb':
             logging.info('Sending nzb to Sabnzbd.')
             sab = sabnzbd.Sabnzbd()
@@ -73,7 +74,7 @@ class Snatcher():
                 logging.error('SABNZBD: {}'.format(response['status']))
                 return "SABNZBD: {}".format(response['status'])
 
-        nzbg_conf = self.config['NzbGet']
+        nzbg_conf = core.CONFIG['NzbGet']
         if nzbg_conf['nzbgenabled'] == 'true' and data['type'] == 'nzb':
             logging.info('Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)

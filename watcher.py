@@ -115,6 +115,7 @@ if __name__ == '__main__':
     else:
         print 'Config file found, merging any new options.'
         conf.merge_new_options()
+    conf.stash()
 
     # set up logging now that the config is ready
     log.start()

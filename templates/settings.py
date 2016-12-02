@@ -2,6 +2,7 @@ from cherrypy import expose
 import dominate
 from dominate.tags import *
 import core
+import json
 from core import config
 from header import Header
 import os
@@ -13,21 +14,7 @@ class Settings():
 
     @expose
     def index(self):
-        # make some shorthand
-        c = self.config.sections()
-
-        # converts comma delimited values into lists
-        for section in c:
-            if section != 'Filters':
-                for key in c[section]:
-                    value = c[section][key]
-                    if ',' in value:
-                        c[section][key] = value.split(',')
-            elif section == 'Filters':
-                for key in c[section]:
-                    value = c[section][key]
-                    if ',' in value:
-                        c[section][key] = value.replace(',', ', ')
+        c = core.CONFIG
 
         doc = dominate.document(title='Watcher')
 
@@ -94,11 +81,10 @@ class Settings():
                                 span('NewzNab Indexers')
 
                             for n in c[c_s]:
-                                if n != '__name__':
-                                    with li(cls='newznab_indexer'):
-                                        i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
-                                        input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL" )
-                                        input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
+                                with li(cls='newznab_indexer'):
+                                    i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
+                                    input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL" )
+                                    input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
                             with li(id='add_newznab_row'):
                                 i(cls='fa fa-plus-square', id='add_row')
                 p('Quality')

@@ -2,6 +2,7 @@ import json
 import cherrypy
 import urllib2
 from urlparse import parse_qs
+import config
 from core import config, sqldb, snatcher, postprocessing
 
 import logging
@@ -20,13 +21,12 @@ class API(object):
     exposed = True
 
     def __init__(self):
-        self.conf = config.Config()
         self.sql = sqldb.SQL()
         self.post = postprocessing.PostProcessing()
 
 
     def GET(self, params):
-        serverkey = self.conf['Server']['apikey']
+        serverkey = core.CONFIG['Server']['apikey']
 
         params = parse_qs(params)
         # parse_qs parses as {key:[val]}, so we 'de-list' the values

@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from threading import Timer
 import core
-from core import config, searcher
+from core import searcher
 from cherrypy.process import plugins
 from log import log
 
@@ -53,10 +53,9 @@ class ScheduledTasks(object):
 
         def __init__(self):
             self.searcher = searcher.Searcher()
-            conf = config.Config()
-            hr = int(conf['Search']['searchtimehr'])
-            min = int(conf['Search']['searchtimemin'])
-            interval = int(conf['Search']['searchfrequency'])
+            hr = int(core.CONFIG['Search']['searchtimehr'])
+            min = int(core.CONFIG['Search']['searchtimemin'])
+            interval = int(core.CONFIG['Search']['searchfrequency'])
             self.task = Task(hr, min, interval, self.searcher.auto_search_and_grab)
 
 class Task(object):

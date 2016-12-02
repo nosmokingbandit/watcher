@@ -10,7 +10,6 @@ class Status():
 
     def __init__(self):
         self.version = version.Version()
-        self.config = config.Config()
         return
 
     @expose
@@ -105,13 +104,13 @@ class Status():
         return doc.render()
 
     def update_check(self):
-        if self.config['Server']['checkupdates'] == 'false':
+        if core.CONFIG['Server']['checkupdates'] == 'false':
             return None
 
         now = datetime.datetime.now()
         if core.UPDATE_LAST_CHECKED != None:
             hours_since_last = (now - core.UPDATE_LAST_CHECKED).seconds / 3600
-            if hours_since_last >= int(self.config['Server']['checkupdatefrequency']):
+            if hours_since_last >= int(core.CONFIG['Server']['checkupdatefrequency']):
                 core.UPDATE_LAST_CHECKED = now
                 return self.version.manager.update_check()
             else:

@@ -16,11 +16,10 @@ class Searcher():
         self.sql = sqldb.SQL()
         self.predb = predb.PreDB()
         self.snatcher = snatcher.Snatcher()
-        self.conf = config.Config()
 
     # this only runs when scheduled. Only started by the user when changing search settings.
     def auto_search_and_grab(self, mode=''):
-        auto_grab = self.conf['Search']['autograb']
+        auto_grab = core.CONFIG['Search']['autograb']
 
         self.predb.check_all()
         logging.info('Running automatic search.')
@@ -52,7 +51,6 @@ class Searcher():
         logging.info('Autosearch complete.')
         return
 
-    # searches indexer for movies. Returns bool if found
     def search(self, imdbid, title):
         '''
         Search for releases for the imdbid and title supplied.

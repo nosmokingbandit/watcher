@@ -18,3 +18,6 @@ CURRENT_HASH = None
 
 # Scheduler info
 NEXT_SEARCH = None
+
+# Store settings after write. Reduces reads from file.
+CONFIG = None

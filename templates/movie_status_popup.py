@@ -2,7 +2,7 @@ import dominate
 from dominate.tags import *
 import json
 import core
-from core import sqldb, config
+from core import sqldb
 from core.conversions import Conversions
 
 
@@ -157,10 +157,9 @@ class MovieStatusPopup():
         if data['quality']:
             quality = json.loads(data['quality'])
         else:
-            self.config = config.Config()
             quality = {}
-            quality['Quality'] = self.config['Quality']
-            quality['Filters'] = self.config['Filters']
+            quality['Quality'] = core.CONFIG['Quality']
+            quality['Filters'] = core.CONFIG['Filters']
             for i in quality['Filters']:
                 quality['Filters'][i] = ','.join(quality['Filters'][i])
         # converts comma delimited values into lists

@@ -74,10 +74,10 @@ class Ajax(object):
             imdbid = data['imdbid']
             title = data['title']
             self.predb.check_one(data)
-            if self.config['Search']['searchafteradd'] == 'true':
+            if core.CONFIG['Search']['searchafteradd'] == 'true':
                 if self.searcher.search(imdbid, title):
                     # if we don't need to wait to grab the movie do it now.
-                    if self.config['Search']['autograb'] == 'true' and self.config['Search']['waitdays'] == '0':
+                    if core.CONFIG['Search']['autograb'] == 'true' and core.CONFIG['Search']['waitdays'] == '0':
                         self.snatcher.auto_grab(imdbid)
 
         TABLE = 'MOVIES'

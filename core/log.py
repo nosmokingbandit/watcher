@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import date
 import os
-from core import config
+import core
 import logging
 import logging.handlers
 
@@ -13,10 +13,8 @@ class log(object):
         if not os.path.exists('logs'):
             os.makedirs('logs')
 
-
-        conf = config.Config()
         path = 'logs/log.txt'
-        backup_days = int(conf['Server']['keeplog'])
+        backup_days = int(core.CONFIG['Server']['keeplog'])
         logging_level = logging.INFO
 
         formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')

@@ -12,8 +12,7 @@ logging = logging.getLogger(__name__)
 class PostProcessing(object):
 
     def __init__(self):
-        self.conf = config.Config()
-        self.pp_conf = self.conf['Postprocessing']
+        self.pp_conf = core.CONFIG['Postprocessing']
         self.sql = sqldb.SQL()
 
     def failed(self, guid, path):
@@ -34,7 +33,7 @@ class PostProcessing(object):
         if imdbid:
             logging.info('Post-processing {} as failed'.format(imdbid))
             try:
-                if self.conf['Search']['autograb'] == 'true':
+                if core.CONFIG['Search']['autograb'] == 'true':
                     s = snatcher.Snatcher()
 
                     if s.auto_grab(imdbid) == True:
@@ -194,7 +193,6 @@ class PostProcessing(object):
                 data[k] = re.sub(r'[:"*?<>|]+', "", v)
 
         return data
-
 
     def renamer(self, data):
         '''

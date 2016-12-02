@@ -1,4 +1,5 @@
-from core import config, sqldb
+import core
+from core import sqldb
 from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 import json
@@ -10,7 +11,6 @@ class ScoreResults():
 
     def __init__(self):
         self.sql = sqldb.SQL()
-        self.config = config.Config()
         return
 
     # returns list of dictionary results after filtering and scoring
@@ -34,10 +34,10 @@ class ScoreResults():
             qualities = quality_dict['Quality']
             filters = quality_dict['Filters']
         else:
-            qualities = self.config['Quality']
-            filters = self.config['Filters']
+            qualities = core.CONFIG['Quality']
+            filters = core.CONFIG['Filters']
 
-        retention = int(self.config['Search']['retention'])
+        retention = int(core.CONFIG['Search']['retention'])
         required = filters['requiredwords'].lower().split(',')
         preferred = filters['preferredwords'].lower().split(',')
         ignored = filters['ignoredwords'].lower().split(',')

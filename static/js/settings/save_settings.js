@@ -7,7 +7,7 @@ $(document).ready(function () {
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width('2.5em');
-        $this_span.text('').addClass('fa-circle-o-notch fa-spin');
+        $this_span.text('').addClass('fa fa-circle-o-notch fa-spin');
 
         //check if only one downloader is active:
         var enabled = 0

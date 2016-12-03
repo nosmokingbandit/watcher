@@ -17,7 +17,7 @@ class log(object):
         backup_days = int(core.CONFIG['Server']['keeplog'])
         logging_level = logging.INFO
 
-        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+        formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s.%(funcName)s: %(message)s')
         handler = logging.handlers.TimedRotatingFileHandler(path, when="D", interval=1, backupCount=backup_days)
         handler.setFormatter(formatter)
         logger = logging.getLogger()

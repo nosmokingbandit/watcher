@@ -39,24 +39,9 @@ $(document).ready(function () {
        }
     });
 
-    /* toggle check box status */
-    $('i.checkbox').click(function(){
-        $this = $(this);
-        // turn on
-        if( $this.attr("value") == "false" ){
-            $this[0].setAttribute("value", "true");
-            $this.removeClass('fa-square-o')
-            $this.addClass('fa-check-square-o');
-        // turn off
-        } else if ( $this.attr("value") == "true" ){
-            $this[0].setAttribute("value", "false");
-            $this.removeClass('fa-check-square-o');
-            $this.addClass('fa-square-o')
-        }
-    });
-
-    /* toggle dynamically created checkboxes */
-    $('ul#newznab_list').on('click', 'i.checkbox', function(){
+    /* toggle checkbox status */
+    $('div#content').on('click', 'i.checkbox', function(){
+        console.log('ul#newznab')
         // turn on
         if( $(this).attr("value") == "false" ){
             $(this).attr("value", "true");

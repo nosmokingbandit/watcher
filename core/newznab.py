@@ -28,6 +28,8 @@ class NewzNab():
         imdbid_s = imdbid[2:] #just imdbid numbers
 
         for indexer in indexers:
+            if indexer[2] == 'false':
+                continue
             url = indexer[0]
             if url[-1] != '/':
                 url = url + '/'

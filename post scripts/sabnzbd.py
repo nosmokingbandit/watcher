@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Disable 'Post-Process Only Verified Jobs' in Sabnzbd.
 # Set up Watcher server info.
 conf = {
@@ -9,6 +11,7 @@ conf = {
     'sabport': '8080'
 }
 
+# DO NOT TOUCH ANYTHING BELOW THIS LINE #
 
 import sys
 import os

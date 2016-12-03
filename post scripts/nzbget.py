@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ###########################################
 ### NZBGET POST-PROCESSING SCRIPT       ###
 

@@ -115,9 +115,7 @@ $(document).ready(function () {
         $this_span = $this.children(':first');
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
-        $this.animate({
-           width: '2.5em'
-        }, 750);
+        $this.width('2.5em');
         $this_span.text('').addClass('fa fa-circle-o-notch fa-spin');
 
         // Gets entered info, even if not saved
@@ -135,7 +133,11 @@ $(document).ready(function () {
         .done(function(r){
             $this.removeAttr('style');
             $this_span.text('Test Connection').removeClass('fa fa-circle-o-notch fa-spin');
-            swal("Error", r, 'warning');
+            if(r.includes("Err") || r.includes(":")){
+                swal("Error", r, 'warning');
+            } else {
+                swal("Connected!", r, 'success');
+            }
         })
     });
 

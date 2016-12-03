@@ -2,26 +2,13 @@ import dominate
 from dominate.tags import *
 import json
 import sys
+import core
 from core.movieinfo import Omdb, Trailer
-from core import config
 
 class MovieInfoPopup():
 
     def __init__(self):
-        self.config = config.Config()
-        self.c = self.config.sections() ## can this be done better?
-        # converts comma delimited values into lists
-        for section in self.c:
-            if section != 'Filters':
-                for key in self.c[section]:
-                    value = self.c[section][key]
-                    if ',' in value:
-                        self.c[section][key] = value.split(',')
-            elif section == 'Filters':
-                for key in self.c[section]:
-                    value = self.c[section][key]
-                    if ',' in value:
-                        self.c[section][key] = value.replace(',', ', ')
+        return
 
     def html(self, imdbid):
 
@@ -71,9 +58,9 @@ class MovieInfoPopup():
 
                                 for res in resolutions:
                                     prior = '{}priority'.format(res)
-                                    with li(cls='rbord', id=prior, sort=self.c['Quality'][res][1]):
+                                    with li(cls='rbord', id=prior, sort=core.CONFIG['Quality'][res][1]):
                                         i(cls='fa fa-bars')
-                                        i(id=res, cls='fa fa-square-o checkbox', value=self.c['Quality'][res][0])
+                                        i(id=res, cls='fa fa-square-o checkbox', value=core.CONFIG['Quality'][res][0])
                                         span(res)
 
                             # Size restriction block
@@ -85,19 +72,19 @@ class MovieInfoPopup():
                                         max = '{}max'.format(res)
                                         with li():
                                             span(res)
-                                            input(type='number', id=min, value=self.c['Quality'][res][2], min='0', style='width: 7.5em')
-                                            input(type='number', id=max, value=self.c['Quality'][res][3], min='0', style='width: 7.5em')
+                                            input(type='number', id=min, value=core.CONFIG['Quality'][res][2], min='0', style='width: 7.5em')
+                                            input(type='number', id=max, value=core.CONFIG['Quality'][res][3], min='0', style='width: 7.5em')
 
                             with ul(id='filters', cls='wide'):
                                 with li(cls='bbord'):
                                     span('Required words:')
-                                    input(type='text', id='requiredwords', value=self.c['Filters']['requiredwords'], style='width: 16em')
+                                    input(type='text', id='requiredwords', value=core.CONFIG['Filters']['requiredwords'], style='width: 16em')
                                 with li(cls='bbord'):
                                     span('Preferred words:')
-                                    input(type='text', id='preferredwords', value=self.c['Filters']['preferredwords'], style='width: 16em')
+                                    input(type='text', id='preferredwords', value=core.CONFIG['Filters']['preferredwords'], style='width: 16em')
                                 with li():
                                     span('Ignored words:')
-                                    input(type='text', id='ignoredwords', value=self.c['Filters']['ignoredwords'], style='width: 16em')
+                                    input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'], style='width: 16em')
 
                 with div(id='plot'):
                     p(data['plot'])

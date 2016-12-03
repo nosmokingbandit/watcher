@@ -57,7 +57,7 @@ class Nzbget():
             nzbg_server = ServerProxy(url)
 
         filename = '{}.watcher.nzb'.format(data['title'])
-        content = data['guid'].replace('http://', 'https://')
+        contenturl = data['guid']
         category = nzbg_conf['nzbgcategory']
         priority_keys = {
             'Very Low': -100,
@@ -76,7 +76,7 @@ class Nzbget():
         dupescore = data['score']
         dupemode = 'All'
 
-        response = nzbg_server.append(filename, content, category, priority, False, paused, dupekey, dupescore, dupemode)
+        response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
 
         return response
 

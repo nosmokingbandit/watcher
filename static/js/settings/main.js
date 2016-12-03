@@ -44,13 +44,12 @@ $(document).ready(function () {
         $this = $(this);
         // turn on
         if( $this.attr("value") == "false" ){
-            $this.removeAttr("value");
-            $this.attr("value", "true");
+            $this[0].setAttribute("value", "true");
             $this.removeClass('fa-square-o')
             $this.addClass('fa-check-square-o');
         // turn off
         } else if ( $this.attr("value") == "true" ){
-            $this.attr("value", "false");
+            $this[0].setAttribute("value", "false");
             $this.removeClass('fa-check-square-o');
             $this.addClass('fa-square-o')
         }

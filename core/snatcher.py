@@ -12,7 +12,7 @@ class Snatcher():
         self.sql = sqldb.SQL()
         return
 
-    def auto_grab(self, imdbid):
+    def auto_grab(self, imdbid, minscore=0):
         '''
         Grabs the best scoring result that isn't 'Bad'
         Returns True or False if movie is snatched
@@ -38,9 +38,15 @@ class Snatcher():
         # through in order until we find the first Available result
         # and grab it.
         for result in search_results:
-            if result['status'] == 'Available':
+            status = result['status']
+
+            if result['status'] == 'Available' and result['score'] > minscore:
                 self.snatch(result)
                 return True
+            # if doing a re-search, if top ranked result is Snatched we have nothing to do.
+            if status in ['Snatched', 'Finished']:
+                logging.info('Top-scoring release for {} has already been snatched.'.format(imdbid))
+                return False
 
         logging.info('Unable to automatically grab {}, no Available results.'.format(imdbid))
         return False

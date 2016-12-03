@@ -4,6 +4,8 @@ import urllib2
 import json
 import shutil
 import re
+import datetime
+import core
 from core import config, sqldb, ajax, snatcher
 
 import logging
@@ -16,6 +18,14 @@ class PostProcessing(object):
         self.sql = sqldb.SQL()
 
     def failed(self, guid, path):
+        '''
+        Takes str guid and str path to process failed downloads.
+        Will delete path if cleanupenabled is 'true'
+        Marks guid as 'Bad' in database MARKEDRESULTS
+        If the guid is not from Watcher it will not mark bad or grab next result, but will still mark in MARKEDRESULTS.
+        Will grab next best release if autograb is 'true'
+        '''
+
         if guid == 'None':
             return 'Success'
 
@@ -68,7 +78,9 @@ class PostProcessing(object):
             imdbid = self.sql.get_imdbid_from_guid(guid)
             if not imdbid:
                 imdbid = None
-        movie_data = self.movie_data(imdbid, path)
+
+        # gets any possible information from the imdbid and path (looks at filename)
+        movie_data = self.movie_data(imdbid, path, guid)
 
         if self.pp_conf['renamerenabled'] == 'true':
             new_name = self.renamer(movie_data)
@@ -84,10 +96,16 @@ class PostProcessing(object):
                 if self.pp_conf['cleanupenabled'] == 'true':
                     self.cleanup(movie_data)
 
-
+        # update DB tables to Finished and update MOVIES row to have finisheddate and finishedscore
         imdbid = movie_data['imdbid']
+        finisheddate = movie_data['finisheddate']
+        finishedscore = movie_data['finishedscore']
         try:
             if not self.sql.update('MOVIES', 'status', 'Finished', imdbid=imdbid):
+                return False
+            if not self.sql.update('MOVIES', 'finisheddate', finisheddate, imdbid=imdbid):
+                return False
+            if not self.sql.update('MOVIES', 'finishedscore', finishedscore, imdbid=imdbid):
                 return False
             if not self.sql.update('SEARCHRESULTS', 'status', 'Finished', guid=guid):
                 return False
@@ -117,19 +135,7 @@ class PostProcessing(object):
         Returns dict as described below.
         '''
 
-        '''
-        This is out base dict. We declare everything here in case we can't find a value later on. We'll still have the key in the dict, so we don't need to check if a key exists every time we want to use one. This MUST match all of the options the user is able to select in Settings.
-        '''
-        data = {
-            'title':'',
-            'year':'',
-            'resolution': '',
-            'group':'',
-            'audiocodec':'',
-            'videocodec':'',
-            'rated':'',
-            'imdbid':''
-        }
+        today = str(datetime.date.today())
 
         # Find the biggest file in the dir. It should be safe to assume that this is the movie.
         files =  os.listdir(path)
@@ -142,6 +148,23 @@ class PostProcessing(object):
 
         filename, ext = os.path.splitext(moviefile)
 
+        '''
+        This is out base dict. We declare everything here in case we can't find a value later on. We'll still have the key in the dict, so we don't need to check if a key exists every time we want to use one. This MUST match all of the options the user is able to select in Settings.
+        '''
+        data = {
+            'title':'',
+            'year':'',
+            'resolution': '',
+            'group':'',
+            'audiocodec':'',
+            'videocodec':'',
+            'rated':'',
+            'imdbid':'',
+            'finisheddate': today,
+            'finishedscore': 1000 # If we are processing a release not grabbed by Watcher we won't have a score, so 1000 is a good upper limit to use for outside processing.
+        }
+
+        # start filling out what we can
         data['filename'] = filename
         data['ext'] = ext
         data['path'] = os.path.normpath(path)
@@ -162,9 +185,11 @@ class PostProcessing(object):
         if imdbid:
             localdata = self.sql.get_movie_details(imdbid)
             if localdata:
-                # sqlalchemy adds an instance state to the results. We need to get rid of it.
-                del localdata['_sa_instance_state']
-                data.update(localdata)
+                # this converts it to a usable dict
+                localdict = dict(localdata)
+                # don't want to overwrite finisheddate
+                del localdict['finisheddate']
+                data.update(localdict)
 
         # If we don't know the imdbid we'll look it up at ombd and add their info to the dict. This can happen if we are post-processing a movie that wasn't snatched by Watcher.
         else:
@@ -186,10 +211,16 @@ class PostProcessing(object):
                 omdbdata_lower = dict((k.lower(), v) for k, v in omdbdata.iteritems())
                 data.update(omdbdata_lower)
 
+
+        # get the snatched result score from SEARCHRESULTS
+        gssr = self.sql.get_single_search_result(guid)
+        if gssr:
+            data['finishedscore'] = gssr['score']
+
         # remove any invalid characters
         for k, v in data.iteritems():
             # but we have to keep the path unmodified
-            if k != 'path':
+            if k != 'path' and type(v) != int:
                 data[k] = re.sub(r'[:"*?<>|]+', "", v)
 
         return data

@@ -19,34 +19,87 @@ class Searcher():
 
     # this only runs when scheduled. Only started by the user when changing search settings.
     def auto_search_and_grab(self, mode=''):
+        '''
+        Runs search when scheduled. ONLY runs when scheduled.
+        Searches only for movies that are Wanted, Found, or Finished (if inside user-allowed range)
+
+        Will grab movie if autograb is 'true' and movie is 'Found'
+        '''
+
+        today = datetime.date.today()
+        keepsearching = core.CONFIG['Search']['keepsearching']
+        keepsearchingdays = int(core.CONFIG['Search']['keepsearchingdays'])
+        keepsearchingdelta = datetime.timedelta(days=keepsearchingdays)
         auto_grab = core.CONFIG['Search']['autograb']
 
         self.predb.check_all()
         logging.info('Running automatic search.')
+        if keepsearching == 'true':
+            logging.info('Search for finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
         movies = self.sql.get_user_movies()
         if not movies:
             return False
         TABLE_NAME = 'MOVIES'
 
+        '''
+        Loops through all movies to search for any that require it.
+        '''
         for movie in movies:
             imdbid = movie['imdbid']
             title = movie['title']
-            if movie['predb'] == 'found':
-                if mode == 'all':
+            status = movie['status']
+            finisheddate = movie['finisheddate']
+
+            if movie['predb'] != 'found':
+                continue
+
+            if status in ['Wanted', 'Found']:
+                    logging.info('{} status is {}. Searching now.'.format(title, status ))
                     self.search(imdbid, title)
-                elif movie['status'] in ['Wanted', 'Found']:
-                        self.search(imdbid, title)
+                    continue
 
+            if status == 'Finished' and keepsearching == 'true':
+                logging.info('{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
+                finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
+                if finisheddateobj + keepsearchingdelta >= today:
+                    logging.info('{} finished on {}, searching again.'.format(title, finisheddate ))
+                    self.search(imdbid, title)
+                    continue
+                else:
+                    logging.info('{} finished on {} and is not within the search window.'.format(title, finisheddate))
+                    continue
+            continue
 
+        '''
+        If autograb is enabled, loops through movies and grabs any appropriate releases.
+        '''
         if auto_grab == 'true':
+            logging.info('Running automatic snatcher.')
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
             if not movies:
                 return False
             for movie in movies:
-                if movie['status'] == 'Found':
-                    logging.info('Running automatic snatcher for {}.'.format(movie['title']))
-                    self.snatcher.auto_grab(movie['imdbid'])
+                status = movie['status']
+                finishedscore = movie['finishedscore']
+
+                if status == 'Found':
+                    logging.info('{} status is Found. Running automatic snatcher.'.format(title))
+                    self.snatcher.auto_grab(imdbid)
+                    continue
+
+                if status == 'Finished' and keepsearching == 'true':
+                    logging.info('{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
+                    if finisheddateobj + keepsearchingdelta >= today:
+                        logging.info('{} finished on {}, checking for a better result.'.format(title, finisheddate))
+                        self.snatcher.auto_grab(imdbid)
+                        continue
+                    else:
+                        logging.info('{} finished on {} and is not within the snatch again window.'.format(title, finisheddate))
+                        continue
+                else:
+                    continue
+
 
         logging.info('Autosearch complete.')
         return
@@ -72,18 +125,13 @@ class Searcher():
 
 
         if scored_results:
-            if self.store_results(scored_results, imdbid):
-                return True
-            else:
-                return False
-        else:
-            logging.info('No acceptable results found for {}.'.format(imdbid))
-            logging.info('Updating {} {} status to wanted.'.format(TABLE_NAME, imdbid))
-            if self.sql.update(TABLE_NAME, 'status', 'Wanted', imdbid=imdbid ):
-                return True
-            else:
+            if not self.store_results(scored_results, imdbid):
                 return False
 
+        if not self.update_movie_status(imdbid):
+            return False
+
+        return True
 
     def store_results(self, results, imdbid):
         '''
@@ -113,10 +161,7 @@ class Searcher():
 
         if BATCH_DB_STRING:
             if self.sql.write_search_results(BATCH_DB_STRING):
-                if self.update_movie_status(imdbid):
-                    return True
-                else:
-                    return False
+                return True
             else:
                 return False
         else:
@@ -135,7 +180,7 @@ class Searcher():
 
         if 'Finished' in result_status:
             status = 'Finished'
-        if 'Snatched' in result_status:
+        elif 'Snatched' in result_status:
             status = 'Snatched'
         elif 'Available' in result_status:
             status = 'Found'

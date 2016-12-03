@@ -65,7 +65,12 @@ class Settings():
                         span('Wait ')
                         input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                         span(' days for best release.')
-                        span('After results are found, wait to snatch in case better match is found.', cls='tip')
+                        span('After movie is found, wait to snatch in case better match is found.', cls='tip')
+                    with li(cls='bbord'):
+                        i(id='keepsearching', cls='fa fa-square-o checkbox', value=c[c_s]['keepsearching'])
+                        span('Continue searching for ')
+                        input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
+                        span(' days for best release.')
                     with li():
                         span('Retention: ')
                         input(type='number', min='0', id='retention', value=c[c_s]['retention'])

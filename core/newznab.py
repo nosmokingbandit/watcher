@@ -9,6 +9,7 @@ logging = logging.getLogger(__name__)
 class NewzNab():
 
     def __init__(self):
+        return
 
     # Returns a list of results stored as dicts
     def search_all(self, imdbid):

@@ -1,4 +1,4 @@
-from core import config
+import core
 import urllib2
 import json
 
@@ -32,8 +32,7 @@ class Sabnzbd():
     # returns dict {'status': <>, 'nzo_ids': [<>] }
     @staticmethod
     def add_nzb(data):
-        c = config.Config()
-        sab_conf = c['Sabnzbd']
+        sab_conf = core.CONFIG['Sabnzbd']
 
         con_test = Sabnzbd.test_connection(sab_conf)
         if con_test != True:

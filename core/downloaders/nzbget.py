@@ -1,3 +1,4 @@
+import core
 from core import config
 import urllib2
 from xmlrpclib import ServerProxy
@@ -36,8 +37,7 @@ class Nzbget():
 
     @staticmethod
     def add_nzb(data):
-        c = config.Config()
-        nzbg_conf = c['NzbGet']
+        nzbg_conf = core.CONFIG['NzbGet']
 
         if Nzbget.test_connection(nzbg_conf) != True:
             return "Could not connect to NZBGet."

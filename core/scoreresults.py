@@ -15,12 +15,20 @@ class ScoreResults():
 
     # returns list of dictionary results after filtering and scoring
     def score(self, results, imdbid, type):
-        '''
-        Accepts list of dicts 'results'
-        type is 'nzb' or 'torrent'
+        ''' Scores and filters search results.
+        :param results: list of dicts of search results
+        :param imdbid: str imdb identification number (tt123456)
+        :param type: str 'nzb' or 'torrent'
 
-        Returns list of dicts with unwanted releases removed and scores added.
+        Iterates over the list and filters movies based on Words.
+        Scores movie based on reslution priority, title match, and
+            preferred words,
 
+        Orders the list by Score, then by Size. So a 5gb release will have
+            a lower index than a 2gb release of the same score.
+
+
+        Returns list of dicts.
         '''
 
         self.results = results

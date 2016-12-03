@@ -18,12 +18,17 @@ class PostProcessing(object):
         self.sql = sqldb.SQL()
 
     def failed(self, guid, path):
-        '''
-        Takes str guid and str path to process failed downloads.
-        Will delete path if cleanupenabled is 'true'
-        Marks guid as 'Bad' in database MARKEDRESULTS
+        ''' Post-process failed downloads.
+        :param guid: str guid of downloads
+        :param path: str path to downloaded files.
+
+        If Clean Up is enabled will delete path and contents.
+        Sets status to 'Bad' in MARKEDRESULTS.
+        If Auto Grab is enabled will grab next best release.
+
         If the guid is not from Watcher it will not mark bad or grab next result, but will still mark in MARKEDRESULTS.
-        Will grab next best release if autograb is 'true'
+
+        Returns 'Success' or 'Failed' to go to ajax handler.
         '''
 
         if guid == 'None':
@@ -61,15 +66,20 @@ class PostProcessing(object):
                 return 'Failed'
 
     def complete(self, guid, path):
-        '''
-        Processed completed downloads.
-        Will mark guid as 'Finished' in MARKEDRESULTS
+        ''' Post-process completed downloads.
+        :param guid: str guid of downloads.
+        :param path: str path to downloaded files.
+
+        Sets status to 'Finished' in MARKEDRESULTS.
         Get imdbid from guid and marks movie as 'Finished' in MOVIES.
         If the guid is not from Watcher it searches OMDB to find the imdbid. see movie_data().
-        Will rename and move is renamerenabled and moverenabled are 'true'
+        If Renamer is enabled, renames file according to settings.
+        If Mover is enabled, moves file to specified location.
+        Set finished date in SEARCHRESULTS.
 
-        Updates SEARCHRESULTS row to have correct finished date
+        Returns 'Success' or 'Failed' to go to ajax handler.
         '''
+
         logging.info('Post-processing {} as complete.'.format(guid))
         imdbid = None
 
@@ -129,9 +139,13 @@ class PostProcessing(object):
 
 
     def movie_data(self, imdbid, path, guid):
-        '''
-        Gathers neccesary data for post-processing.
+        ''' Gathers all required movie information.
+        :param imdbid: str imdb identification number (tt123456) or None if uknown
+        :param guid: str guid of downloads.
+        :param path: str path to downloaded files.
+
         Will search OMBD if Watcher doesn't have info for the guid.
+
         Returns dict as described below.
         '''
 
@@ -226,9 +240,10 @@ class PostProcessing(object):
         return data
 
     def renamer(self, data):
-        '''
-        Renames movie file based on renamerstring
-        Returns new file name.
+        ''' Renames movie file based on renamerstring.
+        :param data: dict of movie information.
+
+        Returns str new file name.
         '''
         renamer_string = self.pp_conf['renamerstring']
 
@@ -252,10 +267,14 @@ class PostProcessing(object):
 
 
     def mover(self, data):
+        ''' Moves movie file.
+        :param data: dict of movie information.
+
+        Moves file to location specified in config.
+
+        Returns Bool for success/failure
         '''
-        Moves movie file to moverpath
-        Returns True on success
-        '''
+
         movie_file = os.path.join(data['path'], data['filename'] + data['ext'])
 
         mover_path = self.pp_conf['moverpath']
@@ -280,9 +299,12 @@ class PostProcessing(object):
         return True
 
     def cleanup(self, data):
+        ''' Deletes failed download files.
+        :param data: dict of movie information.
+
+        Does not return.
         '''
-        For a failed download, deletes data['path']
-        '''
+
         remove_path = data['path']
         logging.info('Clean Up. Removing {}.'.format(remove_path))
         try:

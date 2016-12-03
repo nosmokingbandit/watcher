@@ -16,8 +16,8 @@ import logging
 logging = logging.getLogger(__name__)
 
 class Ajax(object):
-    '''
-    These are all the methods that handle ajax post/get requests from the browser.
+    ''' These are all the methods that handle
+    ajax post/get requests from the browser.
     '''
 
     def __init__(self):
@@ -30,9 +30,10 @@ class Ajax(object):
         self.snatcher = snatcher.Snatcher()
 
     def search_omdb(self, search_term):
-        '''
-        Searches OMDB for the user-supplied term.
-        Returns a json string of a list of dicts that contain omdb's data.
+        ''' Search omdb for movies
+        :param search_term: str title and year of movie (Movie Title 2016)
+
+        Returns str json-encoded list of dicts that contain omdb's data.
         '''
         results = self.omdb.search(search_term.replace(' ', '+'))
 
@@ -48,28 +49,38 @@ class Ajax(object):
 
 
     def movie_info_popup(self, imdbid):
+        ''' Calls movie_info_popup to render html
+        :param imdbid: str imdb identification number (tt123456)
+
+        Returns str html content.
         '''
-        Simply calls on the movie_info_popup template to contruct the html for this movie.
-        Returns html string.
-        '''
+
         mip = movie_info_popup.MovieInfoPopup()
         return mip.html(imdbid)
 
 
     def movie_status_popup(self, imdbid):
+        ''' Calls movie_status_popup to render html
+        :param imdbid: str imdb identification number (tt123456)
+
+        Returns str html content.
         '''
-        Simply calls on the movie_status_popup template to contruct the html for this movie.
-        Returns html string.
-        '''
+
         msp = movie_status_popup.MovieStatusPopup()
         return msp.html(imdbid)
 
     def add_wanted_movie(self, data):
+        ''' Adds movie to Wanted list.
+        :param data: dict of info to add to database.
+
+        Writes data to MOVIES table.
+        If Search on Add enabled,
+            searches for movie immediately in separate thread.
+            If Auto Grab enabled, will snatch movie if found.
+
+        Returns str succes or failure message.
         '''
-        Adds a movie to the Wanted list. Takes dict 'data' and writes it to MOVIES table.
-        Will start an automatic search and snatch if the settings allow.
-        Returns a success/fail message.
-        '''
+
         def thread_search_grab(data):
             imdbid = data['imdbid']
             title = data['title']
@@ -111,10 +122,11 @@ class Ajax(object):
 
 
     def save_settings(self, data):
-        '''
-        Saves *all* of the user's settings.
-        Returns 'failed' or 'success'
-        Alert messages are handled by the javascript.
+        ''' Saves settings to config file
+        :param data: dict of Section with nested dict of keys and values.
+            {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
+
+        Returns str 'failed' or 'success'
         '''
 
         logging.info('Saving settings.')
@@ -130,10 +142,15 @@ class Ajax(object):
             return 'failed'
 
     def remove_movie(self, imdbid):
+        ''' Removes movie
+        :param imdbid: str imdb identification number (tt123456)
+
+        Removes row from MOVIES, removes any entries in SEARCHRESULTS
+        In separate thread deletes poster image.
+
+        Returns srt 'error' or nothing on success
         '''
-        Deletes a movie, its seach results, and poster.
-        On error returns 'error', which is then hanlded by the javascript.
-        '''
+
         t = threading.Thread(target=self.poster.remove_poster, args=(imdbid,))
         t.start()
 
@@ -143,19 +160,23 @@ class Ajax(object):
             return 'error'
 
     def search(self, imdbid, title):
+        ''' Search indexers for specific movie.
+        :param imdbid: str imdb identification number (tt123456)
+        :param title: str movie title and year
+
+        Returns str 'done' when done.
         '''
-        Searches for a specific movie.
-        Returns 'done' when done.
-        '''
+
         self.searcher.search(imdbid, title)
         return 'done'
 
     def manual_download(self, guid):
+        ''' Sends search result to downloader manually
+        :param guid: str download link for nzb/magnet/torrent file.
+
+        Returns str success/fail message
         '''
-        Sends a search result to the downloader when the user clicks the Download Now button.
-        Returns an error message if the sql query fails.
-        Returns the success/fail message from Snatcher.snatch()
-        '''
+
         data = self.sql.get_single_search_result(guid)
         if data:
             return self.snatcher.snatch(data)
@@ -163,10 +184,12 @@ class Ajax(object):
             return 'Unable to get download information from the database. Check logs for more information.'
 
     def mark_bad(self, guid):
+        ''' Marks search result as Bad
+        :param guid: str download link for nzb/magnet/torrent file.
+
+        Returns str success/fail message
         '''
-        Marks a specific search result's guid as Bad.
-        Returns either a success or failure message.
-        '''
+
         TABLE = 'SEARCHRESULTS'
         logging.info('Marking {} as bad.'.format(guid))
 
@@ -217,10 +240,16 @@ class Ajax(object):
 
 
     def refresh_list(self, list, imdbid=''):
+        ''' Re-renders html for Movies/Results list
+        :param list: str the html list id to be re-rendered
+        :param imdbid: str imdb identification number (tt123456) <optional>
+
+        Calls template file to re-render a list when modified in the database.
+        #result_list requires imdbid.
+
+        Returns str html content.
         '''
-        Re-renders html for lists in /status so it can be updated when something is searched for, marked bad, snatched, etc...
-        Returns html.
-        '''
+
         if list == '#movie_list':
             return status.Status.movie_list()
         if list == '#result_list':
@@ -228,9 +257,15 @@ class Ajax(object):
 
 
     def test_downloader_connection(self, mode, data):
+        ''' Test connection to downloader.
+        :param mode: str which downloader to test.
+        :param data: dict connection information (url, port, login, etc)
+
+        Executes staticmethod in the chosen downloader's class.
+
+        Returns str success/failure message.
         '''
-        This simply fires off the staticmethod test_connection for the downloader app and returns a success/failure message.
-        '''
+
         data = json.loads(data)
 
         if mode == 'sabnzbd':
@@ -246,10 +281,19 @@ class Ajax(object):
 
 
     def server_status(self, mode):
+        ''' Check or modify status of CherryPy server_status
+        :param mode: str command or request of state
+
+        Restarts or Shuts Down server in separate thread.
+            Delays by one second to allow browser to redirect.
+
+        If mode == 'online', asks server for status.
+            (ENGINE.started, ENGINE.stopped, etc.)
+
+        Returns nothing for mode == restart || shutdown
+        Returns str server state if mode == online
         '''
-        This is a set of methods to test or set the server status.
-        The only one that returns a value is 'online' which sends the string ENGINE.started, ENGINE.stopped, etc.
-        '''
+
         def server_restart():
             cwd = os.getcwd()
             cherrypy.engine.restart()
@@ -276,14 +320,21 @@ class Ajax(object):
 
 
     def update_now(self, mode):
+        ''' Starts and executes update process.
+        :param mode: str 'set_true' or 'update_now'
+
+        If mode == set_true, sets core.UPDATING to True
+        This is done so if the user visits /update without setting true
+            they will be redirected back to status.
+        Yields 'true' back to browser
+
+        If mode == 'update_now', starts update process.
+        Yields 'true' or 'failed'. If true, restarts server.
         '''
-        This sets us up to update. The mode='set_true' is sent when the user clicks the Update Now button.
-        Then when the update page loads it sends mode='update_now'.
-        This way if the user goes to the update page without first setting 'set_true' it will redirect them back to status.
-        '''
+
         if mode == 'set_true':
             core.UPDATING = True
-            yield 'true'
+            yield 'true' # can be return?
         if mode == 'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
@@ -300,10 +351,17 @@ class Ajax(object):
             return
 
     def update_quality_settings(self, quality, imdbid):
-        '''
-        This takes the information from /movie_status_popup's quality change dialog and update the database entry. quality is the json database string, and imdbid is the imdbid for the target movie.
+        ''' Updates quality settings for individual title
+        :param quality: str json-formatted dict of quality settings as described below.
+        :param imdbid: str imdb identification number (tt123456).
 
-        Returns 'same' if there is no change (which the javascript ignores), returns the next automatic search time if the criteria has changed, or a failure message. Javascript constructs the alert message for the user if the results are changed.
+        Takes entered information from /movie_status_popup and
+            updates database table if it has changed.
+
+        quality must be formatted as:
+            json.dumps({'Quality': {'key': 'val'}, 'Filters': {'key': 'val'}})
+
+        Returns str 'same', error message, or change alert message.
         '''
 
         tabledata = self.sql.get_movie_details(imdbid)

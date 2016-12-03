@@ -18,12 +18,19 @@ class Searcher():
         self.snatcher = snatcher.Snatcher()
 
     # this only runs when scheduled. Only started by the user when changing search settings.
-    def auto_search_and_grab(self, mode=''):
-        '''
-        Runs search when scheduled. ONLY runs when scheduled.
-        Searches only for movies that are Wanted, Found, or Finished (if inside user-allowed range)
+    def auto_search_and_grab(self):
+        ''' Scheduled searcher and grabber.
 
-        Will grab movie if autograb is 'true' and movie is 'Found'
+        Runs search when scheduled. ONLY runs when scheduled.
+        Runs in its own thread.
+
+        Searches only for movies that are Wanted, Found,
+            or Finished -- if inside user-set date range.
+
+        Will grab movie if autograb is 'true' and
+            movie is 'Found' or 'Finished'.
+
+        Does not return
         '''
 
         today = datetime.date.today()
@@ -105,9 +112,17 @@ class Searcher():
         return
 
     def search(self, imdbid, title):
-        '''
-        Search for releases for the imdbid and title supplied.
-        Returns True of False if movie is found.
+        ''' Search indexers for releases
+        :param imdbid: str imdb identification number (tt123456)
+        :param title: str movie title and year (Movie Title 2016)
+
+        Checks if guid matches entries in MARKEDRESULTS and
+            sets status if found. Default status Available.
+
+        Sends results to self.scoreresults(), then stores them in SEARCHRESULTS
+
+
+        Returns Bool if movie is found.
         '''
 
         TABLE_NAME = 'MOVIES'
@@ -134,8 +149,15 @@ class Searcher():
         return True
 
     def store_results(self, results, imdbid):
-        '''
-        Stores search results in SEARCHRESULTS. Doesn't over-write existing results so we know then the movie was first found.
+        ''' Stores search results in database.
+        :param results: list of dicts of search results
+        :param imdbid: str imdb identification number (tt123456)
+
+        Checks if result exists in SEARCHRESULTS already and ignores them.
+            This keeps it from overwriting the date_found
+
+
+        Returns Bool on success/failure.
         '''
 
         logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
@@ -145,11 +167,13 @@ class Searcher():
         BATCH_DB_STRING = []
         existing_results = self.sql.get_search_results(imdbid)
 
+        # get list of guids of existing results
         if existing_results:
             for res in existing_results:
                 kept_guids.append(res['guid'])
 
         for result in results:
+            # if result already exists in table ignore it
             if result['guid'] in kept_guids:
                 continue
             else:
@@ -169,9 +193,13 @@ class Searcher():
 
     # Set MOVIE status to appropriate flag
     def update_movie_status(self, imdbid):
-        '''
-        Updates status based on search results.
-        Changes MOVIES to reflect highest level of search result status.
+        ''' Updates Movie status.
+        :param imdbid: str imdb identification number (tt123456)
+
+        Updates Movie status based on search results.
+        Always sets the status to the highest possible level.
+
+        Returns bool on success/failure.
         '''
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)

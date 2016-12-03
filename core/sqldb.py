@@ -56,7 +56,8 @@ class SQL(object):
                                      Column('guid', TEXT),
                                      Column('torrentfile', TEXT),
                                      Column('resolution', TEXT),
-                                     Column('type', TEXT)
+                                     Column('type', TEXT),
+                                     Column('downloadid', TEXT)
                                     )
         self.MARKEDRESULTS = Table('MARKEDRESULTS', self.metadata,
                                      Column('imdbid', TEXT),

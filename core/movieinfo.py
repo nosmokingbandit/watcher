@@ -6,8 +6,12 @@ logging = logging.getLogger(__name__)
 
 class Omdb():
     def search(self, search_term ):
-        '''
-        Returns a list of dicts that contain OMDB's movie info for the supplied search_term.
+        ''' Search OMDB for all matches
+        :param search_term: str title of movie to search for.
+
+        For best results pass search_term as "Movie Title 2016"
+
+        Returns list of dicts of individual movies.
         '''
 
         search_term = search_term.replace(" ", "+")
@@ -30,9 +34,12 @@ class Omdb():
             return 'Search Error.'
 
     def movie_info(self, imdbid):
-        '''
-        Returns specific details for supplied imdbid. Gives more information than search(), but only for one movie.
+        ''' Searches OMDB for single movie details.
+        :param imdbid: str imdb identification number (tt123456)
 
+        Gives more information than search(), but only for one movie.
+
+        Returns dict.
         '''
 
         search_string = "http://www.omdbapi.com/?i={}&plot=short&tomatoes=true&r=json".format(imdbid)
@@ -60,9 +67,12 @@ class Omdb():
 
 class Trailer():
     def get_trailer(self, title_date):
-        '''
-        Gets the embed video link from youtube.
-        title_date is 'movie title 2016'
+        ''' Gets trailer embed url from Youtube.
+        :param title_date: str movie title and date ("Movie Title 2016")
+
+        Attempts to connect 3 times in case Youtube is down or not responding. Can fail.
+
+        Returns str or None
         '''
 
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')

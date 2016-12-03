@@ -13,10 +13,13 @@ class NewzNab():
 
     # Returns a list of results stored as dicts
     def search_all(self, imdbid):
+        ''' Search all Newznab indexers.
+        :param imdbid: string imdb movie id.
+            tt123456
+
+        Returns list of dicts with sorted nzb information.
         '''
-        Searched every enabled indexer for the supplied imdbid.
-        Returns a list of dicts with download information.
-        '''
+
         indexers = core.CONFIG['Indexers'].values()
 
         self.imdbid = imdbid
@@ -49,10 +52,9 @@ class NewzNab():
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
     def parse_newznab_xml(self, feed):
-        '''
-        Used to parse the xml response from newznab indexers.
-        Returns a dictionary of relevant information.
-        Some indexers won't return JSON even if you ask nicely, so we have to do this.
+        ''' Parse xml from Newnzb api.
+
+        Returns dict of sorted nzb information.
         '''
 
         root = ET.fromstring(feed)
@@ -71,10 +73,14 @@ class NewzNab():
         return res_list
 
     def make_item_dict(self, item):
-        '''
+        ''' Converts parsed xml into dict.
+        :param item: string of xml nzb information
+
         Helper function for parse_newznab_xml().
-        Takes filtered xml and returns dict.
+
+        Returns dict.
         '''
+
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate')
         d = {}
         for ic in item:
@@ -95,9 +101,12 @@ class NewzNab():
         return d
 
     def get_resolution(self, result):
-        '''
-        Helper function for parse_newznab_xml().
-        Returns str resolution gathered from category or title.
+        ''' Parses release resolution from newznab category or title.
+        :param result: dict of individual search result info
+
+        Helper function for make_item_dict()
+
+        Returns str resolution.
         '''
 
         title = result['title']

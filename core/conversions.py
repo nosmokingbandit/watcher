@@ -1,12 +1,16 @@
 import datetime
 
 class Conversions():
-    '''
-    Coverts data to human-readable formats.
-    '''
+    ''' Coverts data to human-readable formats. '''
 
     @staticmethod
     def human_file_size(value, format='%.1f'):
+        ''' Converts bytes to human readable size.
+        :param value: int file size in bytes
+
+        Returns str file size in highest appropriate suffix.
+        '''
+
         suffix = ('kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
 
         base = 1024
@@ -25,4 +29,10 @@ class Conversions():
 
     @staticmethod
     def human_datetime(dt):
+        ''' Converts datetime object into human-readable format.
+        :param dt: datetime object
+
+        Returns str date formatted as "Monday, Jan 1st, at 12:00" (24hr time)
+        '''
+
         return dt.strftime('%A, %b %d, at %H:%M')

@@ -80,8 +80,8 @@ class Task(object):
         self.timer = Timer(self.interval, self.task)
         self.timer.start()
 
-'''
-Global commands
+''' Global commands.
+
 cherrypy.engine.scheduler.{taskname}.stop()
                                     .restart()
                                     .start()
@@ -93,9 +93,12 @@ To add new task:
 
 Create new class, inherit Manager
 In __init__
-    gather time of day to start, interval, and function to fire. Pass to scheduler like this:
-    self.named_task = Task(hr, min, interval, self.searcher.auto_search)
+    Gather time of day to start, interval, and function to fire.
+    Pass to scheduler like this:
+        self.named_task = Task(hr, min, interval, self.searcher.auto_search)
 
-In class ScheduledTasks, add to start, stop, and restart. I'll eventually make a list of tasks and have start/stop/resart iterate over, but that is a job for tomorrow.
+In class ScheduledTasks, add to start, stop, and restart.
+I'll eventually make a list of tasks and have start/stop/resart iterate over.
+But that is a job for tomorrow.
 
 '''

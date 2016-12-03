@@ -76,12 +76,11 @@ class App(object):
 
     @cherrypy.expose
     def update_now(self, mode):
-        '''
-        Executes update method from version.Version()
+        ''' Executes update method from version.Version()
 
         The ajax response is a generator that will contain only the success/fail message.
 
-        We do this so the message can be passed to the ajax request in the browser while cherrypy restarts.
+        This is done so the message can be passed to the ajax request in the browser while cherrypy restarts.
         '''
 
         response = self.ajax.update_now(mode)

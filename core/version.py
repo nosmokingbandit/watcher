@@ -36,16 +36,15 @@ class Version(object):
 
 
 class Git(object):
-    '''
-    Class used to execute all GIT commands.
-    '''
+    ''' Class used to execute all GIT commands. '''
 
     def runner(self, args):
-        '''
-        Runs all git commmands.
-        Returns tuple (output, error message, exit_status).
+        ''' Runs all git commmands.
+        :param args: list of git arguments
 
+        Returns: tuple (output, error message, exit_status).
         '''
+
         command = ['git']
         for i in args.split(' '):
             command.append(i)
@@ -73,15 +72,19 @@ class Git(object):
         return (output, error, status)
 
     def available(self):
+        ''' Checks to see if we can execute git.
+
+        Returns: tuple (output, error message, exit_status).
         '''
-        Checks to see if we can execute git.
-        '''
+
         command = 'version'
         output, error, status = self.runner(command)
         output = output.splitlines()
         return (output, error, status)
 
     def fetch(self):
+        ''' Returns: tuple (output, error message, exit_status). '''
+
         command = 'fetch'
         output, error, status = self.runner(command)
         return (output, error, status)
@@ -134,13 +137,15 @@ class GitUpdater(object):
             return True
 
     def update_check(self):
+        ''' Gets commit delta from GIT.
+
+        Sets core.UPDATE_STATUS to return value.
+        Returns dict:
+            {'status': 'error', 'error': <error> }
+            {'status': 'behind', 'behind_count': #, 'local_hash': 'abcdefg', 'new_hash': 'bcdefgh'}
+            {'status': 'current'}
         '''
-        checks if an update is available.
-        Sets core.UPDATE_STATUS and returns dict:
-        {'status': 'error', 'error': <error> }
-        {'status': 'behind', 'behind_count': #, 'local_hash': 'abcdefg', 'new_hash': 'bcdefgh'}
-        {'status': 'current'}
-        '''
+
         logging.info('Checking git for a new version.')
         core.UPDATE_LAST_CHECKED = datetime.datetime.now()
 
@@ -213,13 +218,14 @@ class ZipUpdater(object):
         return
 
     def get_current_hash(self):
-        '''
-        If there is a version file in watcher/core we read the hash from it.
+        ''' Gets current commit hash.
 
-        If there is no version file then this is the first time Watcher is running. Since we don't know what version a zip from github is we'll just have to assume that it is the newest version for now.
+        If file watcher/core/version exists, reads hash from file
+        If not, gets newest hash from GIT and creates version file
 
-        Sets core.CURRENT_HASH so we can access it everywhere.
+        Sets core.CURRENT_HASH as current commit hash
         '''
+
         if os.path.isfile(self.version_file):
             with open(self.version_file, 'r') as f:
                 hash = f.read()
@@ -248,13 +254,15 @@ class ZipUpdater(object):
 
 
     def update_check(self):
+        ''' Gets commit delta from GIT
+
+        Sets core.UPDATE_STATUS to return value.
+        Returns dict:
+            {'status': 'error', 'error': <error> }
+            {'status': 'behind', 'behind_count': #, 'local_hash': 'abcdefg', 'new_hash': 'bcdefgh'}
+            {'status': 'current'}
         '''
-        checks if an update is available.
-        Sets core.UPDATE_STATUS and returns dict:
-        {'status': 'error', 'error': <error> }
-        {'status': 'behind', 'behind_count': #, 'local_hash': 'abcdefg', 'new_hash': 'bcdefgh'}
-        {'status': 'current'}
-        '''
+
         os.chdir(core.PROG_PATH)
         logging.info('Checking git for a new Zip.')
         core.UPDATE_LAST_CHECKED = datetime.datetime.now()

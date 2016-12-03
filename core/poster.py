@@ -15,9 +15,12 @@ class Poster():
             os.makedirs(self.poster_folder)
 
     def save_poster(self, imdbid, poster_url):
-        '''
-        Saves poster to self.poster_folder
-        as imdbid.jpg
+        ''' Saves poster locally
+        :param imdbid: str imdb identification number (tt123456)
+        :param poster_url: str url of poster image
+
+        Saves poster as watcher/static/images/posters/[imdbid].jpg
+
         Does not return.
         '''
 
@@ -53,9 +56,12 @@ class Poster():
             logging.info('{} already exists.'.format(new_poster_path))
 
     def remove_poster(self, imdbid):
+        ''' Deletes poster from disk.
+        :param imdbid: str imdb identification number (tt123456)
+
+        Does not return.
         '''
-        Deletes poster for given imdbid
-        '''
+
         logging.info('Removing poster for {}'.format(imdbid))
         path = '{}{}.jpg'.format(self.poster_folder, imdbid)
         if os.path.exists(path):
@@ -64,10 +70,14 @@ class Poster():
             logging.info('{} doesn\'t seem to exist.'.format(path))
 
     def find_poster(self, search_term):
+        ''' Searches Yahoo images for movie poster.
+        :param search_term: str movie title and date ("Movie Title 2016").
+
+        Not used any more, but it doesn't hurt to keep it around.
+
+        Returns str poster url.
         '''
-        Searches yahoo and returns poster image link.
-        I don't use this any more, but it doesn't hurt to keep it around.
-        '''
+
         lParser = parseImages()
 
         search_term = search_term.replace(" ","+")
@@ -83,8 +93,10 @@ class Poster():
         return lParser.imgs[1]
 
 class parseImages(HTMLParser):
-    '''
-    Used to parse image links from yahoo search.
+    ''' Parse Yahoo html.
+
+    Used to parse image links from yahoo search. Not used any more.
+
     '''
 
     def handle_starttag(self, tag, attrs):

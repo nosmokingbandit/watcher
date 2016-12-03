@@ -2,7 +2,6 @@ import urllib2
 import ssl
 import xml.etree.cElementTree as ET
 import core
-from core import config
 
 import logging
 logging = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logging = logging.getLogger(__name__)
 class NewzNab():
 
     def __init__(self):
-        self.conf = config.Config()
 
     # Returns a list of results stored as dicts
     def search_all(self, imdbid):

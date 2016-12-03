@@ -29,7 +29,6 @@ class Version(object):
 
     # returns 'git' or 'source' depending on install type
     def get_install_type(self):
-        git_folder = os.path.join(core.PROG_PATH, '.git')
         if os.path.exists('.git'):
             return 'git'
         else:

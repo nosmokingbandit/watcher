@@ -1,6 +1,7 @@
 import urllib2
 import ssl
 import xml.etree.cElementTree as ET
+import core
 from core import config
 
 import logging
@@ -17,8 +18,7 @@ class NewzNab():
         Searched every enabled indexer for the supplied imdbid.
         Returns a list of dicts with download information.
         '''
-
-        indexers = self.conf.get_indexers()
+        indexers = core.CONFIG['Indexers'].values()
 
         self.imdbid = imdbid
 

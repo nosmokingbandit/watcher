@@ -137,7 +137,7 @@ if __name__ == '__main__':
     # Get server settings ready
     server_conf = core.CONFIG['Server']
     conf_port = server_conf['serverport']
-    conf_host = server_conf['serverhost']
+    conf_host = str(server_conf['serverhost'])
     conf_browser = server_conf['launchbrowser']
 
     if passed_args.bind_address:

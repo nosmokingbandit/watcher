@@ -2,6 +2,7 @@
 import cherrypy
 import newznab, scoreresults, sqldb, snatcher, config
 import datetime, json
+import core
 from core.rss import predb
 from core.conversions import Conversions
 
@@ -220,4 +221,3 @@ class Searcher():
             return True
         else:
             return False
-

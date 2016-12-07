@@ -23,8 +23,7 @@ class Nzbget():
             nzbg_server = ServerProxy(url)
         else:
             url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
-
-        nzbg_server = ServerProxy(url)
+            nzbg_server = ServerProxy(url)
 
         try:
             request = nzbg_server.version()
@@ -50,11 +49,10 @@ class Nzbget():
         https = False
         if https:
             url = "https://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
-            nzbg_server = ServerProxy(url)
         else:
             url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
-
-            nzbg_server = ServerProxy(url)
+        
+	nzbg_server = ServerProxy(url)
 
         filename = '{}.watcher.nzb'.format(data['title'])
         contenturl = data['guid']

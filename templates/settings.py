@@ -7,6 +7,57 @@ from core import config
 from header import Header
 import os
 
+def settings_page(page):
+    ''' Decorator template for settings subpages
+    :param page: Sub-page content to render, written with Dominate tags, but without a Dominate instance.
+
+    Returns rendered html from Dominate.
+    '''
+
+    def page_template(self):
+        config = core.CONFIG
+        doc = dominate.document(title='Watcher')
+
+        with doc.head:
+            base(href="/static/")
+
+            link(rel='stylesheet',
+                 href='css/style.css')
+            link(rel='stylesheet',
+                 href='css/settings.css')
+            link(rel='stylesheet',
+                 href='//fonts.googleapis.com/css?family=Raleway')
+            link(rel='stylesheet',
+                 href='font-awesome/css/font-awesome.css')
+            link(rel='stylesheet',
+                 href='js/sweetalert-master/dist/sweetalert.css')
+
+            script(type='text/javascript',
+                   src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
+            script(type='text/javascript',
+                   src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
+            script(type='text/javascript',
+                   src='js/settings/main.js')
+            script(type='text/javascript',
+                   src='js/sweetalert-master/dist/sweetalert-dev.js')
+            script(type='text/javascript',
+                   src='js/settings/save_settings.js')
+
+        with doc:
+            Header.insert_header(current="settings")
+            with div(id="content"):
+                page(config)
+
+            with div(id='footer'):
+                with button(id='save_settings'):
+                    span('Save Changes')
+        return doc.render()
+
+
+    return page_template
+
+
+
 class Settings():
 
     def __init__(self):
@@ -32,7 +83,6 @@ class Settings():
             script(type='text/javascript', src='js/settings/main.js')
             script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
             script(type='text/javascript', src='js/settings/save_settings.js')
-
 
         with doc:
             Header.insert_header(current="settings")
@@ -219,7 +269,7 @@ class Settings():
                             input(id='renamerstring', type='text', style='width: 80%', value=c[c_s]['renamerstring'])
                         with li('Available tags:'):
                             br()
-                            span('{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup}', cls='taglist')
+                            span('{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
                             br()
                             span('Example: ')
                             br()
@@ -276,3 +326,9 @@ class Settings():
                 with button(id='save_settings'):
                     span('Save Changes')
         return doc.render()
+
+    @expose
+    @settings_page
+    def postprocessing(c):
+        return 'this is a test'
+

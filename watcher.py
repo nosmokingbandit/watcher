@@ -23,6 +23,11 @@ class App(object):
     def index(self):
         raise cherrypy.HTTPRedirect("/status")
 
+    @cherrypy.expose
+    def error_page_404(self, *args, **kwargs):
+        # this should be prettier
+        return "Page not Found!"
+
     '''
     From here down just forward requests to ajax.Ajax()
     '''
@@ -209,6 +214,7 @@ if __name__ == '__main__':
         webbrowser.open( "http://{}:{}".format(core.SERVER_ADDRESS,core.SERVER_PORT) )
         logging.info('Launching web browser.')
 
+    cherrypy.config.update({'error_page.404': root.error_page_404})
 
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()

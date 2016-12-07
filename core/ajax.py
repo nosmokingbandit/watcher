@@ -186,11 +186,11 @@ class Ajax(object):
         else:
             return 'Unable to get download information from the database. Check logs for more information.'
 
-    def mark_bad(self, guid):
-        ''' Marks search result as Bad
-        :param guid: str download link for nzb/magnet/torrent file.
+    def mark_bad(self, guid, imdbid):
+        ''' Marks guid as bad in SEARCHRESULTS and MARKEDRESULTS
+        :param guid: srt guid to mark
 
-        Returns str success/fail message
+        Returns success/failure message from update.mark_bad()
         '''
 
         return self.update.mark_bad(guid, imdbid=imdbid)

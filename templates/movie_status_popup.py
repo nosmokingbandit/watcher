@@ -13,7 +13,7 @@ class MovieStatusPopup():
 
     def html(self, imdbid):
 
-        data = self.sql.get_movie_details(imdbid)
+        data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
             poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
             title_date = data['title'] + " " + str( data['year'] )
@@ -151,7 +151,7 @@ class MovieStatusPopup():
     def get_quality_settings(self, data):
         '''
         TAG REMOVE
-        Actually we want to modif this.
+        Actually we want to modify this.
         We will ALWAYS have quality data in the table, so no more getting quality from config
         '''
         if data['quality']:

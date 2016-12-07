@@ -364,7 +364,7 @@ class Ajax(object):
         Returns str 'same', error message, or change alert message.
         '''
 
-        tabledata = self.sql.get_movie_details(imdbid)
+        tabledata = self.sql.get_movie_details('imdbid', imdbid)
 
         if tabledata == False:
             return 'Could not get existing information from sql table. Check logs for more information.'

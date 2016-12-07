@@ -33,7 +33,7 @@ class ScoreResults():
 
         self.results = results
 
-        tableresults = self.sql.get_movie_details(imdbid)
+        tableresults = self.sql.get_movie_details('imdbid', imdbid)
 
         title = tableresults['title']
 

@@ -183,20 +183,22 @@ class SQL(object):
             logging.error('EXECUTE SQL.GET_USER_MOVIES FAILED.')
             return False
 
-    def get_movie_details(self, imdbid):
+    def get_movie_details(self, idcol, idval):
         '''
         Returns dict of single movie details from MOVIES.
-        Selects by imdbid.
+
+        Returns dict of first match
         '''
 
-        logging.info('Retreving details for {}.'.format(imdbid))
+        logging.info('Retreving details for {}.'.format(idval))
 
-        command = 'SELECT * FROM MOVIES WHERE imdbid="{}"'.format(imdbid)
+        command = 'SELECT * FROM MOVIES WHERE {}="{}"'.format(idcol, idval)
 
         result = self.execute(command)
 
         if result:
-            return result.fetchone()
+            data = result.fetchone()
+            return dict(data)
         else:
             return False
 

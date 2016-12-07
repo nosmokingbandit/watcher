@@ -1,6 +1,5 @@
-# Handles searching usenet and torrent suppliers. Writes results to sqldb.
 import cherrypy
-import newznab, scoreresults, sqldb, snatcher, config
+import newznab, scoreresults, sqldb, snatcher, config, updatestatus
 import datetime, json
 import core
 from core.rss import predb
@@ -17,6 +16,7 @@ class Searcher():
         self.sql = sqldb.SQL()
         self.predb = predb.PreDB()
         self.snatcher = snatcher.Snatcher()
+        self.update = updatestatus.Status()
 
     # this only runs when scheduled. Only started by the user when changing search settings.
     def auto_search_and_grab(self):
@@ -144,7 +144,7 @@ class Searcher():
             if not self.store_results(scored_results, imdbid):
                 return False
 
-        if not self.update_movie_status(imdbid):
+        if not self.update.movie_status(imdbid):
             return False
 
         return True
@@ -156,7 +156,6 @@ class Searcher():
 
         Checks if result exists in SEARCHRESULTS already and ignores them.
             This keeps it from overwriting the date_found
-
 
         Returns Bool on success/failure.
         '''
@@ -191,34 +190,3 @@ class Searcher():
                 return False
         else:
             return True
-
-    def update_movie_status(self, imdbid):
-        ''' Updates Movie status.
-        :param imdbid: str imdb identification number (tt123456)
-
-        Updates Movie status based on search results.
-        Always sets the status to the highest possible level.
-
-        Returns bool on success/failure.
-        '''
-
-        result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
-        if not result_status:
-            logging.info('Could not get SEARCHRESULT statuses for {}'.format(imdbid))
-            return False
-
-        if 'Finished' in result_status:
-            status = 'Finished'
-        elif 'Snatched' in result_status:
-            status = 'Snatched'
-        elif 'Available' in result_status:
-            status = 'Found'
-        else:
-            status = 'Wanted'
-
-        logging.info('Setting MOVIES {} status to {}.'.format(imdbid, status))
-        if self.sql.update('MOVIES', 'status', status, imdbid=imdbid ):
-            return True
-        else:
-            logging.info('Could not set {} to {}'.format(imdbid, status))
-            return False

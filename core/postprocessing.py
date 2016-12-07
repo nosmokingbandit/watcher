@@ -92,10 +92,12 @@ class Postprocessing(object):
             logging.info('Post-processing as Failed.')
             # returns to url:
             response =  json.dumps(self.failed(data), indent=2, sort_keys=True)
+            logging.info(response)
         elif data['mode'] == 'complete':
             logging.info('Post-processing as Complete.')
             # returns to url:
             response = json.dumps(self.complete(data), indent=2, sort_keys=True)
+            logging.info(response)
         else:
             logging.info('Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false', \

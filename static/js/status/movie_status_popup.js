@@ -102,6 +102,10 @@ $(document).ready(function() {
     $('i#change_quality').click(function(){
         $(this).hide();
         $('i#save_quality').show();
+        $('i#close').fadeTo(100, 0.5)
+        $('i#remove').fadeTo(100, 0.5)
+        $('i#search_now').fadeTo(100, 0.5)
+
         $('ul#result_list').fadeOut();
         $('ul#quality').fadeIn();
     });
@@ -196,6 +200,10 @@ $(document).ready(function() {
             $this.removeClass('fa-circle-o-notch fa-spin');
             $this.hide();
 
+            $('i#close').fadeTo(100, 1)
+            $('i#remove').fadeTo(100, 1)
+            $('i#search_now').fadeTo(100, 1)
+
             $('i#change_quality').show();
             $('ul#result_list').fadeIn();
             $('ul#quality').fadeOut();
@@ -242,7 +250,10 @@ $(document).ready(function() {
                 var guid = $this.attr('guid');
                 var imdbid = $('span#title').attr('imdbid')
 
-                $.post("/mark_bad", {"guid":guid})
+                $.post("/mark_bad", {
+                    "guid":guid,
+                    "imdbid":imdbid
+                })
                 .done(function(r){
                     refresh_list('#movie_list');
                     refresh_list('#result_list', imdbid=imdbid);

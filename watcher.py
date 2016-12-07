@@ -3,7 +3,7 @@ import sys
 import cherrypy
 import datetime
 import core
-from core import poster, sqldb, config, ajax, api, version
+from core import poster, sqldb, config, ajax, api, version, postprocessing
 from core.scheduler import SchedulerPlugin
 from core.log import log
 import argparse, time
@@ -197,6 +197,11 @@ if __name__ == '__main__':
     cherrypy.tree.mount(api.API(),
                         '/api',
                         api.API.conf
+                       )
+
+    cherrypy.tree.mount(postprocessing.Postprocessing(),
+                        '/postprocessing',
+                        postprocessing.Postprocessing.conf
                        )
 
     # if everything goes well so far, open the browser

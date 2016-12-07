@@ -14,8 +14,11 @@ class Snatcher():
         return
 
     def auto_grab(self, imdbid, minscore=0):
-        '''
-        Grabs the best scoring result that isn't 'Bad'
+        ''' Grabs the best scoring result that isn't 'Bad'
+
+        This simply picks the best release, actual snatching is
+            handled by self.snatch()
+
         Returns True or False if movie is snatched
         '''
 
@@ -59,19 +62,26 @@ class Snatcher():
         Marks release and movie as 'Snatched'
         '''
 
+        data = dict(data)
+
         # Send to active downloaders
         guid = data['guid']
         imdbid = data['imdbid']
         title = data['title']
+        data['title'] = '{}.Watcher'.format(data['title'])
 
+        # If sending to SAB
         sab_conf = core.CONFIG['Sabnzbd']
         if sab_conf['sabenabled'] == 'true' and data['type'] == 'nzb':
             logging.info('Sending nzb to Sabnzbd.')
-            sab = sabnzbd.Sabnzbd()
-            response = sab.add_nzb(data)
+            response = sabnzbd.Sabnzbd.add_nzb(data)
 
             if response['status'] == True:
-                # set status to snatched and add downloader id
+
+                downloadid = response['nzo_ids'][0]
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
+
                 if self.update_status_snatched(guid, imdbid):
                     logging.info('Successfully sent {} to Sabnzbd.'.format(title))
                     return 'Successfully sent to Sabnzbd.'
@@ -81,12 +91,17 @@ class Snatcher():
                 logging.error('SABNZBD: {}'.format(response['status']))
                 return "SABNZBD: {}".format(response['status'])
 
+        # If sending to NZBGET
         nzbg_conf = core.CONFIG['NzbGet']
         if nzbg_conf['nzbgenabled'] == 'true' and data['type'] == 'nzb':
             logging.info('Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
             if type(response) == int and response > 0:
+                downloadid = response
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
+
                 if self.update_status_snatched(guid, imdbid):
                     logging.info('Successfully sent {} to NzbGet.'.format(title))
                     return 'Successfully sent to NzbGet.'

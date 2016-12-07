@@ -192,7 +192,6 @@ class Searcher():
         else:
             return True
 
-    # Set MOVIE status to appropriate flag
     def update_movie_status(self, imdbid):
         ''' Updates Movie status.
         :param imdbid: str imdb identification number (tt123456)
@@ -205,6 +204,7 @@ class Searcher():
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
         if not result_status:
+            logging.info('Could not get SEARCHRESULT statuses for {}'.format(imdbid))
             return False
 
         if 'Finished' in result_status:
@@ -220,4 +220,5 @@ class Searcher():
         if self.sql.update('MOVIES', 'status', status, imdbid=imdbid ):
             return True
         else:
+            logging.info('Could not set {} to {}'.format(imdbid, status))
             return False

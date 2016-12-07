@@ -315,9 +315,9 @@ class SQL(object):
             logging.error('EXECUTE SQL.GET_DISTINCT FAILED.')
             return False
 
-    def row_exists(self, TABLE, imdbid='', guid=''):
+    def row_exists(self, TABLE, imdbid='', guid='', downloadid=''):
         '''
-        Checks TABLE for imdbid or guid.
+        Checks TABLE for imdbid, guid, or downloadid.
         Returns Bool if found.
 
         Used to determine if we need to add a row or update existing row.
@@ -329,6 +329,10 @@ class SQL(object):
         elif guid:
             idcol = 'guid'
             idval = guid
+        elif downloadid:
+            idcol = 'downloadid'
+            idval = downloadid
+
         else:
             return 'ID ERROR'
 

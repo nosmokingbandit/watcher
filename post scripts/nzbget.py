@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
-###########################################
-### NZBGET POST-PROCESSING SCRIPT       ###
+##########################################
+######## DO NOT MODIFY THIS FILE! ########
+## CONFIGURE API INFO THROUGH NZBGET UI ##
+##########################################
+
+#####################################
+### NZBGET POST-PROCESSING SCRIPT ###
 
 # Script to send post-processing info
 # to Watcher.
 
-
-###########################################
-### OPTIONS                  ###
+#####################################
+### OPTIONS                       ###
 
 # Watcher API key.
 #Apikey=
@@ -19,9 +23,9 @@
 # Watcher port.
 #Port=9090
 
+### NZBGET POST-PROCESSING SCRIPT ###
+#####################################
 
-### NZBGET POST-PROCESSING SCRIPT       ###
-###########################################
 import os
 import sys
 import urllib2
@@ -35,42 +39,38 @@ POSTPROCESS_NONE=95
 watcherhost = os.environ['NZBPO_HOST']
 watcherport = os.environ['NZBPO_PORT']
 watcherapi = os.environ['NZBPO_APIKEY']
+name = os.environ['NZBPP_NZBNAME']
 
-# since it is a link it must be encoded to send via GET
+# The values are are going to try to get:
+downloadid = ''
+guid = ''
+path = ''
 
+downloadid = os.environ['NZBPP_NZBID']
+
+# can be blank it from an uploaded nzb file
 if os.environ['NZBPP_URL']:
+    # since it is a path it must be encoded to send via GET
     guid = urllib2.quote(os.environ['NZBPP_URL'], safe='')
-else:
-    guid = 'None'
 
 path = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
 
-# send it to Watcher
+# set the post-processing mode
 if os.environ['NZBPP_TOTALSTATUS'] == 'SUCCESS':
-    print 'Sending {} to Watcher as Complete.'.format(os.environ['NZBPP_NZBNAME'])
+    print 'Sending {} to Watcher as Complete.'.format(name)
     mode = 'complete'
-
-    url = 'http://{}:{}/api/apikey={}&mode={}&guid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, path)
-
-    request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
-    response = urllib2.urlopen(request).read()
-    if response == 'Success':
-        sys.exit(POSTPROCESS_SUCCESS)
-    elif response == 'None':
-        sys.exit(POSTPROCESS_NONE)
-    else:
-        sys.exit(POSTPROCESS_ERROR)
-
-
 else:
-    print 'Sending {} to Watcher as Failed.'.format(os.environ['NZBPP_NZBNAME'])
+    print 'Sending {} to Watcher as Failed.'.format(name)
     mode = 'failed'
-    url = 'http://{}:{}/api/apikey={}&mode={}&guid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, path)
-    request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
-    response = urllib2.urlopen(request)
-    if response == 'Success':
-        sys.exit(POSTPROCESS_SUCCESS)
-    else:
-        sys.exit(POSTPROCESS_ERROR)
 
-sys.exit(POSTPROCESS_NONE)
+# send it to watcher
+url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
+request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
+response = urllib2.urlopen(request).read()
+
+if response['status'] == 'finished':
+    sys.exit(POSTPROCESS_SUCCESS)
+elif result['status'] = 'incomplete'
+    sys.exit(POSTPROCESS_ERROR)
+else:
+    sys.exit(POSTPROCESS_NONE)

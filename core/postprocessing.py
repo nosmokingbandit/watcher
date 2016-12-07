@@ -6,308 +6,586 @@ import shutil
 import re
 import datetime
 import core
-from core import config, sqldb, ajax, snatcher
+import cherrypy
+from core import config, sqldb, ajax, snatcher, updatestatus
 
 import logging
 logging = logging.getLogger(__name__)
 
-class PostProcessing(object):
+
+class Postprocessing(object):
+
+    conf = {
+        '/': {
+            'request.dispatch': cherrypy.dispatch.MethodDispatcher()
+        }
+    }
+
+    exposed = True
 
     def __init__(self):
-        self.pp_conf = core.CONFIG['Postprocessing']
         self.sql = sqldb.SQL()
+        self.snatcher = snatcher.Snatcher()
+        self.update = updatestatus.Status()
 
-    def failed(self, guid, path):
-        ''' Post-process failed downloads.
-        :param guid: str guid of downloads
-        :param path: str path to downloaded files.
+    @cherrypy.expose
+    def GET(self, **data):
+        ''' Handles post-processing requests.
+        :kwparam **params: keyword params send through GET request URL
 
-        If Clean Up is enabled will delete path and contents.
-        Sets status to 'Bad' in MARKEDRESULTS.
-        If Auto Grab is enabled will grab next best release.
+        required kw params:
+            apikey: str Watcher api key
+            mode: str post-processing mode (complete, failed)
+            guid: str download link of file. Can be url or magnet link.
+            path: str path to downloaded files. Can be single file or dir
 
-        If the guid is not from Watcher it will not mark bad or grab next result, but will still mark in MARKEDRESULTS.
+        optional kw params:
+            imdbid: str imdb identification number (tt123456)
+            downloadid: str id number from downloader
 
-        Returns 'Success' or 'Failed' to go to ajax handler.
+        Returns str json.dumps(dict) to post-process reqesting application.
         '''
 
-        if guid == 'None':
-            return 'Success'
+        logging.info('#################################')
+        logging.info('Post-processing request received.')
+        logging.info('#################################')
 
-        ajax.Ajax().mark_bad(guid)
+        # check for required keys
+        required_keys = ['apikey', 'mode', 'guid', 'path']
 
-        if self.pp_conf['cleanupfailed'] == 'true':
-            logging.info('Deleting leftover files from failed download.')
-            if os.path.ispath(path):
-                try:
-                    shutil.rmtree(path)
-                except Exception, e:
-                    logging.error('Could not delete leftover failed files.', exc_info=True)
+        for key in required_keys:
+            if key not in data:
+                logging.info('Missing key {}'.format(key))
+                return json.dumps({'response': 'false',
+                                  'error': 'missing key: {}'.format(key)})
 
-        imdbid = self.sql.get_imdbid_from_guid(guid)
-        if imdbid:
-            logging.info('Post-processing {} as failed'.format(imdbid))
+        # check if api key is correct
+        if data['apikey'] != core.CONFIG['Server']['apikey']:
+            logging.info('Incorrect API key.'.format(key))
+            return json.dumps({'response': 'false',
+                              'error': 'incorrect api key'})
+
+        # check if mode is valid
+        if data['mode'] not in ['failed', 'complete']:
+            logging.info('Invalid mode value: {}.'.format(data['mode']))
+            return json.dumps({'response': 'false',
+                              'error': 'invalid mode value'})
+
+        # get the actual movie file name
+        data['filename'] = self.get_filename(data['path'])
+
+        logging.info('Parsing release name for information.')
+        data.update(self.parse_filename(data['filename']))
+
+        # Get possible local data or get OMDB data to merge with self.params.
+        logging.info('Gathering release information.')
+        data.update(self.get_movie_info(data))
+
+        # remove any invalid characters
+        for (k, v) in data.iteritems():
+            # but we have to keep the path unmodified
+            if k != 'path' and type(v) == str:
+                data[k] = re.sub(r'[:"*?<>|]+', '', v)
+
+        # At this point we have all of the information we're going to get.
+        if data['mode'] == 'failed':
+            logging.info('Post-processing as Failed.')
+            # returns to url:
+            response =  json.dumps(self.failed(data), indent=2, sort_keys=True)
+        elif data['mode'] == 'complete':
+            logging.info('Post-processing as Complete.')
+            # returns to url:
+            response = json.dumps(self.complete(data), indent=2, sort_keys=True)
+        else:
+            logging.info('Invalid mode value: {}.'.format(data['mode']))
+            return json.dumps({'response': 'false', \
+                               'error': 'invalid mode value'})
+
+        logging.info('#################################')
+        logging.info('Post-processing complete.')
+        logging.info('#################################')
+
+        return response
+
+    def get_filename(self, path):
+        ''' Looks for the filename of the movie being processed
+        :param path: str url-passed path to download dir
+
+        If path is a file, just returns path.
+        If path is a directory, finds the largest file in that dir.
+
+        Returns str filename.ext
+        '''
+
+        logging.info('Finding movie file name.')
+        if os.path.isfile(path):
+            return path
+        else:
+            # Find the biggest file in the dir. It should be safe to assume that this is the movie.
             try:
-                if core.CONFIG['Search']['autograb'] == 'true':
-                    s = snatcher.Snatcher()
-
-                    if s.auto_grab(imdbid) == True:
-                        # This ulitmately goes to an ajax response, so we can't return a bool
-                        return 'Success'
-                    else:
-                        logging.info('Setting status of {} back to Wanted.'.format(imdbid))
-                        if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
-                            return False
-                        return 'Success'
-                else:
-                    return 'Success'
+                files = os.listdir(path)
             except Exception, e:
-                logging.error('Post-processing failed.', exc_info=True)
-                return 'Failed'
+                logging.error('Path not found in filesystem.',
+                              exc_info=True)
+                return ''
 
-    def complete(self, guid, path):
-        ''' Post-process completed downloads.
-        :param guid: str guid of downloads.
-        :param path: str path to downloaded files.
+            files = [file for file in files
+                     if os.path.isfile(os.path.join(path, file))]
 
-        Sets status to 'Finished' in MARKEDRESULTS.
-        Get imdbid from guid and marks movie as 'Finished' in MOVIES.
-        If the guid is not from Watcher it searches OMDB to find the imdbid. see movie_data().
-        If Renamer is enabled, renames file according to settings.
-        If Mover is enabled, moves file to specified location.
-        Set finished date in SEARCHRESULTS.
+            if files == []:
+                return ''
 
-        Returns 'Success' or 'Failed' to go to ajax handler.
-        '''
-
-        logging.info('Post-processing {} as complete.'.format(guid))
-        imdbid = None
-
-        # if we get a guid get the imdbid from SEARCHRESULTS. Can set imdbid None.
-        if guid != 'None':
-            imdbid = self.sql.get_imdbid_from_guid(guid)
-            if not imdbid:
-                imdbid = None
-
-        # gets any possible information from the imdbid and path (looks at filename)
-        movie_data = self.movie_data(imdbid, path, guid)
-
-        if self.pp_conf['renamerenabled'] == 'true':
-            new_name = self.renamer(movie_data)
-            if new_name == False:
-                return 'Fail'
-            else:
-                movie_data['filename'] = new_name
-
-        if self.pp_conf['moverenabled'] == 'true':
-            if self.mover(movie_data) == False:
-                return 'Fail'
-            else:
-                if self.pp_conf['cleanupenabled'] == 'true':
-                    self.cleanup(movie_data)
-
-        # update DB tables to Finished and update MOVIES row to have finisheddate and finishedscore
-        imdbid = movie_data['imdbid']
-        finisheddate = movie_data['finisheddate']
-        finishedscore = movie_data['finishedscore']
-        try:
-            if not self.sql.update('MOVIES', 'status', 'Finished', imdbid=imdbid):
-                return False
-            if not self.sql.update('MOVIES', 'finisheddate', finisheddate, imdbid=imdbid):
-                return False
-            if not self.sql.update('MOVIES', 'finishedscore', finishedscore, imdbid=imdbid):
-                return False
-            if not self.sql.update('SEARCHRESULTS', 'status', 'Finished', guid=guid):
-                return False
-            if self.sql.row_exists('MARKEDRESULTS', guid=guid) and guid != 'None':
-                if not self.sql.update('MARKEDRESULTS', 'status', 'Finished', guid=guid):
-                    return False
-
-            imdbid = self.sql.get_imdbid_from_guid(guid)
-            DB_STRING = {}
-            DB_STRING['imdbid'] = imdbid
-            DB_STRING['guid'] = guid
-            DB_STRING['status'] = 'Snatched'
-            if not self.sql.write('MARKEDRESULTS', DB_STRING):
-                return 'Fail'
-
-            logging.info('{} postprocessing finished.'.format(imdbid))
-            return 'Success'
-        except Exception, e:
-            logging.error('Post-processing failed.', exc_info=True)
-            return 'Fail'
-
-
-    def movie_data(self, imdbid, path, guid):
-        ''' Gathers all required movie information.
-        :param imdbid: str imdb identification number (tt123456) or None if uknown
-        :param guid: str guid of downloads.
-        :param path: str path to downloaded files.
-
-        Will search OMBD if Watcher doesn't have info for the guid.
-
-        Returns dict as described below.
-        '''
-
-        today = str(datetime.date.today())
-
-        # Find the biggest file in the dir. It should be safe to assume that this is the movie.
-        files =  os.listdir(path)
-        for file in files:
+            biggestfile = None
             s = 0
-            abspath = os.path.join(path, file)
-            size = os.path.getsize(abspath)
-            if size > s:
-                moviefile = file
+            for file in files:
+                abspath = os.path.join(path, file)
+                size = os.path.getsize(abspath)
+                if size > s:
+                    biggestfile = file
+                    s = size
 
-        filename, ext = os.path.splitext(moviefile)
+            logging.info('Post-processing file {}.'.format(biggestfile))
+            return biggestfile
 
+    def parse_filename(self, filename):
+        ''' Parses filename for release information
+        :param filename: str name of movie file
+
+        PTN only returns information it finds, so we start with a blank dict
+        of keys that we NEED to have, then update it with PTN's data. This
+        way when we rename the file it will insert a blank string instead of
+        throwing a missing key exception.
+
+        Might eventually replace this with Hachoir-metadata
+
+        Returns dict of parsed data
         '''
-        This is out base dict. We declare everything here in case we can't find a value later on. We'll still have the key in the dict, so we don't need to check if a key exists every time we want to use one. This MUST match all of the options the user is able to select in Settings.
-        '''
+
         data = {
-            'title':'',
-            'year':'',
+            'title': '',
+            'year': '',
             'resolution': '',
-            'group':'',
-            'audiocodec':'',
-            'videocodec':'',
-            'rated':'',
-            'imdbid':'',
-            'finisheddate': today,
-            'finishedscore': 1000 # If we are processing a release not grabbed by Watcher we won't have a score, so 1000 is a good upper limit to use for outside processing.
-        }
+            'group': '',
+            'audiocodec': '',
+            'videocodec': '',
+            'source': '',
+            }
 
-        # start filling out what we can
-        data['filename'] = filename
-        data['ext'] = ext
-        data['path'] = os.path.normpath(path)
-
-        # Parse what we can from the filename
         titledata = PTN.parse(filename)
-        # this key can sometimes be a list, which is a pain to deal with later. We don't ever need it, so del
+
+        # this key is useless
         if 'excess' in titledata:
             titledata.pop('excess')
+
         # Make sure this matches our key names
         if 'codec' in titledata:
             titledata['videocodec'] = titledata.pop('codec')
         if 'audio' in titledata:
             titledata['audiocodec'] = titledata.pop('audio')
+        if 'quality' in titledata:
+            titledata['source'] = titledata.pop('quality')
         data.update(titledata)
 
-        # if we know the imdbid we'll look it up.
-        if imdbid:
-            localdata = self.sql.get_movie_details(imdbid)
-            if localdata:
-                # this converts it to a usable dict
-                localdict = dict(localdata)
-                # don't want to overwrite finisheddate
-                del localdict['finisheddate']
-                data.update(localdict)
+        return data
 
-        # If we don't know the imdbid we'll look it up at ombd and add their info to the dict. This can happen if we are post-processing a movie that wasn't snatched by Watcher.
+    def get_movie_info(self, data):
+        ''' Gets score, imdbid, and other information to help process
+        :param data: dict url-passed params with any additional info
+
+        Uses guid to look up local details.
+        If that fails, uses downloadid.
+        If that fails, uses title and year from  to search omdb for imdbid
+
+        Returns dict of any gathered information
+        '''
+
+        # try to get searchresult using guid first then downloadid
+        logging.info('Searching local database for guid.')
+        result = self.sql.get_single_search_result('guid', data['guid'])
+        if not result:
+            # try to get result from downloadid
+            logging.info('Searching local database for downloadid.')
+            result = self.sql.get_single_search_result('downloadid', data['downloadid'])
+            if result:
+                logging.info('Searchresult found by downloadid.')
+                if result['guid'] != data['guid']:
+                    logging.info('Guid for downloadid does not match local data. ' \
+                                 'Adding guid2 to processing data.')
+                    data['guid2'] = result['guid']
         else:
+            logging.info('Searchresult found by guid.')
+
+        # if we found it, get local movie info
+        if result:
+            logging.info('Searching local database by imdbid.')
+            data = self.sql.get_movie_details('imdbid', result['imdbid'])
+            if data:
+                logging.info('Movie data found locally by imdbid.')
+                data['finishedscore'] = result['score']
+            else:
+                logging.info('Unable to find movie in local db.')
+
+        else:
+            # Still no luck? Try to get the imdbid from OMDB
+            logging.info('Unable to find local data for release. Searching OMDB.')
+
             title = data['title']
             year = data['year']
-            search_string = 'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
 
-            request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
+            logging.info('Searching omdb for {} {}'.format(title, year))
+            search_string ='http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title,year).replace(' ', '+')
+
+            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
                 omdbdata = json.loads(urllib2.urlopen(request).read())
-            except (SystemExit, KeyboardInterrupt):
-                raise
             except Exception, e:
                 logging.error('Post-processing omdb request.', exc_info=True)
+                return None
 
-            if omdbdata['Response'] == 'True':
+            if omdbdata['Response'] == 'False':
+                logging.info('Nothing found in OMDB.')
+                return None
+            else:
+                logging.info('Data found on OMDB.')
+
                 # make the keys all lower case
-                omdbdata_lower = dict((k.lower(), v) for k, v in omdbdata.iteritems())
-                data.update(omdbdata_lower)
+                omdbdata_lower = dict((k.lower(), v) for (k, v) in omdbdata.iteritems())
+                return omdbdata_lower
 
+        if data:
+            # remove unnecessary info
+            del data['quality']
+            del data['plot']
+            return data
+        else:
+            return None
 
-        # get the snatched result score from SEARCHRESULTS
-        gssr = self.sql.get_single_search_result(guid)
-        if gssr:
-            data['finishedscore'] = gssr['score']
+    def failed(self, data):
+        ''' Post-process failed downloads.
+        :param data: dict of gathered data from downloader and localdb/omdb
 
-        # remove any invalid characters
-        for k, v in data.iteritems():
-            # but we have to keep the path unmodified
-            if k != 'path' and type(v) != int:
-                data[k] = re.sub(r'[:"*?<>|]+', "", v)
+        In SEARCHRESULTS marks guid as Bad
+        In MARKEDRESULTS:
+            Creates or updates entry for guid and optional guid2 with status=Bad
+        Updates MOVIES status
 
-        return data
+        If Clean Up is enabled will delete path and contents.
+        If Auto Grab is enabled will grab next best release.
+
+        Returns dict of post-processing results
+        '''
+
+        # dict we will json.dump and send back to downloader
+        result = {}
+        result['status'] = 'finished'
+        result['data'] = data
+        result['tasks'] = {}
+
+        # mark guid in both results tables
+        logging.info('Marking guid as Bad.')
+        guid_result = {'url': data['guid']}
+        if self.update.searchresults(data['guid'], 'Bad'):
+            guid_result['update_SEARCHRESULTS'] = 'true'
+        else:
+            guid_result['update_SEARCHRESULTS'] = 'false'
+
+        if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'
+                ):
+            guid_result['update_MARKEDRESULTS'] = 'true'
+        else:
+            guid_result['update_MARKEDRESULTS'] = 'false'
+
+        # create result entry for guid
+        result['tasks']['guid'] = guid_result
+
+        # if we have a guid2, do it all again
+        if 'guid2' in data.keys():
+            logging.info('Marking guid2 as Bad.')
+            guid2_result = {'url': data['guid2']}
+            if self.update.searchresults(data['guid2'], 'Bad'):
+                guid2_result['update SEARCHRESULTS'] = 'true'
+            else:
+                guid2_result['update SEARCHRESULTS'] = 'false'
+
+            if self.update.markedresults(data['guid2'], data['imdbid'],
+                    'Bad'):
+                guid2_result['update_MARKEDRESULTS'] = 'true'
+            else:
+                guid2_result['update_MARKEDRESULTS'] = 'false'
+            # create result entry for guid2
+            result['tasks']['guid2'] = guid2_result
+
+        # set movie status
+        if data['imdbid']:
+            logging.info('Setting MOVIE status.')
+            r = str(self.update.movie_status(data['imdbid'])).lower()
+        else:
+            logging.info('Imdbid not supplied or found, unable to update Movie status.')
+            r = 'false'
+        result['tasks']['update_movie_status'] = r
+
+        # delete failed files
+        if core.CONFIG['Postprocessing']['cleanupfailed'] == 'true':
+            result['tasks']['cleanup'] = {'enabled': 'true', 'path': data['path']}
+
+            logging.info('Deleting leftover files from failed download.')
+            if self.cleanup(data['path']) == True:
+                result['tasks']['cleanup']['response'] = 'true'
+            else:
+                result['tasks']['cleanup']['response'] = 'false'
+        else:
+            result['tasks']['cleanup'] = {'enabled': 'false'}
+
+        # grab the next best release
+        if core.CONFIG['Search']['autograb'] == 'true':
+            result['tasks']['autograb'] = {'enabled': 'true'}
+            if data['imdbid']:
+                if self.snatcher.auto_grab(data['imdbid']):
+                    r = 'true'
+                else:
+                    r = 'false'
+            else:
+                r = 'false'
+            result['tasks']['autograb']['response'] = r
+        else:
+            result['tasks']['autograb'] = {'enabled': 'false'}
+
+        # all done!
+        result['status'] = 'finished'
+        return result
+
+    def complete(self, data):
+        '''
+        :param data: str guid of downloads
+        :param downloadid: str watcher-generated downloadid
+        :param path: str path to downloaded files.
+
+        All params can be blank strings ie ""
+
+        In SEARCHRESULTS marks guid as Finished
+        In MARKEDRESULTS:
+            Creates or updates entry for guid and optional guid with status=bad
+        In MOVIES updates finishedscore and finisheddate
+        Updates MOVIES status
+
+        Checks to see if we found a movie file. If not, ends here.
+
+        If Renamer is enabled, renames movie file according to core.CONFIG
+        If Mover is enabled, moves file to location in core.CONFIG
+        If Clean Up enabled, deletes path after Mover finishes.
+
+        Returns dict of post-processing results
+        '''
+
+        # dict we will json.dump and send back to downloader
+        result = {}
+        result['status'] = 'incomplete'
+        result['data'] = data
+        result['data']['finisheddate'] = str(datetime.date.today())
+        result['tasks'] = {}
+
+        # mark guid in both results tables
+        logging.info('Marking guid as Finished.')
+        guid_result = {}
+        if self.update.searchresults(data['guid'], 'Finished'):
+            guid_result['update_SEARCHRESULTS'] = 'true'
+        else:
+            guid_result['update_SEARCHRESULTS'] = 'false'
+
+        if self.update.markedresults(data['guid'], data['imdbid'], 'Finished'):
+            guid_result['update_MARKEDRESULTS'] = 'true'
+        else:
+            guid_result['update_MARKEDRESULTS'] = 'false'
+
+        # create result entry for guid
+        result['tasks'][data['guid']] = guid_result
+
+        # if we have a guid2, do it all again
+        if 'guid2' in data.keys():
+            logging.info('Marking guid2 as Finished.')
+            guid2_result = {}
+            if self.update.searchresults(data['guid2'], 'Finished'):
+                guid2_result['update_SEARCHRESULTS'] = 'true'
+            else:
+                guid2_result['update_SEARCHRESULTS'] = 'false'
+
+            if self.update.markedresults(data['guid2'], data['imdbid'],
+                    'Finished'):
+                guid2_result['update_MARKEDRESULTS'] = 'true'
+            else:
+                guid2_result['update_MARKEDRESULTS'] = 'false'
+
+            # create result entry for guid2
+            result['tasks'][data['guid2']] = guid2_result
+
+        # set movie status and add finished date
+        if data['imdbid']:
+            logging.info('Setting MOVIE status.')
+            r = str(self.update.movie_status(data['imdbid'])).lower()
+            self.sql.update('MOVIES', 'finisheddate',\
+                result['data']['finisheddate'], imdbid=data['imdbid'])
+        else:
+            logging.info('Imdbid not supplied or found, unable to update Movie status.')
+            r = 'false'
+        result['tasks']['update_movie_status'] = r
+
+        # renamer
+        if core.CONFIG['Postprocessing']['renamerenabled'] == 'true':
+            result['tasks']['renamer'] = {'enabled': 'true'}
+            result['data']['orig_filename'] = result['data']['filename']
+            response = self.renamer(data)
+            if response == None:
+                result['tasks']['renamer']['response'] = 'false'
+            else:
+                data['filename'] = response
+                result['tasks']['renamer']['response'] = 'true'
+        else:
+            logging.info('Renamer disabled.')
+            result['tasks']['mover'] = {'enabled': 'false'}
+
+        # mover
+        if core.CONFIG['Postprocessing']['moverenabled'] == 'true':
+            result['tasks']['mover'] = {'enabled': 'true'}
+            response = self.mover(data)
+            if response == None:
+                result['tasks']['mover']['response'] = 'false'
+            else:
+                data['new_file_location'] = response
+                result['tasks']['mover']['response'] = 'true'
+        else:
+            logging.info('Mover disabled.')
+            result['tasks']['mover'] = {'enabled': 'false'}
+
+        #delete leftover dir, only is mover was enabled successful
+        if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
+            result['tasks']['cleanup'] = {'enabled': 'true'}
+            # fail if mover failed
+            if core.CONFIG['Postprocessing']['moverenabled'] == 'false':
+                result['tasks']['cleanup']['response'] = 'false'
+            else:
+                if self.cleanup(data['path']):
+                    r = 'true'
+                else:
+                    r = 'false'
+                result['tasks']['cleanup']['response'] = r
+        else:
+            result['tasks']['cleanup'] = {'enabled': 'false'}
+
+        # all done!
+        result['status'] = 'finished'
+        return result
 
     def renamer(self, data):
         ''' Renames movie file based on renamerstring.
         :param data: dict of movie information.
 
-        Returns str new file name.
+        Renames movie file based on params in core.CONFIG
+
+        Returns str new file name or None on failure
         '''
-        renamer_string = self.pp_conf['renamerstring']
 
-        existing_file_path = os.path.join(data['path'], data['filename'] + data['ext'])
+        renamer_string = core.CONFIG['Postprocessing']['renamerstring']
 
-        new_file_name =  renamer_string.format(**data)
+        # check to see if we have a valid renamerstring
+        if re.match(r'{(.*?)}', renamer_string) == None:
+            logging.info('Invalid renamer string {}'.format(renamerstring))
+            return None
 
-        new_file_path = os.path.join(data['path'], new_file_name + data['ext'])
+        # remove invalid chars
+        renamer_string = re.sub(r'[:"*?<>|]+', '', renamer_string)
 
-        logging.info('Renaming {} to {}'.format(existing_file_path, new_file_path))
+        # existing absolute path
+        abs_path_old = os.path.join(data['path'], data['filename'])
 
+        # get the extension
+        ext = os.path.splitext(abs_path_old)[1]
+
+        # get the new file name
+        new_name = renamer_string.format(**data).replace('  ', ' ')
+        while new_name[-1] == ' ':
+            new_name = new_name[:-1]
+        new_name = new_name + ext
+
+        # new absolute path
+        abs_path_new = os.path.join(data['path'], new_name)
+
+        logging.info('Renaming {} to {}'.format(data['filename'], new_name))
         try:
-            os.rename(existing_file_path, new_file_path)
+            os.rename(abs_path_old, abs_path_new)
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error('Post-Processing Renamer.', exc_info=True)
-            return False
-        # return the new name so the mover knows what our file is
-        return new_file_name
+            logging.error('Renamer failed: Could not rename file.', exc_info=True)
+            return None
 
+        # return the new name so the mover knows what our file is
+        return new_name
 
     def mover(self, data):
-        ''' Moves movie file.
+        ''' Moves movie file to path constructed by moverstring
         :param data: dict of movie information.
 
-        Moves file to location specified in config.
+        Moves file to location specified in core.CONFIG
 
-        Returns Bool for success/failure
+        Returns str new file location or None on failure
         '''
 
-        movie_file = os.path.join(data['path'], data['filename'] + data['ext'])
-
-        mover_path = self.pp_conf['moverpath']
+        abs_path_old = os.path.join(data['path'], data['filename'])
+        mover_path = core.CONFIG['Postprocessing']['moverpath']
 
         target_folder = mover_path.format(**data)
 
+        # remove invalid chars and normalize
+        target_folder = re.sub(r'["*?<>|]+', '', target_folder)
         target_folder = os.path.normpath(target_folder)
 
-        logging.info('Moving {} to {}'.format(movie_file, target_folder))
+        logging.info('Moving {} to {}'.format(abs_path_old, target_folder))
 
+        # if the new folder doesn't exist, make it
         try:
             if not os.path.exists(target_folder):
                 os.mkdir(target_folder)
         except Exception, e:
-            logging.error('Post-processing failed. Could not create folder.', exc_info=True)
+            logging.error('Mover failed: Could not create folder.', exc_info=True)
+            return None
 
+        # move the file
         try:
-            shutil.move(movie_file, target_folder)
+            shutil.move(abs_path_old, target_folder)
         except Exception, e:
-            logging.error('Post-processing failed. Could not move file.', exc_info=True)
+            logging.error('Mover failed: Could not move file.', exc_info=True)
+            return None
 
-        return True
+        return os.path.join(target_folder, data['filename'])
 
-    def cleanup(self, data):
-        ''' Deletes failed download files.
-        :param data: dict of movie information.
+    def cleanup(self, path):
+        ''' Deletes specified path
+        :param path: str of path to remover
 
-        Does not return.
+        path can be file or dir
+
+        Returns Bool on success/failure
         '''
 
-        remove_path = data['path']
-        logging.info('Clean Up. Removing {}.'.format(remove_path))
-        try:
-            shutil.rmtree(remove_path)
-        except Exception, e:
-            logging.error('Post-processing failed. Could not clean up.', exc_info=True)
+        # if its a dir
+        if os.path.isdir(path):
+            try:
+                shutil.rmtree(path)
+                return True
+            except Exception, e:
+                logging.error('Could not delete path.', exc_info=True)
+                return False
+        elif os.path.isfile(path):
+        # if its a file
+            try:
+                os.remove(path)
+                return True
+            except Exception, e:
+                logging.error('Could not delete path.', exc_info=True)
+                return False
+        else:
+        # if it is somehow neither
+            return False
+
+

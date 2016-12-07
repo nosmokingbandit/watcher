@@ -180,7 +180,7 @@ class Ajax(object):
         Returns str success/fail message
         '''
 
-        data = self.sql.get_single_search_result(guid)
+        data = self.sql.get_single_search_result('guid', guid)
         if data:
             return self.snatcher.snatch(data)
         else:

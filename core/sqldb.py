@@ -342,14 +342,14 @@ class SQL(object):
         # this will return True if there was a sql error to prevent accidental double-entires. Probably not the best solution, but it works.
             return True
 
-    def get_single_search_result(self, guid):
+    def get_single_search_result(self, idcol, idval):
         '''
         Returns dict from SEARCHRESULTS for single row.
         '''
 
-        logging.info('Retreving search result details for {}.'.format(guid))
+        logging.info('Retreving search result details for {}.'.format(idval))
 
-        command = 'SELECT * FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)
+        command = 'SELECT * FROM SEARCHRESULTS WHERE {}="{}"'.format(idcol, idval)
 
         result = self.execute(command)
 
@@ -358,27 +358,8 @@ class SQL(object):
         else:
             return False
 
-    def get_imdbid_from_guid(self, guid):
-        '''
-        Mainly used for post-processing.
-
-        Takes guid and looks in SEARCHRESULTS for matching row.
-        If found, returns string imdbid.
-        '''
-
-        logging.info('Retreving imdbid for {}.'.format(guid))
-
-        command = 'SELECT imdbid FROM SEARCHRESULTS WHERE guid="{}"'.format(guid)
-
-        imdbid = self.execute(command)
-
-        if imdbid:
-            return imdbid.fetchone()[0]
-        else:
-            return False
-
+    # REMOVE:
     '''
-    TAG REMOVE
     These next methods are for adding columns to tables. It will run at program start.
 
     _get_existing_columns gathers a dict of existing tables and columns:

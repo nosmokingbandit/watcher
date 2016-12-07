@@ -39,8 +39,8 @@ class App(object):
         return self.ajax.manual_download(guid)
 
     @cherrypy.expose
-    def mark_bad(self, guid):
-        return self.ajax.mark_bad(guid)
+    def mark_bad(self, guid, imdbid):
+        return self.ajax.mark_bad(guid, imdbid)
 
     @cherrypy.expose
     def movie_info_popup(self, imdbid):

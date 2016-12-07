@@ -1,5 +1,5 @@
 import core
-from core import sqldb
+from core import sqldb, updatestatus
 from core.downloaders import sabnzbd, nzbget
 from datetime import datetime
 
@@ -10,6 +10,7 @@ class Snatcher():
 
     def __init__(self):
         self.sql = sqldb.SQL()
+        self.update = updatestatus.Status()
         return
 
     def auto_grab(self, imdbid, minscore=0):
@@ -98,41 +99,16 @@ class Snatcher():
     def update_status_snatched(self, guid, imdbid):
         '''
         Updates MOVIES, SEARCHRESULTS, and MARKEDRESULTS to 'Snatched'
-        Returns True or False on success.
+        Returns Bool on success/fail
         '''
 
-        # set movie status snatched
-        logging.info('Setting MOVIES {} status to Snatched.'.format(imdbid))
-        if self.sql.row_exists('MOVIES', imdbid=imdbid):
-            if not self.sql.update('MOVIES', 'status', 'Snatched', imdbid=imdbid):
-                return False
-        else:
-            logging.error('Attempting to snatch a movie that doesn\'t exist in table MOVIES. I don\'t know how this happened.'.format(imdbid))
+        if not self.update.searchresults(guid, 'Snatched'):
             return False
 
-        # set search result to snatched
-        logging.info('Setting SEARCHRESULTS {} to Snatched.'.format(guid))
-        TABLE_NAME = 'SEARCHRESULTS'
-        if self.sql.row_exists(TABLE_NAME, guid=guid):
-            if not self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid ):
-                return False
-        else:
-            logging.error('Trying to set {} as snatched, but it doesn\'t exist in {}.'.format(guid, TABLE_NAME))
+        if not self.update.markedresults(guid, 'Snatched', imdbid=imdbid):
+            return False
 
-        TABLE_NAME = 'MARKEDRESULTS'
-        if self.sql.row_exists(TABLE_NAME, guid=guid):
-            if not self.sql.update(TABLE_NAME, 'status', 'Snatched', guid=guid ):
-                return False
-        else:
-            DB_STRING = {}
-            DB_STRING['imdbid'] = imdbid
-            DB_STRING['guid'] = guid
-            DB_STRING['status'] = 'Snatched'
-            if self.sql.write(TABLE_NAME, DB_STRING):
-                logging.info('Marked {} as Snatched'.format(guid))
-                return True
-            else:
-                return False
+        if not self.update.movie_status(imdbid):
+            return False
 
-
-
+        return True

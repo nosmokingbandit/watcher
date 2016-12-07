@@ -6,7 +6,7 @@ import sys
 import datetime
 import threading
 import core
-from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler, version
+from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler, version, updatestatus
 from core.conversions import Conversions
 from core.movieinfo import Omdb
 from core.downloaders import sabnzbd, nzbget
@@ -28,6 +28,7 @@ class Ajax(object):
         self.sql = sqldb.SQL()
         self.poster = poster.Poster()
         self.snatcher = snatcher.Snatcher()
+        self.update = updatestatus.Status()
 
     def search_omdb(self, search_term):
         ''' Search omdb for movies
@@ -190,54 +191,7 @@ class Ajax(object):
         Returns str success/fail message
         '''
 
-        TABLE = 'SEARCHRESULTS'
-        logging.info('Marking {} as bad.'.format(guid))
-
-        if self.sql.row_exists(TABLE, guid=guid):
-            logging.info('Setting status of {} to \'Bad\''.format(guid))
-            if not self.sql.update(TABLE, 'status', 'Bad', guid=guid):
-                return 'Could not update {} to Bad. Check logs for more information.'.format(guid)
-
-            # Check to see if all results are bad. If so change MOVIE back to Wanted
-            imdbid = self.sql.get_imdbid_from_guid(guid)
-            if imdbid:
-                statuses = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
-                if not statuses:
-                    return 'Could not set Movie status. Check logs for more information.'.format()
-
-            moviestatus = ''
-            if 'Snatched' not in statuses and 'Finished' not in statuses:
-                moviestatus = 'Found'
-
-            if all(s == 'Bad' for s in statuses):
-                moviestatus = 'Wanted'
-
-            if moviestatus:
-                logging.info('Setting {} back to {}.'.format(imdbid, moviestatus))
-                if not self.sql.update('MOVIES', 'status', moviestatus, imdbid= imdbid):
-                    return 'Could not update {} to {}. Check logs for more information.'.format(imdbid, moviestatus)
-
-            TABLE = 'MARKEDRESULTS'
-            if self.sql.row_exists(TABLE, guid=guid):
-                if not self.sql.update(TABLE, 'status', 'Bad', guid=guid):
-                    return 'Could not update {} to Bad. Check logs for more information.'.format(guid)
-                else:
-                    return 'Successfully marked result as Bad.'.format(guid)
-
-            else:
-                DB_STRING = {}
-                DB_STRING['imdbid'] = imdbid
-                DB_STRING['guid'] = guid
-                DB_STRING['status'] = 'Bad'
-                if self.sql.write(TABLE, DB_STRING):
-                    return 'Successfully marked result as Bad.'.format(guid)
-                else:
-                    return 'Could not add {} to {}. Check logs for more information.'.format(guid, TABLE)
-
-        else:
-            logging.info('Successfully marked {} as Bad.'.format(guid))
-            return 'Successfully marked result as Bad.'.format(guid)
-
+        return self.update.mark_bad(guid, imdbid=imdbid)
 
     def refresh_list(self, list, imdbid=''):
         ''' Re-renders html for Movies/Results list

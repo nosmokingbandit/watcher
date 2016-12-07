@@ -107,6 +107,8 @@ class Ajax(object):
         else:
             data['status'] = 'Wanted'
             data['predb'] = 'None'
+            data['poster'] = 'images/poster/{}.jpg'.format(imdbid)
+
             DB_STRING = data
             if self.sql.write(TABLE, DB_STRING):
 

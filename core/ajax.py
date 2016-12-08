@@ -107,12 +107,13 @@ class Ajax(object):
         else:
             data['status'] = 'Wanted'
             data['predb'] = 'None'
+            poster_url = data['poster']
             data['poster'] = 'images/poster/{}.jpg'.format(imdbid)
 
             DB_STRING = data
             if self.sql.write(TABLE, DB_STRING):
 
-                t2 = threading.Thread(target=self.poster.save_poster, args=(imdbid, data['poster']))
+                t2 = threading.Thread(target=self.poster.save_poster, args=(imdbid, poster_url))
                 t2.start()
 
                 t = threading.Thread(target=thread_search_grab, args=(data,))

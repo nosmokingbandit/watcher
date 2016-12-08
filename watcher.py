@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")
     parser.add_argument('-d','--daemon',help='Run the server as a daemon.', action='store_true')
-    parser.add_argument('-a','--bind-address',help='Network address to bind to.')
+    parser.add_argument('-a','--address',help='Network address to bind to.')
     parser.add_argument('-p','--port',help='Port to bind to.', type=int)
     parser.add_argument('-b','--browser', help='Open browser on launch.',action='store_true')
     parser.add_argument('-c', '--conf', help='Location of config file.', type=str)

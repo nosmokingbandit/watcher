@@ -9,16 +9,16 @@ import logging.handlers
 class log(object):
 
     @staticmethod
-    def start():
-        if not os.path.exists('logs'):
-            os.makedirs('logs')
+    def start(path):
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-        path = 'logs/log.txt'
+        logfile = os.path.join(path, 'log.txt')
         backup_days = int(core.CONFIG['Server']['keeplog'])
         logging_level = logging.INFO
 
         formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s.%(funcName)s: %(message)s')
-        handler = logging.handlers.TimedRotatingFileHandler(path, when="D", interval=1, backupCount=backup_days)
+        handler = logging.handlers.TimedRotatingFileHandler(logfile, when="D", interval=1, backupCount=backup_days)
         handler.setFormatter(formatter)
         logger = logging.getLogger()
         logger.addHandler(handler)

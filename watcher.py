@@ -108,12 +108,14 @@ if __name__ == '__main__':
     parser.add_argument('-a','--bind-address',help='Network address to bind to.')
     parser.add_argument('-p','--port',help='Port to bind to.', type=int)
     parser.add_argument('-b','--browser', help='Open browser on launch.',action='store_true')
-    parser.add_argument('--conf', help='Location of config file.', type=str)
+    parser.add_argument('-c', '--conf', help='Location of config file.', type=str)
+    parser.add_argument('-l', '--log', help='Directory in which to create log files.', type=str)
     passed_args = parser.parse_args()
-
 
     if passed_args.conf:
         core.CONF_FILE = passed_args.conf
+    if passed_args.log:
+        core.LOG_DIR = passed_args.log
 
     # set up config file on first launch
     conf = config.Config()
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     conf.stash()
 
     # set up logging now that the config is ready
-    log.start()
+    log.start(core.LOG_DIR)
     import logging
     logging = logging.getLogger(__name__)
 

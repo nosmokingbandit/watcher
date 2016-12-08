@@ -41,7 +41,7 @@ Change address to bind to.
 `$ watcher.py --address 0.0.0.0`
 
 Change port to host on.
-`$ watcher.py --port 9090` 9090 Port to bind to.
+`$ watcher.py --port 9090`
 
 Open browser on launch.
 `$ watcher.py --browser`

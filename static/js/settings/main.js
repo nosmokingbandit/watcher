@@ -41,7 +41,6 @@ $(document).ready(function () {
 
     /* toggle checkbox status */
     $('div#content').on('click', 'i.checkbox', function(){
-        console.log('ul#newznab')
         // turn on
         if( $(this).attr("value") == "false" ){
             $(this).attr("value", "true");

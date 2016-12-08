@@ -56,6 +56,10 @@ class App(object):
         return self.ajax.movie_status_popup(imdbid)
 
     @cherrypy.expose
+    def quick_add(self, imdbid):
+        return self.ajax.quick_add(imdbid)
+
+    @cherrypy.expose
     def refresh_list(self, list, imdbid=''):
         return self.ajax.refresh_list(list, imdbid)
 

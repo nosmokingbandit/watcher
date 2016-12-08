@@ -72,15 +72,19 @@ class Ajax(object):
 
     def add_wanted_movie(self, data):
         ''' Adds movie to Wanted list.
-        :param data: dict of info to add to database.
+        :param data: str json.dumps(dict) of info to add to database.
 
         Writes data to MOVIES table.
         If Search on Add enabled,
             searches for movie immediately in separate thread.
             If Auto Grab enabled, will snatch movie if found.
 
-        Returns str succes or failure message.
+        Returns str json.dumps(dict) of status and message
         '''
+
+        data = json.loads(data)
+
+        response = {}
 
         def thread_search_grab(data):
             imdbid = data['imdbid']
@@ -94,15 +98,16 @@ class Ajax(object):
 
         TABLE = 'MOVIES'
 
-        data = json.loads(data)
         imdbid = data['imdbid']
-        title = data['title']
-
-        title_year = (title + data['year']).replace(' ', '_')
+        title = data['title'].replace('_', ' ')
+        year = data['year']
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
-            logging.info('{} already exists as a wanted movie'.format(title_year, imdbid))
-            return '{} is already wanted, cannot add.'.format(title_year, imdbid)
+            logging.info('{} {} already exists as a wanted movie'.format(title, year, imdbid))
+
+            response['status'] = 'failed'
+            response['message'] = '{} {} is already wanted, cannot add.'.format(title, year, imdbid)
+            return json.dumps(response)
 
         else:
             data['status'] = 'Wanted'
@@ -119,11 +124,42 @@ class Ajax(object):
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
-                title = title.replace('_', ' ')
-                return '{} {} added to wanted list.'.format(title, data['year'])
+                response['status'] = 'success'
+                response['message'] = '{} {} added to wanted list.'.format(title, year)
+                return json.dumps(response)
             else:
-                return 'Could not write to database. Check logs for more information.'
+                response['status'] = 'failed'
+                response['message'] = 'Could not write to database. Check logs for more information.'
+                return json.dumps(response)
 
+    def quick_add(self, imdbid):
+        ''' Method to quckly add movie with just imdbid
+        :param imdbid: str imdb identification number (tt123456)
+
+        Submits movie with base quality options
+        Gets info from omdb and sends to self.add_wanted_movie
+
+        Returns dict of success/fail with message.
+
+        Returns str json.dumps(dict)
+        '''
+
+        response = {}
+
+        movie_info = self.omdb.movie_info(imdbid)
+
+        if not movie_info:
+            response['status'] = 'failed'
+            response['message'] = 'Data not found on omdb.'
+            return response
+
+        quality = {}
+        quality['Quality'] = core.CONFIG['Quality']
+        quality['Filters'] = core.CONFIG['Filters']
+
+        movie_info['quality'] = json.dumps(quality)
+
+        return self.add_wanted_movie(json.dumps(movie_info))
 
     def save_settings(self, data):
         ''' Saves settings to config file

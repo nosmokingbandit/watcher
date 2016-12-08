@@ -109,17 +109,18 @@ $(document).ready(function() {
         $.post("/add_wanted_movie", {"data": data})
         .done(function(r){
 
-            if(r.includes('added')){
-                swal("", r, 'success');
+            response = JSON.parse(r)
+
+            if(response['status'] == 'success'){
+                swal("", response['message'], 'success');
             } else {
-                swal("", r, 'error');
+                swal("", response['message'], 'error');
             };
 
             $this.removeClass('fa-circle-o-notch fa-spin');
             $this.hide();
             $('iframe').fadeIn();
             $('ul#quality').fadeOut();
-
         });
 
     e.preventDefault();

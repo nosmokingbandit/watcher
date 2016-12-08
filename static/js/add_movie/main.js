@@ -22,7 +22,7 @@ $(document).ready(function() {
         $('#thinker').fadeIn();
 
         $.post("/search_omdb", {
-            "search_term":              $("input[name='search_term']").val()
+            "search_term": $("input[name='search_term']").val()
         })
 
         .done(function(l) {
@@ -33,9 +33,14 @@ $(document).ready(function() {
                 var movie_list = $("#movie_list")
                 // move this to a py template or just have the post function return the html ?
                 $.each(l, function(ind, dict){
-                    $('<li>', {class: 'movie',imdbid: dict['imdbID']}).append(
+                    $('<li>', {class: 'movie'}).append(
                         $('<span>').append(
-                            $('<img>', {src:dict['Poster']}),
+                            $("<span>", {class:'quickadd',imdbid: dict['imdbID']})
+                                .append(
+                                $("<span>", {class: 'quickadd_text'}).text('Quick-Add'),
+                                $("<i>", {class: 'fa fa-plus button_add'})
+                                ),
+                            $('<img>', {src:dict['Poster'],imdbid: dict['imdbID']}),
                             dict['Title'],' ',dict['Year'].slice(0,4)
                         )
                     ).appendTo(movie_list)
@@ -49,9 +54,39 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
+// quickadd buttons
+    $("ul#movie_list").on("mouseenter", "span.quickadd", function(){
+        $(this).children("span.quickadd_text").stop(true, true).animate(
+            {width: 'toggle'}
+        )
+    });
+
+    $("ul#movie_list").on("mouseleave", "span.quickadd", function(){
+        $(this).children("span.quickadd_text").stop(true, true).animate(
+            {width: 'toggle'}
+        )
+    });
+
+    $("ul#movie_list").on("click", "span.quickadd", function(){
+       imdbid = $(this).attr('imdbid');
+        // change icon
+       $.post("/quick_add", {"imdbid":imdbid})
+       .done(function(r){
+            response = JSON.parse(r)
+
+            // reset icon
+
+            if(response['status'] == 'success'){
+                swal("", response['message'], 'success');
+            } else {
+                swal("", response['message'], 'error');
+            };
+       })
+    });
+
 // applies add movie overlay
 
-    $('div#database_results').on('click', 'li', function(){
+    $('div#database_results').on('click', 'img', function(){
         $('div#overlay').fadeIn();
 
         imdbid = $(this).attr('imdbid')

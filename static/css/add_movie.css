@@ -67,17 +67,11 @@ ul#movie_list{
 }
 
 ul#movie_list li{
-    padding: 5px;
-}
-
-ul#movie_list li span{
-    height: 100%;
     width: 200px;
     float: left;
-    padding: 6px 6px 0px 6px;
-    margin: 10px;
-    cursor: pointer;
+    margin: 20px;
     text-align: center;
+    position: relative;
 }
 
 ul#movie_list li span img{
@@ -85,8 +79,35 @@ ul#movie_list li span img{
     height: 300px;
     margin: 0 0 5px 0;
     float: left;
+    cursor: pointer;
     border: 1px solid #bdbdbd;
 }
+
+span.quickadd{
+    position: absolute;
+    cursor: pointer;
+    background-color: #212121;
+    bottom: 4em;
+    left: 0;
+    padding: 0.25em .4em .25em 0.4em;
+    color:  white;
+    height: 1.5em;
+    line-height: 1.5em;
+    border-radius: 0 .5em .5em 0;
+    overflow: hidden;
+}
+
+span.quickadd_text{
+    display: none;
+    text-overflow: clip;
+    overflow-x: hidden;
+    float: left;
+}
+
+i.button_add{
+    margin-left: 0.4em;
+}
+
 
 /* loading animation */
 #thinker {

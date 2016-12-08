@@ -30,24 +30,32 @@ If you do not wish to use Git, follow these steps.
 * Open a browser and navigate to `localhost:9090`
 
 
-## Options
+## Usage
 
 You can add the following arguments to Watcher when running the Python script.
 
-`-d` Run the server as a daemon (only available for *nix based operating systems).
+Run the server as a daemon (only available for *nix based operating systems).
+`$ watcher.py --daemon`
 
-`-a 0.0.0.0` Network address to bind to.
+Change address to bind to.
+`$ watcher.py --address 0.0.0.0`
 
-`-p 9090` Port to bind to.
+Change port to host on.
+`$ watcher.py --port 9090` 9090 Port to bind to.
 
-`-b` Open browser on launch.
+Open browser on launch.
+`$ watcher.py --browser`
 
-`--conf config.conf` Path to config file.
+Change path to config file. If not present, one will be created.
+`$ watcher.py --conf path/to/config.cfg`
+
+Change path of log directory.
+`$ watcher.py --log path/to/logs/`
 
 ## Post-Processing
 
 Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.
 
-For Sabnzb, edit the script file and add your api keys and server information. Then, in Sabnzb, disable `Post-Process Only Verified Jobs`, create a new Category using the same category name you have in Watcher. Select the post-processing script and save.
+For *Sabnzb*, edit the script file and add your api keys and server information. Then, in Sabnzb, disable `Post-Process Only Verified Jobs`, create a new Category using the same category name you have in Watcher. Select the post-processing script and save.
 
-For NZBGet, go to Settings and set up a Category with the same category name you have in Watcher. In `Post-Script` select the Watcher post-processing script. In the left column, select Watcher and add your server information. Save your settings and restart NZBGet.
+For *NZBGet*, go to Settings and set up a Category with the same category name you have in Watcher. In `Post-Script` select the Watcher post-processing script. In the left column, select Watcher and add your server information. Save your settings and restart NZBGet.

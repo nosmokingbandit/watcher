@@ -52,6 +52,7 @@ class Omdb():
             raise
         except Exception, e:
             logging.error('OMDB movie_info.', exc_info=True)
+            return None
 
         keep = ('Title', 'Year', 'Released', 'Plot', 'Rated',
                 'DVD', 'Poster', 'imdbID', 'tomatoURL', 'tomatoRating')

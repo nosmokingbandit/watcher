@@ -16,6 +16,9 @@ class MovieInfoPopup():
         trailer = Trailer()
 
         data = omdb.movie_info(imdbid)
+        if not data:
+            return self.no_data()
+
         data_json = json.dumps(data)
 
         title_date = data['title'] + ' '+  data['year']
@@ -97,4 +100,6 @@ class MovieInfoPopup():
 
         return doc.render()
 
-
+    def no_data(self):
+        message = "<div id='container'><span>Unable to retrive movie information. Try again in a few minutes or check logs for more information.</span></div>"
+        return message

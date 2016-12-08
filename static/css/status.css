@@ -61,10 +61,6 @@ ul#movie_list li div{
     overflow: hidden;
 }
 
-ul#movie_list li div:hover{
-    background-color: #eee;
-}
-
 ul#movie_list li div span.status{
     height: 24px;
     font-size: 0.75em;
@@ -107,7 +103,6 @@ ul#movie_list li div img{
     border-color: #212121;
     border-style: solid;
 }
-
 
 ul#movie_list li span.title_year{
     height: 1.5em;

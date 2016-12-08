@@ -80,11 +80,6 @@ ul#movie_list li span{
     text-align: center;
 }
 
-ul#movie_list li span:hover{
-    background-color: #eee;
-}
-
-
 ul#movie_list li span img{
     width: 100%;
     height: 300px;

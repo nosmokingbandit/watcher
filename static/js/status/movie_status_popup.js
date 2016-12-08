@@ -40,8 +40,23 @@ $(document).ready(function() {
         }
     });
 
-
     /* Button actions */
+    function search_now(imdbid, title){
+        $('ul#result_list').hide();
+        $('div#results_thinker').show();
+        $('i#search_now').addClass('fa-circle-o-notch fa-spin');
+
+        $.post("/search", {"imdbid":imdbid, "title":title})
+        .done(function(r){
+            refresh_list('#result_list', imdbid=imdbid)
+            refresh_list('#movie_list')
+
+            $('div#results_thinker').hide();
+            $('i#search_now').removeClass('fa-circle-o-notch fa-spin');
+
+        });
+    };
+
     $('i#close').click(function(e) {
         $('div#overlay').fadeOut();
         $('div#status_pop_up').slideUp();
@@ -82,21 +97,7 @@ $(document).ready(function() {
         var $this = $(this);
         var imdbid = $this.attr('imdbid');
         var title = $this.attr('title');
-
-        $('ul#result_list').hide();
-        $('div#results_thinker').show();
-        $this.addClass('fa-circle-o-notch fa-spin');
-
-        $.post("/search", {"imdbid":imdbid, "title":title})
-        .done(function(r){
-            refresh_list('#result_list', imdbid=imdbid)
-            refresh_list('#movie_list')
-
-            $('div#results_thinker').hide();
-            $this.removeClass('fa-circle-o-notch fa-spin');
-
-        });
-        e.preventDefault();
+        search_now(imdbid, title);
     });
 
     $('i#change_quality').click(function(){
@@ -166,10 +167,10 @@ $(document).ready(function() {
 
         $.post("/update_quality_settings", {"quality": quality_dict, "imdbid": imdbid})
         .done(function(r){
+            refresh_list('#result_list', imdbid=imdbid);
+            refresh_list('#movie_list');
 
-            if(r == 'same'){
-                //do nothing
-            }
+            if(r == 'same'){ /* do nothing */ }
             // if criteria has changed we get passed a time
             else if(r.includes(':')){
 
@@ -187,7 +188,7 @@ $(document).ready(function() {
                     confirmButtonText: "Search Now",
                     closeOnConfirm: true
                 }, function(){
-                    $.post("/search", {"imdbid": imdbid, "title":title})
+                    search_now(imdbid, title);
                 })
             }
             // if we get an error message
@@ -195,7 +196,7 @@ $(document).ready(function() {
                 refresh_list('#result_list', imdbid=imdbid);
                 refresh_list('#movie_list');
                 swal("Error", r, "error");
-            }
+            };
 
             $this.removeClass('fa-circle-o-notch fa-spin');
             $this.hide();

@@ -54,7 +54,7 @@ $(document).ready(function() {
 
     $('i#button_submit').click(function(e){
         $this = $(this);
-        $this.addClass('fa-circle-o-notch fa-spin');
+        $this.addClass('fa-circle faa-burst animated');
 
         quality_dict = {}
         // QUALITY options. This has a lot of data, so this wil get messy.
@@ -117,7 +117,7 @@ $(document).ready(function() {
                 swal("", response['message'], 'error');
             };
 
-            $this.removeClass('fa-circle-o-notch fa-spin');
+            $this.removeClass('fa-circle faa-burst animated');
             $this.hide();
             $('iframe').fadeIn();
             $('ul#quality').fadeOut();

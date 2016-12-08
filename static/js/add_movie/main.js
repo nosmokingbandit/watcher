@@ -72,13 +72,13 @@ $(document).ready(function() {
 
         $icon = $(this).children("i");
         $icon.removeClass('fa-plus');
-        $icon.addClass('fa-circle-o-notch fa-spin');
+        $icon.addClass('fa-circle faa-burst animated');
 
         $.post("/quick_add", {"imdbid":imdbid})
         .done(function(r){
             response = JSON.parse(r)
 
-            $icon.removeClass('fa-circle-o-notch fa-spin');
+            $icon.removeClass('fa-circle faa-burst animated');
             $icon.addClass('fa-plus');
 
             if(response['status'] == 'success'){

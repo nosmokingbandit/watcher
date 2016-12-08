@@ -44,7 +44,7 @@ $(document).ready(function() {
     function search_now(imdbid, title){
         $('ul#result_list').hide();
         $('div#results_thinker').show();
-        $('i#search_now').addClass('fa-circle-o-notch fa-spin');
+        $('i#search_now').addClass('fa-circle faa-burst animated');
 
         $.post("/search", {"imdbid":imdbid, "title":title})
         .done(function(r){
@@ -52,7 +52,7 @@ $(document).ready(function() {
             refresh_list('#movie_list')
 
             $('div#results_thinker').hide();
-            $('i#search_now').removeClass('fa-circle-o-notch fa-spin');
+            $('i#search_now').removeClass('fa-circle faa-burst animated');
 
         });
     };
@@ -114,7 +114,7 @@ $(document).ready(function() {
 
     $('i#save_quality').click(function(){
         $this = $(this);
-        $this.addClass('fa-circle-o-notch fa-spin');
+        $this.addClass('fa-circle faa-burst animated');
 
         /* gather information */
         var quality_dict = {}
@@ -198,7 +198,7 @@ $(document).ready(function() {
                 swal("Error", r, "error");
             };
 
-            $this.removeClass('fa-circle-o-notch fa-spin');
+            $this.removeClass('fa-circle faa-burst animated');
             $this.hide();
 
             $('i#close').fadeTo(100, 1)
@@ -223,14 +223,14 @@ $(document).ready(function() {
         var title = $this.attr('title');
         var imdbid = $('span#title').attr('imdbid')
 
-        $this.addClass('fa-circle-o-notch fa-spin');
+        $this.addClass('fa-circle faa-burst animated');
 
         $.post("/manual_download", {"guid":guid})
         .done(function(r){
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
             swal("", r, "success");
-            $this.removeClass('fa-square fa-spin');
+            $this.removeClass('fa-circle faa-burst animated');
         });
         e.preventDefault();
     });
@@ -247,7 +247,7 @@ $(document).ready(function() {
             confirmButtonText: "Mark Bad",
             closeOnConfirm: false
             }, function(){
-                $this.addClass('fa-circle-o-notch fa-spin');
+                $this.addClass('fa-circle faa-burst animated');
                 var guid = $this.attr('guid');
                 var imdbid = $('span#title').attr('imdbid')
 
@@ -263,7 +263,7 @@ $(document).ready(function() {
                     } else {
                         swal("", r, "error");
                     };
-                    $this.removeClass('fa-circle-o-notch fa-spin');
+                    $this.removeClass('fa-circle faa-burst animated');
                 });
             }
         );

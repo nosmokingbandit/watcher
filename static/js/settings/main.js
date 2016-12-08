@@ -99,7 +99,7 @@ $(document).ready(function () {
         $this.css('background-color', '#212121');
         $this.css('color', 'white');
         $this.width('2.5em');
-        $this_span.text('').addClass('fa fa-circle-o-notch fa-spin');
+        $this_span.text('').addClass('fa fa-circle faa-burst animated');
 
         // Gets entered info, even if not saved
         var data = {}
@@ -115,7 +115,7 @@ $(document).ready(function () {
         })
         .done(function(r){
             $this.removeAttr('style');
-            $this_span.text('Test Connection').removeClass('fa fa-circle-o-notch fa-spin');
+            $this_span.text('Test Connection').removeClass('fa fa-circle faa-burst animated');
             if(r.includes("Err") || r.includes(":")){
                 swal("Error", r, 'warning');
             } else {

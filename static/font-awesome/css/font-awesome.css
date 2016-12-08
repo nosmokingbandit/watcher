@@ -2,6 +2,10 @@
  *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
+/* FAA ANIMATIONS */
+@import url('font-awesome-animation.css');
+
+
 /* FONT PATH
  * -------------------------- */
 @font-face {

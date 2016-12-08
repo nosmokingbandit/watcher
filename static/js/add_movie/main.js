@@ -68,20 +68,25 @@ $(document).ready(function() {
     });
 
     $("ul#movie_list").on("click", "span.quickadd", function(){
-       imdbid = $(this).attr('imdbid');
-        // change icon
-       $.post("/quick_add", {"imdbid":imdbid})
-       .done(function(r){
+        imdbid = $(this).attr('imdbid');
+
+        $icon = $(this).children("i");
+        $icon.removeClass('fa-plus');
+        $icon.addClass('fa-circle-o-notch fa-spin');
+
+        $.post("/quick_add", {"imdbid":imdbid})
+        .done(function(r){
             response = JSON.parse(r)
 
-            // reset icon
+            $icon.removeClass('fa-circle-o-notch fa-spin');
+            $icon.addClass('fa-plus');
 
             if(response['status'] == 'success'){
                 swal("", response['message'], 'success');
             } else {
                 swal("", response['message'], 'error');
             };
-       })
+        })
     });
 
 // applies add movie overlay

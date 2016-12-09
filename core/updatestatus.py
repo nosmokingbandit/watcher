@@ -86,7 +86,7 @@ class Status(object):
 
         Calls self method to update both db tables
         Tries to find imdbid if not supplied.
-        If imdbid is available, executes self.update_movie_status()
+        If imdbid is available, executes self.movie_status()
 
         Returns str success/fail message
         '''
@@ -121,18 +121,20 @@ class Status(object):
         '''
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
-        if not result_status:
+        if result_status == False:
             logging.info('Could not get SEARCHRESULT statuses for {}'.format(imdbid))
             return False
-
-        if 'Finished' in result_status:
-            status = 'Finished'
-        elif 'Snatched' in result_status:
-            status = 'Snatched'
-        elif 'Available' in result_status:
-            status = 'Found'
-        else:
+        elif result_status == None:
             status = 'Wanted'
+        else:
+            if 'Finished' in result_status:
+                status = 'Finished'
+            elif 'Snatched' in result_status:
+                status = 'Snatched'
+            elif 'Available' in result_status:
+                status = 'Found'
+            else:
+                status = 'Wanted'
 
         logging.info('Setting MOVIES {} status to {}.'.format(imdbid, status))
         if self.sql.update('MOVIES', 'status', status, imdbid=imdbid ):

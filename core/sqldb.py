@@ -307,8 +307,13 @@ class SQL(object):
         data = self.execute(command)
 
         if data:
+            data = data.fetchall()
+
+            if len(data) == 0:
+                return None
+
             l = []
-            for i in data.fetchall():
+            for i in data:
                 l.append(i[column])
             return l
         else:

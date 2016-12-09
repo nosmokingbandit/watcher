@@ -35,21 +35,27 @@ If you do not wish to use Git, follow these steps.
 You can add the following arguments to Watcher when running the Python script.
 
 Run the server as a daemon (only available for *nix based operating systems).
+
 `$ watcher.py --daemon`
 
 Change address to bind to.
+
 `$ watcher.py --address 0.0.0.0`
 
 Change port to host on.
+
 `$ watcher.py --port 9090`
 
 Open browser on launch.
+
 `$ watcher.py --browser`
 
 Change path to config file. If not present, one will be created.
+
 `$ watcher.py --conf path/to/config.cfg`
 
 Change path of log directory.
+
 `$ watcher.py --log path/to/logs/`
 
 ## Post-Processing

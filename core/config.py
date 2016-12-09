@@ -92,3 +92,4 @@ class Config():
             d['Quality'][k] = v.split(',')
 
         core.CONFIG = d
+

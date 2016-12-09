@@ -80,13 +80,13 @@ $(document).ready(function() {
             tmp[$(this).attr("id")] = $(this).val();
         });
 
-        $.each(q_list, function(i, v){
-            var enabled = v,
-                priority = v + "priority",
-                min = v + "min",
-                max = v + "max";
+        $.each(q_list, function(i, res){
+            var enabled = res,
+                priority = res + "priority",
+                min = res + "min",
+                max = res + "max";
             var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
-            Quality[v] = dt.join();
+            Quality[res] = dt
         });
 
         quality_dict["Quality"] = Quality;

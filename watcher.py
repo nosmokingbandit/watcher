@@ -150,8 +150,8 @@ if __name__ == '__main__':
     conf_host = str(server_conf['serverhost'])
     conf_browser = server_conf['launchbrowser']
 
-    if passed_args.bind_address:
-        core.SERVER_ADDRESS = passed_args.bind_address
+    if passed_args.address:
+        core.SERVER_ADDRESS = passed_args.address
     else:
         core.SERVER_ADDRESS = conf_host
 

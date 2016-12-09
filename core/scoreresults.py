@@ -120,15 +120,25 @@ class ScoreResults():
         for result in self.results:
             resolution = result['resolution']
             size = result['size'] / 1000000
-            for qi in qualities:
-                ql = qualities[qi].split(',')
-                if ql[0] != 'true':
-                    continue
-                priority = int(ql[1])
-                min_size = int(ql[2])
-                max_size = int(ql[3])
+            for quality in qualities:
+                ## REMOVE:
+                '''
+                remove conditional, should always be:
+                qlist = qualities[quality]
 
-                if resolution == qi:
+                Remember to reformat everyone's database before changing.
+                '''
+                if type(qualities[quality]) == str:
+                    qlist = qualities[quality].split(',')
+                else:
+                    qlist = qualities[quality]
+                if qlist[0] != 'true':
+                    continue
+                priority = int(qlist[1])
+                min_size = int(qlist[2])
+                max_size = int(qlist[3])
+
+                if resolution == quality:
                     if min_size < size < max_size:
                         result['score'] += (8 - priority)*100
                         l.append(result)

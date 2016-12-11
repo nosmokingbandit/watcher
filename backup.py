@@ -20,21 +20,21 @@ print '**############################################################**'
 def backup():
     # check for files and paths
     if not os.path.isfile('watcher.sqlite'):
-        if raw_input('Database watcher.sqlite not found. Continue? (y/N): ').lower() != y:
+        if raw_input('Database watcher.sqlite not found. Continue? (y/N): ').lower() != 'y':
             sys.exit(0)
         database = False
     else:
         database = True
 
     if not os.path.isfile('config.cfg'):
-        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != y:
+        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
             sys.exit(0)
         config = False
     else:
         config = True
 
     if not os.path.isdir(posterpath):
-        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != y:
+        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
             sys.exit(0)
         posters = False
     else:
@@ -83,7 +83,7 @@ def restore():
         'Place watcher.zip in same directory as backup script.'
         sys.exit(0)
 
-    ans = raw_input('Restoring backup. This will overwrite existing ' \
+    ans = raw_input('Restoring backup. This will overwrite existing '
                     'database, config, and posters. Continue? (y/N):  ')
     if ans.lower() != 'y':
         sys.exit(0)
@@ -96,8 +96,8 @@ def restore():
     os.mkdir('backup_tmp')
 
     print 'Extracting zip.'
-    zip = zipfile.ZipFile('watcher.zip')
-    zip.extractall(tmpdir)
+    zipf = zipfile.ZipFile('watcher.zip')
+    zipf.extractall(tmpdir)
 
     files = os.listdir(tmpdir)
 
@@ -133,7 +133,6 @@ def restore():
     print 'Removing temporary directory.'
     shutil.rmtree(tmpdir)
 
-
     print '**############################################################**'
     print '**##################### Backup finished ######################**'
     print '**################# Zip backup: watcher.zip ##################**'
@@ -146,8 +145,6 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument('-b', '--backup', help='Back up to watcher.zip.', action="store_true")
 group.add_argument('-r', '--restore', help='Restore from watcher.zip', action="store_true")
 args = parser.parse_args()
-
-
 
 if args.backup:
     backup()

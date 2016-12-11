@@ -29,6 +29,7 @@
 import os
 import sys
 import urllib2
+import json
 
 
 POSTPROCESS_SUCCESS = 93
@@ -66,7 +67,7 @@ else:
 # send it to watcher
 url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-response = urllib2.urlopen(request).read()
+response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':
     sys.exit(POSTPROCESS_SUCCESS)

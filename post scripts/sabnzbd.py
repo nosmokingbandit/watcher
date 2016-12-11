@@ -72,7 +72,7 @@ else:
 
 url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
-response = urllib2.urlopen(request).read()
+response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':
     sys.exit(0)

@@ -31,9 +31,9 @@ import sys
 import urllib2
 
 
-POSTPROCESS_SUCCESS=93
-POSTPROCESS_ERROR=94
-POSTPROCESS_NONE=95
+POSTPROCESS_SUCCESS = 93
+POSTPROCESS_ERROR = 94
+POSTPROCESS_NONE = 95
 
 
 watcherhost = os.environ['NZBPO_HOST']
@@ -65,12 +65,12 @@ else:
 
 # send it to watcher
 url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
-request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
+request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = urllib2.urlopen(request).read()
 
 if response['status'] == 'finished':
     sys.exit(POSTPROCESS_SUCCESS)
-elif result['status'] = 'incomplete'
+elif result['status'] == 'incomplete':
     sys.exit(POSTPROCESS_ERROR)
 else:
     sys.exit(POSTPROCESS_NONE)

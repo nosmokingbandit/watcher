@@ -1,8 +1,5 @@
 import core
-from core import config
-import urllib2
 from xmlrpclib import ServerProxy
-import base64
 
 import logging
 logging = logging.getLogger(__name__)
@@ -26,7 +23,7 @@ class Nzbget():
             nzbg_server = ServerProxy(url)
 
         try:
-            request = nzbg_server.version()
+            nzbg_server.version()
             return True
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -38,7 +35,7 @@ class Nzbget():
     def add_nzb(data):
         nzbg_conf = core.CONFIG['NzbGet']
 
-        if Nzbget.test_connection(nzbg_conf) != True:
+        if not Nzbget.test_connection(nzbg_conf):
             return "Could not connect to NZBGet."
 
         host = nzbg_conf['nzbghost']
@@ -51,8 +48,8 @@ class Nzbget():
             url = "https://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
         else:
             url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
-        
-	nzbg_server = ServerProxy(url)
+
+        nzbg_server = ServerProxy(url)
 
         filename = '{}.watcher.nzb'.format(data['title'])
         contenturl = data['guid']

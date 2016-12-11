@@ -5,6 +5,7 @@ import json
 import logging
 logging = logging.getLogger(__name__)
 
+
 class Sabnzbd():
 
     @staticmethod
@@ -16,7 +17,7 @@ class Sabnzbd():
 
         url = 'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
 
-        request = urllib2.Request( url, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
             response = urllib2.urlopen(request).read()
@@ -35,11 +36,10 @@ class Sabnzbd():
         sab_conf = core.CONFIG['Sabnzbd']
 
         con_test = Sabnzbd.test_connection(sab_conf)
-        if con_test != True:
+        if not con_test:
             d = {}
             d['status'] = con_test
             return d
-
 
         host = sab_conf['sabhost']
         port = sab_conf['sabport']
@@ -48,7 +48,7 @@ class Sabnzbd():
         base_url = 'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
         mode = 'addurl'
-        name =  urllib2.quote(data['guid'].encode('utf-8'))
+        name = urllib2.quote(data['guid'].encode('utf-8'))
         nzbname = urllib2.quote('{}.watcher'.format(data['title']))
         cat = sab_conf['sabcategory']
         priority_keys = {
@@ -62,12 +62,12 @@ class Sabnzbd():
 
         command_url = '&mode={}&name={}&nzbname={}&cat={}&priority={}&output=json'.format(mode, name, nzbname, cat, priority)
 
-        url =  base_url + command_url
+        url = base_url + command_url
 
-        request = urllib2.Request( url, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
-            response = json.loads( urllib2.urlopen(request).read() )
+            response = json.loads(urllib2.urlopen(request).read())
             return response
 
         except Exception as err:

@@ -61,6 +61,7 @@ class Config():
         # After writing, copy it back to core.CONFIG
         self.stash()
 
+    # REMOVE:
     def merge_new_options(self):
         ''' Opens base_config and config,
             then saves them merged with config taking priority.

@@ -2,7 +2,6 @@ import subprocess
 import core
 import os
 import datetime
-import sys
 import urllib2
 import json
 import shutil
@@ -14,6 +13,7 @@ import zipfile
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class Version(object):
 
@@ -179,9 +179,9 @@ class GitUpdater(object):
         # try to get a history of commit hashes
         commit_history = self.git.get_commit_hash_history()
         if commit_history[2] == 1:
-            logging.error('Error getting git commit history: {}'.format(commit_list[1]))
+            logging.error('Error getting git commit history: {}'.format(commit_history[1]))
             result['status'] = 'error'
-            result['error'] = commit_list[1]
+            result['error'] = commit_history[1]
             core.UPDATE_STATUS = result
             return result
         commit_list = commit_history[0]
@@ -238,12 +238,11 @@ class ZipUpdater(object):
         core.CURRENT_HASH = hash
         return hash
 
-
     def get_newest_hash(self):
         api_url = '{}/commits/{}'.format(core.GIT_API, core.GIT_BRANCH)
-        request = urllib2.Request( api_url, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
-            response = json.load(urllib2.urlopen( request ) )
+            response = json.load(urllib2.urlopen(request))
             hash = response['sha']
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -251,7 +250,6 @@ class ZipUpdater(object):
             logging.error('Could not get newest hash from git.', exc_info=True)
             return None
         return hash
-
 
     def update_check(self):
         ''' Gets commit delta from GIT
@@ -277,7 +275,6 @@ class ZipUpdater(object):
             core.UPDATE_STATUS = result
             return result
 
-
         logging.info('Getting newest version hash.')
         newest_hash = self.get_newest_hash()
         if not newest_hash:
@@ -288,9 +285,9 @@ class ZipUpdater(object):
 
         compare_url = '{}/compare/{}...{}'.format(core.GIT_API, newest_hash, local_hash)
 
-        request = urllib2.Request(compare_url, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(compare_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
-            response = json.load(urllib2.urlopen( request ) )
+            response = json.load(urllib2.urlopen(request))
             behind_count = response['behind_by']
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -332,10 +329,9 @@ class ZipUpdater(object):
             logging.error('Could not delete old update files.', exc_info=True)
             return False
 
-
         logging.info('Downloading latest Zip.')
-        zip_url = '{}/archive/{}.zip'.format(core.GIT_URL, core.GIT_BRANCH )
-        request = urllib2.Request(zip_url, headers={'User-Agent' : 'Mozilla/5.0'} )
+        zip_url = '{}/archive/{}.zip'.format(core.GIT_URL, core.GIT_BRANCH)
+        request = urllib2.Request(zip_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             zip_response = urllib2.urlopen(request).read()
             with open(update_zip, 'wb') as f:
@@ -347,7 +343,7 @@ class ZipUpdater(object):
         logging.info('Extracting Zip to temporary directory.')
         try:
             with zipfile.ZipFile(update_zip) as f:
-                 f.extractall(update_path)
+                f.extractall(update_path)
         except Exception, e:
             logging.error('Could not extract Zip.', exc_info=True)
             return False
@@ -420,7 +416,6 @@ class ZipUpdater(object):
         except Exception, e:
             logging.error('Could not delete temporary files.', exc_info=True)
             return False
-
 
         logging.info('Update successful.')
         return True

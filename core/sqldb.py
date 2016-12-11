@@ -1,8 +1,4 @@
 from sqlalchemy import *
-import os
-import json
-from core import poster
-import sys
 import time
 
 import logging
@@ -10,9 +6,11 @@ logging = logging.getLogger(__name__)
 
 DB_NAME = 'sqlite:///watcher.sqlite'
 
+
 class SQL(object):
     '''
-    All methods will return False on failure. On success they will return the expected data or True.
+    All methods will return False on failure.
+    On success they will return the expected data or True.
     '''
 
     def __init__(self):
@@ -26,44 +24,44 @@ class SQL(object):
             raise
 
         self.MOVIES = Table('MOVIES', self.metadata,
-                              Column('imdbid', TEXT),
-                              Column('title', TEXT),
-                              Column('year', TEXT),
-                              Column('poster', TEXT),
-                              Column('plot', TEXT),
-                              Column('tomatourl', TEXT),
-                              Column('tomatorating', TEXT),
-                              Column('released', TEXT),
-                              Column('dvd', TEXT),
-                              Column('rated', TEXT),
-                              Column('status', TEXT),
-                              Column('predb', TEXT),
-                              Column('quality', TEXT),
-                              Column('finisheddate', TEXT),
-                              Column('finishedscore', SMALLINT)
-                             )
+                            Column('imdbid', TEXT),
+                            Column('title', TEXT),
+                            Column('year', TEXT),
+                            Column('poster', TEXT),
+                            Column('plot', TEXT),
+                            Column('tomatourl', TEXT),
+                            Column('tomatorating', TEXT),
+                            Column('released', TEXT),
+                            Column('dvd', TEXT),
+                            Column('rated', TEXT),
+                            Column('status', TEXT),
+                            Column('predb', TEXT),
+                            Column('quality', TEXT),
+                            Column('finisheddate', TEXT),
+                            Column('finishedscore', SMALLINT)
+                           )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
-                                     Column('score', SMALLINT),
-                                     Column('size', SMALLINT),
-                                     Column('category', TEXT),
-                                     Column('status', TEXT),
-                                     Column('pubdate', TEXT),
-                                     Column('title', TEXT),
-                                     Column('imdbid', TEXT),
-                                     Column('indexer', TEXT),
-                                     Column('date_found', TEXT),
-                                     Column('info_link', TEXT),
-                                     Column('guid', TEXT),
-                                     Column('torrentfile', TEXT),
-                                     Column('resolution', TEXT),
-                                     Column('type', TEXT),
-                                     Column('downloadid', TEXT)
-                                    )
+                                   Column('score', SMALLINT),
+                                   Column('size', SMALLINT),
+                                   Column('category', TEXT),
+                                   Column('status', TEXT),
+                                   Column('pubdate', TEXT),
+                                   Column('title', TEXT),
+                                   Column('imdbid', TEXT),
+                                   Column('indexer', TEXT),
+                                   Column('date_found', TEXT),
+                                   Column('info_link', TEXT),
+                                   Column('guid', TEXT),
+                                   Column('torrentfile', TEXT),
+                                   Column('resolution', TEXT),
+                                   Column('type', TEXT),
+                                   Column('downloadid', TEXT)
+                                  )
         self.MARKEDRESULTS = Table('MARKEDRESULTS', self.metadata,
-                                     Column('imdbid', TEXT),
-                                     Column('guid', TEXT),
-                                     Column('status', TEXT)
-                                    )
+                                   Column('imdbid', TEXT),
+                                   Column('guid', TEXT),
+                                   Column('status', TEXT)
+                                  )
 
     def create_database(self):
         logging.info('Creating tables.')
@@ -74,6 +72,7 @@ class SQL(object):
         '''
         We are going to loop this up to 5 times in case the database is locked. After each attempt we wait 1 second to try again. This allows the query that has the database locked to (hopefully) finish. It might (i'm not sure) allow a query to jump in line between a series of queries. So if we are writing search results to every movie at once, the get_user_movies request may be able to jump in between them to get the user's movies to the browser. Maybe.
         '''
+
         tries = 0
         while tries < 5:
             try:
@@ -101,6 +100,7 @@ class SQL(object):
         DB_STRING must have key:val matching Column:Value in table.
         Returns Bool on success.
         '''
+
         logging.info('Writing data to {}'.format(TABLE))
 
         cols = ', '.join(DB_STRING.keys())
@@ -178,7 +178,10 @@ class SQL(object):
         result = self.execute(command)
 
         if result:
-            return result.fetchall()
+            l = []
+            for i in result:
+                l.append(dict(i))
+            return l
         else:
             logging.error('EXECUTE SQL.GET_USER_MOVIES FAILED.')
             return False
@@ -230,7 +233,7 @@ class SQL(object):
 
         results = {}
 
-        command ='SELECT * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
+        command = 'SELECT * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
 
         data = self.execute(command)
 
@@ -322,10 +325,17 @@ class SQL(object):
 
     def row_exists(self, TABLE, imdbid='', guid='', downloadid=''):
         '''
-        Checks TABLE for imdbid, guid, or downloadid.
-        Returns Bool if found.
+        :param TABLE: str name of sql table to look through
+        :param imdbid: str imdb identification number <optional>
+        :param guid: str download guid <optional>
+        :param downloadid: str downloader id <optional>
 
-        Used to determine if we need to add a row or update existing row.
+        Checks TABLE for imdbid, guid, or downloadid.
+        Exactly one optional variable must be supplied.
+
+        Used to check if we need to add row or update existing row.
+
+        Returns Bool of found status
         '''
 
         if imdbid:
@@ -345,10 +355,9 @@ class SQL(object):
 
         row = self.execute(command)
 
-        if row == False or row.fetchone() == None:
+        if row is False or row.fetchone() is None:
             return False
         else:
-        # this will return True if there was a sql error to prevent accidental double-entires. Probably not the best solution, but it works.
             return True
 
     def get_single_search_result(self, idcol, idval):
@@ -435,3 +444,22 @@ class SQL(object):
                     if not self.execute(command):
                         raise ValueError('Could not alter database. {}'.format(command))
         return
+
+    def convert_movies(self):
+        import json
+        qualities = ['4K', '1080P', '720P', 'SD']
+        for m in self.get_user_movies():
+            imdbid = m['imdbid']
+            quality_col = json.loads(m['quality'])
+            quality_d = quality_col['Quality']
+
+            for i in qualities:
+                if not isinstance(quality_d[i], list):
+                    quality_d[i] = quality_d[i].split(',')
+
+            quality_col['Quality'] = quality_d
+
+            update_val = json.dumps(quality_col)
+
+            self.update('MOVIES', 'quality', update_val, imdbid=imdbid)
+

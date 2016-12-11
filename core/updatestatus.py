@@ -3,6 +3,7 @@ from core import sqldb
 import logging
 logging = logging.getLogger(__name__)
 
+
 class Status(object):
 
     def __init__(self):
@@ -35,7 +36,6 @@ class Status(object):
         else:
             logging.info('Guid {} not found in SEARCHRESULTS.'.format(guid))
             return False
-
 
     def markedresults(self, guid, status, imdbid=None):
         ''' Marks markedresults status
@@ -79,7 +79,6 @@ class Status(object):
                 logging.info('Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')
                 return False
 
-
     def mark_bad(self, guid, imdbid=None):
         ''' Marks search result as Bad
         :param guid: str download link for nzb/magnet/torrent file.
@@ -95,7 +94,7 @@ class Status(object):
             return 'Could not mark guid in SEARCHRESULTS. See logs for more information.'
 
         # try to get imdbid
-        if imdbid == None:
+        if imdbid is None:
             result = self.sql.get_single_search_result('guid', guid)
             if not result:
                 return 'Could not get imdbid to update Movie status.'
@@ -121,10 +120,10 @@ class Status(object):
         '''
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
-        if result_status == False:
+        if result_status is False:
             logging.info('Could not get SEARCHRESULT statuses for {}'.format(imdbid))
             return False
-        elif result_status == None:
+        elif result_status is None:
             status = 'Wanted'
         else:
             if 'Finished' in result_status:
@@ -137,7 +136,7 @@ class Status(object):
                 status = 'Wanted'
 
         logging.info('Setting MOVIES {} status to {}.'.format(imdbid, status))
-        if self.sql.update('MOVIES', 'status', status, imdbid=imdbid ):
+        if self.sql.update('MOVIES', 'status', status, imdbid=imdbid):
             return True
         else:
             logging.info('Could not set {} to {}'.format(imdbid, status))

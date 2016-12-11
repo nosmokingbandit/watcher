@@ -2,7 +2,7 @@ from cherrypy import expose
 import dominate
 from dominate.tags import *
 import core
-from core import sqldb, version, config
+from core import sqldb, version
 from header import Header
 import datetime
 
@@ -33,7 +33,6 @@ class Status():
             script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
             script(type='text/javascript', src='js/status/main.js')
 
-
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
@@ -41,7 +40,7 @@ class Status():
                     with ul(id='movie_list'):
                         self.movie_list()
 
-            if core.UPDATE_STATUS != None:
+            if core.UPDATE_STATUS is not None:
                 if core.UPDATE_STATUS['status'] == 'behind':
                     commit = 'commit'
                     if core.UPDATE_STATUS['behind_count'] > 1:
@@ -108,7 +107,7 @@ class Status():
             return None
 
         now = datetime.datetime.now()
-        if core.UPDATE_LAST_CHECKED != None:
+        if core.UPDATE_LAST_CHECKED is not None:
             hours_since_last = (now - core.UPDATE_LAST_CHECKED).seconds / 3600
             if hours_since_last >= int(core.CONFIG['Server']['checkupdatefrequency']):
                 core.UPDATE_LAST_CHECKED = now

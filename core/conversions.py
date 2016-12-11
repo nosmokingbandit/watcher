@@ -1,5 +1,3 @@
-import datetime
-
 class Conversions():
     ''' Coverts data to human-readable formats. '''
 
@@ -18,11 +16,11 @@ class Conversions():
 
         if bytes == 1 and not gnu:
             return '1 Byte'
-        elif bytes < base :
+        elif bytes < base:
             return '%d Bytes' % bytes
 
-        for i,s in enumerate(suffix):
-            unit = base ** (i+2)
+        for i, s in enumerate(suffix):
+            unit = base ** (i + 2)
             if bytes < unit:
                 return (format + ' %s') % ((base * bytes / unit), s)
         return (format + ' %s') % ((base * bytes / unit), s)

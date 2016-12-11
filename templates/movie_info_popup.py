@@ -1,9 +1,9 @@
 import dominate
 from dominate.tags import *
 import json
-import sys
 import core
 from core.movieinfo import Omdb, Trailer
+
 
 class MovieInfoPopup():
 
@@ -21,7 +21,7 @@ class MovieInfoPopup():
 
         data_json = json.dumps(data)
 
-        title_date = data['title'] + ' '+  data['year']
+        title_date = data['title'] + ' ' + data['year']
         imdbid = data['imdbid']
         youtube_id = trailer.get_trailer(title_date)
         if youtube_id:

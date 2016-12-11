@@ -1,10 +1,10 @@
 import urllib2
-import ssl
 import xml.etree.cElementTree as ET
 import core
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class NewzNab():
 
@@ -25,7 +25,7 @@ class NewzNab():
         self.imdbid = imdbid
 
         results = []
-        imdbid_s = imdbid[2:] #just imdbid numbers
+        imdbid_s = imdbid[2:]  #just imdbid numbers
 
         for indexer in indexers:
             if indexer[2] == 'false':

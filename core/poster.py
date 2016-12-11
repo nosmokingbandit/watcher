@@ -1,9 +1,10 @@
 from HTMLParser import HTMLParser
-import urllib2, os, shutil
+import urllib2
+import os
+import shutil
 
 import logging
 logging = logging.getLogger(__name__)
-
 
 
 class Poster():
@@ -28,7 +29,7 @@ class Poster():
 
         new_poster_path = '{}{}.jpg'.format(self.poster_folder, imdbid)
 
-        if os.path.exists(new_poster_path) ==  False:
+        if os.path.exists(new_poster_path) is False:
             logging.info('Saving poster to {}'.format(new_poster_path))
 
             if poster_url == 'images/missing_poster.jpg':
@@ -37,7 +38,7 @@ class Poster():
             else:
                 request = urllib2.Request( poster_url, headers={'User-Agent' : 'Mozilla/5.0'} )
                 try:
-                    result = urllib2.urlopen( request ).read()
+                    result = urllib2.urlopen(request).read()
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e:
@@ -80,7 +81,7 @@ class Poster():
 
         lParser = parseImages()
 
-        search_term = search_term.replace(" ","+")
+        search_term = search_term.replace(" ", "+")
         search_string = "https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
 
         request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
@@ -91,6 +92,7 @@ class Poster():
         lParser.close()
 
         return lParser.imgs[1]
+
 
 class parseImages(HTMLParser):
     ''' Parse Yahoo html.

@@ -2,10 +2,9 @@ from cherrypy import expose
 import dominate
 from dominate.tags import *
 import core
-import json
 from core import config
 from header import Header
-import os
+
 
 def settings_page(page):
     ''' Decorator template for settings subpages
@@ -53,9 +52,7 @@ def settings_page(page):
                     span('Save Changes')
         return doc.render()
 
-
     return page_template
-
 
 
 class Settings():

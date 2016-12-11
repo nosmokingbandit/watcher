@@ -9,7 +9,7 @@ class Update():
 
     @expose
     def index(self):
-        if core.UPDATING == False:
+        if not core.UPDATING:
             raise cherrypy.HTTPRedirect("/status")
             return
 
@@ -24,7 +24,6 @@ class Update():
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(type='text/javascript', src='js/update/main.js')
-
 
         with doc:
             with div(id='content'):

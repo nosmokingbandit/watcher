@@ -3,10 +3,9 @@ import json
 from templates import movie_info_popup, movie_status_popup, status
 import os
 import sys
-import datetime
 import threading
 import core
-from core import sqldb, poster, config, scoreresults, snatcher, searcher, scheduler, version, updatestatus
+from core import sqldb, poster, config, snatcher, searcher, version, updatestatus
 from core.conversions import Conversions
 from core.movieinfo import Omdb
 from core.downloaders import sabnzbd, nzbget
@@ -14,6 +13,7 @@ from core.rss import predb
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class Ajax(object):
     ''' These are all the methods that handle
@@ -48,7 +48,6 @@ class Ajax(object):
 
             return json.dumps(results)
 
-
     def movie_info_popup(self, imdbid):
         ''' Calls movie_info_popup to render html
         :param imdbid: str imdb identification number (tt123456)
@@ -58,7 +57,6 @@ class Ajax(object):
 
         mip = movie_info_popup.MovieInfoPopup()
         return mip.html(imdbid)
-
 
     def movie_status_popup(self, imdbid):
         ''' Calls movie_status_popup to render html
@@ -93,7 +91,8 @@ class Ajax(object):
             if core.CONFIG['Search']['searchafteradd'] == 'true':
                 if self.searcher.search(imdbid, title):
                     # if we don't need to wait to grab the movie do it now.
-                    if core.CONFIG['Search']['autograb'] == 'true' and core.CONFIG['Search']['waitdays'] == '0':
+                    if core.CONFIG['Search']['autograb'] == 'true' and \
+                            core.CONFIG['Search']['waitdays'] == '0':
                         self.snatcher.auto_grab(imdbid)
 
         TABLE = 'MOVIES'
@@ -103,10 +102,12 @@ class Ajax(object):
         year = data['year']
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
-            logging.info('{} {} already exists as a wanted movie'.format(title, year, imdbid))
+            logging.info('{} {} already exists as a wanted movie'
+                .format(title, year, imdbid))
 
             response['status'] = 'failed'
-            response['message'] = '{} {} is already wanted, cannot add.'.format(title, year, imdbid)
+            response['message'] = '{} {} is already wanted, cannot add.' \
+                .format(title, year, imdbid)
             return json.dumps(response)
 
         else:
@@ -118,18 +119,21 @@ class Ajax(object):
             DB_STRING = data
             if self.sql.write(TABLE, DB_STRING):
 
-                t2 = threading.Thread(target=self.poster.save_poster, args=(imdbid, poster_url))
+                t2 = threading.Thread(target=self.poster.save_poster,
+                    args=(imdbid, poster_url))
                 t2.start()
 
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
                 response['status'] = 'success'
-                response['message'] = '{} {} added to wanted list.'.format(title, year)
+                response['message'] = '{} {} added to wanted list.' \
+                    .format(title, year)
                 return json.dumps(response)
             else:
                 response['status'] = 'failed'
-                response['message'] = 'Could not write to database. Check logs for more information.'
+                response['message'] = 'Could not write to database. ' \
+                    'Check logs for more information.'
                 return json.dumps(response)
 
     def quick_add(self, imdbid):
@@ -163,8 +167,8 @@ class Ajax(object):
 
     def save_settings(self, data):
         ''' Saves settings to config file
-        :param data: dict of Section with nested dict of keys and values.
-            {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
+        :param data: dict of Section with nested dict of keys and values:
+        {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
 
         Returns str 'failed' or 'success'
         '''
@@ -221,7 +225,8 @@ class Ajax(object):
         if data:
             return self.snatcher.snatch(data)
         else:
-            return 'Unable to get download information from the database. Check logs for more information.'
+            return 'Unable to get download information from the database. ' \
+                'Check logs for more information.'
 
     def mark_bad(self, guid, imdbid):
         ''' Marks guid as bad in SEARCHRESULTS and MARKEDRESULTS
@@ -248,7 +253,6 @@ class Ajax(object):
         if list == '#result_list':
             return movie_status_popup.MovieStatusPopup().result_list(imdbid)
 
-
     def test_downloader_connection(self, mode, data):
         ''' Test connection to downloader.
         :param mode: str which downloader to test.
@@ -262,16 +266,15 @@ class Ajax(object):
         data = json.loads(data)
 
         if mode == 'sabnzbd':
-            if sabnzbd.Sabnzbd.test_connection(data) == True:
+            if sabnzbd.Sabnzbd.test_connection(data):
                 return 'Connection successful.'
             else:
                 return sabnzbd.Sabnzbd.test_connection(data)
         if mode == 'nzbget':
-            if nzbget.Nzbget.test_connection(data) == True:
+            if nzbget.Nzbget.test_connection(data):
                 return 'Connection successful.'
             else:
                 return nzbget.Nzbget.test_connection(data)
-
 
     def server_status(self, mode):
         ''' Check or modify status of CherryPy server_status
@@ -290,7 +293,7 @@ class Ajax(object):
         def server_restart():
             cwd = os.getcwd()
             cherrypy.engine.restart()
-            os.chdir(cwd) # again, for the daemon
+            os.chdir(cwd)  # again, for the daemon
             return
 
         def server_shutdown():
@@ -305,12 +308,11 @@ class Ajax(object):
 
         elif mode == 'shutdown':
             logging.info('Shutting Down Server...')
-            threading.Timer(1, server_shutdown ).start()
+            threading.Timer(1, server_shutdown).start()
             return
 
         elif mode == 'online':
             return str(cherrypy.engine.state)
-
 
     def update_now(self, mode):
         ''' Starts and executes update process.
@@ -327,14 +329,14 @@ class Ajax(object):
 
         if mode == 'set_true':
             core.UPDATING = True
-            yield 'true' # can be return?
+            yield 'true'  # can be return?
         if mode == 'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
-            if update_status == False:
+            if update_status is False:
                 logging.info('Update Failed.')
                 yield 'failed'
-            elif update_status == True:
+            elif update_status is True:
                 yield 'true'
                 logging.info('Respawning process...')
                 cherrypy.engine.stop()
@@ -345,7 +347,8 @@ class Ajax(object):
 
     def update_quality_settings(self, quality, imdbid):
         ''' Updates quality settings for individual title
-        :param quality: str json-formatted dict of quality settings as described below.
+        :param quality: str json-formatted dict of quality
+                        settings as described below.
         :param imdbid: str imdb identification number (tt123456).
 
         Takes entered information from /movie_status_popup and
@@ -359,8 +362,9 @@ class Ajax(object):
 
         tabledata = self.sql.get_movie_details('imdbid', imdbid)
 
-        if tabledata == False:
-            return 'Could not get existing information from sql table. Check logs for more information.'
+        if tabledata is False:
+            return 'Could not get existing information from sql table. ' \
+                'Check logs for more information.'
         else:
             tabledata = tabledata['quality']
 
@@ -371,12 +375,15 @@ class Ajax(object):
         else:
             logging.info('Updating quality for {}.'.format(imdbid))
             if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
-                return 'Could not save quality to database. Check logs for more information. '
+                return 'Could not save quality to database. ' \
+                    'Check logs for more information.'
             else:
                 if not self.sql.purge_search_results(imdbid):
-                    return 'Search criteria has changed, but old search results could not be purged. Check logs for more information.'
+                    return 'Search criteria has changed, but old search results ' \
+                        'could not be purged. Check logs for more information.'
                 if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
-                    return 'Search criteria has changed, old search results have been purged, but the movie status could not be set. Check logs for more information.'
+                    return 'Search criteria has changed, old search results ' \
+                        'have been purged, but the movie status could not be set. Check logs for more information.'
                 else:
                     return Conversions.human_datetime(core.NEXT_SEARCH)
 

@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 logging = logging.getLogger(__name__)
 
+
 class Snatcher():
 
     def __init__(self):
@@ -76,7 +77,7 @@ class Snatcher():
             logging.info('Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
-            if response['status'] == True:
+            if response['status'] is True:
 
                 downloadid = response['nzo_ids'][0]
                 # store downloadid in database

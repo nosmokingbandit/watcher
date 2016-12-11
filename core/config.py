@@ -1,12 +1,12 @@
 import ConfigParser
 import random
 import shutil
-import os
 import json
 import core
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class Config():
 
@@ -36,7 +36,7 @@ class Config():
         self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
 
         apikey = "%06x" % random.randint(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-        self.config.set('Server', 'apikey', apikey )
+        self.config.set('Server', 'apikey', apikey)
 
         with open(self.file, 'w') as conf_file:
             self.config.write(conf_file)
@@ -44,8 +44,8 @@ class Config():
 
     def write_dict(self, data):
         ''' Writes a dict to the config file.
-        :param data: dict of Section with nested dict of keys and values
-            {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
+        :param data: dict of Section with nested dict of keys and values:
+        {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
         '''
         self.config.read(self.file)
 

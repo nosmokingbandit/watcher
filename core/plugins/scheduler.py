@@ -1,12 +1,11 @@
-import cherrypy
 from datetime import datetime
 from datetime import timedelta
 from threading import Timer
-import core
 from cherrypy.process import plugins
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class SchedulerPlugin(plugins.SimplePlugin):
     '''
@@ -33,6 +32,7 @@ class SchedulerPlugin(plugins.SimplePlugin):
     def stop(self):
         for i in self.task_list:
             i.stop()
+
 
 class ScheduledTask(object):
     ''' Class that creates a new scheduled task.
@@ -61,7 +61,7 @@ class ScheduledTask(object):
 
         self.task = Task(hr, min, interval, task)
 
-        if auto_start == True:
+        if auto_start is True:
             self.start()
 
         SchedulerPlugin.task_list.append(self)
@@ -82,6 +82,7 @@ class ScheduledTask(object):
             return True
         except Exception as e:
             return e
+
 
 class Task(object):
     def __init__(self, hour, minute, interval, func):

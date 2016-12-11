@@ -4,7 +4,9 @@ import json
 import logging
 logging = logging.getLogger(__name__)
 
+
 class Omdb():
+
     def search(self, search_term ):
         ''' Search OMDB for all matches
         :param search_term: str title of movie to search for.
@@ -22,7 +24,7 @@ class Omdb():
         request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
 
         try:
-            results_json = json.load(urllib2.urlopen( request ) )
+            results_json = json.load(urllib2.urlopen(request))
             if results_json['Response'] == 'False':
                 return 'Nothing Found'
             else:
@@ -47,7 +49,7 @@ class Omdb():
         request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
 
         try:
-            data = json.load(urllib2.urlopen( request ) )
+            data = json.load(urllib2.urlopen(request))
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
@@ -71,7 +73,8 @@ class Trailer():
         ''' Gets trailer embed url from Youtube.
         :param title_date: str movie title and date ("Movie Title 2016")
 
-        Attempts to connect 3 times in case Youtube is down or not responding. Can fail.
+        Attempts to connect 3 times in case Youtube is down or not responding
+        Can fail if no response is recieved.
 
         Returns str or None
         '''

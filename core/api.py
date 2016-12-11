@@ -1,13 +1,11 @@
 import json
 import cherrypy
-import urllib2
-from urlparse import parse_qs
-import config
 import core
-from core import config, sqldb, snatcher, postprocessing
+from core import sqldb
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class API(object):
     '''
@@ -27,11 +25,6 @@ class API(object):
     def GET(self, **params):
         serverkey = core.CONFIG['Server']['apikey']
 
-
-        # then we need to reconstruct the guid
-        if 'i' in params and 'r' in params:
-            params['guid'] = '{}&i={}&r={}'.format(params['guid'], params['i'], params['r'])
-
         # check for api key
         if serverkey != params['apikey']:
             logging.warning('Invalid API key in request.')
@@ -41,10 +34,8 @@ class API(object):
         if 'mode' not in params:
             return 'No API mode specified.'
 
-
         if params['mode'] == 'liststatus':
             return self.liststatus()
-
 
     def liststatus(self):
         logging.info('API request movie list.')

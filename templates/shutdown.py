@@ -19,7 +19,6 @@ class Shutdown():
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(type='text/javascript', src='js/shutdown/main.js')
 
-
         with doc:
             with div(id='content'):
                 div(id='thinker')

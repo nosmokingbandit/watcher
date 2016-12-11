@@ -1,12 +1,11 @@
-import cherrypy
-import newznab, scoreresults, sqldb, snatcher, config, updatestatus
-import datetime, json
+from core import newznab, scoreresults, sqldb, snatcher, updatestatus
+import datetime
 import core
 from core.rss import predb
-from core.conversions import Conversions
 
 import logging
 logging = logging.getLogger(__name__)
+
 
 class Searcher():
 
@@ -31,8 +30,13 @@ class Searcher():
         Will grab movie if autograb is 'true' and
             movie is 'Found' or 'Finished'.
 
+        Updates core.NEXT_SEARCH time
+
         Does not return
         '''
+        interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
+        now = datetime.datetime.today().replace(second=0, microsecond=0)
+        core.NEXT_SEARCH = now + datetime.timedelta(0, interval)
 
         today = datetime.date.today()
         keepsearching = core.CONFIG['Search']['keepsearching']
@@ -47,7 +51,6 @@ class Searcher():
         movies = self.sql.get_user_movies()
         if not movies:
             return False
-        TABLE_NAME = 'MOVIES'
 
         '''
         Loops through all movies to search for any that require it.
@@ -62,7 +65,7 @@ class Searcher():
                 continue
 
             if status in ['Wanted', 'Found']:
-                    logging.info('{} status is {}. Searching now.'.format(title, status ))
+                    logging.info('{} status is {}. Searching now.'.format(title, status))
                     self.search(imdbid, title)
                     continue
 
@@ -70,7 +73,7 @@ class Searcher():
                 logging.info('{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
-                    logging.info('{} finished on {}, searching again.'.format(title, finisheddate ))
+                    logging.info('{} finished on {}, searching again.'.format(title, finisheddate))
                     self.search(imdbid, title)
                     continue
                 else:
@@ -89,7 +92,6 @@ class Searcher():
                 return False
             for movie in movies:
                 status = movie['status']
-                finishedscore = movie['finishedscore']
 
                 if status == 'Found':
                     logging.info('{} status is Found. Running automatic snatcher.'.format(title))
@@ -108,7 +110,6 @@ class Searcher():
                 else:
                     continue
 
-
         logging.info('Autosearch complete.')
         return
 
@@ -122,29 +123,26 @@ class Searcher():
 
         Sends results to self.scoreresults(), then stores them in SEARCHRESULTS
 
-
         Returns Bool if movie is found.
         '''
-
-        TABLE_NAME = 'MOVIES'
 
         newznab_results = self.nn.search_all(imdbid)
         scored_results = self.score.score(newznab_results, imdbid, 'nzb')
         ## eventually add search for torrents
 
         # sets result status based off marked results table
-        marked_results =  self.sql.get_marked_results(imdbid)
+        marked_results = self.sql.get_marked_results(imdbid)
         if marked_results:
             for result in scored_results:
                 if result['guid'] in marked_results:
                     result['status'] = marked_results[result['guid']]
-
 
         if scored_results:
             if not self.store_results(scored_results, imdbid):
                 return False
 
         if not self.update.movie_status(imdbid):
+            logging.info('No acceptable results found for {}'.format(imdbid))
             return False
 
         return True

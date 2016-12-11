@@ -236,7 +236,7 @@ class Postprocessing(object):
             year = data['year']
 
             logging.info('Searching omdb for {} {}'.format(title, year))
-            search_string ='http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title,year).replace(' ', '+')
+            search_string = 'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
 
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -333,7 +333,7 @@ class Postprocessing(object):
             result['tasks']['cleanup'] = {'enabled': 'true', 'path': data['path']}
 
             logging.info('Deleting leftover files from failed download.')
-            if self.cleanup(data['path']) == True:
+            if self.cleanup(data['path']) is True:
                 result['tasks']['cleanup']['response'] = 'true'
             else:
                 result['tasks']['cleanup']['response'] = 'false'
@@ -426,7 +426,7 @@ class Postprocessing(object):
         if data['imdbid']:
             logging.info('Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
-            self.sql.update('MOVIES', 'finisheddate',\
+            self.sql.update('MOVIES', 'finisheddate',
                 result['data']['finisheddate'], imdbid=data['imdbid'])
         else:
             logging.info('Imdbid not supplied or found, unable to update Movie status.')
@@ -438,7 +438,7 @@ class Postprocessing(object):
             result['tasks']['renamer'] = {'enabled': 'true'}
             result['data']['orig_filename'] = result['data']['filename']
             response = self.renamer(data)
-            if response == None:
+            if response is None:
                 result['tasks']['renamer']['response'] = 'false'
             else:
                 data['filename'] = response
@@ -451,7 +451,7 @@ class Postprocessing(object):
         if core.CONFIG['Postprocessing']['moverenabled'] == 'true':
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
-            if response == None:
+            if response is None:
                 result['tasks']['mover']['response'] = 'false'
             else:
                 data['new_file_location'] = response
@@ -491,7 +491,7 @@ class Postprocessing(object):
         renamer_string = core.CONFIG['Postprocessing']['renamerstring']
 
         # check to see if we have a valid renamerstring
-        if re.match(r'{(.*?)}', renamer_string) == None:
+        if re.match(r'{(.*?)}', renamer_string) is None:
             logging.info('Invalid renamer string {}'.format(renamer_string))
             return None
 

@@ -491,7 +491,7 @@ class Postprocessing(object):
 
         # check to see if we have a valid renamerstring
         if re.match(r'{(.*?)}', renamer_string) == None:
-            logging.info('Invalid renamer string {}'.format(renamerstring))
+            logging.info('Invalid renamer string {}'.format(renamer_string))
             return None
 
         # remove invalid chars

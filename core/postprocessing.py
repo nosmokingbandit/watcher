@@ -7,7 +7,7 @@ import re
 import datetime
 import core
 import cherrypy
-from core import config, sqldb, ajax, snatcher, updatestatus
+from core import sqldb, snatcher, updatestatus
 
 import logging
 logging = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ class Postprocessing(object):
         if data['mode'] == 'failed':
             logging.info('Post-processing as Failed.')
             # returns to url:
-            response =  json.dumps(self.failed(data), indent=2, sort_keys=True)
+            response = json.dumps(self.failed(data), indent=2, sort_keys=True)
             logging.info(response)
         elif data['mode'] == 'complete':
             logging.info('Post-processing as Complete.')
@@ -100,11 +100,12 @@ class Postprocessing(object):
             logging.info(response)
         else:
             logging.info('Invalid mode value: {}.'.format(data['mode']))
-            return json.dumps({'response': 'false', \
+            return json.dumps({'response': 'false',
                                'error': 'invalid mode value'})
 
         logging.info('#################################')
         logging.info('Post-processing complete.')
+        logging.info(response)
         logging.info('#################################')
 
         return response

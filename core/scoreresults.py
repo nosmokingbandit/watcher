@@ -1,7 +1,7 @@
 import core
 from core import sqldb
-from fuzzywuzzy import fuzz, process
-from datetime import datetime, timedelta
+from fuzzywuzzy import fuzz
+from datetime import datetime
 import json
 
 import logging
@@ -121,17 +121,7 @@ class ScoreResults():
             resolution = result['resolution']
             size = result['size'] / 1000000
             for quality in qualities:
-                ## REMOVE:
-                '''
-                remove conditional, should always be:
                 qlist = qualities[quality]
-
-                Remember to reformat everyone's database before changing.
-                '''
-                if type(qualities[quality]) == str:
-                    qlist = qualities[quality].split(',')
-                else:
-                    qlist = qualities[quality]
                 if qlist[0] != 'true':
                     continue
                 priority = int(qlist[1])
@@ -140,7 +130,7 @@ class ScoreResults():
 
                 if resolution == quality:
                     if min_size < size < max_size:
-                        result['score'] += (8 - priority)*100
+                        result['score'] += (8 - priority) * 100
                         l.append(result)
         self.results = l
 

@@ -1,3 +1,5 @@
+## Watcher
+
 Watcher is an automated movie NZB searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB to Sabnzbd or NZBGet. Watcher also has basic post-processing capabilities such as renaming and moving.
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features.
@@ -65,3 +67,20 @@ Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appr
 For *Sabnzb*, edit the script file and add your api keys and server information. Then, in Sabnzb, disable `Post-Process Only Verified Jobs`, create a new Category using the same category name you have in Watcher. Select the post-processing script and save.
 
 For *NZBGet*, go to Settings and set up a Category with the same category name you have in Watcher. In `Post-Script` select the Watcher post-processing script. In the left column, select Watcher and add your server information. Save your settings and restart NZBGet.
+
+## Backup / Restore
+
+Watcher includes a simple script for backing up and restoring your database and config.
+
+The backup function will create a new watcher.zip in the Watcher folder.
+
+To restore, place watcher.zip in the Watcher folder of your target installation and run the restore command.
+
+####Usage
+Back up Watcher.
+
+`$ backup.py -b`
+
+Restore Watcher.
+
+`$ backup.py -r`

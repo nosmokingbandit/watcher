@@ -19,7 +19,7 @@ UPDATE_LAST_CHECKED = None
 UPDATING = False
 CURRENT_HASH = None
 
-# Scheduler info
+# Search Scheduler info
 NEXT_SEARCH = None
 
 # Store settings after write. Reduces reads from file.

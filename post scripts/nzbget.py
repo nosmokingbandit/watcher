@@ -70,7 +70,7 @@ response = urllib2.urlopen(request).read()
 
 if response['status'] == 'finished':
     sys.exit(POSTPROCESS_SUCCESS)
-elif result['status'] == 'incomplete':
+elif response['status'] == 'incomplete':
     sys.exit(POSTPROCESS_ERROR)
 else:
     sys.exit(POSTPROCESS_NONE)

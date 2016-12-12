@@ -51,7 +51,7 @@ class Nzbget():
 
         nzbg_server = ServerProxy(url)
 
-        filename = '{}.watcher.nzb'.format(data['title'])
+        filename = data['title']
         contenturl = data['guid']
         category = nzbg_conf['nzbgcategory']
         priority_keys = {

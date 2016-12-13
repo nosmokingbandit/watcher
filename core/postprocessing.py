@@ -495,9 +495,6 @@ class Postprocessing(object):
             logging.info('Invalid renamer string {}'.format(renamer_string))
             return None
 
-        # remove invalid chars
-        renamer_string = re.sub(r'[:"*?<>|]+', '', renamer_string)
-
         # existing absolute path
         abs_path_old = os.path.join(data['path'], data['filename'])
 
@@ -509,6 +506,9 @@ class Postprocessing(object):
         while new_name[-1] == ' ':
             new_name = new_name[:-1]
         new_name = new_name + ext
+
+        # remove invalid chars
+        new_name = re.sub(r'[:"*?<>|]+', '', new_name)
 
         # new absolute path
         abs_path_new = os.path.join(data['path'], new_name)
@@ -590,5 +590,3 @@ class Postprocessing(object):
         else:
         # if it is somehow neither
             return False
-
-

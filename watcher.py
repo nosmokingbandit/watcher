@@ -1,13 +1,13 @@
-import os
+import argparse
 import cherrypy
+from cherrypy.process.plugins import Daemonizer
 import datetime
+import os
+import webbrowser
 import core
 from core import sqldb, config, ajax, api, postprocessing, searcher
 from core.log import log
 from core.plugins import scheduler
-import argparse
-from cherrypy.process.plugins import Daemonizer
-import webbrowser
 from templates import status, add_movie, settings, restart, shutdown, update
 
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -130,6 +130,11 @@ class Scheduler(object):
 
             now = datetime.datetime.today().replace(second=0, microsecond=0)
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
+
+    class AutoUpdate(object):
+
+        def __init__(self):
+            return
 
 if __name__ == '__main__':
 

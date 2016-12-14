@@ -1,5 +1,6 @@
 from dominate.tags import *
 
+
 class Header():
     @staticmethod
     def insert_header(current):

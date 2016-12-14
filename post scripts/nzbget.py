@@ -26,11 +26,10 @@
 ### NZBGET POST-PROCESSING SCRIPT ###
 #####################################
 
+import json
 import os
 import sys
 import urllib2
-import json
-
 
 POSTPROCESS_SUCCESS = 93
 POSTPROCESS_ERROR = 94

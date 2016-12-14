@@ -1,7 +1,8 @@
-from cherrypy import expose
 import dominate
+from cherrypy import expose
 from dominate.tags import *
 from header import Header
+
 
 class AddMovie():
     @expose
@@ -26,7 +27,7 @@ class AddMovie():
         with doc:
             Header.insert_header(current="add_movie")
             with div(id='search_box'):
-                input(id='search_input',type="text", placeholder="Search...", name="search_term")
+                input(id='search_input', type="text", placeholder="Search...", name="search_term")
                 with button(id="search_button"):
                     i(cls='fa fa-search')
 

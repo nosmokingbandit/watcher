@@ -1,9 +1,9 @@
-from datetime import datetime
-from datetime import timedelta
+import logging
+from datetime import datetime, timedelta
 from threading import Timer
+
 from cherrypy.process import plugins
 
-import logging
 logging = logging.getLogger(__name__)
 
 
@@ -90,7 +90,7 @@ class Task(object):
         self.func = func
 
         now = datetime.today().replace(second=0, microsecond=0)
-        next = now.replace(hour = hour, minute = minute)
+        next = now.replace(hour=hour, minute=minute)
 
         while next < now:
             next += timedelta(seconds=self.interval)

@@ -1,9 +1,10 @@
-import dominate
-from dominate.tags import *
 import json
+
 import core
+import dominate
 from core import sqldb
 from core.conversions import Conversions
+from dominate.tags import *
 
 
 class MovieStatusPopup():
@@ -16,7 +17,7 @@ class MovieStatusPopup():
         data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
             poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
-            title_date = data['title'] + " " + str( data['year'] )
+            title_date = data['title'] + " " + str(data['year'])
 
             tomatoes_url = data['tomatourl']
 
@@ -48,11 +49,11 @@ class MovieStatusPopup():
                     with div(id='search_results'):
 
                         with ul(id='result_list'):
-                             self.result_list(imdbid)
+                            self.result_list(imdbid)
                         div(id='results_thinker')
 
                         # Panel that swaps in with quality adjustments
-                        resolutions = ['4K','1080P','720P','SD']
+                        resolutions = ['4K', '1080P', '720P', 'SD']
                         with ul(id='quality', cls='wide'):
                             # Resolution Block
                             with ul(id='resolution', cls='sortable'):
@@ -92,7 +93,7 @@ class MovieStatusPopup():
                     p(data['plot'])
                 with div(id='additional_info'):
                     with a(href=tomatoes_url, target='_blank'):
-                        span('Rotten Tomatoes Rating: {}'.format(data['tomatorating']) )
+                        span('Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
                     span('Theatrical Release Date: {}'.format(data['released']))
                     span('DVD Release Date: {}'.format(data['dvd']))
 
@@ -112,7 +113,7 @@ class MovieStatusPopup():
                     title = res['title']
                     guid = res['guid']
                     status = res['status']
-                    size = Conversions.human_file_size( res['size'] )
+                    size = Conversions.human_file_size(res['size'])
                     pubdate = res['pubdate']
 
                     # applied bottom border to all but last element
@@ -127,7 +128,7 @@ class MovieStatusPopup():
                                 i(cls='fa fa-info-circle')
                             i(cls='fa fa-download', id='manual_download', imdbid=imdbid, guid=guid)
                             i(cls='fa fa-ban', id='mark_bad', guid=guid)
-                    with li(cls='data '+ bbord):
+                    with li(cls='data ' + bbord):
                         span(' Status: ')
                         if status == 'Snatched':
                             span(status, cls='bold snatched')
@@ -139,7 +140,7 @@ class MovieStatusPopup():
                             span(status, cls='bold')
                         span(' Size: ')
                         span(size, cls='bold')
-                        span( ' Score: ')
+                        span(' Score: ')
                         span(res['score'], cls='bold')
                         span(' Source: ')
                         span(res['indexer'], cls='bold')

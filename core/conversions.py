@@ -14,7 +14,7 @@ class Conversions():
         base = 1024
         bytes = float(value)
 
-        if bytes == 1 and not gnu:
+        if bytes == 1:
             return '1 Byte'
         elif bytes < base:
             return '%d Bytes' % bytes

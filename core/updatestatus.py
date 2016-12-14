@@ -1,6 +1,7 @@
+import logging
+
 from core import sqldb
 
-import logging
 logging = logging.getLogger(__name__)
 
 

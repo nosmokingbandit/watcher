@@ -1,6 +1,6 @@
 import dominate
-from dominate.tags import *
 from cherrypy import expose
+from dominate.tags import *
 
 
 class Shutdown():

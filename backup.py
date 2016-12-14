@@ -1,7 +1,7 @@
 import argparse
 import os
-import sys
 import shutil
+import sys
 import zipfile
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -16,6 +16,7 @@ print '**############################################################**'
 print '**############### Watcher backup/restore tool ################**'
 print '** Confirm that Watcher is not running while restoring backup **'
 print '**############################################################**'
+
 
 def backup():
     # check for files and paths
@@ -77,10 +78,11 @@ def backup():
 
     sys.exit(0)
 
+
 def restore():
     if not os.path.isfile('watcher.zip'):
         print 'watcher.zip not found. ' \
-        'Place watcher.zip in same directory as backup script.'
+              'Place watcher.zip in same directory as backup script.'
         sys.exit(0)
 
     ans = raw_input('Restoring backup. This will overwrite existing '
@@ -152,5 +154,3 @@ elif args.restore:
     restore()
 else:
     print 'Invalid arguments.'
-
-

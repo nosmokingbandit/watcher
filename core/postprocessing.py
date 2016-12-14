@@ -1,15 +1,16 @@
-import os
-import PTN
-import urllib2
-import json
-import shutil
-import re
 import datetime
-import core
-import cherrypy
-from core import sqldb, snatcher, updatestatus
-
+import json
 import logging
+import os
+import re
+import shutil
+import urllib2
+
+import cherrypy
+import core
+import PTN
+from core import snatcher, sqldb, updatestatus
+
 logging = logging.getLogger(__name__)
 
 
@@ -27,6 +28,8 @@ class Postprocessing(object):
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()
         self.update = updatestatus.Status()
+
+    def null(*args, **kwargs): return
 
     @cherrypy.expose
     def GET(self, **data):
@@ -124,7 +127,7 @@ class Postprocessing(object):
         if os.path.isfile(path):
             return path
         else:
-            # Find the biggest file in the dir. It should be safe to assume that this is the movie.
+            # Find the biggest file in the dir. Assume that this is the movie.
             try:
                 files = os.listdir(path)
             except Exception, e:
@@ -212,7 +215,7 @@ class Postprocessing(object):
             if result:
                 logging.info('Searchresult found by downloadid.')
                 if result['guid'] != data['guid']:
-                    logging.info('Guid for downloadid does not match local data. ' \
+                    logging.info('Guid for downloadid does not match local data. '
                                  'Adding guid2 to processing data.')
                     data['guid2'] = result['guid']
         else:
@@ -293,8 +296,7 @@ class Postprocessing(object):
         else:
             guid_result['update_SEARCHRESULTS'] = 'false'
 
-        if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'
-                ):
+        if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'):
             guid_result['update_MARKEDRESULTS'] = 'true'
         else:
             guid_result['update_MARKEDRESULTS'] = 'false'
@@ -311,8 +313,7 @@ class Postprocessing(object):
             else:
                 guid2_result['update SEARCHRESULTS'] = 'false'
 
-            if self.update.markedresults(data['guid2'], data['imdbid'],
-                    'Bad'):
+            if self.update.markedresults(data['guid2'], data['imdbid'], 'Bad'):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
             else:
                 guid2_result['update_MARKEDRESULTS'] = 'false'
@@ -414,7 +415,7 @@ class Postprocessing(object):
                 guid2_result['update_SEARCHRESULTS'] = 'false'
 
             if self.update.markedresults(data['guid2'], data['imdbid'],
-                    'Finished'):
+                                         'Finished'):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
             else:
                 guid2_result['update_MARKEDRESULTS'] = 'false'
@@ -426,8 +427,8 @@ class Postprocessing(object):
         if data['imdbid']:
             logging.info('Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
-            self.sql.update('MOVIES', 'finisheddate',
-                result['data']['finisheddate'], imdbid=data['imdbid'])
+            self.sql.update('MOVIES', 'finisheddate', result['data']['finisheddate'],
+                            imdbid=data['imdbid'])
         else:
             logging.info('Imdbid not supplied or found, unable to update Movie status.')
             r = 'false'
@@ -460,7 +461,7 @@ class Postprocessing(object):
             logging.info('Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
-        #delete leftover dir, only is mover was enabled successful
+        # delete leftover dir, only is mover was enabled successful
         if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
             # fail if mover failed
@@ -526,7 +527,7 @@ class Postprocessing(object):
         return new_name
 
     def mover(self, data):
-        ''' Moves movie file to path constructed by moverstring
+        '''Moves movie file to path constructed by moverstring
         :param data: dict of movie information.
 
         Moves file to location specified in core.CONFIG
@@ -555,9 +556,7 @@ class Postprocessing(object):
 
         # move the file
         try:
-            def null(*args, **kwargs): return
-
-            shutil.copystat = null
+            shutil.copystat = self.null
             shutil.move(abs_path_old, target_folder)
         except Exception, e:
             logging.error('Mover failed: Could not move file.', exc_info=True)

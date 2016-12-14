@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-##########################################
-############## INSTRUCTIONS ##############
+#========================================#
+#============= INSTRUCTIONS =============#
 
 # Disable 'Post-Process Only Verified Jobs' in Sabnzbd.
 # Add api information to conf:
@@ -16,16 +16,15 @@ conf = {
 }
 
 # DO NOT TOUCH ANYTHING BELOW THIS LINE! #
-##########################################
+#========================================#
 
-import sys
-import os
-import urllib2
 import json
+import sys
+import urllib2
 
 try:
     status = int(sys.argv[7])
-    guid =  sys.argv[3].replace('-', ':').replace('+', '/')
+    guid = sys.argv[3].replace('-', ':').replace('+', '/')
 except:
     print 'Post-processing failed. Incorrect args.'
     sys.exit(1)
@@ -42,13 +41,13 @@ sabport = conf['sabport']
 name = urllib2.quote(sys.argv[3], safe='')
 url = 'http://{}:{}/sabnzbd/api?apikey={}&mode=history&output=json&search={}'.format(sabhost, sabport, sabkey, name)
 
-request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
+request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = urllib2.urlopen(request).read()
 
 slots = json.loads(response)['history']['slots']
 
 for dl in slots:
-    if dl['loaded'] == True:
+    if dl['loaded'] is True:
         guid = dl['url']
         downloadid = dl['nzo_id']
         break
@@ -71,7 +70,7 @@ else:
     mode = 'failed'
 
 url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
-request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0'} )
+request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':

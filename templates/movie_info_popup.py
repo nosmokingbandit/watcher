@@ -1,8 +1,9 @@
-import dominate
-from dominate.tags import *
 import json
+
 import core
+import dominate
 from core.movieinfo import Omdb, Trailer
+from dominate.tags import *
 
 
 class MovieInfoPopup():
@@ -53,7 +54,8 @@ class MovieInfoPopup():
                         iframe(id='trailer', width="640", height="360", src=trailer_embed, frameborder="0")
 
                         # Panel that swaps in with quality adjustments
-                        resolutions = ['4K','1080P','720P','SD']
+                        # TODO put this list in core.__init__?
+                        resolutions = ['4K', '1080P', '720P', 'SD']
                         with ul(id='quality', cls='wide'):
                             # Resolution Block
                             with ul(id='resolution', cls='sortable'):
@@ -93,7 +95,7 @@ class MovieInfoPopup():
                     p(data['plot'])
                 with div(id='additional_info'):
                     with a(href=data['tomatourl'], target='_blank'):
-                        p('Rotten Tomatoes Rating: {}'.format(data['tomatorating']) )
+                        p('Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
                     p('Theatrical Release Date: {}'.format(data['released']))
                     p('DVD Release Date: {}'.format(data['dvd']))
                 div(data_json, id='hidden_data')

@@ -1,16 +1,18 @@
 import sys
 sys.path.append('lib')
+
 import argparse
-import cherrypy
-from cherrypy.process.plugins import Daemonizer
 import datetime
 import os
 import webbrowser
+
+import cherrypy
 import core
-from core import sqldb, config, ajax, api, postprocessing, searcher
+from cherrypy.process.plugins import Daemonizer
+from core import ajax, api, config, postprocessing, searcher, sqldb
 from core.log import log
 from core.plugins import taskscheduler
-from templates import status, add_movie, settings, restart, shutdown, update
+from templates import add_movie, restart, settings, shutdown, status, update
 
 if os.name == 'nt':
     from core.plugins import systray
@@ -118,7 +120,7 @@ class Scheduler(object):
         # create scheduler plugin
         self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
 
-    #create classes for each scheduled task
+    # create classes for each scheduled task
     class AutoSearch(object):
         @staticmethod
         def create():
@@ -129,7 +131,7 @@ class Scheduler(object):
             min = int(core.CONFIG['Search']['searchtimemin'])
 
             task_search = taskscheduler.ScheduledTask(hr, min, interval,
-                search.auto_search_and_grab, auto_start=True)
+                          search.auto_search_and_grab, auto_start=True)
             delay = task_search.task.delay
 
             now = datetime.datetime.today().replace(second=0, microsecond=0)
@@ -140,20 +142,21 @@ class Scheduler(object):
         def __init__(self):
             return
 
+
 if __name__ == '__main__':
 
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")
     parser.add_argument('-d', '--daemon', help='Run the server as a daemon.',
-        action='store_true')
+                        action='store_true')
     parser.add_argument('-a', '--address', help='Network address to bind to.')
     parser.add_argument('-p', '--port', help='Port to bind to.', type=int)
     parser.add_argument('-b', '--browser', help='Open browser on launch.',
-        action='store_true')
+                        action='store_true')
     parser.add_argument('-c', '--conf', help='Location of config file.',
-        type=str)
+                        type=str)
     parser.add_argument('-l', '--log',
-        help='Directory in which to create log files.', type=str)
+                        help='Directory in which to create log files.', type=str)
     passed_args = parser.parse_args()
 
     # Set up conf file
@@ -237,17 +240,17 @@ if __name__ == '__main__':
     cherrypy.tree.mount(root,
                         '/',
                         cherry_conf
-                       )
+                        )
 
     cherrypy.tree.mount(api.API(),
                         '/api',
                         api.API.conf
-                       )
+                        )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
                         '/postprocessing',
                         postprocessing.Postprocessing.conf
-                       )
+                        )
 
     # if everything goes well so far, open the browser
     if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
@@ -275,5 +278,5 @@ if __name__ == '__main__':
         systrayplugin.start()
 
     # finish by blocking
-    os.chdir(core.PROG_PATH) # have to do this for the daemon
+    os.chdir(core.PROG_PATH)  # have to do this for the daemon
     cherrypy.engine.block()

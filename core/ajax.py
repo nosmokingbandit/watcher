@@ -1,17 +1,19 @@
-import cherrypy
 import json
-from templates import movie_info_popup, movie_status_popup, status
+import logging
 import os
 import sys
 import threading
-import core
-from core import sqldb, poster, config, snatcher, searcher, version, updatestatus
-from core.conversions import Conversions
-from core.movieinfo import Omdb
-from core.downloaders import sabnzbd, nzbget
-from core.rss import predb
 
-import logging
+import cherrypy
+import core
+from core import (config, poster, searcher, snatcher, sqldb, updatestatus,
+                  version)
+from core.conversions import Conversions
+from core.downloaders import nzbget, sabnzbd
+from core.movieinfo import Omdb
+from core.rss import predb
+from templates import movie_info_popup, movie_status_popup, status
+
 logging = logging.getLogger(__name__)
 
 
@@ -386,5 +388,3 @@ class Ajax(object):
                         'have been purged, but the movie status could not be set. Check logs for more information.'
                 else:
                     return Conversions.human_datetime(core.NEXT_SEARCH)
-
-

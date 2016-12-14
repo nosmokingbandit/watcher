@@ -1,8 +1,8 @@
-import dominate
-from dominate.tags import *
-from cherrypy import expose
-import core
 import cherrypy
+import core
+import dominate
+from cherrypy import expose
+from dominate.tags import *
 
 
 class Update():

@@ -1,6 +1,6 @@
 import dominate
-from dominate.tags import *
 from cherrypy import expose
+from dominate.tags import *
 
 
 class Restart():
@@ -23,7 +23,7 @@ class Restart():
             with div(id='content'):
                 div(id='thinker')
                 span('Restarting', cls='msg')
-                with span('Timeout Exceeded.',cls='error'):
+                with span('Timeout Exceeded.', cls='error'):
                     p('Watcher is taking too long to restart, please check your logs and restart manually.')
 
         return doc.render()

@@ -1,17 +1,18 @@
-import subprocess
-import core
-import os
 import datetime
-import urllib2
 import json
+import logging
+import os
 import shutil
+import subprocess
+import urllib2
 import zipfile
+
+import core
 
 # get remote hash # git rev-parse origin/master
 # get local hash  # git rev-parse HEAD
 # Hash history    # git rev-list @{u}
 
-import logging
 logging = logging.getLogger(__name__)
 
 
@@ -49,7 +50,8 @@ class Git(object):
         for i in args.split(' '):
             command.append(i)
         try:
-            p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,shell=False, cwd=core.PROG_PATH)
+            p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT, shell=False, cwd=core.PROG_PATH)
             output, error = p.communicate()
             exit_status = p.returncode
             return (output.rstrip(), error, exit_status)
@@ -93,6 +95,7 @@ class Git(object):
         command = 'pull'
         output, error, status = self.runner(command)
         return (output, error, status)
+
 
 class GitUpdater(object):
 

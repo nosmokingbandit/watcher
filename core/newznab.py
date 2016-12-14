@@ -1,8 +1,9 @@
+import logging
 import urllib2
 import xml.etree.cElementTree as ET
+
 import core
 
-import logging
 logging = logging.getLogger(__name__)
 
 

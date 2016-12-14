@@ -1,7 +1,7 @@
-import urllib2
 import json
-
 import logging
+import urllib2
+
 logging = logging.getLogger(__name__)
 
 
@@ -99,4 +99,3 @@ class Trailer():
                 logging.error('Tailer get_trailer.', exc_info=True)
                 tries += 1
         return None
-

@@ -1,12 +1,12 @@
-import cherrypy
-from cherrypy.process import plugins
-import core
-from infi.systray import SysTrayIcon
-import webbrowser
-import sys
-from threading import Timer
-
 import logging
+import sys
+import webbrowser
+
+import cherrypy
+import core
+from cherrypy.process import plugins
+from infi.systray import SysTrayIcon
+
 logging = logging.getLogger(__name__)
 
 
@@ -52,7 +52,8 @@ class SysTrayPlugin(plugins.SimplePlugin):
     def __init__(self, bus):
         plugins.SimplePlugin.__init__(self, bus)
         menu_options = (('Open Browser', None, self.open),)
-        self.systray = SysTrayIcon('core/favicon.ico', 'Watcher', menu_options, on_quit = self.on_quit)
+        self.systray = SysTrayIcon('core/favicon.ico', 'Watcher',
+                                   menu_options, on_quit=self.on_quit)
         self.quit_method = None
         return
 
@@ -71,6 +72,7 @@ class SysTrayPlugin(plugins.SimplePlugin):
     def on_quit(self, systray):
         self.quit_method = 'menu'
         cherrypy.engine.exit()
+        sys.exit(0)
 
     # sys tray functions:
     def open(self, systray):

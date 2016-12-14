@@ -1,8 +1,8 @@
-from cherrypy import expose
-import dominate
-from dominate.tags import *
 import core
+import dominate
+from cherrypy import expose
 from core import config
+from dominate.tags import *
 from header import Header
 
 
@@ -105,7 +105,7 @@ class Settings():
                         span('What time of day to begin searches (24h time). Requires Restart.', cls='tip')
                     with li(cls='bbord'):
                         span('Search every ')
-                        input(type='number', min='1', id='searchfrequency', style='width: 2.5em', value=c[c_s]['searchfrequency'] )
+                        input(type='number', min='1', id='searchfrequency', style='width: 2.5em', value=c[c_s]['searchfrequency'])
                         span('hours.')
                         span('Once releases are available according to predb.me. Requires Restart.', cls='tip')
                     with li(cls='bbord'):
@@ -135,13 +135,13 @@ class Settings():
                             for n in c[c_s]:
                                 with li(cls='newznab_indexer'):
                                     i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
-                                    input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL" )
+                                    input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL")
                                     input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
                             with li(id='add_newznab_row'):
                                 i(cls='fa fa-plus-square', id='add_row')
                 p('Quality')
                 c_s = 'Quality'
-                resolutions = ['4K','1080P','720P','SD']
+                resolutions = ['4K', '1080P', '720P', 'SD']
                 br()
                 span('Quality and Filters may be set separately for each movie, this is the default setting.')
                 with ul(id='quality', cls='wide'):
@@ -208,7 +208,7 @@ class Settings():
                             span('i.e. \'movies\', \'watcher\'. ', cls='tip')
                         with li('Priority: ', cls='bbord'):
                             with select(id='sabpriority', value=c[c_s]['sabpriority'], style='width: 50%'):
-                                pl = ['Paused','Low','Normal','High','Forced']
+                                pl = ['Paused', 'Low', 'Normal', 'High', 'Forced']
                                 for o in pl:
                                     if o == c[c_s]['sabpriority']:
                                         option(o, value=o, selected="selected")
@@ -238,7 +238,7 @@ class Settings():
                             span('i.e. \'movies\', \'watcher\'. ', cls='tip')
                         with li('Priority: ', cls='bbord'):
                             with select(id='nzbgpriority', style='width: 50%'):
-                                pl = ['Very Low','Low','Normal','High','Forced']
+                                pl = ['Very Low', 'Low', 'Normal', 'High', 'Forced']
                                 for o in pl:
                                     if o == c[c_s]['nzbgpriority']:
                                         option(o, value=o, selected="selected")
@@ -328,4 +328,3 @@ class Settings():
     @settings_page
     def postprocessing(c):
         return 'this is a test'
-

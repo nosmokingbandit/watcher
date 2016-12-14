@@ -1,9 +1,10 @@
-from fuzzywuzzy import fuzz
-from core import sqldb
+import logging
 import urllib2
 import xml.etree.cElementTree as ET
 
-import logging
+from core import sqldb
+from fuzzywuzzy import fuzz
+
 logging = logging.getLogger(__name__)
 
 
@@ -65,7 +66,7 @@ class PreDB(object):
 
         root = ET.fromstring(feed)
 
-        # This is so ugly, but some newznab sites don't output json. I don't want to include a huge xml parsing module, so here we are. I'm not happy about it either.
+        # This so ugly, but some newznab sites don't output json.
         items = []
         for item in root.iter('item'):
             for i_c in item:
@@ -80,5 +81,3 @@ class PreDB(object):
             if match > 50:
                 return True
         return False
-
-

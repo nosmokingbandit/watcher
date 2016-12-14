@@ -1,9 +1,10 @@
 import json
+import logging
+
 import cherrypy
 import core
 from core import sqldb
 
-import logging
 logging = logging.getLogger(__name__)
 
 
@@ -47,8 +48,3 @@ class API(object):
             for movie in movies:
                 l.append(dict(movie))
             return json.dumps(l, indent=1)
-
-
-
-
-

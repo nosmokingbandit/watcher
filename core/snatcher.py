@@ -1,9 +1,10 @@
-import core
-from core import sqldb, updatestatus
-from core.downloaders import sabnzbd, nzbget
+import logging
 from datetime import datetime
 
-import logging
+import core
+from core import sqldb, updatestatus
+from core.downloaders import nzbget, sabnzbd
+
 logging = logging.getLogger(__name__)
 
 

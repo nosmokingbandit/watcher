@@ -1,11 +1,13 @@
+import json
+import logging
+from datetime import datetime
+
 import core
 from core import sqldb
 from fuzzywuzzy import fuzz
-from datetime import datetime
-import json
 
-import logging
 logging = logging.getLogger(__name__)
+
 
 class ScoreResults():
 
@@ -82,16 +84,16 @@ class ScoreResults():
     def retention_check(self, retention, today):
         if retention == 0:
             return
-        l = []
+        lst = []
         for result in self.results:
             if result['type'] != 'nzb':
-                l.append(result)
+                lst.append(result)
             else:
                 pubdate = datetime.strptime(result['pubdate'], '%d %b %Y')
                 age = (today - pubdate).days
                 if age < retention:
-                    l.append(result)
-        self.results = l
+                    lst.append(result)
+        self.results = lst
 
     def score_preferred(self, words):
         if not words:
@@ -105,18 +107,18 @@ class ScoreResults():
                         result['score'] += 10
 
     def fuzzy_title(self, title):
-        l = []
+        lst = []
         for result in self.results:
             title = title.replace(' ', '.').replace(':', '.').lower()
             test = result['title'].replace(' ', '.').lower()
             match = fuzz.partial_ratio(title, test)
             if match > 60:
                 result['score'] += (match / 20)
-                l.append(result)
-        self.results = l
+                lst.append(result)
+        self.results = lst
 
     def score_quality(self, qualities):
-        l = []
+        lst = []
         for result in self.results:
             resolution = result['resolution']
             size = result['size'] / 1000000
@@ -131,8 +133,9 @@ class ScoreResults():
                 if resolution == quality:
                     if min_size < size < max_size:
                         result['score'] += (8 - priority) * 100
-                        l.append(result)
-        self.results = l
+                        lst.append(result)
+        self.results = lst
+
 
 """
 SCORING COLUMNS. I swear some day this will make sense.
@@ -143,8 +146,11 @@ SCORING COLUMNS. I swear some day this will make sense.
 0-4
 Resolution Match. Starts at 8.
 Remove 1 point for the priority of the matched resolution.
-So if we want 1080P then 720P in that order, 1080 movies will get 0 points removed, where 720P will get 1 point removed.
-We do this because the jquery sortable gives higher priority items a lower number, so 0 is the most important item. This allows a large amount of preferred word matches to overtake a resolution match.
+So if we want 1080P then 720P in that order, 1080 movies will get 0 points
+    removed, where 720P will get 1 point removed.
+We do this because the jquery sortable gives higher priority items a lower
+    number, so 0 is the most important item. This allows a large amount of
+    preferred word matches to overtake a resolution match.
 
 <3-1>
 0-100

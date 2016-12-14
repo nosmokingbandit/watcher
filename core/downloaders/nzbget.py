@@ -1,8 +1,10 @@
-import core
+import logging
 from xmlrpclib import ServerProxy
 
-import logging
+import core
+
 logging = logging.getLogger(__name__)
+
 
 class Nzbget():
 
@@ -74,5 +76,3 @@ class Nzbget():
         response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
 
         return response
-
-

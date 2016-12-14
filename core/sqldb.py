@@ -1,7 +1,8 @@
-from sqlalchemy import *
+import logging
 import time
 
-import logging
+from sqlalchemy import *
+
 logging = logging.getLogger(__name__)
 
 DB_NAME = 'sqlite:///watcher.sqlite'
@@ -39,7 +40,7 @@ class SQL(object):
                             Column('quality', TEXT),
                             Column('finisheddate', TEXT),
                             Column('finishedscore', SMALLINT)
-                           )
+                            )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                    Column('score', SMALLINT),
                                    Column('size', SMALLINT),
@@ -56,12 +57,12 @@ class SQL(object):
                                    Column('resolution', TEXT),
                                    Column('type', TEXT),
                                    Column('downloadid', TEXT)
-                                  )
+                                   )
         self.MARKEDRESULTS = Table('MARKEDRESULTS', self.metadata,
                                    Column('imdbid', TEXT),
                                    Column('guid', TEXT),
                                    Column('status', TEXT)
-                                  )
+                                   )
 
     def create_database(self):
         logging.info('Creating tables.')
@@ -70,7 +71,13 @@ class SQL(object):
 
     def execute(self, command):
         '''
-        We are going to loop this up to 5 times in case the database is locked. After each attempt we wait 1 second to try again. This allows the query that has the database locked to (hopefully) finish. It might (i'm not sure) allow a query to jump in line between a series of queries. So if we are writing search results to every movie at once, the get_user_movies request may be able to jump in between them to get the user's movies to the browser. Maybe.
+        We are going to loop this up to 5 times in case the database is locked.
+        After each attempt we wait 1 second to try again. This allows the query
+            that has the database locked to (hopefully) finish. It might
+            (i'm not sure) allow a query to jump in line between a series of
+            queries. So if we are writing searchresults to every movie at once,
+            the get_user_movies request may be able to jump in between them to
+            get the user's movies to the browser. Maybe.
         '''
 
         tries = 0
@@ -178,10 +185,10 @@ class SQL(object):
         result = self.execute(command)
 
         if result:
-            l = []
+            lst = []
             for i in result:
-                l.append(dict(i))
-            return l
+                lst.append(dict(i))
+            return lst
         else:
             logging.error('EXECUTE SQL.GET_USER_MOVIES FAILED.')
             return False
@@ -206,6 +213,7 @@ class SQL(object):
             return False
 
     def get_search_results(self, imdbid):
+
         '''
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
@@ -213,7 +221,7 @@ class SQL(object):
         logging.info('Retreving Search Results for {}.'.format(imdbid))
         TABLE = 'SEARCHRESULTS'
 
-        command ='SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
+        command = 'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
 
         results = self.execute(command)
 
@@ -315,10 +323,10 @@ class SQL(object):
             if len(data) == 0:
                 return None
 
-            l = []
+            lst = []
             for i in data:
-                l.append(i[column])
-            return l
+                lst.append(i[column])
+            return lst
         else:
             logging.error('EXECUTE SQL.GET_DISTINCT FAILED.')
             return False
@@ -409,10 +417,10 @@ class SQL(object):
             columns = self.execute(command)
             if not columns:
                 return False
-            l = []
+            lst = []
             for col in columns:
-                l.append(col['name'])
-            table_dict[i] = l
+                lst.append(col['name'])
+            table_dict[i] = lst
 
         return table_dict
 
@@ -462,4 +470,3 @@ class SQL(object):
             update_val = json.dumps(quality_col)
 
             self.update('MOVIES', 'quality', update_val, imdbid=imdbid)
-

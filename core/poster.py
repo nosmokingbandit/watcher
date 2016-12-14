@@ -1,9 +1,9 @@
-from HTMLParser import HTMLParser
-import urllib2
+import logging
 import os
 import shutil
+import urllib2
+from HTMLParser import HTMLParser
 
-import logging
 logging = logging.getLogger(__name__)
 
 

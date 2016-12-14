@@ -1,3 +1,5 @@
+import sys
+sys.path.append('lib')
 import argparse
 import cherrypy
 from cherrypy.process.plugins import Daemonizer

@@ -7,8 +7,11 @@ import webbrowser
 import core
 from core import sqldb, config, ajax, api, postprocessing, searcher
 from core.log import log
-from core.plugins import scheduler
+from core.plugins import taskscheduler
 from templates import status, add_movie, settings, restart, shutdown, update
+
+if os.name == 'nt':
+    from core.plugins import systray
 
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(core.PROG_PATH)
@@ -108,11 +111,10 @@ class App(object):
 
 
 class Scheduler(object):
-    # create scheduler plugin
-    plugin = scheduler.SchedulerPlugin(cherrypy.engine)
 
     def __init__(self):
-        return
+        # create scheduler plugin
+        self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
 
     #create classes for each scheduled task
     class AutoSearch(object):
@@ -124,7 +126,7 @@ class Scheduler(object):
             hr = int(core.CONFIG['Search']['searchtimehr'])
             min = int(core.CONFIG['Search']['searchtimemin'])
 
-            task_search = scheduler.ScheduledTask(hr, min, interval,
+            task_search = taskscheduler.ScheduledTask(hr, min, interval,
                 search.auto_search_and_grab, auto_start=True)
             delay = task_search.task.delay
 
@@ -229,10 +231,6 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
-    # daemonize if desired
-    if passed_args.daemon:
-        Daemonizer(cherrypy.engine).subscribe()
-
     # mount applications
     cherrypy.tree.mount(root,
                         '/',
@@ -255,15 +253,25 @@ if __name__ == '__main__':
             core.SERVER_ADDRESS, core.SERVER_PORT))
         logging.info('Launching web browser.')
 
-    # Create scheduled task objects
-    Scheduler.AutoSearch.create()
+    # daemonize in *nix if desired
+    if passed_args.daemon and os.name == 'posix':
+        Daemonizer(cherrypy.engine).subscribe()
 
+    # start engine
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
-    # have to do this for the daemon
-    os.chdir(core.PROG_PATH)
-    # and start the scheduler
-    Scheduler.plugin.subscribe()
-    Scheduler.plugin.start()  # # not neccesary?
 
+    # Create plugin instances and subscribe
+    scheduler = Scheduler()
+    scheduler.AutoSearch.create()
+    scheduler.plugin.subscribe()
+
+    # If windows os and daemon selected, start systray
+    if passed_args.daemon and os.name == 'nt':
+        systrayplugin = systray.SysTrayPlugin(cherrypy.engine)
+        systrayplugin.subscribe()
+        systrayplugin.start()
+
+    # finish by blocking
+    os.chdir(core.PROG_PATH) # have to do this for the daemon
     cherrypy.engine.block()

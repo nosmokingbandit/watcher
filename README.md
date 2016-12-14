@@ -36,9 +36,13 @@ If you do not wish to use Git, follow these steps.
 
 You can add the following arguments to Watcher when running the Python script.
 
-Run the server as a daemon (only available for *nix based operating systems).
+Run the server as a daemon (*nix only)
 
 `$ watcher.py --daemon`
+
+Run the server as a background process (Windows only)
+
+`$ pythonw watcher.py --daemon`
 
 Change address to bind to.
 

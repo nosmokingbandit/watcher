@@ -555,6 +555,7 @@ class Postprocessing(object):
 
         # move the file
         try:
+            shutil.copystat = None # ugly hack to get cross-filesystem copy
             shutil.move(abs_path_old, target_folder)
         except Exception, e:
             logging.error('Mover failed: Could not move file.', exc_info=True)

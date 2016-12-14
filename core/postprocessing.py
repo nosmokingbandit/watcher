@@ -555,6 +555,9 @@ class Postprocessing(object):
 
         # move the file
         try:
+            def null(*args, **kwargs): return
+
+            shutil.copystat = null
             shutil.move(abs_path_old, target_folder)
         except Exception, e:
             logging.error('Mover failed: Could not move file.', exc_info=True)

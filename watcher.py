@@ -1,5 +1,7 @@
 import sys
-sys.path.append('lib')
+import os
+lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
+sys.path.append(lib_dir)
 
 import argparse
 import datetime

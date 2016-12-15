@@ -21,7 +21,7 @@ $(document).ready(function () {
                 .done(function(r){
                     if(r == "states.STARTED"){
                         $("span.msg").text("Update successful!");
-                        setTimeout(function() {window.location = "/";},3000);
+                        setTimeout(function() {window.location = "/restart";},3000);
                     }
                 })
                 .fail(function(r){

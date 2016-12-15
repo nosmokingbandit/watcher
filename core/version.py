@@ -242,7 +242,7 @@ class ZipUpdater(object):
         return hash
 
     def get_newest_hash(self):
-        api_url = '{}/commits/{}'.format(core.GIT_API, core.GIT_BRANCH)
+        api_url = '{}/commits/{}'.format(core.GIT_API, core.CONFIG['Server']['gitbranch'])
         request = urllib2.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             response = json.load(urllib2.urlopen(request))
@@ -333,7 +333,7 @@ class ZipUpdater(object):
             return False
 
         logging.info('Downloading latest Zip.')
-        zip_url = '{}/archive/{}.zip'.format(core.GIT_URL, core.GIT_BRANCH)
+        zip_url = '{}/archive/{}.zip'.format(core.GIT_URL, core.CONFIG['Server']['gitbranch'])
         request = urllib2.Request(zip_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             zip_response = urllib2.urlopen(request).read()
@@ -370,7 +370,7 @@ class ZipUpdater(object):
         core.UPDATE_STATUS = None
 
         logging.info('Moving update files.')
-        subfolder = 'watcher-{}'.format(core.GIT_BRANCH)
+        subfolder = 'watcher-{}'.format(core.CONFIG['Server']['gitbranch'])
         update_files_path = os.path.join(update_path, subfolder)
         try:
             files = os.listdir(update_files_path)

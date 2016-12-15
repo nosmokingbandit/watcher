@@ -89,6 +89,10 @@ class Settings():
                 with span('Current version hash: ', cls='tip'):
                     a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
             with li(cls='bbord'):
+                span('Branch: ')
+                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'], style='width: 50%')
+                span('Just stay on master. Please.', cls='tip')
+            with li(cls='bbord'):
                 span('Keep ')
                 input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')
                 span(' days of logs.')

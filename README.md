@@ -64,6 +64,9 @@ Change path of log directory.
 
 `$ watcher.py --log path/to/logs/`
 
+#### Docker
+A [Docker container](https://hub.docker.com/r/williambroown/watcherdocker/) has been created and maintained by Williambroown.
+
 ## Post-Processing
 
 Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.
@@ -80,7 +83,7 @@ The backup function will create a new watcher.zip in the Watcher folder.
 
 To restore, place watcher.zip in the Watcher folder of your target installation and run the restore command.
 
-####Usage
+#### Usage
 Back up Watcher.
 
 `$ backup.py -b`

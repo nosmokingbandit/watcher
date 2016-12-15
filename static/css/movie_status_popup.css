@@ -187,6 +187,20 @@ ul#filters{
     padding: 1em 0 0 0;
 }
 
+ul#filters li.flexbox{
+    display: flex;
+    align-items: center;
+}
+
+ul#filters li.flexbox span{
+    flex-shrink: 0;
+}
+
+ul#filters li.flexbox input{
+    flex-grow: 1;
+    margin: 0 2em 0 1em;
+    height: 1.5em;
+}
 
 @-webkit-keyframes sk-scaleout {
     0% { -webkit-transform: scale(0) }

@@ -79,13 +79,13 @@ class MovieStatusPopup():
                                             input(type='number', id=max, value=quality_settings['Quality'][res][3], min='0', style='width: 7.5em')
 
                             with ul(id='filters', cls='wide'):
-                                with li(cls='bbord'):
+                                with li(cls='bbord flexbox'):
                                     span('Required words:')
                                     input(type='text', id='requiredwords', value=quality_settings['Filters']['requiredwords'], style='width: 16em')
-                                with li(cls='bbord'):
+                                with li(cls='bbord flexbox'):
                                     span('Preferred words:')
                                     input(type='text', id='preferredwords', value=quality_settings['Filters']['preferredwords'], style='width: 16em')
-                                with li():
+                                with li(cls='flexbox'):
                                     span('Ignored words:')
                                     input(type='text', id='ignoredwords', value=quality_settings['Filters']['ignoredwords'], style='width: 16em')
 

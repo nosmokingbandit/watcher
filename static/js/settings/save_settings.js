@@ -1,69 +1,85 @@
 $(document).ready(function () {
 
-/* grab all settings and write them to the config writer */
-    $("button#save_settings").click(function(e){
-        $this = $(this);
-        $this_span = $this.children(':first');
-        $this.css('background-color', '#212121');
-        $this.css('color', 'white');
-        $this.width('2.5em');
-        $this_span.text('').addClass('fa fa-circle faa-burst animated');
-
-        //check if only one downloader is active:
-        var enabled = 0
-        $('ul#downloader > li > i.checkbox').each(function(){
-            if($(this).attr('value') == 'true'){
-                enabled++;
-            }
-        });
-
-        if(enabled > 1){
-            swal("", "Please enable only one downloader.", "warning");
-            return
+    $("span#save").click(function(e){
+        if(verify_data() == false){
+            return;
         }
 
-        var post_list = {};
+        $this = $(this);
+        $thisi = $this.children(':first');
+        $thisi.removeClass('fa-save')
+        $thisi.addClass('fa-circle faa-burst animated');
 
-        // SEARCH options
-        var Search = {};
+        cat = $this.attr('cat');
+
+        if(cat == 'server'){
+            data = server();
+        } else if(cat == 'search'){
+            data = search();
+        } else if(cat == 'quality'){
+            data = quality()
+        } else if(cat == 'providers'){
+            data = providers()
+        } else if(cat == 'downloader'){
+            data = downloader()
+        }else if(cat == 'postprocessing') {
+            data = postprocessing()
+        }
+
+        post_data = JSON.stringify(data);
+
+        $.post("/save_settings", {
+            "data": post_data
+        })
+
+        .done(function(r) {
+            if(r == 'failed'){
+                swal("Error", "Unable to save settings. Check log for more information.", "error")
+            }
+            else if(r == 'success'){
+                swal("Settings Saved", "", "success")
+            }
+
+            $thisi.removeClass('fa-circle faa-burst animated');
+            $thisi.addClass('fa-save');
+        });
+
+        e.preventDefault();
+    });
+
+    function server(){
+        var data = {}
+        var server = {}
+        $("#server i.checkbox").each(function(){
+            server[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("#server :input").each(function(){
+            server[$(this).attr("id")] = $(this).val();
+        });
+
+        data['Server'] = server
+
+        return data
+    }
+
+    function search(){
+        var data = {};
+        var search = {};
         $("ul#search i.checkbox").each(function(){
-            Search[$(this).attr("id")] = $(this).attr("value");
+            search[$(this).attr("id")] = $(this).attr("value");
         })
         $("ul#search :input").each(function(){
-            Search[$(this).attr("id")] = $(this).val();
+            search[$(this).attr("id")] = $(this).val();
         });
-        post_list["Search"] = Search;
+        data["Search"] = search;
 
-        // INDEXER options
-        // The order of these tend to get jumbled. I think it sorts alphabetically, but I haven't put much effort into it yet because it really doesn't affect usage.
-        var Indexers = {};
-        var ind = 1;
+        return data
+    }
 
-        $("#newznab_list li").each(function(){
-            if ($(this).attr("class") == "newznab_indexer"){
-                var check = $(this).children("i.newznab_check").attr('value');
-                var url = $(this).children("input.newznab_url").val();
-                var api = $(this).children("input.newznab_api").val();
-
-                // check if one field is blank and both are not blank
-                if ( (url == "" || api == "") && (url + api !=="") ){
-                    swal("", "Please complete or clear out incomplete providers.", "warning");
-                    Indexers = {}
-                    return
-                }
-                // but ignore it if both are blank
-                else if (url + api !=="") {
-                    var data = [url, api, check].toString().toLowerCase();
-                    Indexers[ind] = data;
-                    ind++;
-                }
-            }
-        });
-        post_list["Indexers"] = Indexers;
-
-        // QUALITY options. This has a lot of data, so this wil get messy.
-        var Quality = {},
-            tmp = {};
+    function quality(){
+        var data = {}
+        var quality = {}
+        var tmp = {}
 
         var q_list = []
         $("ul#resolution i.checkbox").each(function(){
@@ -91,87 +107,112 @@ $(document).ready(function () {
                 min = res + "min",
                 max = res + "max";
             var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
-            Quality[res] = [tmp[enabled], tmp[priority], tmp[min], tmp[max]].join(',');
+            quality[res] = [tmp[enabled], tmp[priority], tmp[min], tmp[max]].join(',');
         });
 
-        post_list["Quality"] = Quality;
+        data["Quality"] = quality;
 
         // FILTERS options.
-        var Filters = {};
+        var filters = {};
         $("ul#filters li input").each(function(){
             var val = $(this).val().split(", ").join(",");
-            Filters[$(this).attr("id")] = val;
+            filters[$(this).attr("id")] = val;
         });
-        post_list["Filters"] = Filters;
+        data["Filters"] = filters;
 
-        // DOWNLOADER options.
-        var Sabnzbd = {};
-        Sabnzbd["sabenabled"] = $("i#sabenabled").attr("value");
+        return data
+    }
+
+    function providers(){
+        // The order of these tend to get jumbled. I think it sorts alphabetically, but
+        // I haven't put much effort into it yet because it really doesn't affect usage.
+        var data = {};
+        var indexer = {};
+        var ind = 1;
+
+        $("#newznab_list li").each(function(){
+            if ($(this).attr("class") == "newznab_indexer"){
+                var check = $(this).children("i.newznab_check").attr('value');
+                var url = $(this).children("input.newznab_url").val();
+                var api = $(this).children("input.newznab_api").val();
+
+                // check if one field is blank and both are not blank
+                if ( (url == "" || api == "") && (url + api !=="") ){
+                    swal("", "Please complete or clear out incomplete providers.", "warning");
+                    indexers = {}
+                    return
+                }
+                // but ignore it if both are blank
+                else if (url + api !=="") {
+                    var data = [url, api, check].toString().toLowerCase();
+                    indexers[ind] = data;
+                    ind++;
+                }
+            }
+        });
+        data["Indexers"] = indexers;
+
+        return data
+    }
+
+    function downloader(){
+        var data = {}
+        var sabnzbd = {};
+        sabnzbd["sabenabled"] = $("i#sabenabled").attr("value");
         $("ul#sabnzbd li input").each(function(){
-            Sabnzbd[$(this).attr("id")] = $(this).val()
+            sabnzbd[$(this).attr("id")] = $(this).val()
         });
         $("ul#sabnzbd li select").each(function(){
-            Sabnzbd[$(this).attr("id")] = $(this).val()
+            sabnzbd[$(this).attr("id")] = $(this).val()
         });
-        post_list["Sabnzbd"] = Sabnzbd;
+        data["Sabnzbd"] = sabnzbd;
 
-        var NzbGet = {};
-        NzbGet["nzbgenabled"] = $("i#nzbgenabled").attr("value");
+        var nzbget = {};
+        nzbget["nzbgenabled"] = $("i#nzbgenabled").attr("value");
         $("ul#nzbget li i.checkbox").each(function(){
-            NzbGet[$(this).attr("id")] = $(this).attr("value");
+            nzbget[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#nzbget li input").not("[type=button]").each(function(){
-            NzbGet[$(this).attr("id")] = $(this).val();
+            nzbget[$(this).attr("id")] = $(this).val();
         });
         $("ul#nzbget li select").each(function(){
-            NzbGet[$(this).attr("id")] = $(this).val()
+            nzbget[$(this).attr("id")] = $(this).val()
         });
-        post_list["NzbGet"] = NzbGet;
+        data["NzbGet"] = nzbget;
 
+        return data
+    }
 
-        // POSTPROCESSING options
-        var Postprocessing = {}
+    function postprocessing(){
+        var data = {}
+        var postprocessing = {}
         $("ul#postprocessing li i.checkbox").each(function(){
-            Postprocessing[$(this).attr("id")] = $(this).attr("value");
+            postprocessing[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#postprocessing li input").not("[type=button]").each(function(){
-            Postprocessing[$(this).attr("id")] = $(this).val();
+            postprocessing[$(this).attr("id")] = $(this).val();
         });
 
-        post_list["Postprocessing"] = Postprocessing;
+        data["Postprocessing"] = postprocessing;
 
-        // SERVER options
-        var Server = {}
-        $("#server i.checkbox").each(function(){
-            Server[$(this).attr("id")] = $(this).attr("value");
-        });
-        $("#server :input").each(function(){
-            Server[$(this).attr("id")] = $(this).val();
-        });
+        return data
+    }
 
-        post_list["Server"] = Server;
+    function verify_data(){
 
-        // make it pretty.
-        var post_data = JSON.stringify(post_list)
-
-        // Whew, finally got all of the data. That wasn"t so bad.
-
-        $.post("/save_settings", {
-            "data": post_data
-        })
-
-        .done(function(r) {
-            if(r == 'failed'){
-                swal("Error", "Unable to save settings. Check log for more information.", "error")
+        //check if only one downloader is active:
+        var enabled = 0
+        $('ul#downloader > li > i.checkbox').each(function(){
+            if($(this).attr('value') == 'true'){
+                enabled++;
             }
-            else if(r == 'success'){
-                swal("Settings Saved", "", "success")
-            }
-
-            $this.removeAttr('style');
-            $this_span.text('Save Settings').removeClass('fa fa-circle faa-burst animated');
         });
 
-        e.preventDefault();
-    });
+        if(enabled > 1){
+            swal("", "Please enable only one downloader.", "warning");
+            return false
+        }
+        return true
+    }
+
 });

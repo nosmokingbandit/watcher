@@ -90,16 +90,15 @@ $(document).ready(function () {
     });
 
     /* test connection post */
-    $('button.test_connection').click(function(){
-        var mode = $(this).attr('mode');
-        var cont = "ul#" + mode + " li input";
+    $('span.test_connection').click(function(){
+        $this = $(this)
+        $thisi = $this.children(':first');
 
-        $this = $(this);
-        $this_span = $this.children(':first');
-        $this.css('background-color', '#212121');
-        $this.css('color', 'white');
-        $this.width('2.5em');
-        $this_span.text('').addClass('fa fa-circle faa-burst animated');
+        $thisi.removeClass('fa-plug');
+        $thisi.addClass('fa-circle faa-burst animated');
+
+        var mode = $this.attr('mode');
+        var cont = "ul#" + mode + " li input";
 
         // Gets entered info, even if not saved
         var data = {}
@@ -114,12 +113,14 @@ $(document).ready(function () {
             "data": data
         })
         .done(function(r){
-            $this.removeAttr('style');
-            $this_span.text('Test Connection').removeClass('fa fa-circle faa-burst animated');
-            if(r.includes("Err") || r.includes(":")){
-                swal("Error", r, 'warning');
+            var response = JSON.parse(r);
+            $thisi.addClass('fa-plug');
+            $thisi.removeClass('fa-circle faa-burst animated');
+
+            if(response['status'] == 'false'){
+                swal("Error", response['message'], 'warning');
             } else {
-                swal("Connected!", r, 'success');
+                swal("Connected!", response['message'], 'success');
             }
         })
     });
@@ -141,7 +142,7 @@ $(document).ready(function () {
 
     /* shutdown / restart */
 
-    $('button#restart').click(function(){
+    $('span#restart').click(function(){
         swal({
             title: "Restart Watcher?",
             text: "",
@@ -155,7 +156,7 @@ $(document).ready(function () {
         });
     });
 
-    $('button#shutdown').click(function(){
+    $('span#shutdown').click(function(){
         swal({
             title: "Shut Down Watcher?",
             text: "",

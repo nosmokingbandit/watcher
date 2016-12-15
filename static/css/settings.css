@@ -5,9 +5,12 @@ input[type="number"]{
 }
 
 input[type='text']{
+    font-family: "Lucida Console", Monaco, monospace;
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
+    font-size: 0.75em;
+    height: 1.5em;
 }
 
 select{
@@ -35,8 +38,6 @@ button:hover{
     color: #fff;
 }
 
-
-
 i{
     margin: 0 0 0 0;
     vertical-align: middle;
@@ -53,7 +54,7 @@ p{
 
 div#content{
     margin: 1.5em auto 0 auto;
-    width: 60%;
+    width: 80%;
     max-width: 768px;
     clear: both;
 }
@@ -93,6 +94,12 @@ div#content ul li.lbord{
     line-height: 2.5em;
 }
 
+/* server */
+span#restart, span#shutdown{
+    margin: 0 1em 0 0;
+    cursor: pointer;
+}
+
 /* Providers */
 
 div#content ul#providers{
@@ -123,6 +130,7 @@ input#retention{
 }
 
 li#add_newznab_row{
+    margin: 0 0 2em 0;
 }
 
 
@@ -167,6 +175,10 @@ ul#sabnzbd, ul#nzbget{
     display: none;
     width: 100%;
 
+}
+
+span.test_connection{
+    cursor: pointer;
 }
 
 /* post processing */

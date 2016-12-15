@@ -262,21 +262,32 @@ class Ajax(object):
 
         Executes staticmethod in the chosen downloader's class.
 
-        Returns str success/failure message.
+        Returns str json.dumps dict:
+        {'status': 'false', 'message': 'this is a message'}
         '''
+
+        response = {}
 
         data = json.loads(data)
 
         if mode == 'sabnzbd':
-            if sabnzbd.Sabnzbd.test_connection(data):
-                return 'Connection successful.'
+            test = sabnzbd.Sabnzbd.test_connection(data)
+            if test == True:
+                response['status'] = 'true'
+                response['message'] = 'Connection successful.'
             else:
-                return sabnzbd.Sabnzbd.test_connection(data)
+                response['status'] = 'false'
+                response['message'] = test
         if mode == 'nzbget':
-            if nzbget.Nzbget.test_connection(data):
-                return 'Connection successful.'
+            test = nzbget.Nzbget.test_connection(data)
+            if test == True:
+                response['status'] = 'true'
+                response['message'] = 'Connection successful.'
             else:
-                return nzbget.Nzbget.test_connection(data)
+                response['status'] = 'false'
+                response['message'] = test
+
+        return json.dumps(response)
 
     def server_status(self, mode):
         ''' Check or modify status of CherryPy server_status

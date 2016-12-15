@@ -46,7 +46,15 @@ class Config():
     def write_dict(self, data):
         ''' Writes a dict to the config file.
         :param data: dict of Section with nested dict of keys and values:
+
         {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
+
+        Removes the Section from config, then writes in new dict['Section'].
+        Only modifies supplied section.
+
+        After updating config file, copies to core.CONFIG via self.stash()
+
+        Does not return.
         '''
         self.config.read(self.file)
 

@@ -33,10 +33,55 @@
     box-sizing: border-box;
 }
 
-#nav li:hover{
+#nav > a > li:hover, #nav > li:hover{
     border-bottom: 4px solid #bdbdbd;
 }
 
 #nav li.current{
     border-bottom: 4px solid #f4693b;
+}
+
+/* Dropdown Settings Menu */
+
+#nav li.settings{
+    position: relative;
+}
+
+#nav ul.settings_menu{
+    display: none;
+    position: absolute;
+    background: #eeeeee;
+    box-sizing: border-box;
+    border: 1px solid #bdbdbd;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    left: 0;
+}
+
+#nav ul.settings_menu li{
+    margin: 0;
+    padding: 0;
+    height: 2em;
+    line-height: 2em;
+    font-size: 0.60em;
+    display: block;
+    text-align: left;
+    width: 100%;
+    float: none;
+}
+
+#nav ul.settings_menu li i{
+  font-size: 0.9em;
+  margin: 0 0 0 0.5em;
+}
+
+#nav ul.settings_menu li:hover{
+    background-color: #f4693b;
+    color: white;
+}
+
+#nav li.settings:hover .settings_menu{
+    display: block;
 }

@@ -32,6 +32,7 @@ class SchedulerPlugin(plugins.SimplePlugin):
     def stop(self):
         for i in self.task_list:
             i.stop()
+            print 'Done'
 
 
 class ScheduledTask(object):
@@ -43,15 +44,16 @@ class ScheduledTask(object):
     :param task: function reference to function to execute
     :param auto_start: bool If timer should start on creation <default True>
 
-    Executes a given task function on a scheduled basis.
+
+    Executes a given 'task' function on a scheduled basis.
     First execution occurs at hr:min
-    Subsequent executions occur at regular intervals afterwards,
-        at intervals of interval seconds
+    Subsequent executions occur at regularly afterwards, at
+        intervals of 'interval' seconds
 
     Class Methods:
         start()     Starts countdown to initial execution
         stop()      Stops countdown. Waits for any in-process tasks to finish
-        reload()    Calls stop(), then restarts countdown to initial execution
+        reload()    Calls stop(), __init__(), then start()
 
     Does not return
     '''

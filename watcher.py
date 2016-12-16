@@ -179,8 +179,8 @@ class Scheduler(object):
 
         @staticmethod
         def install():
-            print 'INSTALL'
             ver = version.Version()
+
             if core.UPDATE_STATUS['status'] != 'behind':
                 return
 
@@ -192,18 +192,13 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
-            print 'DBUG3'
             update = ver.manager.execute_update()
             core.UPDATING = False
 
-            if update:
+            if not update:
                 logging.error('Update failed.')
 
             logging.info('Update successful, restarting.')
-            cwd = os.getcwd()
-            cherrypy.engine.restart()
-            os.chdir(cwd)  # again, for the daemon
-            logging.info('Update complete.')
             return
 
 
@@ -343,6 +338,6 @@ if __name__ == '__main__':
         systrayplugin.subscribe()
         systrayplugin.start()
 
-    # finish by blocking
     os.chdir(core.PROG_PATH)  # have to do this for the daemon
+    # finish by blocking
     cherrypy.engine.block()

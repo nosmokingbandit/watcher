@@ -5,7 +5,7 @@ static/images/posters/*
 logs/*
 
 # Compiled #
-# *.pyc
+*.pyc
 
 # System Files #
 .Spotlight-V100

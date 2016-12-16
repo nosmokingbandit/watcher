@@ -211,6 +211,8 @@ class GitUpdater(object):
                 result['local_hash'] = local_hash
                 result['new_hash'] = commit_list[0]
                 core.UPDATE_STATUS = result
+                logging.info('Update found:')
+                logging.info(result)
                 return result
         else:
             logging.error('Current local hash not in git history.')

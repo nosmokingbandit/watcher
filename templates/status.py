@@ -11,13 +11,10 @@ from header import Header
 class Status():
 
     def __init__(self):
-        self.version = version.Version()
         return
 
     @expose
     def index(self):
-        self.update_check()
-
         doc = dominate.document(title='Watcher')
 
         with doc.head:
@@ -103,20 +100,3 @@ class Status():
                         span(title_year, cls='title_year')
 
         return doc.render()
-
-    def update_check(self):
-        if core.CONFIG['Server']['checkupdates'] == 'false':
-            return None
-
-        now = datetime.datetime.now()
-        if core.UPDATE_LAST_CHECKED is not None:
-            hours_since_last = (now - core.UPDATE_LAST_CHECKED).seconds / 3600
-            if hours_since_last >= int(core.CONFIG['Server']['checkupdatefrequency']):
-                core.UPDATE_LAST_CHECKED = now
-                return self.version.manager.update_check()
-            else:
-                return None
-        else:
-            # This will happen on first open of /status
-            core.UPDATE_LAST_CHECKED = now
-            return self.version.manager.update_check()

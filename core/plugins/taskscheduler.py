@@ -32,7 +32,6 @@ class SchedulerPlugin(plugins.SimplePlugin):
     def stop(self):
         for i in self.task_list:
             i.stop()
-            print 'Done'
 
 
 class ScheduledTask(object):

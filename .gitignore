@@ -3,6 +3,7 @@
 config.cfg
 static/images/posters/*
 logs/*
+watcher.zip
 
 # Compiled #
 *.pyc

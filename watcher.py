@@ -134,8 +134,9 @@ class Scheduler(object):
 
             task_search = taskscheduler.ScheduledTask(hr, min, interval,
                           search.auto_search_and_grab, auto_start=True)
-            delay = task_search.task.delay
 
+            # update core.NEXT_SEARCH
+            delay = task_search.task.delay
             now = datetime.datetime.today().replace(second=0, microsecond=0)
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
 
@@ -279,6 +280,6 @@ if __name__ == '__main__':
         systrayplugin.subscribe()
         systrayplugin.start()
 
-    # finish by blocking
     os.chdir(core.PROG_PATH)  # have to do this for the daemon
+    # finish by blocking
     cherrypy.engine.block()

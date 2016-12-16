@@ -120,6 +120,13 @@ class GitUpdater(object):
     def execute_update(self):
         logging.info('Updating from Git.')
 
+        logging.info('Cleaning up before updating.')
+
+        for root, dirs, files in os.walk(core.PROG_PATH):
+            for file in files:
+                if file.endswith('.pyc'):
+                    os.remove(os.path.join(root, file))
+
         logging.info('Executing git fetch.')
         fetch = self.git.fetch()
         if fetch[2] == 1:
@@ -204,6 +211,8 @@ class GitUpdater(object):
                 result['local_hash'] = local_hash
                 result['new_hash'] = commit_list[0]
                 core.UPDATE_STATUS = result
+                logging.info('Update found:')
+                logging.info(result)
                 return result
         else:
             logging.error('Current local hash not in git history.')

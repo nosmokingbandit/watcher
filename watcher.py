@@ -149,7 +149,7 @@ class Scheduler(object):
 
             now = datetime.datetime.today()
             hr = now.hour
-            min = now.minute
+            min = now.minute + 1
 
             if core.CONFIG['Server']['checkupdates'] == 'true':
                 auto_start = True
@@ -158,6 +158,7 @@ class Scheduler(object):
 
             taskscheduler.ScheduledTask(hr, min, interval, ver.manager.update_check,
                                         auto_start=auto_start)
+            return
 
     class AutoUpdateInstall(object):
 
@@ -181,7 +182,7 @@ class Scheduler(object):
         def install():
             ver = version.Version()
 
-            if core.UPDATE_STATUS['status'] != 'behind':
+            if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != 'behind':
                 return
 
             logging.info('Running automatic updater.')

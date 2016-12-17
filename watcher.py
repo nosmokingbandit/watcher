@@ -11,7 +11,7 @@ import webbrowser
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
-from core import ajax, api, config, postprocessing, searcher, sqldb
+from core import ajax, api, config, postprocessing, searcher, sqldb, version
 from core.log import log
 from core.plugins import taskscheduler
 from templates import add_movie, restart, settings, shutdown, status, update
@@ -140,9 +140,67 @@ class Scheduler(object):
             now = datetime.datetime.today().replace(second=0, microsecond=0)
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
 
-    class AutoUpdate(object):
+    class AutoUpdateCheck(object):
 
-        def __init__(self):
+        @staticmethod
+        def create():
+            ver = version.Version()
+            interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
+
+            now = datetime.datetime.today()
+            hr = now.hour
+            min = now.minute + 1
+
+            if core.CONFIG['Server']['checkupdates'] == 'true':
+                auto_start = True
+            else:
+                auto_start = False
+
+            taskscheduler.ScheduledTask(hr, min, interval, ver.manager.update_check,
+                                        auto_start=auto_start)
+            return
+
+    class AutoUpdateInstall(object):
+
+        @staticmethod
+        def create():
+            interval = 24 * 3600
+
+            hr = int(core.CONFIG['Server']['installupdatehr'])
+            min = int(core.CONFIG['Server']['installupdatemin'])
+
+            if core.CONFIG['Server']['installupdates'] == 'true':
+                auto_start = True
+            else:
+                auto_start = False
+
+            taskscheduler.ScheduledTask(hr, min, interval, Scheduler.AutoUpdateInstall.install,
+                                        auto_start=auto_start)
+            return
+
+        @staticmethod
+        def install():
+            ver = version.Version()
+
+            if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != 'behind':
+                return
+
+            logging.info('Running automatic updater.')
+
+            logging.info('Currently {} commits behind. Updating to {}.'.format(
+                         core.UPDATE_STATUS['behind_count'], core.UPDATE_STATUS['new_hash']))
+
+            core.UPDATING = True
+
+            logging.info('Executing update.')
+            update = ver.manager.execute_update()
+            core.UPDATING = False
+
+            if not update:
+                logging.error('Update failed.')
+
+            logging.info('Update successful, restarting.')
+            cherrypy.engine.restart()
             return
 
 
@@ -272,6 +330,8 @@ if __name__ == '__main__':
     # Create plugin instances and subscribe
     scheduler = Scheduler()
     scheduler.AutoSearch.create()
+    scheduler.AutoUpdateCheck.create()
+    scheduler.AutoUpdateInstall.create()
     scheduler.plugin.subscribe()
 
     # If windows os and daemon selected, start systray

@@ -69,12 +69,12 @@ class Settings():
         c_s = 'Server'
         with ul(id='server', cls='wide'):
             with li('Host: ', cls='bbord'):
-                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 50%')
+                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 17em')
                 span('Typically localhost or 127.0.0.1.', cls='tip')
             with li('Port: ', cls='bbord'):
-                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 50%')
+                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 5em')
             with li('API Key: ', cls='bbord'):
-                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 50%')
+                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 20em')
                 with span(cls='tip'):
                     i(id='generate_new_key', cls='fa fa-refresh')
                     span('Generate new key.')
@@ -84,13 +84,19 @@ class Settings():
             with li(cls='bbord'):
                 i(id='checkupdates', cls='fa fa-square-o checkbox', value=c[c_s]['checkupdates'])
                 span('Check for updates every ')
-                input(type='number', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 3em')
+                input(type='number', min='8', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 2.25em')
                 span(' hours.')
-                with span('Current version hash: ', cls='tip'):
-                    a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
+                span('Checks at program start and every X hours afterward. *Requires restart.', cls='tip')
+            with li(cls='bbord'):
+                i(id='installupdates', cls='fa fa-square-o checkbox', value=c[c_s]['installupdates'])
+                span('Automatically install updates at ')
+                input(type='number', min='0', max='23', id='installupdatehr', value=c[c_s]['installupdatehr'], style='width: 2.25em')
+                span(':')
+                input(type='number', min='0', max='59', id='installupdatemin', value=c[c_s]['installupdatemin'], style='width: 2.25em')
+                span('24hr time. *Requires restart.', cls='tip')
             with li(cls='bbord'):
                 span('Branch: ')
-                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'], style='width: 50%')
+                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'], style='width: 15em')
                 span('Just stay on master. Please.', cls='tip')
             with li(cls='bbord'):
                 span('Keep ')
@@ -103,6 +109,8 @@ class Settings():
                 with span(id='shutdown'):
                     i(cls='fa fa-power-off')
                     span('Shutdown')
+                with span('Current version hash: ', cls='tip'):
+                    a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
 
         with span(id='save', cat='server'):
             i(cls='fa fa-save')

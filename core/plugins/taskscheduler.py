@@ -97,12 +97,17 @@ class Task(object):
             next += timedelta(seconds=self.interval)
 
         self.delay = (next - now).seconds
+        # this prevents infinite loops if the task restarts the plugin
+        if self.delay == 0:
+            self.delay = self.interval
+
         self.timer = Timer(self.delay, self.task)
 
     def task(self):
-        self.func()
         self.timer = Timer(self.interval, self.task)
         self.timer.start()
+        self.func()
+
 
 
 ''' Global commands.

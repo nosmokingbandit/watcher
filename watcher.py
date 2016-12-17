@@ -144,6 +144,9 @@ class Scheduler(object):
 
         @staticmethod
         def create():
+            print '================'
+            print ' THIS IS A TEST '
+            print '================'
             ver = version.Version()
             interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
 

@@ -193,7 +193,6 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
-            print 'EXECUTING UPDATE'
             update = ver.manager.execute_update()
             core.UPDATING = False
 

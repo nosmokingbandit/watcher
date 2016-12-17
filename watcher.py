@@ -192,6 +192,7 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
+            print 'EXECUTING UPDATE'
             update = ver.manager.execute_update()
             core.UPDATING = False
 
@@ -199,6 +200,7 @@ class Scheduler(object):
                 logging.error('Update failed.')
 
             logging.info('Update successful, restarting.')
+            cherrypy.engine.restart()
             return
 
 

@@ -464,6 +464,8 @@ class SQL(object):
             for i in qualities:
                 if not isinstance(quality_d[i], list):
                     quality_d[i] = quality_d[i].split(',')
+                else:
+                    continue
 
             quality_col['Quality'] = quality_d
 

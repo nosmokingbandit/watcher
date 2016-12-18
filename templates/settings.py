@@ -110,7 +110,8 @@ class Settings():
                     i(cls='fa fa-power-off')
                     span('Shutdown')
                 with span('Current version hash: ', cls='tip'):
-                    a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
+                    if core.CURRENT_HASH is not None:
+                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
 
         with span(id='save', cat='server'):
             i(cls='fa fa-save')

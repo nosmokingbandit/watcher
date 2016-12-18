@@ -20,10 +20,4 @@ $(document).ready(function() {
 
     });
 
-    $("button#update_now").click(function(){
-        $.post("/update_now", {"mode": "set_true"})
-        .done(function(){
-            window.location = "/update";
-        });
-    });
 });

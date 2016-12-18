@@ -239,6 +239,20 @@ class Ajax(object):
 
         return self.update.mark_bad(guid, imdbid=imdbid)
 
+    def notification_remove(self, index):
+        ''' Removes notification from core.notification
+        :param index: int index of notification to remove
+
+        Replaces list item with None as to not affect other indexes.
+        When adding new notifs through core.notification, any None values
+            will be overwritten before appending to the end of the list.
+
+        Does not return
+        '''
+
+        core.NOTIFICATIONS[index] = None
+        return
+
     def refresh_list(self, list, imdbid=''):
         ''' Re-renders html for Movies/Results list
         :param list: str the html list id to be re-rendered

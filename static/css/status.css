@@ -128,24 +128,6 @@ div#update_footer{
 
 }
 
-div#footer_container{
-    margin: 0 auto;
-    max-width: 1024px;
-    text-align: center;
-}
-
-div#footer_container span.updatemsg{
-    line-height: 64px;
-}
-
-div#footer_container span.errormsg{
-    font-size: 1em;
-    line-height: 32px;
-    width: 100%;
-    display: block;
-}
-
-
 /* specific movie details */
 #overlay {
     display: none;

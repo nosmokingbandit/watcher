@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
 sys.path.append(lib_dir)
 
@@ -13,6 +13,7 @@ import core
 from cherrypy.process.plugins import Daemonizer
 from core import ajax, api, config, postprocessing, searcher, sqldb, version
 from core.log import log
+from core.notification import Notification
 from core.plugins import taskscheduler
 from templates import add_movie, restart, settings, shutdown, status, update
 
@@ -67,6 +68,11 @@ class App(object):
     @cherrypy.expose
     def movie_status_popup(self, imdbid):
         return self.ajax.movie_status_popup(imdbid)
+
+    @cherrypy.expose
+    def notification_remove(self, index):
+        index = int(index)
+        return self.ajax.notification_remove(index)
 
     @cherrypy.expose
     def quick_add(self, imdbid):
@@ -144,7 +150,7 @@ class Scheduler(object):
 
         @staticmethod
         def create():
-            ver = version.Version()
+
             interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
 
             now = datetime.datetime.today()
@@ -156,9 +162,44 @@ class Scheduler(object):
             else:
                 auto_start = False
 
-            taskscheduler.ScheduledTask(hr, min, interval, ver.manager.update_check,
+            taskscheduler.ScheduledTask(hr, min, interval, Scheduler.AutoUpdateCheck.update_check,
                                         auto_start=auto_start)
             return
+
+        @staticmethod
+        def update_check():
+            ver = version.Version()
+            data = ver.manager.update_check()
+        # {'icon': 'fa-star', 'title': '2 Updates Available', 'text': 'Updates will be installed automatically at 2:15', 'button': ('Update now', '/settings', 'fa-repeat')}
+
+            if data['status'] == 'current':
+                return
+            elif data['status'] == 'error':
+                notif = {'icon': 'fa-exclamation-triangle',
+                         'title': 'Error Checking for Updates',
+                         'text': data['error']
+                         }
+                Notification.add(notif)
+
+            elif data['status'] == 'behind':
+                if core.CONFIG['Server']['installupdates'] == 'true':
+                    hour = core.CONFIG['Server']['installupdatehr']
+                    minute = core.CONFIG['Server']['installupdatemin']
+                    text = 'Updates will install at {}:{}'.format(hour, minute)
+                else:
+                    text = None
+
+                title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
+
+                button = ('Update Now', '/update_now', 'fa-repeat')
+
+                notif = {'icon': 'fa-star',
+                         'title': '{} Updates Available',
+                         'title_link': title_link,
+                         'text': text,
+                         'button': button}
+                Notification.new_notif(notif)
+
 
     class AutoUpdateInstall(object):
 

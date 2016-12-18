@@ -39,3 +39,17 @@ class Notification(object):
         # if not just append
         core.NOTIFICATIONS.append(base)
         return
+
+
+'''
+NOTIFICATION dict:
+
+'icon': None,       str font awesome icon 'fa-star'
+'title': None,      str large title text 'Something Happened!'
+'title_link': None, str url for title to link to.
+'text': None,       str main body text explaining title if necessary
+'button': None      tuple ('Name', '/url/link' , 'fa-refresh')
+
+All Ajax  requests should be specified in static/notifications/main.js
+
+'''

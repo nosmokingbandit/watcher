@@ -64,6 +64,15 @@ class ScoreResults():
         return self.results
 
     def remove_ignored(self, words):
+        ''' Remove results with ignored 'words'
+        :param words: list of forbidden words
+
+        Iterates through self.results and removes any entry that contains
+            any 'words'
+
+        Does not return
+        '''
+
         if not words:
             return
         for word in words:
@@ -73,6 +82,15 @@ class ScoreResults():
                 self.results = [r for r in self.results if word not in r['title'].lower()]
 
     def keep_required(self, words):
+        ''' Remove results without required 'words'
+        :param words: list of required words
+
+        Iterates through self.results and removes any entry that does not
+            contain all 'words'
+
+        Does not return
+        '''
+
         if not words:
             return
         for word in words:
@@ -82,6 +100,16 @@ class ScoreResults():
                 self.results = [r for r in self.results if word in r['title'].lower()]
 
     def retention_check(self, retention, today):
+        ''' Remove results older than 'retention' days
+        :param retention: int days of retention limit
+        :param today: datetime obj today's date
+
+        Iterates through self.results and removes any entry that was published
+            more than 'retention' days ago
+
+        Does not return
+        '''
+
         if retention == 0:
             return
         lst = []
@@ -96,6 +124,15 @@ class ScoreResults():
         self.results = lst
 
     def score_preferred(self, words):
+        ''' Increase score for each 'words' match
+        :param words: list of preferred words
+
+        Iterates through self.results and increases ['score'] each time a
+            preferred 'words' is found
+
+        Does not return
+        '''
+
         if not words:
             return
         for word in words:
@@ -107,6 +144,16 @@ class ScoreResults():
                         result['score'] += 10
 
     def fuzzy_title(self, title):
+        ''' Score and remove results based on title match
+        :param title: str title of movie
+
+        Iterates through self.results and removes any entry that does not
+            fuzzy match 'title' > 60.
+        Adds fuzzy_score / 20 points to ['score']
+
+        Does not return
+        '''
+
         lst = []
         for result in self.results:
             title = title.replace(' ', '.').replace(':', '.').lower()
@@ -118,6 +165,16 @@ class ScoreResults():
         self.results = lst
 
     def score_quality(self, qualities):
+        ''' Score releases based on quality preferences
+        :param qualities: dict of quality preferences from MOVIES table
+
+        Iterates through self.results and removes any entry that does not
+            fit into quality criteria (resoution, filesize)
+        Adds to ['score'] based on resolution priority
+
+        Does not return
+        '''
+
         lst = []
         for result in self.results:
             resolution = result['resolution']

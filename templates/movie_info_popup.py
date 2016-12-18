@@ -54,7 +54,6 @@ class MovieInfoPopup():
                         iframe(id='trailer', width="640", height="360", src=trailer_embed, frameborder="0")
 
                         # Panel that swaps in with quality adjustments
-                        # TODO put this list in core.__init__?
                         resolutions = ['4K', '1080P', '720P', 'SD']
                         with ul(id='quality', cls='wide'):
                             # Resolution Block

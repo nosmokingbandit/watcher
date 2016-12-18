@@ -35,6 +35,7 @@ class Searcher():
 
         Does not return
         '''
+        
         interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, interval)

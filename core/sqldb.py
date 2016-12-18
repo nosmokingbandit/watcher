@@ -384,7 +384,7 @@ class SQL(object):
         else:
             return False
 
-    # REMOVE:
+    # REMOVE when going open
     '''
     These next methods are for adding columns to tables. It will run at program start.
 

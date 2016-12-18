@@ -92,6 +92,7 @@ ul#notif_list{
     position: absolute;
     bottom: 0;
     left: 0;
+    list-style: none;
 }
 
 ul#notif_list li{

@@ -249,8 +249,12 @@ class Ajax(object):
 
         Does not return
         '''
-
+        print core.NOTIFICATIONS
         core.NOTIFICATIONS[index] = None
+
+        if core.NOTIFICATIONS[-1] is None:
+            core.NOTIFICATIONS.pop()
+        print core.NOTIFICATIONS
         return
 
     def refresh_list(self, list, imdbid=''):

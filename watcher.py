@@ -147,7 +147,7 @@ class Scheduler(object):
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
 
     class AutoUpdateCheck(object):
-
+        ver = version.Version()
         @staticmethod
         def create():
 
@@ -170,9 +170,7 @@ class Scheduler(object):
 
         @staticmethod
         def update_check():
-            ver = version.Version()
-            data = ver.manager.update_check()
-        # {'icon': 'fa-star', 'title': '2 Updates Available', 'text': 'Updates will be installed automatically at 2:15', 'button': ('Update now', '/settings', 'fa-repeat')}
+            data = Scheduler.AutoUpdateCheck.ver.manager.update_check()
 
             if data['status'] == 'current':
                 return
@@ -235,7 +233,7 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
-            update = ver.manager.execute_update()
+            update = Scheduler.AutoUpdateCheck.ver.manager.execute_update()
             core.UPDATING = False
 
             if not update:

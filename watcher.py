@@ -155,7 +155,9 @@ class Scheduler(object):
 
             now = datetime.datetime.today()
             hr = now.hour
-            min = now.minute + 1
+            min = now.minute
+            if now.second > 30:
+                min += 1
 
             if core.CONFIG['Server']['checkupdates'] == 'true':
                 auto_start = True
@@ -185,7 +187,7 @@ class Scheduler(object):
                 if core.CONFIG['Server']['installupdates'] == 'true':
                     hour = core.CONFIG['Server']['installupdatehr']
                     minute = core.CONFIG['Server']['installupdatemin']
-                    text = 'Updates will install at {}:{}'.format(hour, minute)
+                    text = 'Updates will install automatically at {}:{}'.format(hour, minute)
                 else:
                     text = None
 
@@ -194,12 +196,11 @@ class Scheduler(object):
                 button = ('Update Now', '/update_now', 'fa-repeat')
 
                 notif = {'icon': 'fa-star',
-                         'title': '{} Updates Available',
+                         'title': '{} Updates Available'.format(data['behind_count']),
                          'title_link': title_link,
                          'text': text,
                          'button': button}
-                Notification.new_notif(notif)
-
+                Notification.add(notif)
 
     class AutoUpdateInstall(object):
 

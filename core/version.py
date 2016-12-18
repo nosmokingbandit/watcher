@@ -227,6 +227,7 @@ class ZipUpdater(object):
     def __init__(self):
         self.version_file = os.path.join('core', 'version')
         self.current_hash = self.get_current_hash()
+        core.CURRENT_HASH = self.current_hash
         return
 
     def get_current_hash(self):

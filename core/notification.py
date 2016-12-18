@@ -31,6 +31,10 @@ class Notification(object):
         logging.info('Creating notification:')
         logging.info(base)
 
+        # if it already exists, ignore it
+        if base in core.NOTIFICATIONS:
+            return
+
         # if there is a None in the list, overwrite it.
         for i, v in enumerate(core.NOTIFICATIONS):
             if v is None:

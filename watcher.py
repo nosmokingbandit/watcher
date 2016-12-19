@@ -147,6 +147,7 @@ class Scheduler(object):
 
     class AutoUpdateCheck(object):
         ver = version.Version()
+        
         @staticmethod
         def create():
 

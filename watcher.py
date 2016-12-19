@@ -191,7 +191,7 @@ class Scheduler(object):
 
                 title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
 
-                button = ('Update Now', '/update_now', 'fa-repeat')
+                button = ('Update Now', '/update_now', 'fa-arrow-circle-up')
 
                 notif = {'icon': 'fa-star',
                          'title': '{} Updates Available'.format(data['behind_count']),

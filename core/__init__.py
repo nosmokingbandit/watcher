@@ -23,3 +23,6 @@ NEXT_SEARCH = None
 
 # Store settings after write. Reduces reads from file.
 CONFIG = None
+
+# A list of notification data
+NOTIFICATIONS = []

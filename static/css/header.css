@@ -85,3 +85,78 @@
 #nav li.settings:hover .settings_menu{
     display: block;
 }
+
+/* Notifications */
+
+ul#notif_list{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    list-style: none;
+}
+
+ul#notif_list li{
+    background: #eeeeee;
+    border: 1px solid #bdbdbd;
+    padding: 0.5em;
+    position: relative;
+    width: 20em;
+    margin: 8px
+}
+
+ul#notif_list li span{
+    vertical-align: middle;
+}
+
+ul#notif_list li div.notif_title{
+    margin: 0 0 0.5em 0;
+}
+
+ul#notif_list li div.notif_title i{
+    background: #de3e65; /* Old browsers */
+    background: -moz-linear-gradient(top,  #de3e65 0%, #f4693b 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #de3e65 0%,#f4693b 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #de3e65 0%,#f4693b 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#de3e65', endColorstr='#f4693b',GradientType=0 ); /* IE6-9 */
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.5em;
+}
+
+ul#notif_list li div.notif_title span{
+    margin: 0 0 0 0.5em;
+    font-size: 1.25em;
+}
+
+ul#notif_list li div.notif_text{
+    font-size: 0.8em;
+    vertical-align: middle;
+    margin: 0 0 0 0.25em;
+    word-wrap: normal;
+}
+
+ul#notif_list li div.notif_close{
+    float: right;
+    width: 1em;
+    vertical-align: middle;
+}
+
+ul#notif_list li div.notif_footer{
+    margin-top: 0.5em;
+    font-size: 1em;
+    overflow: hidden;
+}
+
+ul#notif_list li div.notif_footer i{
+    font-size: 1em;
+}
+
+ul#notif_list li div.notif_footer span.dismiss{
+    float: left;
+    cursor: pointer;
+}
+
+ul#notif_list li div.notif_footer a.button{
+    float: right;
+}

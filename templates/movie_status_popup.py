@@ -151,7 +151,7 @@ class MovieStatusPopup():
 
     def get_quality_settings(self, data):
         '''
-        TAG REMOVE
+        # REMOVE
         Actually we want to modify this.
         We will ALWAYS have quality data in the table, so no more getting quality from config
         '''

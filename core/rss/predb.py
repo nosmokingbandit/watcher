@@ -14,6 +14,14 @@ class PreDB(object):
         self.sql = sqldb.SQL()
 
     def check_all(self):
+        ''' Checks all movies for predb status
+
+        Simply loops through MOVIES table and executes self.check_one if
+            predb column is not 'found'
+
+        Returns bool False is movies cannot be retrieved
+        '''
+
         logging.info('Checking predb.me for new available releases.')
 
         movies = self.sql.get_user_movies()
@@ -25,6 +33,14 @@ class PreDB(object):
                 self.check_one(movie)
 
     def check_one(self, data):
+        ''' Searches predb for releases and marks row in MOVIES
+        :param data: dict data from row in MOVIES
+
+        Checks predb rss for releases. Marks row 'found' if found.
+
+        Returns bool on success/failure
+        '''
+
         title = data['title']
         year = data['year']
         title_year = '{} {}'.format(title, year)
@@ -47,6 +63,12 @@ class PreDB(object):
                 return False
 
     def search_rss(self, title_year):
+        ''' Searches predb rss for title_year
+        :param title_year: str movie title and year 'Black Swan 2010'
+
+        Returns list of found rss entries or None if not found.
+        '''
+
         search_term = title_year.replace(' ', '+').lower()
 
         search_string = 'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
@@ -63,6 +85,11 @@ class PreDB(object):
             return None
 
     def parse_predb_xml(self, feed):
+        ''' Helper function to parse predb xmlrpclib
+        :param feed: str rss feed
+
+        Returns list of items with 'title' in tag
+        '''
 
         root = ET.fromstring(feed)
 
@@ -76,6 +103,13 @@ class PreDB(object):
 
     # keeps checking release titles until one matches or all are checked
     def fuzzy_match(self, items, test):
+        ''' Fuzzy matches title with predb rss titles
+        :param items: list of titles in predb rss
+        :param test: str to match to rss titles
+
+        Returns bool if any one 'items' fuzzy matches above 50%
+        '''
+
         for item in items:
             match = fuzz.partial_ratio(item, test)
             if match > 50:

@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
 sys.path.append(lib_dir)
 
@@ -13,6 +13,7 @@ import core
 from cherrypy.process.plugins import Daemonizer
 from core import ajax, api, config, postprocessing, searcher, sqldb, version
 from core.log import log
+from core.notification import Notification
 from core.plugins import taskscheduler
 from templates import add_movie, restart, settings, shutdown, status, update
 
@@ -67,6 +68,11 @@ class App(object):
     @cherrypy.expose
     def movie_status_popup(self, imdbid):
         return self.ajax.movie_status_popup(imdbid)
+
+    @cherrypy.expose
+    def notification_remove(self, index):
+        index = int(index)
+        return self.ajax.notification_remove(index)
 
     @cherrypy.expose
     def quick_add(self, imdbid):
@@ -141,24 +147,58 @@ class Scheduler(object):
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
 
     class AutoUpdateCheck(object):
-
+        ver = version.Version()
         @staticmethod
         def create():
-            ver = version.Version()
+
             interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
 
             now = datetime.datetime.today()
             hr = now.hour
-            min = now.minute + 1
+            min = now.minute
+            if now.second > 30:
+                min += 1
 
             if core.CONFIG['Server']['checkupdates'] == 'true':
                 auto_start = True
             else:
                 auto_start = False
 
-            taskscheduler.ScheduledTask(hr, min, interval, ver.manager.update_check,
+            taskscheduler.ScheduledTask(hr, min, interval, Scheduler.AutoUpdateCheck.update_check,
                                         auto_start=auto_start)
             return
+
+        @staticmethod
+        def update_check():
+            data = Scheduler.AutoUpdateCheck.ver.manager.update_check()
+
+            if data['status'] == 'current':
+                return
+            elif data['status'] == 'error':
+                notif = {'icon': 'fa-exclamation-triangle',
+                         'title': 'Error Checking for Updates',
+                         'text': data['error']
+                         }
+                Notification.add(notif)
+
+            elif data['status'] == 'behind':
+                if core.CONFIG['Server']['installupdates'] == 'true':
+                    hour = core.CONFIG['Server']['installupdatehr']
+                    minute = core.CONFIG['Server']['installupdatemin']
+                    text = 'Updates will install automatically at {}:{}'.format(hour, minute)
+                else:
+                    text = None
+
+                title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
+
+                button = ('Update Now', '/update_now', 'fa-arrow-circle-up')
+
+                notif = {'icon': 'fa-star',
+                         'title': '{} Updates Available'.format(data['behind_count']),
+                         'title_link': title_link,
+                         'text': text,
+                         'button': button}
+                Notification.add(notif)
 
     class AutoUpdateInstall(object):
 
@@ -193,7 +233,7 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
-            update = ver.manager.execute_update()
+            update = Scheduler.AutoUpdateCheck.ver.manager.execute_update()
             core.UPDATING = False
 
             if not update:

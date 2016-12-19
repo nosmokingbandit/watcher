@@ -9,6 +9,12 @@ class log(object):
 
     @staticmethod
     def start(path):
+        """ Starts logging service
+        :param path: srt path to log directory
+
+        Does not return
+        """
+        
         if not os.path.exists(path):
             os.makedirs(path)
 

@@ -56,6 +56,7 @@ class NewzNab():
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
     def parse_newznab_xml(self, feed):
         ''' Parse xml from Newnzb api.
+        :param feed: str nn xml feed
 
         Returns dict of sorted nzb information.
         '''

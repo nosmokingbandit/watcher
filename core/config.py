@@ -20,7 +20,10 @@ class Config():
 
     def new_config(self):
         ''' Copies base_file to config directory.
+
         Automatically assigns random values to searchtimehr, searchtimemin, and apikey.
+
+        Returns str 'Config Saved' on success. Throws execption on failure.
         '''
 
         try:
@@ -70,7 +73,7 @@ class Config():
         # After writing, copy it back to core.CONFIG
         self.stash()
 
-    # REMOVE:
+    # REMOVE when going open
     def merge_new_options(self):
         ''' Opens base_config and config,
             then saves them merged with config taking priority.

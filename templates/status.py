@@ -39,29 +39,6 @@ class Status():
                     with ul(id='movie_list'):
                         self.movie_list()
 
-            if core.UPDATE_STATUS is not None:
-                if core.UPDATE_STATUS['status'] == 'behind':
-                    commit = 'commit'
-                    if core.UPDATE_STATUS['behind_count'] > 1:
-                        commit = 'commits'
-                    message = 'Update available. You are {} {} behind.'.format(core.UPDATE_STATUS['behind_count'], commit)
-                    href = '{}/compare/{}...{}'.format(core.GIT_URL, core.UPDATE_STATUS['local_hash'], core.UPDATE_STATUS['new_hash'])
-
-                    with div(id='update_footer'):
-                        with div(id='footer_container'):
-                            with span(cls='updatemsg'):
-                                a(message, href=href, target='_blank')
-                                button('Update Now', id='update_now')
-
-                elif core.UPDATE_STATUS['status'] == 'error':
-                    message = 'Error checking for updates.'
-                    err = core.UPDATE_STATUS['error']
-
-                    with div(id='update_footer'):
-                        with div(id='footer_container'):
-                            span(message, cls='errormsg')
-                            span(err, cls='errormsg')
-
             div(id='overlay')
             div(id='status_pop_up')
 

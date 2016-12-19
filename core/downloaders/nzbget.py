@@ -10,6 +10,13 @@ class Nzbget():
 
     @staticmethod
     def test_connection(data):
+        ''' Tests connectivity to Nzbget
+        :para data: dict of nzbget server information
+
+        Tests if we can get nzbget's version using server info in 'data'
+
+        Return True on success or str error message on failure
+        '''
 
         host = data['nzbghost']
         port = data['nzbgport']
@@ -35,6 +42,12 @@ class Nzbget():
 
     @staticmethod
     def add_nzb(data):
+        ''' Adds nzb file to nzbget to download
+        :param data: dict of nzb information
+
+        Returns str response from server
+        '''
+        
         nzbg_conf = core.CONFIG['NzbGet']
 
         if not Nzbget.test_connection(nzbg_conf):

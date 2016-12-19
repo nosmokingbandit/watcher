@@ -15,7 +15,7 @@ from core import ajax, api, config, postprocessing, searcher, sqldb, version
 from core.log import log
 from core.notification import Notification
 from core.plugins import taskscheduler
-from templates import add_movie, restart, settings, shutdown, status, update
+from templates import add_movie, restart, settings, shutdown, status, update, fourohfour
 
 if os.name == 'nt':
     from core.plugins import systray
@@ -39,8 +39,7 @@ class App(object):
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
-        # TODO: this should be prettier
-        return "Page not Found!"
+        return fourohfour.FourOhFour.index()
 
     '''
     From here down just forward requests to ajax.Ajax()

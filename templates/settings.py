@@ -95,9 +95,9 @@ class Settings():
                 input(type='number', min='0', max='59', id='installupdatemin', value=c[c_s]['installupdatemin'], style='width: 2.25em')
                 span('24hr time. *Requires restart.', cls='tip')
             with li(cls='bbord'):
-                span('Branch: ')
-                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'], style='width: 15em')
-                span('Just stay on master. Please.', cls='tip')
+                with span(id='update_check'):
+                    i(cls='fa fa-arrow-circle-up')
+                    span('Check for updates now.')
             with li(cls='bbord'):
                 span('Keep ')
                 input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')

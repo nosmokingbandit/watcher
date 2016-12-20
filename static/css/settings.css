@@ -99,6 +99,10 @@ span#restart, span#shutdown{
     cursor: pointer;
 }
 
+span#update_check{
+    cursor: pointer;
+}
+
 /* Providers */
 
 div#content ul#providers{

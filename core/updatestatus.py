@@ -64,7 +64,7 @@ class Status(object):
                 logging.info('Successfully marked {} as {} in MARKEDRESULTS.'.format(guid, status))
                 return True
         else:
-            logging.info('Guid {} not found in MARKEDRESULTS, creating entry.')
+            logging.info('Guid {} not found in MARKEDRESULTS, creating entry.'.format(guid))
             if imdbid:
                 DB_STRING = {}
                 DB_STRING['imdbid'] = imdbid

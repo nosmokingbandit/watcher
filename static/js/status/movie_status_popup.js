@@ -73,7 +73,7 @@ $(document).ready(function() {
             text: "This will not remove any downloaded movies.",
             type: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#F44336",
+            confirmButtonColor: "#4CAF50",
             confirmButtonText: "Remove It",
             closeOnConfirm: false
         }, function(){
@@ -184,7 +184,7 @@ $(document).ready(function() {
                     type: "warning",
                     showCancelButton: true,
                     cancelButtonText: "Wait",
-                    confirmButtonColor: "#F44336",
+                    confirmButtonColor: "#4CAF50",
                     confirmButtonText: "Search Now",
                     closeOnConfirm: true
                 }, function(){
@@ -243,7 +243,7 @@ $(document).ready(function() {
             text: "",
             type: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#F44336",
+            confirmButtonColor: "#4CAF50",
             confirmButtonText: "Mark Bad",
             closeOnConfirm: false
             }, function(){

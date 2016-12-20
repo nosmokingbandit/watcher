@@ -11,10 +11,10 @@ import webbrowser
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
-from core import ajax, api, config, postprocessing, searcher, sqldb, version
+from core import ajax, api, config, postprocessing, searcher, sqldb
 from core.log import log
 from core.notification import Notification
-from core.plugins import taskscheduler
+from core.scheduler import Scheduler
 from templates import add_movie, restart, settings, shutdown, status, update, fourohfour
 
 if os.name == 'nt':
@@ -98,6 +98,10 @@ class App(object):
         return self.ajax.search(imdbid, title)
 
     @cherrypy.expose
+    def update_check(self):
+        return self.ajax.update_check()
+
+    @cherrypy.expose
     def test_downloader_connection(self, mode, data):
         return self.ajax.test_downloader_connection(mode, data)
 
@@ -119,130 +123,6 @@ class App(object):
     @cherrypy.expose
     def update_quality_settings(self, quality, imdbid):
         return self.ajax.update_quality_settings(quality, imdbid)
-
-
-class Scheduler(object):
-
-    def __init__(self):
-        # create scheduler plugin
-        self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
-
-    # create classes for each scheduled task
-    class AutoSearch(object):
-        @staticmethod
-        def create():
-            search = searcher.Searcher()
-            interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
-
-            hr = int(core.CONFIG['Search']['searchtimehr'])
-            min = int(core.CONFIG['Search']['searchtimemin'])
-
-            task_search = taskscheduler.ScheduledTask(hr, min, interval,
-                          search.auto_search_and_grab, auto_start=True)
-
-            # update core.NEXT_SEARCH
-            delay = task_search.task.delay
-            now = datetime.datetime.today().replace(second=0, microsecond=0)
-            core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
-
-    class AutoUpdateCheck(object):
-        ver = version.Version()
-        
-        @staticmethod
-        def create():
-
-            interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
-
-            now = datetime.datetime.today()
-            hr = now.hour
-            min = now.minute
-            if now.second > 30:
-                min += 1
-
-            if core.CONFIG['Server']['checkupdates'] == 'true':
-                auto_start = True
-            else:
-                auto_start = False
-
-            taskscheduler.ScheduledTask(hr, min, interval, Scheduler.AutoUpdateCheck.update_check,
-                                        auto_start=auto_start)
-            return
-
-        @staticmethod
-        def update_check():
-            data = Scheduler.AutoUpdateCheck.ver.manager.update_check()
-
-            if data['status'] == 'current':
-                return
-            elif data['status'] == 'error':
-                notif = {'icon': 'fa-exclamation-triangle',
-                         'title': 'Error Checking for Updates',
-                         'text': data['error']
-                         }
-                Notification.add(notif)
-
-            elif data['status'] == 'behind':
-                if core.CONFIG['Server']['installupdates'] == 'true':
-                    hour = core.CONFIG['Server']['installupdatehr']
-                    minute = core.CONFIG['Server']['installupdatemin']
-                    text = 'Updates will install automatically at {}:{}'.format(hour, minute)
-                else:
-                    text = None
-
-                title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
-
-                button = ('Update Now', '/update_now', 'fa-arrow-circle-up')
-
-                notif = {'icon': 'fa-star',
-                         'title': '{} Updates Available'.format(data['behind_count']),
-                         'title_link': title_link,
-                         'text': text,
-                         'button': button}
-                Notification.add(notif)
-
-    class AutoUpdateInstall(object):
-
-        @staticmethod
-        def create():
-            interval = 24 * 3600
-
-            hr = int(core.CONFIG['Server']['installupdatehr'])
-            min = int(core.CONFIG['Server']['installupdatemin'])
-
-            if core.CONFIG['Server']['installupdates'] == 'true':
-                auto_start = True
-            else:
-                auto_start = False
-
-            taskscheduler.ScheduledTask(hr, min, interval, Scheduler.AutoUpdateInstall.install,
-                                        auto_start=auto_start)
-            return
-
-        @staticmethod
-        def install():
-            ver = version.Version()
-
-            if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != 'behind':
-                return
-
-            logging.info('Running automatic updater.')
-
-            logging.info('Currently {} commits behind. Updating to {}.'.format(
-                         core.UPDATE_STATUS['behind_count'], core.UPDATE_STATUS['new_hash']))
-
-            core.UPDATING = True
-
-            logging.info('Executing update.')
-            update = Scheduler.AutoUpdateCheck.ver.manager.execute_update()
-            core.UPDATING = False
-
-            if not update:
-                logging.error('Update failed.')
-
-            logging.info('Update successful, restarting.')
-            cherrypy.engine.restart()
-            return
-
 
 if __name__ == '__main__':
 
@@ -323,9 +203,7 @@ if __name__ == '__main__':
         sql.create_database()
     else:
         logging.info('SQL DB found.')
-        print 'Database found, altering if necessary.'
-        sql.add_new_columns()
-        sql.convert_movies()
+        print 'Database found.'
     del sql
 
     # Set up root app

@@ -21,7 +21,7 @@ class MovieStatusPopup():
 
             tomatoes_url = data['tomatourl']
 
-        quality_settings = self.get_quality_settings(data)
+        quality_settings = json.loads(data['quality'])
 
         doc = dominate.document(title='Watcher')
 
@@ -148,31 +148,3 @@ class MovieStatusPopup():
                         span(pubdate, cls='bold')
 
         return doc.render()
-
-    def get_quality_settings(self, data):
-        '''
-        # REMOVE
-        Actually we want to modify this.
-        We will ALWAYS have quality data in the table, so no more getting quality from config
-        '''
-        if data['quality']:
-            quality = json.loads(data['quality'])
-        else:
-            quality = {}
-            quality['Quality'] = core.CONFIG['Quality']
-            quality['Filters'] = core.CONFIG['Filters']
-            for i in quality['Filters']:
-                quality['Filters'][i] = ','.join(quality['Filters'][i])
-        # converts comma delimited values into lists
-        for section in quality:
-            if section == 'Quality':
-                for key in quality[section]:
-                    value = quality[section][key]
-                    if ',' in value:
-                        quality[section][key] = value.split(',')
-            elif section == 'Filters':
-                for key in quality[section]:
-                    value = quality[section][key]
-                    if ',' in value:
-                        quality[section][key] = value.replace(',', ', ')
-        return quality

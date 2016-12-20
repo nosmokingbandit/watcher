@@ -257,6 +257,15 @@ class Ajax(object):
         print core.NOTIFICATIONS
         return
 
+    def update_check(self):
+        ''' Manually check for updates
+
+        Returns dict from Version manager update_check()
+        '''
+
+        response = version.Version().manager.update_check()
+        return json.dumps(response)
+
     def refresh_list(self, list, imdbid=''):
         ''' Re-renders html for Movies/Results list
         :param list: str the html list id to be re-rendered

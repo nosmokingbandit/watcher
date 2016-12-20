@@ -152,7 +152,7 @@ $(document).ready(function () {
             response = JSON.parse(r);
             if(response['status'] == 'current'){
                 swal("No updates available", "", "info");
-            } else if(repsonse['status'] == 'error'){
+            } else if(response['status'] == 'error'){
                 swal("Error", response['error'], "warning");
             } else if(response["status"] == "behind"){
 

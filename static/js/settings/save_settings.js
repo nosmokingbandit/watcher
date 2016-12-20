@@ -26,6 +26,10 @@ $(document).ready(function () {
             data = postprocessing()
         }
 
+        if(data == false){
+            return
+        }
+
         post_data = JSON.stringify(data);
 
         $.post("/save_settings", {
@@ -127,7 +131,7 @@ $(document).ready(function () {
         // The order of these tend to get jumbled. I think it sorts alphabetically, but
         // I haven't put much effort into it yet because it really doesn't affect usage.
         var data = {};
-        var indexer = {};
+        var indexers = {};
         var ind = 1;
 
         $("#newznab_list li").each(function(){
@@ -140,17 +144,19 @@ $(document).ready(function () {
                 if ( (url == "" || api == "") && (url + api !=="") ){
                     swal("", "Please complete or clear out incomplete providers.", "warning");
                     indexers = {}
-                    return
+                    return false;
                 }
+
                 // but ignore it if both are blank
                 else if (url + api !=="") {
-                    var data = [url, api, check].toString().toLowerCase();
-                    indexers[ind] = data;
+                    indexers[ind] = [url, api, check].toString().toLowerCase();
                     ind++;
                 }
             }
         });
         data["Indexers"] = indexers;
+
+        console.log(data)
 
         return data
     }

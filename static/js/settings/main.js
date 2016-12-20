@@ -161,7 +161,7 @@ $(document).ready(function () {
                     text: "Update now?",
                     type: "info",
                     showCancelButton: true,
-                    confirmButtonColor: "#CDDC39",
+                    confirmButtonColor: "#4CAF50",
                     confirmButtonText: "Update",
                     closeOnConfirm: true
                 }, function(){
@@ -188,7 +188,7 @@ $(document).ready(function () {
             text: "",
             type: "info",
             showCancelButton: true,
-            confirmButtonColor: "#CDDC39",
+            confirmButtonColor: "#4CAF50",
             confirmButtonText: "Restart",
             closeOnConfirm: true
         }, function(){
@@ -202,7 +202,7 @@ $(document).ready(function () {
             text: "",
             type: "info",
             showCancelButton: true,
-            confirmButtonColor: "#CDDC39",
+            confirmButtonColor: "#4CAF50",
             confirmButtonText: "Shut Down",
             closeOnConfirm: true
         }, function(){

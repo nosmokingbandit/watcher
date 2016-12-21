@@ -39,6 +39,9 @@ class Config():
         self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2) )
         self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
 
+        self.config.set('Server', 'installupdatehr', str(random.randint(0, 23)).zfill(2))
+        self.config.set('Server', 'installupdatemin', str(random.randint(0, 59)).zfill(2))
+
         apikey = "%06x" % random.randint(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         self.config.set('Server', 'apikey', apikey)
 

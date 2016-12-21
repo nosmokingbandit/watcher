@@ -11,6 +11,7 @@ class Scheduler(object):
     def __init__(self):
         # create scheduler plugin
         self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
+        self.version = version.Version()
 
     # create classes for each scheduled task
     class AutoSearch(object):
@@ -31,7 +32,6 @@ class Scheduler(object):
             core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
 
     class AutoUpdateCheck(object):
-        ver = version.Version()
 
         @staticmethod
         def create():
@@ -63,7 +63,7 @@ class Scheduler(object):
                 {'status': 'current'}
             '''
 
-            data = Scheduler.AutoUpdateCheck.ver.manager.update_check()
+            data = Scheduler.version.manager.update_check()
             # if data['status'] == 'current', nothing to do.
 
             if data['status'] == 'error':
@@ -92,7 +92,7 @@ class Scheduler(object):
                          'text': text,
                          'button': button}
                 Notification.add(notif)
-                
+
             return data
 
     class AutoUpdateInstall(object):
@@ -128,7 +128,7 @@ class Scheduler(object):
             core.UPDATING = True
 
             logging.info('Executing update.')
-            update = Scheduler.AutoUpdateCheck.ver.manager.execute_update()
+            update = Scheduler.version.manager.execute_update()
             core.UPDATING = False
 
             if not update:

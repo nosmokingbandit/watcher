@@ -223,6 +223,12 @@ class GitUpdater(object):
 
 
 class ZipUpdater(object):
+    ''' Manager for updates install without git.
+
+    Updates by downloading the new zip from github. Moves config,
+        database, and posters to temp folder, then extracts zip over
+        existing files before restoring config, db, and posters.
+    '''
 
     def __init__(self):
         self.version_file = os.path.join('core', 'version')

@@ -144,11 +144,7 @@ $(document).ready(function () {
 
         $.post("/update_check", {})
         .done(function(r){
-            // {'status': 'error', 'error': <error> }
-            // {'status': 'behind', 'behind_count': #, 'local_hash': 'abcdefg', 'new_hash': 'bcdefgh'}
-            // {'status': 'current'}
 
-            console.log(r);
             response = JSON.parse(r);
             if(response['status'] == 'current'){
                 swal("No updates available", "", "info");

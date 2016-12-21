@@ -21,8 +21,7 @@ class Config():
     def new_config(self):
         ''' Copies base_file to config directory.
 
-        Automatically assigns random values to searchtimehr, searchtimemin,
-            installupdatehr, installupdatemin, and apikey.
+        Automatically assigns random values to searchtimehr, searchtimemin, and apikey.
 
         Returns str 'Config Saved' on success. Throws execption on failure.
         '''
@@ -37,11 +36,8 @@ class Config():
 
         self.config.readfp(open(self.file))
 
-        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2))
-        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2))
-
-        self.config.set('Search', 'installupdatehr', str(random.randint(0, 23)).zfill(2))
-        self.config.set('Search', 'installupdatemin', str(random.randint(0, 59)).zfill(2))
+        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2) )
+        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
 
         apikey = "%06x" % random.randint(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         self.config.set('Server', 'apikey', apikey)

@@ -233,7 +233,7 @@ class Settings():
                     for n in c[c_s]:
                         with li(cls='newznab_indexer'):
                             i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
-                            input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" URL")
+                            input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" http://www.indexer-url.com/")
                             input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
                     with li(id='add_newznab_row'):
                         i(cls='fa fa-plus-square', id='add_row')

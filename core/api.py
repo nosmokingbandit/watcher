@@ -42,7 +42,11 @@ class API(object):
             return 'No API mode specified.'
 
         if params['mode'] == 'liststatus':
-            return self.liststatus()
+
+            if 'imdbid' in params:
+                return self.liststatus(imdbid=params['imdbid'])
+            else:
+                return self.liststatus()
 
         elif params['mode'] == 'addmovie':
             if 'imdbid' not in params:
@@ -60,16 +64,21 @@ class API(object):
         else:
             return 'Invalid mode.'
 
-    def liststatus(self):
+    def liststatus(self, imdbid=None):
         logging.info('API request movie list.')
         lst = []
         movies = self.sql.get_user_movies()
         if not movies:
-            return lst
+            return 'No movies found.'
+
+        if imdbid:
+            for i in movies:
+                if i['imdbid'] == imdbid:
+                    return json.dumps(i, indent=1)
         else:
             for movie in movies:
                 lst.append(dict(movie))
-            return json.dumps(lst, indent=1)
+                return json.dumps(lst, indent=1)
 
     def addmovie(self, imdbid):
         logging.info('API request add movie {}'.format(imdbid))

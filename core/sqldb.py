@@ -1,5 +1,6 @@
 import logging
 import time
+import json
 
 from sqlalchemy import *
 
@@ -187,7 +188,9 @@ class SQL(object):
         if result:
             lst = []
             for i in result:
-                lst.append(dict(i))
+                i = dict(i)
+                i['quality'] = json.loads(i['quality'])
+                lst.append(i)
             return lst
         else:
             logging.error('EXECUTE SQL.GET_USER_MOVIES FAILED.')

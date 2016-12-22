@@ -80,7 +80,9 @@ $(document).ready(function() {
             var imdbid = $('span#title').attr('imdbid');
             $.post("/remove_movie", {"imdbid":imdbid})
             .done(function(r){
-                if(r == "error"){
+                response = JSON.parse(r)
+
+                if(response["status"] == "failed"){
                     var message = title + ' could not be removed. Check logs for more information.';
                     swal("Error", message, "error");
                 } else {

@@ -330,9 +330,6 @@ class Settings():
             with ul(id='renamer'):
                 with li():
                     input(id='renamerstring', type='text', style='width: 80%', value=c[c_s]['renamerstring'])
-                with li('Available tags:'):
-                    br()
-                    span('{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
                     br()
                     span('Example: ')
                     br()
@@ -344,7 +341,7 @@ class Settings():
             with ul(id='mover'):
                 with li():
                     span('Move movie file to: ')
-                    input(type='text', style='width: 18em', id='moverpath', value=c[c_s]['moverpath'])
+                    input(type='text', style='width: 28em', id='moverpath', value=c[c_s]['moverpath'])
                     span('Use absolute path.', cls='tip')
                     br()
                     span('Example: ')
@@ -353,6 +350,8 @@ class Settings():
                     br()
                     i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupenabled'])
                     span('Clean up after move.')
+            with li('Available tags:'):
+                span('{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
 
         with span(id='save', cat='postprocessing'):
             i(cls='fa fa-save')

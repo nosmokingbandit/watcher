@@ -19,7 +19,11 @@ logging = logging.getLogger(__name__)
 
 class Ajax(object):
     ''' These are all the methods that handle
-    ajax post/get requests from the browser.
+        ajax post/get requests from the browser.
+
+    Except in special circumstances, all should return a string
+        since that is the only datatype sent over http
+
     '''
 
     def __init__(self):
@@ -259,7 +263,7 @@ class Ajax(object):
     def update_check(self):
         ''' Manually check for updates
 
-        Returns dict from Version manager update_check()
+        Returns str json.dumps(dict) from Version manager update_check()
         '''
 
         response = version.Version().manager.update_check()
@@ -368,7 +372,7 @@ class Ajax(object):
 
         if mode == 'set_true':
             core.UPDATING = True
-            yield 'true'  # can be return?
+            yield 'success'  # can be return?
         if mode == 'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
@@ -376,7 +380,7 @@ class Ajax(object):
                 logging.info('Update Failed.')
                 yield 'failed'
             elif update_status is True:
-                yield 'true'
+                yield 'success'
                 logging.info('Respawning process...')
                 cherrypy.engine.stop()
                 python = sys.executable

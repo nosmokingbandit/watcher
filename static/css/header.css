@@ -84,6 +84,7 @@
 
 #nav li.settings:hover .settings_menu{
     display: block;
+    z-index: 1;
 }
 
 /* Notifications */

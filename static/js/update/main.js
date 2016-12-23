@@ -12,7 +12,7 @@ $(document).ready(function () {
             $("#thinker").fadeOut();
             $("span.msg").text("Update failed. Check logs for more information.");
 
-        }else if(r == "true"){
+        }else if(r == "success"){
             // if the update succeeds we"ll start checking for the server to come back online
             var check = setInterval(function(){
                 $.post("/server_status", {

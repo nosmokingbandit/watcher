@@ -21,7 +21,8 @@ class Config():
     def new_config(self):
         ''' Copies base_file to config directory.
 
-        Automatically assigns random values to searchtimehr, searchtimemin, and apikey.
+        Automatically assigns random values to searchtimehr, searchtimemin,
+            installupdatehr, installupdatemin, and apikey.
 
         Returns str 'Config Saved' on success. Throws execption on failure.
         '''

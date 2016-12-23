@@ -82,9 +82,7 @@ class API(object):
 
     def addmovie(self, imdbid):
         logging.info('API request add movie {}'.format(imdbid))
-        response = self.ajax.quick_add(imdbid)
-
-        return response
+        return self.ajax.quick_add(imdbid)
 
     def removemovie(self, imdbid):
         logging.info('API request remove movie {}'.format(imdbid))

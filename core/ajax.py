@@ -205,9 +205,10 @@ class Ajax(object):
         t.start()
 
         if self.sql.remove_movie(imdbid):
-            return {'status': 'success'}
+            response = {'status': 'success'}
         else:
-            return {'status': 'failed'}
+            response = {'status': 'failed'}
+        return json.dumps(response)
 
     def search(self, imdbid, title):
         ''' Search indexers for specific movie.

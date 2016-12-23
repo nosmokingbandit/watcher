@@ -47,7 +47,10 @@ class Status():
     @staticmethod
     def movie_list():
         movies = sqldb.SQL().get_user_movies()
-        if not movies:
+
+        if movies == []:
+            return None
+        elif not movies:
             html = 'Error retrieving list of user\'s movies. Check logs for more information'
             return html
 

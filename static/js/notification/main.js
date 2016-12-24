@@ -29,9 +29,9 @@ $(document).ready(function () {
         remove_notif(index);
 
         if($this.attr("href") == "/update_now"){
-            $.post("/update_now", {"mode": "set_true"})
+            $.post("ajax/update_now", {"mode": "set_true"})
             .done(function(){
-                window.location = "/update";
+                window.location = "update";
             });
         } else {
 
@@ -44,7 +44,7 @@ $(document).ready(function () {
 
     /* sends post to remove notification from list */
     function remove_notif(index){
-        $.post("/notification_remove", {
+        $.post("ajax/notification_remove", {
             "index": index
         })
     }

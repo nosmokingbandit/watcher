@@ -5,6 +5,7 @@ from cherrypy import expose
 from core import config
 from dominate.tags import *
 from header import Header
+from head import Head
 
 
 def settings_page(page):
@@ -19,29 +20,10 @@ def settings_page(page):
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            base(href="/static/")
-
-            link(rel='stylesheet',
-                 href='css/style.css')
-            link(rel='stylesheet',
-                 href='css/settings.css')
-            link(rel='stylesheet',
-                 href='//fonts.googleapis.com/css?family=Raleway')
-            link(rel='stylesheet',
-                 href='font-awesome/css/font-awesome.css')
-            link(rel='stylesheet',
-                 href='js/sweetalert-master/dist/sweetalert.css')
-
-            script(type='text/javascript',
-                   src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
-            script(type='text/javascript',
-                   src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-            script(type='text/javascript',
-                   src='js/settings/main.js')
-            script(type='text/javascript',
-                   src='js/sweetalert-master/dist/sweetalert-dev.js')
-            script(type='text/javascript',
-                   src='js/settings/save_settings.js')
+            Head.insert()
+            link(rel='stylesheet', href='static/css/settings.css')
+            script(type='text/javascript', src='static/js/settings/main.js')
+            script(type='text/javascript', src='static/js/settings/save_settings.js')
 
         with doc:
             Header.insert_header(current="settings")

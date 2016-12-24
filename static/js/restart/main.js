@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $.post('/server_status', {
+    $.post("ajax/server_status", {
         mode: 'restart'
     });
 
@@ -9,12 +9,12 @@ $(document).ready(function () {
     var try_count = 0
     var check = setInterval(function(){
         if(try_count < 10){
-            $.post("/server_status", {
+            $.post("ajax/server_status", {
                 mode: "online",
             })
             .done(function(r){
                 if(r == "states.STARTED"){
-                    window.location = "/";
+                    window.location = "";
                 }
             });
         }

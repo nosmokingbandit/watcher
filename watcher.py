@@ -28,101 +28,21 @@ class App(object):
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+
         # point server toward custom 404
         cherrypy.config.update({
             'error_page.404': self.error_page_404
         })
+        return
 
     @cherrypy.expose
     def index(self):
-        raise cherrypy.HTTPRedirect("/status")
+        raise cherrypy.HTTPRedirect("status")
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
         return fourohfour.FourOhFour.index()
 
-    '''
-    From here down just forward requests to ajax.Ajax()
-    '''
-    @cherrypy.expose
-    def search_omdb(self, search_term):
-        return self.ajax.search_omdb(search_term)
-
-    @cherrypy.expose
-    def add_wanted_movie(self, data):
-        return self.ajax.add_wanted_movie(data)
-
-    @cherrypy.expose
-    def manual_download(self, guid):
-        return self.ajax.manual_download(guid)
-
-    @cherrypy.expose
-    def mark_bad(self, guid, imdbid):
-        return self.ajax.mark_bad(guid, imdbid)
-
-    @cherrypy.expose
-    def movie_info_popup(self, imdbid):
-        return self.ajax.movie_info_popup(imdbid)
-
-    @cherrypy.expose
-    def movie_status_popup(self, imdbid):
-        return self.ajax.movie_status_popup(imdbid)
-
-    @cherrypy.expose
-    def notification_remove(self, index):
-        index = int(index)
-        return self.ajax.notification_remove(index)
-
-    @cherrypy.expose
-    def quick_add(self, imdbid):
-        return self.ajax.quick_add(imdbid)
-
-    @cherrypy.expose
-    def refresh_list(self, list, imdbid=''):
-        return self.ajax.refresh_list(list, imdbid)
-
-    @cherrypy.expose
-    def remove_movie(self, imdbid):
-        return self.ajax.remove_movie(imdbid)
-
-    @cherrypy.expose
-    def server_status(self, mode):
-        return self.ajax.server_status(mode)
-
-    @cherrypy.expose
-    def save_settings(self, data):
-        return self.ajax.save_settings(data)
-
-    @cherrypy.expose
-    def search(self, imdbid, title):
-        return self.ajax.search(imdbid, title)
-
-    @cherrypy.expose
-    def update_check(self):
-        return self.ajax.update_check()
-
-    @cherrypy.expose
-    def test_downloader_connection(self, mode, data):
-        return self.ajax.test_downloader_connection(mode, data)
-
-    @cherrypy.expose
-    def update_now(self, mode):
-        ''' Executes update method from version.Version()
-
-        The ajax response is a generator that will contain
-            only the success/fail message.
-
-        This is done so the message can be passed to the ajax
-            request in the browser while cherrypy restarts.
-        '''
-
-        response = self.ajax.update_now(mode)
-        for i in response:
-            return i
-
-    @cherrypy.expose
-    def update_quality_settings(self, quality, imdbid):
-        return self.ajax.update_quality_settings(quality, imdbid)
 
 if __name__ == '__main__':
 
@@ -215,26 +135,31 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
+    if core.CONFIG['Server']['behindproxy'] == 'true':
+        mount = '/watcher'
+    else:
+        mount = '/'
+
     # mount applications
     cherrypy.tree.mount(root,
-                        '/',
+                        mount,
                         cherry_conf
                         )
 
     cherrypy.tree.mount(api.API(),
-                        '/api',
+                        '{}/api'.format(mount),
                         api.API.conf
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
-                        '/postprocessing',
+                        '{}/postprocessing'.format(mount),
                         postprocessing.Postprocessing.conf
                         )
 
     # if everything goes well so far, open the browser
     if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
-        webbrowser.open("http://{}:{}".format(
-            core.SERVER_ADDRESS, core.SERVER_PORT))
+        webbrowser.open("http://{}:{}{}".format(
+            core.SERVER_ADDRESS, core.SERVER_PORT, mount))
         logging.info('Launching web browser.')
 
     # daemonize in *nix if desired

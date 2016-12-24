@@ -32,7 +32,7 @@ $(document).ready(function () {
 
         post_data = JSON.stringify(data);
 
-        $.post("/save_settings", {
+        $.post("ajax/save_settings", {
             "data": post_data
         })
 

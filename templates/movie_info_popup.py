@@ -30,16 +30,12 @@ class MovieInfoPopup():
         else:
             trailer_embed = ''
         if data['poster'] == 'N/A':
-            data['poster'] = 'images/missing_poster.jpg'
+            data['poster'] = 'static/images/missing_poster.jpg'
 
         doc = dominate.document()
 
         with doc.head:
-            base(href="/static/")
-
-            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-
-            script(src='js/add_movie/movie_info_popup.js')
+            script(type='text/javascript', src='static/js/add_movie/movie_info_popup.js')
 
         with doc:
             with div(id='container'):

@@ -1,22 +1,21 @@
 #!/usr/bin/env python
 
-#========================================#
-#============= INSTRUCTIONS =============#
+# ======================================== #
+# ============= INSTRUCTIONS ============= #
 
 # Disable 'Post-Process Only Verified Jobs' in Sabnzbd.
 # Add api information to conf:
 
 conf = {
     'watcherapi': 'WATCHERAPIKEY',
-    'watcherhost': 'localhost',
-    'watcherport': '9090',
+    'watcheraddress': 'http://localhost:9090/',
     'sabkey': 'SABAPIKEY',
     'sabhost': 'localhost',
     'sabport': '8080'
 }
 
-# DO NOT TOUCH ANYTHING BELOW THIS LINE! #
-#========================================#
+#  DO NOT TOUCH ANYTHING BELOW THIS LINE!  #
+# ======================================== #
 
 import json
 import sys

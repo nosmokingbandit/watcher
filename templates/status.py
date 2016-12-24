@@ -6,6 +6,7 @@ from cherrypy import expose
 from core import sqldb, version
 from dominate.tags import *
 from header import Header
+from head import Head
 
 
 class Status():
@@ -18,19 +19,10 @@ class Status():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            base(href="/static/")
-
-            link(rel='stylesheet', href='css/style.css')
-            link(rel='stylesheet', href='css/status.css')
-            link(rel='stylesheet', href='css/movie_status_popup.css')
-            link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
-            link(rel='stylesheet', href='font-awesome/css/font-awesome.css')
-            link(rel='stylesheet', href='js/sweetalert-master/dist/sweetalert.css')
-
-            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
-            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-            script(type='text/javascript', src='js/sweetalert-master/dist/sweetalert-dev.js')
-            script(type='text/javascript', src='js/status/main.js')
+            Head.insert()
+            link(rel='stylesheet', href='static/css/status.css')
+            link(rel='stylesheet', href='static/css/movie_status_popup.css')
+            script(type='text/javascript', src='static/js/status/main.js')
 
         with doc:
             Header.insert_header(current="status")
@@ -58,7 +50,7 @@ class Status():
         with doc:
             for data in movies:
                 title_year = '{} {}'.format(data['title'], data['year'])
-                poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
+                poster_path = 'static/images/posters/{}.jpg'.format(data['imdbid'])
                 with li(cls='movie', imdbid=data['imdbid']):
                     with div():
                         status = data['status']

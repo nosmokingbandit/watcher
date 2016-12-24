@@ -22,15 +22,15 @@ def settings_page(page):
             base(href="/static/")
 
             link(rel='stylesheet',
-                 href='css/style.css')
+                 href='css/'+theme+'/style.css')
             link(rel='stylesheet',
-                 href='css/settings.css')
+                 href='css/'+theme+'/settings.css')
             link(rel='stylesheet',
                  href='//fonts.googleapis.com/css?family=Raleway')
             link(rel='stylesheet',
                  href='font-awesome/css/font-awesome.css')
             link(rel='stylesheet',
-                 href='js/sweetalert-master/dist/sweetalert.css')
+                 href='js/sweetalert-master/dist/'+theme+'/sweetalert.css')
 
             script(type='text/javascript',
                    src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
@@ -102,6 +102,14 @@ class Settings():
                 span('Keep ')
                 input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')
                 span(' days of logs.')
+            with li(cls='bbord'):
+                i(cls='fa fa-desktop')
+                span('Theme')
+                with select(id='csstheme', style='width: 6em'):
+                        option('Default')
+                        option('Dark')
+                with span(cls='tip'):
+                    span('Page refresh required after saving.')                
             with li():
                 with span(id='restart'):
                     i(cls='fa fa-refresh')

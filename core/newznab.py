@@ -116,7 +116,7 @@ class NewzNab():
         title = result['title']
         if result['category'] and 'SD' in result['category']:
             resolution = 'SD'
-        elif '4K' in title or 'UHD' in title:
+        elif '4K' in title or 'UHD' in title or '2160P' in title:
             resolution = '4K'
         elif '1080' in title:
             resolution = '1080P'

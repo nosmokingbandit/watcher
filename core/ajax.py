@@ -36,6 +36,7 @@ class Ajax(object):
         self.snatcher = snatcher.Snatcher()
         self.update = updatestatus.Status()
 
+    @cherrypy.expose
     def search_omdb(self, search_term):
         ''' Search omdb for movies
         :param search_term: str title and year of movie (Movie Title 2016)
@@ -50,10 +51,11 @@ class Ajax(object):
         else:
             for i in results:
                 if i['Poster'] == 'N/A':
-                    i['Poster'] = 'images/missing_poster.jpg'
+                    i['Poster'] = 'static/images/missing_poster.jpg'
 
             return json.dumps(results)
 
+    @cherrypy.expose
     def movie_info_popup(self, imdbid):
         ''' Calls movie_info_popup to render html
         :param imdbid: str imdb identification number (tt123456)
@@ -64,6 +66,7 @@ class Ajax(object):
         mip = movie_info_popup.MovieInfoPopup()
         return mip.html(imdbid)
 
+    @cherrypy.expose
     def movie_status_popup(self, imdbid):
         ''' Calls movie_status_popup to render html
         :param imdbid: str imdb identification number (tt123456)
@@ -74,6 +77,7 @@ class Ajax(object):
         msp = movie_status_popup.MovieStatusPopup()
         return msp.html(imdbid)
 
+    @cherrypy.expose
     def add_wanted_movie(self, data):
         ''' Adds movie to Wanted list.
         :param data: str json.dumps(dict) of info to add to database.
@@ -142,6 +146,7 @@ class Ajax(object):
                     'Check logs for more information.'
                 return json.dumps(response)
 
+    @cherrypy.expose
     def quick_add(self, imdbid):
         ''' Method to quckly add movie with just imdbid
         :param imdbid: str imdb identification number (tt123456)
@@ -171,6 +176,7 @@ class Ajax(object):
 
         return self.add_wanted_movie(json.dumps(movie_info))
 
+    @cherrypy.expose
     def save_settings(self, data):
         ''' Saves settings to config file
         :param data: dict of Section with nested dict of keys and values:
@@ -191,6 +197,7 @@ class Ajax(object):
             logging.exception('Writing config.')
             return 'failed'
 
+    @cherrypy.expose
     def remove_movie(self, imdbid):
         ''' Removes movie
         :param imdbid: str imdb identification number (tt123456)
@@ -210,6 +217,7 @@ class Ajax(object):
             response = {'status': 'failed'}
         return json.dumps(response)
 
+    @cherrypy.expose
     def search(self, imdbid, title):
         ''' Search indexers for specific movie.
         :param imdbid: str imdb identification number (tt123456)
@@ -221,6 +229,7 @@ class Ajax(object):
         self.searcher.search(imdbid, title)
         return 'done'
 
+    @cherrypy.expose
     def manual_download(self, guid):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
@@ -235,6 +244,7 @@ class Ajax(object):
             return 'Unable to get download information from the database. ' \
                 'Check logs for more information.'
 
+    @cherrypy.expose
     def mark_bad(self, guid, imdbid):
         ''' Marks guid as bad in SEARCHRESULTS and MARKEDRESULTS
         :param guid: srt guid to mark
@@ -244,6 +254,7 @@ class Ajax(object):
 
         return self.update.mark_bad(guid, imdbid=imdbid)
 
+    @cherrypy.expose
     def notification_remove(self, index):
         ''' Removes notification from core.notification
         :param index: int index of notification to remove
@@ -261,6 +272,7 @@ class Ajax(object):
             core.NOTIFICATIONS.pop()
         return
 
+    @cherrypy.expose
     def update_check(self):
         ''' Manually check for updates
 
@@ -270,6 +282,7 @@ class Ajax(object):
         response = version.Version().manager.update_check()
         return json.dumps(response)
 
+    @cherrypy.expose
     def refresh_list(self, list, imdbid=''):
         ''' Re-renders html for Movies/Results list
         :param list: str the html list id to be re-rendered
@@ -286,6 +299,7 @@ class Ajax(object):
         if list == '#result_list':
             return movie_status_popup.MovieStatusPopup().result_list(imdbid)
 
+    @cherrypy.expose
     def test_downloader_connection(self, mode, data):
         ''' Test connection to downloader.
         :param mode: str which downloader to test.
@@ -320,6 +334,7 @@ class Ajax(object):
 
         return json.dumps(response)
 
+    @cherrypy.expose
     def server_status(self, mode):
         ''' Check or modify status of CherryPy server_status
         :param mode: str command or request of state
@@ -358,6 +373,7 @@ class Ajax(object):
         elif mode == 'online':
             return str(cherrypy.engine.state)
 
+    @cherrypy.expose
     def update_now(self, mode):
         ''' Starts and executes update process.
         :param mode: str 'set_true' or 'update_now'
@@ -389,6 +405,7 @@ class Ajax(object):
         else:
             return
 
+    @cherrypy.expose
     def update_quality_settings(self, quality, imdbid):
         ''' Updates quality settings for individual title
         :param quality: str json-formatted dict of quality

@@ -106,7 +106,7 @@ $(document).ready(function() {
         data['quality'] = quality;
         data = JSON.stringify(data);
 
-        $.post("/add_wanted_movie", {"data": data})
+        $.post("ajax/add_wanted_movie", {"data": data})
         .done(function(r){
 
             response = JSON.parse(r)

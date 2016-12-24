@@ -1,6 +1,7 @@
 import dominate
 from cherrypy import expose
 from dominate.tags import *
+from head import Head
 
 
 class FourOhFour():
@@ -12,11 +13,10 @@ class FourOhFour():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            base(href="/static/")
+            Head.insert()
+            link(rel='stylesheet', href='static/css/fourohfour.css')
+            style
 
-            link(rel='stylesheet', href='css/style.css')
-            link(rel='stylesheet', href='css/fourohfour.css')
-            link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
 
         with doc:
             with div(id='content'):

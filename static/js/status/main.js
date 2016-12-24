@@ -5,7 +5,7 @@ $(document).ready(function() {
 
         imdbid = $(this).attr("imdbid");
 
-        $.post("/movie_status_popup", {"imdbid": imdbid})
+        $.post("ajax/movie_status_popup", {"imdbid": imdbid})
             .done(function(html){
                 $("div#status_pop_up").html(html);
                 $("div#status_pop_up").slideDown();

@@ -3,6 +3,7 @@ import core
 import dominate
 from cherrypy import expose
 from dominate.tags import *
+from head import Head
 
 
 class Update():
@@ -16,14 +17,9 @@ class Update():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            base(href="/static/")
-
-            link(rel='stylesheet', href='css/style.css')
-            link(rel='stylesheet', href='css/update.css')
-            link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
-
-            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
-            script(type='text/javascript', src='js/update/main.js')
+            Head.insert()
+            link(rel='stylesheet', href='static/css/update.css')
+            script(type='text/javascript', src='static/js/update/main.js')
 
         with doc:
             with div(id='content'):

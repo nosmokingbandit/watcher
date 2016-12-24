@@ -4,7 +4,7 @@ $(document).ready(function () {
     This sometimes creates an error in CherryPy because we ask for a response when the server is turned off.
     */
 
-    $.post("/update_now", {
+    $.post("ajax/update_now", {
         "mode": "update_now"
     })
     .done(function(r){
@@ -15,13 +15,13 @@ $(document).ready(function () {
         }else if(r == "success"){
             // if the update succeeds we"ll start checking for the server to come back online
             var check = setInterval(function(){
-                $.post("/server_status", {
+                $.post("ajax/server_status", {
                     "mode": "online"
                 })
                 .done(function(r){
                     if(r == "states.STARTED"){
                         $("span.msg").text("Update successful!");
-                        setTimeout(function() {window.location = "/restart";},3000);
+                        setTimeout(function() {window.location = "restart";},3000);
                     }
                 })
                 .fail(function(r){

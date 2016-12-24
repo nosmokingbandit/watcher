@@ -16,7 +16,7 @@ class MovieStatusPopup():
 
         data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
-            poster_path = 'images/posters/{}.jpg'.format(data['imdbid'])
+            poster_path = 'static/images/posters/{}.jpg'.format(data['imdbid'])
             title_date = data['title'] + " " + str(data['year'])
 
             tomatoes_url = data['tomatourl']
@@ -26,9 +26,7 @@ class MovieStatusPopup():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            base(href="/static/")
-
-            script(src='js/status/movie_status_popup.js')
+            script(src='static/js/status/movie_status_popup.js')
 
         with doc:
             with div(id='container'):

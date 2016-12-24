@@ -32,7 +32,7 @@ class Poster():
         if os.path.exists(new_poster_path) is False:
             logging.info('Saving poster to {}'.format(new_poster_path))
 
-            if poster_url == 'images/missing_poster.jpg':
+            if poster_url == 'static/images/missing_poster.jpg':
                 shutil.copy2(poster_url, new_poster_path)
 
             else:

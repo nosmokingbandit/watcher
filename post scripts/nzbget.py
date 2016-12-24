@@ -17,11 +17,8 @@
 # Watcher API key.
 #Apikey=
 
-# Watcher host.
-#Host=localhost
-
-# Watcher port.
-#Port=9090
+# Watcher address.
+#Host=http://localhost:9090/
 
 ### NZBGET POST-PROCESSING SCRIPT ###
 #####################################
@@ -36,8 +33,7 @@ POSTPROCESS_ERROR = 94
 POSTPROCESS_NONE = 95
 
 
-watcherhost = os.environ['NZBPO_HOST']
-watcherport = os.environ['NZBPO_PORT']
+watcheraddress = os.environ['NZBPO_ADDRESS']
 watcherapi = os.environ['NZBPO_APIKEY']
 name = os.environ['NZBPP_NZBNAME']
 
@@ -64,7 +60,7 @@ else:
     mode = 'failed'
 
 # send it to watcher
-url = 'http://{}:{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherport, watcherapi, mode, guid, downloadid, path)
+url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 

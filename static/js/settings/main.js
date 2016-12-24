@@ -53,7 +53,7 @@ $(document).ready(function () {
 
     /* add new newznab row */
     $("i#add_row").click(function (){
-        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' URL' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'>\n</li>"
+        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'>\n</li>"
 
         $("ul#newznab_list li:nth-last-child(2)").after(row);
     });
@@ -102,7 +102,7 @@ $(document).ready(function () {
 
         data = JSON.stringify(data);
 
-        $.post("/test_downloader_connection", {
+        $.post("ajax/test_downloader_connection", {
             "mode": mode,
             "data": data
         })
@@ -142,7 +142,7 @@ $(document).ready(function () {
         $i.removeClass("fa-arrow-circle-up");
         $i.addClass("fa-circle faa-burst animated");
 
-        $.post("/update_check", {})
+        $.post("ajax/update_check", {})
         .done(function(r){
 
             response = JSON.parse(r);
@@ -161,9 +161,9 @@ $(document).ready(function () {
                     confirmButtonText: "Update",
                     closeOnConfirm: true
                 }, function(){
-                    $.post("/update_now", {"mode": "set_true"})
+                    $.post("ajax/update_now", {"mode": "set_true"})
                     .done(function(){
-                        window.location = "/update";
+                        window.location = "update";
                     });
                 });
 
@@ -188,7 +188,7 @@ $(document).ready(function () {
             confirmButtonText: "Restart",
             closeOnConfirm: true
         }, function(){
-            window.location = "/restart";
+            window.location = "restart";
         });
     });
 
@@ -202,7 +202,7 @@ $(document).ready(function () {
             confirmButtonText: "Shut Down",
             closeOnConfirm: true
         }, function(){
-            window.location = "/shutdown";
+            window.location = "shutdown";
         });
     });
 });

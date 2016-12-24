@@ -46,7 +46,7 @@ $(document).ready(function() {
         $('div#results_thinker').show();
         $('i#search_now').addClass('fa-circle faa-burst animated');
 
-        $.post("/search", {"imdbid":imdbid, "title":title})
+        $.post("ajax/search", {"imdbid":imdbid, "title":title})
         .done(function(r){
             refresh_list('#result_list', imdbid=imdbid)
             refresh_list('#movie_list')
@@ -78,7 +78,7 @@ $(document).ready(function() {
             closeOnConfirm: false
         }, function(){
             var imdbid = $('span#title').attr('imdbid');
-            $.post("/remove_movie", {"imdbid":imdbid})
+            $.post("ajax/remove_movie", {"imdbid":imdbid})
             .done(function(r){
                 response = JSON.parse(r)
 
@@ -167,7 +167,7 @@ $(document).ready(function() {
         var imdbid = $('span#title').attr('imdbid');
         var title = $('i#search_now').attr('title');
 
-        $.post("/update_quality_settings", {"quality": quality_dict, "imdbid": imdbid})
+        $.post("ajax/update_quality_settings", {"quality": quality_dict, "imdbid": imdbid})
         .done(function(r){
             refresh_list('#result_list', imdbid=imdbid);
             refresh_list('#movie_list');
@@ -227,7 +227,7 @@ $(document).ready(function() {
 
         $this.addClass('fa-circle faa-burst animated');
 
-        $.post("/manual_download", {"guid":guid})
+        $.post("ajax/manual_download", {"guid":guid})
         .done(function(r){
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
@@ -253,7 +253,7 @@ $(document).ready(function() {
                 var guid = $this.attr('guid');
                 var imdbid = $('span#title').attr('imdbid')
 
-                $.post("/mark_bad", {
+                $.post("ajax/mark_bad", {
                     "guid":guid,
                     "imdbid":imdbid
                 })
@@ -272,7 +272,7 @@ $(document).ready(function() {
     });
 
     function refresh_list(list, imdbid = ''){
-        $.post('/refresh_list', {"list":list, 'imdbid':imdbid})
+        $.post('ajax/refresh_list', {"list":list, 'imdbid':imdbid})
         .done(function(html){
             $(list).html(html);
             $(list).fadeIn();

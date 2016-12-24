@@ -21,7 +21,7 @@ $(document).ready(function() {
 
         $('#thinker').fadeIn();
 
-        $.post("/search_omdb", {
+        $.post("ajax/search_omdb", {
             "search_term": $("input[name='search_term']").val()
         })
 
@@ -74,7 +74,7 @@ $(document).ready(function() {
         $icon.removeClass('fa-plus');
         $icon.addClass('fa-circle faa-burst animated');
 
-        $.post("/quick_add", {"imdbid":imdbid})
+        $.post("ajax/quick_add", {"imdbid":imdbid})
         .done(function(r){
             response = JSON.parse(r)
 
@@ -96,7 +96,7 @@ $(document).ready(function() {
 
         imdbid = $(this).attr('imdbid')
 
-        $.post('/movie_info_popup', {'imdbid': imdbid})
+        $.post("ajax/movie_info_popup", {'imdbid': imdbid})
             .done(function(html){
                 $('div#info_pop_up').html(html);
                 $('div#info_pop_up').slideDown();

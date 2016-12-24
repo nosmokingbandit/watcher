@@ -35,7 +35,7 @@ class App(object):
 
     @cherrypy.expose
     def index(self):
-        raise cherrypy.HTTPRedirect("/status")
+        raise cherrypy.HTTPRedirect("status")
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
@@ -44,6 +44,7 @@ class App(object):
     '''
     From here down just forward requests to ajax.Ajax()
     '''
+
     @cherrypy.expose
     def search_omdb(self, search_term):
         return self.ajax.search_omdb(search_term)
@@ -106,6 +107,7 @@ class App(object):
         return self.ajax.test_downloader_connection(mode, data)
 
     @cherrypy.expose
+## CHECK THIS
     def update_now(self, mode):
         ''' Executes update method from version.Version()
 
@@ -215,26 +217,31 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
+    if core.CONFIG['Server']['behindproxy'] == 'true':
+        mount = '/watcher'
+    else:
+        mount = '/'
+
     # mount applications
     cherrypy.tree.mount(root,
-                        '/',
+                        mount,
                         cherry_conf
                         )
 
     cherrypy.tree.mount(api.API(),
-                        '/api',
+                        '{}/api'.format(mount),
                         api.API.conf
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
-                        '/postprocessing',
+                        '{}/postprocessing'.format(mount),
                         postprocessing.Postprocessing.conf
                         )
 
     # if everything goes well so far, open the browser
     if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
-        webbrowser.open("http://{}:{}".format(
-            core.SERVER_ADDRESS, core.SERVER_PORT))
+        webbrowser.open("http://{}:{}{}".format(
+            core.SERVER_ADDRESS, core.SERVER_PORT, mount))
         logging.info('Launching web browser.')
 
     # daemonize in *nix if desired

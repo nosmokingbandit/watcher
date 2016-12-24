@@ -1,0 +1,5 @@
+@import url("../status.css");
+
+ul#movie_list li div span.status{ color: white; }
+ul#movie_list li div span.found{ background-color: rgb(76, 175, 80); }
+#status_pop_up { background: black; }

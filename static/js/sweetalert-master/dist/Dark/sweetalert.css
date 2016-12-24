@@ -1,0 +1,5 @@
+@import url("../sweetalert.css");
+.sweet-alert { background-color: #222; }
+.sweet-alert .sa-icon.sa-success::before, .sweet-alert .sa-icon.sa-success::after { background: #222; }
+.sweet-alert .sa-icon.sa-success .sa-fix { background-color: #222; }
+

@@ -4,6 +4,8 @@ Watcher is an automated movie NZB searcher and snatcher. You can add a list of w
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features.
 
+Screenshots can be viewed [here](http://imgur.com/a/EQ963)
+
 
 ## Installation
 

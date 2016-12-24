@@ -3,7 +3,7 @@ import datetime
 import core
 import dominate
 from cherrypy import expose
-from core import sqldb, version
+from core import sqldb, version, config
 from dominate.tags import *
 from header import Header
 
@@ -15,17 +15,18 @@ class Status():
 
     @expose
     def index(self):
+        theme=str(core.CONFIG['Server']['csstheme'])
         doc = dominate.document(title='Watcher')
 
         with doc.head:
             base(href="/static/")
 
-            link(rel='stylesheet', href='css/style.css')
-            link(rel='stylesheet', href='css/status.css')
-            link(rel='stylesheet', href='css/movie_status_popup.css')
+            link(rel='stylesheet', href='css/'+theme+'/style.css')
+            link(rel='stylesheet', href='css/'+theme+'/status.css')
+            link(rel='stylesheet', href='css/'+theme+'/movie_status_popup.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
             link(rel='stylesheet', href='font-awesome/css/font-awesome.css')
-            link(rel='stylesheet', href='js/sweetalert-master/dist/sweetalert.css')
+            link(rel='stylesheet', href='js/sweetalert-master/dist/'+theme+'/sweetalert.css')
 
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')

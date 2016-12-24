@@ -1,0 +1,4 @@
+@import url("../settings.css");
+input[type='text']{
+    color: #212121;
+}

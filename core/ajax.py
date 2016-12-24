@@ -378,6 +378,24 @@ class Ajax(object):
         ''' Starts and executes update process.
         :param mode: str 'set_true' or 'update_now'
 
+        The ajax response is a generator that will contain
+            only the success/fail message.
+
+        This is done so the message can be passed to the ajax
+            request in the browser while cherrypy restarts.
+        '''
+
+        response = self._update_now(mode)
+        for i in response:
+            return i
+
+    @cherrypy.expose
+    def _update_now(self, mode):
+        ''' Starts and executes update process.
+        :param mode: str 'set_true' or 'update_now'
+
+        Helper for self.update_now()
+
         If mode == set_true, sets core.UPDATING to True
         This is done so if the user visits /update without setting true
             they will be redirected back to status.

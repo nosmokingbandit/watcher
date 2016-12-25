@@ -33,7 +33,7 @@ POSTPROCESS_ERROR = 94
 POSTPROCESS_NONE = 95
 
 
-watcheraddress = os.environ['NZBPO_ADDRESS']
+watcherhost = os.environ['NZBPO_HOST']
 watcherapi = os.environ['NZBPO_APIKEY']
 name = os.environ['NZBPP_NZBNAME']
 
@@ -60,7 +60,7 @@ else:
     mode = 'failed'
 
 # send it to watcher
-url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
+url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 

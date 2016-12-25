@@ -373,7 +373,7 @@ class ZipUpdater(object):
                 shutil.copy2('watcher.sqlite', backup_path)
             if os.path.isfile('config.cfg'):
                 shutil.copy2('config.cfg', backup_path)
-            if os.path.path('logs'):
+            if os.path.ispath('logs'):
                 shutil.copytree('logs', backup_path)
             posterpath = os.path.join('static', 'images', 'posters')
             if os.path.ispath(posterpath):

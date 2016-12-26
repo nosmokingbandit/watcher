@@ -147,12 +147,12 @@ if __name__ == '__main__':
                         )
 
     cherrypy.tree.mount(api.API(),
-                        '{}api'.format(mount),
+                        '{}/api'.format(mount),
                         api.API.conf
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
-                        '{}postprocessing'.format(mount),
+                        '{}/postprocessing'.format(mount),
                         postprocessing.Postprocessing.conf
                         )
 

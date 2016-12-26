@@ -2,6 +2,7 @@ import datetime
 
 import cherrypy
 import core
+from core.notification import Notification
 
 from core import searcher, version
 from core.plugins import taskscheduler

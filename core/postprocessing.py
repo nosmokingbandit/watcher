@@ -78,7 +78,7 @@ class Postprocessing(object):
         data['filename'] = self.get_filename(data['path'])
 
         logging.info('Parsing release name for information.')
-        data.update(self.parse_filename(data['filename']))
+        data.update(self.parse_filename(os.path.basename(data['filename'])))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info('Gathering release information.')
@@ -120,7 +120,7 @@ class Postprocessing(object):
         If path is a file, just returns path.
         If path is a directory, finds the largest file in that dir.
 
-        Returns str filename.ext
+        Returns str absolute path /home/user/filename.ext
         '''
 
         logging.info('Finding movie file name.')
@@ -135,8 +135,10 @@ class Postprocessing(object):
                               exc_info=True)
                 return ''
 
-            files = [file for file in files
-                     if os.path.isfile(os.path.join(path, file))]
+            files = []
+            for root, dirs, filenames in os.walk(path):
+                for file in filenames:
+                    files.append(os.path.join(root, file))
 
             if files == []:
                 return ''
@@ -144,8 +146,7 @@ class Postprocessing(object):
             biggestfile = None
             s = 0
             for file in files:
-                abspath = os.path.join(path, file)
-                size = os.path.getsize(abspath)
+                size = os.path.getsize(file)
                 if size > s:
                     biggestfile = file
                     s = size
@@ -442,7 +443,8 @@ class Postprocessing(object):
             if response is None:
                 result['tasks']['renamer']['response'] = 'false'
             else:
-                data['filename'] = response
+                path = os.path.split(data['filename'])[0]
+                data['filename'] = os.path.join(path, response)
                 result['tasks']['renamer']['response'] = 'true'
         else:
             logging.info('Renamer disabled.')
@@ -497,7 +499,8 @@ class Postprocessing(object):
             return None
 
         # existing absolute path
-        abs_path_old = os.path.join(data['path'], data['filename'])
+        abs_path_old = data['filename']
+        file_path = os.path.split(data['filename'])[0]
 
         # get the extension
         ext = os.path.splitext(abs_path_old)[1]
@@ -512,9 +515,9 @@ class Postprocessing(object):
         new_name = re.sub(r'[:"*?<>|]+', '', new_name)
 
         # new absolute path
-        abs_path_new = os.path.join(data['path'], new_name)
+        abs_path_new = os.path.join(file_path, new_name)
 
-        logging.info('Renaming {} to {}'.format(data['filename'], new_name))
+        logging.info('Renaming {} to {}'.format(os.path.basename(data['filename']), new_name))
         try:
             os.rename(abs_path_old, abs_path_new)
         except (SystemExit, KeyboardInterrupt):
@@ -535,7 +538,7 @@ class Postprocessing(object):
         Returns str new file location or None on failure
         '''
 
-        abs_path_old = os.path.join(data['path'], data['filename'])
+        abs_path_old = data['filename']
         mover_path = core.CONFIG['Postprocessing']['moverpath']
 
         target_folder = mover_path.format(**data)
@@ -562,7 +565,7 @@ class Postprocessing(object):
             logging.error('Mover failed: Could not move file.', exc_info=True)
             return None
 
-        return os.path.join(target_folder, data['filename'])
+        return os.path.join(target_folder, os.path.basename(data['filename']))
 
     def cleanup(self, path):
         ''' Deletes specified path

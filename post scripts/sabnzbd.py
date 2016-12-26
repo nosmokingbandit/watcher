@@ -67,7 +67,7 @@ else:
     print 'Seinding {} to Watcher as Failed.'.format(name)
     mode = 'failed'
 
-url = 'http://{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
+url = 'http://{}/core/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 

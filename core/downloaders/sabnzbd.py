@@ -63,7 +63,7 @@ class Sabnzbd():
 
         mode = 'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))
-        nzbname = urllib2.quote(data['title'])
+        nzbname = urllib2.quote(data['title'].encode('ascii','ignore'))
         cat = sab_conf['sabcategory']
         priority_keys = {
             'Paused': '-2',

@@ -165,7 +165,7 @@ $(document).ready(function () {
                 }, function(){
                     $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
                     .done(function(){
-                        window.location = "update";
+                        window.location = url_base + "/update";
                     });
                 });
 
@@ -190,7 +190,7 @@ $(document).ready(function () {
             confirmButtonText: "Restart",
             closeOnConfirm: true
         }, function(){
-            window.location = "restart";
+            window.location = url_base + "/restart";
         });
     });
 
@@ -204,7 +204,7 @@ $(document).ready(function () {
             confirmButtonText: "Shut Down",
             closeOnConfirm: true
         }, function(){
-            window.location = "shutdown";
+            window.location = url_base + "shutdown";
         });
     });
 });

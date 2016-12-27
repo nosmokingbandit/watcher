@@ -32,7 +32,7 @@ $(document).ready(function () {
         if($this.attr("href") == "/update_now"){
             $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
             .done(function(){
-                window.location = "update";
+                window.location = url_base + "update";
             });
         } else {
 

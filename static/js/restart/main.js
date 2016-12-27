@@ -1,6 +1,6 @@
 $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
-    
+
     $.post(url_base + "/ajax/server_status", {
         mode: 'restart'
     });
@@ -15,8 +15,9 @@ $(document).ready(function () {
                 mode: "online",
             })
             .done(function(r){
-                if(r == "states.STARTED"){
-                    window.location = "";
+                console.log(r)
+                if(r != "states.STOPPING"){
+                    window.location =  url_base;
                 }
             });
         }

@@ -2,8 +2,10 @@ $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
 
     /*
-    This repeats every 3 seconds to check if the server is back online. Sends the browser to / if it is started.
-    This sometimes creates an error in CherryPy because we ask for a response when the server is turned off.
+    This repeats every 3 seconds to check if the server is back online.
+    Sends the browser to /restart if it is started.
+    This sometimes creates an error in CherryPy because we ask for a response
+        when the server is turned off, but this is ok.
     */
 
     $.post(url_base + "/ajax/update_now", {
@@ -23,7 +25,7 @@ $(document).ready(function () {
                 .done(function(r){
                     if(r == "states.STARTED"){
                         $("span.msg").text("Update successful!");
-                        setTimeout(function() {window.location = "restart";},3000);
+                        setTimeout(function() {window.location =  url_base + "/restart";},3000);
                     }
                 })
                 .fail(function(r){

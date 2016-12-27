@@ -2,7 +2,7 @@ import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
-
+from footer import Footer
 
 class FourOhFour():
 
@@ -24,5 +24,5 @@ class FourOhFour():
                     span('404')
                     br()
                     span('Page Not Found')
-
+            Footer.insert_footer()
         return doc.render()

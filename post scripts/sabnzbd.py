@@ -8,7 +8,7 @@
 
 conf = {
     'watcherapi': 'WATCHERAPIKEY',
-    'watcheraddress': 'http://localhost:9090/',
+    'watcheraddress': 'localhost:9090',
     'sabkey': 'SABAPIKEY',
     'sabhost': 'localhost',
     'sabport': '8080'
@@ -61,10 +61,10 @@ path = urllib2.quote(sys.argv[1], safe='')
 
 # send it to Watcher
 if status == 0:
-    print 'Seinding {} to Watcher as Complete.'.format(name)
+    print 'Sending {} to Watcher as Complete.'.format(name)
     mode = 'complete'
 else:
-    print 'Seinding {} to Watcher as Failed.'.format(name)
+    print 'Sending {} to Watcher as Failed.'.format(name)
     mode = 'failed'
 
 url = 'http://{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)

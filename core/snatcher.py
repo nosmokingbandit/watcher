@@ -70,7 +70,7 @@ class Snatcher():
         guid = data['guid']
         imdbid = data['imdbid']
         title = data['title']
-        data['title'] = '{}.Watcher'.format(data['title'])
+        data['title'] = u'{}.Watcher'.format(data['title'])
 
         # If sending to SAB
         sab_conf = core.CONFIG['Sabnzbd']
@@ -85,7 +85,7 @@ class Snatcher():
                 self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
-                    logging.info('Successfully sent {} to Sabnzbd.'.format(title))
+                    logging.info(u'Successfully sent {} to Sabnzbd.'.format(title))
                     return 'Successfully sent to Sabnzbd.'
                 else:
                     return 'Error marking result as Snatched. Check logs for more information.'
@@ -105,7 +105,7 @@ class Snatcher():
                 self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
-                    logging.info('Successfully sent {} to NzbGet.'.format(title))
+                    logging.info(u'Successfully sent {} to NzbGet.'.format(title))
                     return 'Successfully sent to NzbGet.'
                 else:
                     return 'Error marking result as Snatched. Check logs for more information.'

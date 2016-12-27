@@ -49,7 +49,7 @@ class Status():
         doc = dominate.document(title='Watcher')
         with doc:
             for data in movies:
-                title_year = '{} {}'.format(data['title'], data['year'])
+                title_year = u'{} {}'.format(data['title'], data['year'])
                 poster_path = 'static/images/posters/{}.jpg'.format(data['imdbid'])
                 with li(cls='movie', imdbid=data['imdbid']):
                     with div():

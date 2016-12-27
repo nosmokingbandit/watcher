@@ -59,7 +59,7 @@ class Sabnzbd():
         port = sab_conf['sabport']
         api = sab_conf['sabapi']
 
-        base_url = 'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
+        base_url = u'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
         mode = 'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))

@@ -35,7 +35,7 @@ class Searcher():
 
         Does not return
         '''
-        
+
         interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, interval)
@@ -67,19 +67,19 @@ class Searcher():
                 continue
 
             if status in ['Wanted', 'Found']:
-                    logging.info('{} status is {}. Searching now.'.format(title, status))
+                    logging.info(u'{} status is {}. Searching now.'.format(title, status))
                     self.search(imdbid, title)
                     continue
 
             if status == 'Finished' and keepsearching == 'true':
-                logging.info('{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
+                logging.info(u'{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
                     logging.info('{} finished on {}, searching again.'.format(title, finisheddate))
                     self.search(imdbid, title)
                     continue
                 else:
-                    logging.info('{} finished on {} and is not within the search window.'.format(title, finisheddate))
+                    logging.info(u'{} finished on {} and is not within the search window.'.format(title, finisheddate))
                     continue
             continue
 
@@ -96,18 +96,18 @@ class Searcher():
                 status = movie['status']
 
                 if status == 'Found':
-                    logging.info('{} status is Found. Running automatic snatcher.'.format(title))
+                    logging.info(u'{} status is Found. Running automatic snatcher.'.format(title))
                     self.snatcher.auto_grab(imdbid)
                     continue
 
                 if status == 'Finished' and keepsearching == 'true':
-                    logging.info('{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
+                    logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta >= today:
-                        logging.info('{} finished on {}, checking for a better result.'.format(title, finisheddate))
+                        logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
                         self.snatcher.auto_grab(imdbid)
                         continue
                     else:
-                        logging.info('{} finished on {} and is not within the snatch again window.'.format(title, finisheddate))
+                        logging.info(u'{} finished on {} and is not within the snatch again window.'.format(title, finisheddate))
                         continue
                 else:
                     continue

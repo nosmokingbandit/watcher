@@ -8,8 +8,6 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 cwd = os.getcwd()
 tmpdir = 'backup_tmp'
-# files = 'watcher.sqlite', 'config.cfg'
-# paths = '/static/images/posters'
 posterpath = os.path.join('static', 'images', 'posters')
 
 print '**############################################################**'

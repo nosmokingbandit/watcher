@@ -11,6 +11,7 @@ GIT_API = 'https://api.github.com/repos/nosmokingbandit/watcher'
 # Server settings
 SERVER_ADDRESS = None
 SERVER_PORT = None
+URL_BASE = ''
 
 # Update info
 UPDATE_STATUS = None

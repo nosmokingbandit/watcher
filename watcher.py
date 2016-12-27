@@ -28,6 +28,17 @@ class App(object):
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+        self.conf = {
+                '/': {
+                    'tools.sessions.on': True,
+                    #'tools.auth.on': False,
+                    'tools.staticdir.root': core.PROG_PATH
+                },
+                '/static': {  # # use mount variable here?
+                    'tools.staticdir.on': True,
+                    'tools.staticdir.dir': './static'
+                }
+            }
 
         # point server toward custom 404
         cherrypy.config.update({
@@ -96,18 +107,6 @@ if __name__ == '__main__':
     else:
         core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
 
-    # Set up base cherrypy config
-    cherry_conf = {
-        '/': {
-            'tools.sessions.on': True,
-            'tools.staticdir.root': core.PROG_PATH
-        },
-        '/static': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': './static'
-        }
-    }
-
     # update cherrypy config based on passed args
     cherrypy.config.update({
         'engine.autoreload.on': False,
@@ -136,30 +135,28 @@ if __name__ == '__main__':
     root.update = update.Update()
 
     if core.CONFIG['Server']['behindproxy'] == 'true':
-        mount = '/watcher'
-    else:
-        mount = '/'
+        core.URL_BASE = '/watcher'
 
     # mount applications
     cherrypy.tree.mount(root,
-                        mount,
-                        cherry_conf
+                        '{}/'.format(core.URL_BASE),
+                        root.conf
                         )
 
     cherrypy.tree.mount(api.API(),
-                        '{}/api'.format(mount),
+                        '{}/api'.format(core.URL_BASE),
                         api.API.conf
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
-                        '{}/postprocessing'.format(mount),
+                        '{}/postprocessing'.format(core.URL_BASE),
                         postprocessing.Postprocessing.conf
                         )
 
     # if everything goes well so far, open the browser
     if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
         webbrowser.open("http://{}:{}{}".format(
-            core.SERVER_ADDRESS, core.SERVER_PORT, mount))
+            core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
         logging.info('Launching web browser.')
 
     # daemonize in *nix if desired

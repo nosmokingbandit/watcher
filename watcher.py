@@ -144,8 +144,8 @@ if __name__ == '__main__':
     if core.CONFIG['Server']['authrequired'] == 'true':
         root.conf['/']['tools.auth.on'] = True
 
-    if core.CONFIG['Server']['behindproxy'] == 'true':
-        core.URL_BASE = '/watcher'
+    if core.CONFIG['Proxy']['behindproxy'] == 'true':
+        core.URL_BASE = core.CONFIG['Proxy']['webroot']
 
     # mount applications
     cherrypy.tree.mount(root,

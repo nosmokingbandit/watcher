@@ -31,7 +31,7 @@ class App(object):
         self.conf = {
                 '/': {
                     'tools.sessions.on': True,
-                    'tools.auth.on': False,
+                    #'tools.auth.on': False,
                     'tools.staticdir.root': core.PROG_PATH
                 },
                 '/static': {  # # use mount variable here?

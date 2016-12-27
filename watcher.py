@@ -13,6 +13,7 @@ import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
 from core import ajax, api, config, postprocessing, searcher, sqldb
+from core.auth import AuthController, require
 from core.log import log
 from core.notification import Notification
 from core.scheduler import Scheduler
@@ -26,16 +27,22 @@ os.chdir(core.PROG_PATH)
 
 
 class App(object):
+    _cp_config = {
+        'auth.require': []
+    }
+
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+
         self.conf = {
                 '/': {
                     'tools.sessions.on': True,
-                    #'tools.auth.on': False,
+                    'tools.sessions.timeout': 60,
+                    'tools.auth.on': False,
                     'tools.staticdir.root': core.PROG_PATH
                 },
-                '/static': {  # # use mount variable here?
+                '/static': {
                     'tools.staticdir.on': True,
                     'tools.staticdir.dir': './static'
                 }
@@ -49,7 +56,7 @@ class App(object):
 
     @cherrypy.expose
     def index(self):
-        raise cherrypy.HTTPRedirect("status")
+        raise cherrypy.HTTPRedirect(core.URL_BASE + "/status")
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
@@ -134,6 +141,9 @@ if __name__ == '__main__':
     root.update = update.Update()
 
     # Set up root app
+    if core.CONFIG['Server']['authrequired'] == 'true':
+        root.conf['/']['tools.auth.on'] = True
+
     if core.CONFIG['Server']['behindproxy'] == 'true':
         core.URL_BASE = '/watcher'
 
@@ -151,6 +161,11 @@ if __name__ == '__main__':
     cherrypy.tree.mount(postprocessing.Postprocessing(),
                         '{}/postprocessing'.format(core.URL_BASE),
                         postprocessing.Postprocessing.conf
+                        )
+    auth = AuthController()
+    cherrypy.tree.mount(auth,
+                        '{}/auth'.format(core.URL_BASE),
+                        auth.conf
                         )
 
     # if everything goes well so far, open the browser

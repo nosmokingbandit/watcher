@@ -28,6 +28,17 @@ class App(object):
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+        self.conf = {
+                '/': {
+                    'tools.sessions.on': True,
+                    'tools.auth.on': False,
+                    'tools.staticdir.root': core.PROG_PATH
+                },
+                '/static': {  # # use mount variable here?
+                    'tools.staticdir.on': True,
+                    'tools.staticdir.dir': './static'
+                }
+            }
 
         # point server toward custom 404
         cherrypy.config.update({
@@ -95,18 +106,6 @@ if __name__ == '__main__':
         core.SERVER_PORT = passed_args.port
     else:
         core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
-
-    # Set up base cherrypy config
-    cherry_conf = {
-        '/': {
-            'tools.sessions.on': True,
-            'tools.staticdir.root': core.PROG_PATH
-        },
-        '/static': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': './static'
-        }
-    }
 
     # update cherrypy config based on passed args
     cherrypy.config.update({

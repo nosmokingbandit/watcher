@@ -125,7 +125,6 @@ if __name__ == '__main__':
         print 'Database found.'
     del sql
 
-    # Set up root app
     root = App()
     root.add_movie = add_movie.AddMovie()
     root.status = status.Status()
@@ -134,6 +133,7 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
+    # Set up root app
     if core.CONFIG['Server']['behindproxy'] == 'true':
         core.URL_BASE = '/watcher'
 

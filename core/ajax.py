@@ -108,15 +108,15 @@ class Ajax(object):
         TABLE = 'MOVIES'
 
         imdbid = data['imdbid']
-        title = data['title'].replace('_', ' ')
+        title = data['title'].replace('_', ' ').encode('ascii','ignore')
         year = data['year']
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
-            logging.info('{} {} already exists as a wanted movie'
+            logging.info(u'{} {} already exists as a wanted movie'
                 .format(title, year, imdbid))
 
             response['status'] = 'failed'
-            response['message'] = '{} {} is already wanted, cannot add.' \
+            response['message'] = u'{} {} is already wanted, cannot add.' \
                 .format(title, year, imdbid)
             return json.dumps(response)
 
@@ -137,7 +137,7 @@ class Ajax(object):
                 t.start()
 
                 response['status'] = 'success'
-                response['message'] = '{} {} added to wanted list.' \
+                response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
                 return json.dumps(response)
             else:

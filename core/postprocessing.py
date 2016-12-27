@@ -239,8 +239,8 @@ class Postprocessing(object):
             title = data['title']
             year = data['year']
 
-            logging.info('Searching omdb for {} {}'.format(title, year))
-            search_string = 'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
+            logging.info(u'Searching omdb for {} {}'.format(title, year))
+            search_string = u'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
 
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -517,7 +517,7 @@ class Postprocessing(object):
         # new absolute path
         abs_path_new = os.path.join(file_path, new_name)
 
-        logging.info('Renaming {} to {}'.format(os.path.basename(data['filename']), new_name))
+        logging.info(u'Renaming {} to {}'.format(os.path.basename(data['filename']), new_name))
         try:
             os.rename(abs_path_old, abs_path_new)
         except (SystemExit, KeyboardInterrupt):
@@ -547,7 +547,7 @@ class Postprocessing(object):
         target_folder = re.sub(r'["*?<>|]+', '', target_folder)
         target_folder = os.path.normpath(target_folder)
 
-        logging.info('Moving {} to {}'.format(abs_path_old, target_folder))
+        logging.info(u'Moving {} to {}'.format(abs_path_old, target_folder))
 
         # if the new folder doesn't exist, make it
         try:

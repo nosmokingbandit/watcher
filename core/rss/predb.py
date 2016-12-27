@@ -43,10 +43,10 @@ class PreDB(object):
 
         title = data['title']
         year = data['year']
-        title_year = '{} {}'.format(title, year)
+        title_year = u'{} {}'.format(title, year)
         imdbid = data['imdbid']
 
-        logging.info('Checking predb.me for new available releases for {}.'.format(title))
+        logging.info(u'Checking predb.me for new available releases for {}.'.format(title))
 
         rss_titles = self.search_rss(title_year)
 
@@ -56,7 +56,7 @@ class PreDB(object):
         test = title_year.replace(' ', '.').lower()
 
         if self.fuzzy_match(rss_titles, test):
-            logging.info('{} {} found on predb.me.'.format(title, year))
+            logging.info(u'{} {} found on predb.me.'.format(title, year))
             if self.sql.update('MOVIES', 'predb', 'found', imdbid=imdbid):
                 return True
             else:
@@ -71,7 +71,7 @@ class PreDB(object):
 
         search_term = title_year.replace(' ', '+').lower()
 
-        search_string = 'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
+        search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:

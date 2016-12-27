@@ -3,7 +3,7 @@ from cherrypy import expose
 from dominate.tags import *
 from header import Header
 from head import Head
-
+from footer import Footer
 
 class AddMovie():
     @expose
@@ -22,7 +22,7 @@ class AddMovie():
                 input(id='search_input', type="text", placeholder="Search...", name="search_term")
                 with button(id="search_button"):
                     i(cls='fa fa-search')
-
+            Footer.insert_footer()
             div(id='thinker')
 
             with div(id="database_results"):

@@ -6,6 +6,7 @@ from core import config
 from dominate.tags import *
 from header import Header
 from head import Head
+from footer import Footer
 
 
 def settings_page(page):
@@ -29,7 +30,7 @@ def settings_page(page):
             Header.insert_header(current="settings")
             with div(id="content"):
                 page(config)
-
+            Footer.insert_footer()
         return doc.render()
 
     return page_template

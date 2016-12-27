@@ -1,5 +1,6 @@
 import dominate
 from cherrypy import expose
+import core
 from dominate.tags import *
 from header import Header
 from head import Head
@@ -12,9 +13,9 @@ class AddMovie():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href='static/css/add_movie.css')
-            link(rel='stylesheet', href='static/css/movie_info_popup.css')
-            script(type='text/javascript', src='static/js/add_movie/main.js')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/add_movie.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_info_popup.css')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=12.27')
 
         with doc:
             Header.insert_header(current="add_movie")

@@ -1,5 +1,7 @@
 $(document).ready(function () {
-    $.post("ajax/server_status", {
+    var url_base = $("meta[name='url_base']").attr("content");
+    
+    $.post(url_base + "/ajax/server_status", {
         mode: 'restart'
     });
 
@@ -9,7 +11,7 @@ $(document).ready(function () {
     var try_count = 0
     var check = setInterval(function(){
         if(try_count < 10){
-            $.post("ajax/server_status", {
+            $.post(url_base + "/ajax/server_status", {
                 mode: "online",
             })
             .done(function(r){
@@ -26,4 +28,3 @@ $(document).ready(function () {
         }
     }, 3000);
 });
-

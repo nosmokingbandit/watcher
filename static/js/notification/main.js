@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    var url_base = $("meta[name='url_base']").attr("content");
 
     $("span.dismiss").click(function(){
         $this = $(this)
@@ -29,7 +30,7 @@ $(document).ready(function () {
         remove_notif(index);
 
         if($this.attr("href") == "/update_now"){
-            $.post("ajax/update_now", {"mode": "set_true"})
+            $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
             .done(function(){
                 window.location = "update";
             });
@@ -44,7 +45,7 @@ $(document).ready(function () {
 
     /* sends post to remove notification from list */
     function remove_notif(index){
-        $.post("ajax/notification_remove", {
+        $.post(url_base + "/ajax/notification_remove", {
             "index": index
         })
     }

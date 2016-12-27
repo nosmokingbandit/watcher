@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    var url_base = $("meta[name='url_base']").attr("content");
+
     /* set up sortable */
     $(function () {
         $( "ul.sortable" ).sortable();
@@ -102,7 +104,7 @@ $(document).ready(function () {
 
         data = JSON.stringify(data);
 
-        $.post("ajax/test_downloader_connection", {
+        $.post(url_base + "/ajax/test_downloader_connection", {
             "mode": mode,
             "data": data
         })
@@ -142,7 +144,7 @@ $(document).ready(function () {
         $i.removeClass("fa-arrow-circle-up");
         $i.addClass("fa-circle faa-burst animated");
 
-        $.post("ajax/update_check", {})
+        $.post(url_base + "/ajax/update_check", {})
         .done(function(r){
 
             response = JSON.parse(r);
@@ -161,7 +163,7 @@ $(document).ready(function () {
                     confirmButtonText: "Update",
                     closeOnConfirm: true
                 }, function(){
-                    $.post("ajax/update_now", {"mode": "set_true"})
+                    $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
                     .done(function(){
                         window.location = "update";
                     });

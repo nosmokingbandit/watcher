@@ -1,4 +1,5 @@
 import dominate
+import core
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -14,9 +15,8 @@ class FourOhFour():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href='static/css/fourohfour.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css')
             style
-
 
         with doc:
             with div(id='content'):

@@ -1,5 +1,6 @@
 $(document).ready(function() {
-    var movie_results_dict = {};
+    var url_base = $("meta[name='url_base']").attr("content");
+
 // sends post to SearchDatabase.post() in main.py and displays results
 
     $("#search_input").keyup(function(event){
@@ -9,6 +10,7 @@ $(document).ready(function() {
     });
 
     $("#search_button").click(function(e) {
+        var movie_results_dict = {};
         if ( $("input[name='search_term']").val() == "" ){
             return false;
         }
@@ -21,7 +23,7 @@ $(document).ready(function() {
 
         $('#thinker').fadeIn();
 
-        $.post("ajax/search_omdb", {
+        $.post(url_base + "/ajax/search_omdb", {
             "search_term": $("input[name='search_term']").val()
         })
 
@@ -74,7 +76,7 @@ $(document).ready(function() {
         $icon.removeClass('fa-plus');
         $icon.addClass('fa-circle faa-burst animated');
 
-        $.post("ajax/quick_add", {"imdbid":imdbid})
+        $.post(url_base + "/ajax/quick_add", {"imdbid":imdbid})
         .done(function(r){
             response = JSON.parse(r)
 
@@ -96,7 +98,7 @@ $(document).ready(function() {
 
         imdbid = $(this).attr('imdbid')
 
-        $.post("ajax/movie_info_popup", {'imdbid': imdbid})
+        $.post(url_base + "/ajax/movie_info_popup", {'imdbid': imdbid})
             .done(function(html){
                 $('div#info_pop_up').html(html);
                 $('div#info_pop_up').slideDown();

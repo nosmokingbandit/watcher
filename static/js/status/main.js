@@ -1,11 +1,13 @@
 $(document).ready(function() {
-// applies add movie overlay
+    var url_base = $("meta[name='url_base']").attr("content");
+
+    // applies add movie overlay
     $("div#content").on("click", "li", function(){
         $("div#overlay").fadeIn();
 
         imdbid = $(this).attr("imdbid");
 
-        $.post("ajax/movie_status_popup", {"imdbid": imdbid})
+        $.post(url_base + "/ajax/movie_status_popup", {"imdbid": imdbid})
             .done(function(html){
                 $("div#status_pop_up").html(html);
                 $("div#status_pop_up").slideDown();

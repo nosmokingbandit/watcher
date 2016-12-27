@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    var url_base = $("meta[name='url_base']").attr("content");
 
     $("span#save").click(function(e){
         if(verify_data() == false){
@@ -32,7 +33,7 @@ $(document).ready(function () {
 
         post_data = JSON.stringify(data);
 
-        $.post("ajax/save_settings", {
+        $.post(url_base + "/ajax/save_settings", {
             "data": post_data
         })
 

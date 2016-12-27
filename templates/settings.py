@@ -7,7 +7,6 @@ from dominate.tags import *
 from header import Header
 from head import Head
 
-
 def settings_page(page):
     ''' Decorator template for settings subpages
     :param page: Sub-page content to render, written with Dominate tags, but without a Dominate instance.
@@ -21,9 +20,9 @@ def settings_page(page):
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href='static/css/settings.css')
-            script(type='text/javascript', src='static/js/settings/main.js')
-            script(type='text/javascript', src='static/js/settings/save_settings.js')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=12.27')
 
         with doc:
             Header.insert_header(current="settings")
@@ -42,7 +41,7 @@ class Settings():
 
     @expose
     def index(self):
-        raise cherrypy.HTTPRedirect("/settings/server")
+        raise cherrypy.HTTPRedirect(core.URL_BASE + 'settings/server')
 
     @expose
     @settings_page
@@ -60,6 +59,14 @@ class Settings():
                 with span(cls='tip'):
                     i(id='generate_new_key', cls='fa fa-refresh')
                     span('Generate new key.')
+            with li():
+                i(id='authrequired', cls='fa fa-square-o checkbox', value=c[c_s]['authrequired'])
+                span('Password-protect web-ui.')
+                span('*Requires restart.', cls='tip')
+            with li('Name: '):
+                input(type='text', id='authuser', value=c[c_s]['authuser'], style='width: 20em')
+            with li('Password: ', cls='bbord'):
+                input(type='text', id='authpass', value=c[c_s]['authpass'], style='width: 20em')
             with li(cls='bbord'):
                 i(id='launchbrowser', cls='fa fa-square-o checkbox', value=c[c_s]['launchbrowser'])
                 span('Open browser on launch.')

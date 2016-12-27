@@ -25,17 +25,18 @@ class MovieInfoPopup():
         title_date = data['title'] + ' ' + data['year']
         imdbid = data['imdbid']
         youtube_id = trailer.get_trailer(title_date)
+
         if youtube_id:
             trailer_embed = "https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
         else:
             trailer_embed = ''
         if data['poster'] == 'N/A':
-            data['poster'] = 'static/images/missing_poster.jpg'
+            data['poster'] = core.URL_BASE + '/static/images/missing_poster.jpg'
 
         doc = dominate.document()
 
         with doc.head:
-            script(type='text/javascript', src='static/js/add_movie/movie_info_popup.js')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=12.27')
 
         with doc:
             with div(id='container'):

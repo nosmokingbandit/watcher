@@ -5,6 +5,7 @@ sys.path.append(lib_dir)
 
 import argparse
 import datetime
+import logging
 import os
 import webbrowser
 
@@ -92,7 +93,6 @@ if __name__ == '__main__':
     if passed_args.log:
         core.LOG_DIR = passed_args.log
     log.start(core.LOG_DIR)
-    import logging
     logging = logging.getLogger(__name__)
     cherrypy.log.error_log.propagate = True
     cherrypy.log.access_log.propagate = True

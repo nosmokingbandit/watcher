@@ -70,7 +70,7 @@ class Sabnzbd():
             'Low': '-1',
             'Normal': '0',
             'High': '1',
-            'Force': '2'
+            'Forced': '2'
         }
         priority = priority_keys[sab_conf['sabpriority']]
 

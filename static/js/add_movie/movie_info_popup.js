@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    var url_base = $("meta[name='url_base']").attr("content");
+
     /* set up sortable */
     $(function () {
         $( "ul.sortable" ).sortable();
@@ -106,7 +108,7 @@ $(document).ready(function() {
         data['quality'] = quality;
         data = JSON.stringify(data);
 
-        $.post("ajax/add_wanted_movie", {"data": data})
+        $.post(url_base + "/ajax/add_wanted_movie", {"data": data})
         .done(function(r){
 
             response = JSON.parse(r)

@@ -5,16 +5,17 @@ sys.path.append(lib_dir)
 
 import argparse
 import datetime
+import logging
 import os
 import webbrowser
 
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
-from core import ajax, api, config, postprocessing, searcher, sqldb
+from core import ajax, api, config, postprocessing, scheduler, searcher, sqldb, version
+from core.auth import AuthController, require
 from core.log import log
 from core.notification import Notification
-from core.scheduler import Scheduler
 from templates import add_movie, restart, settings, shutdown, status, update, fourohfour
 
 if os.name == 'nt':
@@ -25,16 +26,22 @@ os.chdir(core.PROG_PATH)
 
 
 class App(object):
+    _cp_config = {
+        'auth.require': []
+    }
+
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+
         self.conf = {
                 '/': {
                     'tools.sessions.on': True,
-                    #'tools.auth.on': False,
+                    'tools.sessions.timeout': 60,
+                    'tools.auth.on': False,
                     'tools.staticdir.root': core.PROG_PATH
                 },
-                '/static': {  # # use mount variable here?
+                '/static': {
                     'tools.staticdir.on': True,
                     'tools.staticdir.dir': './static'
                 }
@@ -44,11 +51,19 @@ class App(object):
         cherrypy.config.update({
             'error_page.404': self.error_page_404
         })
+
+        if core.CONFIG['Server']['checkupdates'] == 'true':
+            self.initial_update_check()
+
         return
+
+    def initial_update_check(self):
+        scheduler.AutoUpdateCheck.update_check()
+
 
     @cherrypy.expose
     def index(self):
-        raise cherrypy.HTTPRedirect("status")
+        raise cherrypy.HTTPRedirect(core.URL_BASE + "/status")
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
@@ -92,7 +107,6 @@ if __name__ == '__main__':
     if passed_args.log:
         core.LOG_DIR = passed_args.log
     log.start(core.LOG_DIR)
-    import logging
     logging = logging.getLogger(__name__)
     cherrypy.log.error_log.propagate = True
     cherrypy.log.access_log.propagate = True
@@ -125,7 +139,6 @@ if __name__ == '__main__':
         print 'Database found.'
     del sql
 
-    # Set up root app
     root = App()
     root.add_movie = add_movie.AddMovie()
     root.status = status.Status()
@@ -134,8 +147,12 @@ if __name__ == '__main__':
     root.shutdown = shutdown.Shutdown()
     root.update = update.Update()
 
-    if core.CONFIG['Server']['behindproxy'] == 'true':
-        core.URL_BASE = '/watcher'
+    # Set up root app
+    if core.CONFIG['Server']['authrequired'] == 'true':
+        root.conf['/']['tools.auth.on'] = True
+
+    if core.CONFIG['Proxy']['behindproxy'] == 'true':
+        core.URL_BASE = core.CONFIG['Proxy']['webroot']
 
     # mount applications
     cherrypy.tree.mount(root,
@@ -151,6 +168,11 @@ if __name__ == '__main__':
     cherrypy.tree.mount(postprocessing.Postprocessing(),
                         '{}/postprocessing'.format(core.URL_BASE),
                         postprocessing.Postprocessing.conf
+                        )
+    auth = AuthController()
+    cherrypy.tree.mount(auth,
+                        '{}/auth'.format(core.URL_BASE),
+                        auth.conf
                         )
 
     # if everything goes well so far, open the browser
@@ -168,11 +190,11 @@ if __name__ == '__main__':
     cherrypy.engine.start()
 
     # Create plugin instances and subscribe
-    scheduler = Scheduler()
+    scheduler_plugin = scheduler.Scheduler()
     scheduler.AutoSearch.create()
     scheduler.AutoUpdateCheck.create()
     scheduler.AutoUpdateInstall.create()
-    scheduler.plugin.subscribe()
+    scheduler_plugin.plugin.subscribe()
 
     # If windows os and daemon selected, start systray
     if passed_args.daemon and os.name == 'nt':

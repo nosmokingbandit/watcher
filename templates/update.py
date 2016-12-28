@@ -11,15 +11,15 @@ class Update():
     @expose
     def index(self):
         if not core.UPDATING:
-            raise cherrypy.HTTPRedirect("/status")
+            raise cherrypy.HTTPRedirect(core.URL_BASE + '/status')
             return
 
         doc = dominate.document(title='Watcher')
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href='static/css/update.css')
-            script(type='text/javascript', src='static/js/update/main.js')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=12.27')
 
         with doc:
             with div(id='content'):

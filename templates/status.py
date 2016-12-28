@@ -20,16 +20,15 @@ class Status():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href='static/css/status.css')
-            link(rel='stylesheet', href='static/css/movie_status_popup.css')
-            script(type='text/javascript', src='static/js/status/main.js')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=12.27')
 
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
-
-                    with ul(id='movie_list'):
-                        self.movie_list()
+                with ul(id='movie_list'):
+                    self.movie_list()
 
             div(id='overlay')
             div(id='status_pop_up')
@@ -50,7 +49,7 @@ class Status():
         with doc:
             for data in movies:
                 title_year = u'{} {}'.format(data['title'], data['year'])
-                poster_path = 'static/images/posters/{}.jpg'.format(data['imdbid'])
+                poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
                 with li(cls='movie', imdbid=data['imdbid']):
                     with div():
                         status = data['status']

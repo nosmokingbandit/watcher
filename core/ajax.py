@@ -6,11 +6,11 @@ import threading
 
 import cherrypy
 import core
-from core import (config, poster, searcher, snatcher, sqldb, updatestatus,
-                  version)
+from core import config, poster, searcher, snatcher, sqldb, updatestatus, version
 from core.conversions import Conversions
 from core.downloaders import nzbget, sabnzbd
 from core.movieinfo import Omdb
+from core.notification import Notification
 from core.rss import predb
 from templates import movie_info_popup, movie_status_popup, status
 
@@ -257,19 +257,18 @@ class Ajax(object):
     @cherrypy.expose
     def notification_remove(self, index):
         ''' Removes notification from core.notification
-        :param index: int index of notification to remove
+        :param index: str or unicode index of notification to remove
 
-        Replaces list item with None as to not affect other indexes.
-        When adding new notifs through core.notification, any None values
-            will be overwritten before appending to the end of the list.
+        'index' will be a type of string since it comes from ajax request.
+            Therefore we convert to int here before passing to Notification
+
+        Simply calls Notification module.
 
         Does not return
         '''
 
-        core.NOTIFICATIONS[index] = None
-
-        if core.NOTIFICATIONS[-1] is None:
-            core.NOTIFICATIONS.pop()
+        Notification.remove(int(index))
+        
         return
 
     @cherrypy.expose

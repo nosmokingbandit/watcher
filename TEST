@@ -3,3 +3,5 @@ TEST UPDATER:
   OK
 TEST 2
   behind proxy, no auth
+
+TEST 3, no proxy, no auth

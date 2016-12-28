@@ -51,7 +51,7 @@ class Ajax(object):
         else:
             for i in results:
                 if i['Poster'] == 'N/A':
-                    i['Poster'] = 'static/images/missing_poster.jpg'
+                    i['Poster'] = core.URL_BASE + '/static/images/missing_poster.jpg'
 
             return json.dumps(results)
 
@@ -268,7 +268,7 @@ class Ajax(object):
         '''
 
         Notification.remove(int(index))
-        
+
         return
 
     @cherrypy.expose

@@ -204,7 +204,7 @@ $(document).ready(function () {
             confirmButtonText: "Shut Down",
             closeOnConfirm: true
         }, function(){
-            window.location = url_base + "shutdown";
+            window.location = url_base + "/shutdown";
         });
     });
 });

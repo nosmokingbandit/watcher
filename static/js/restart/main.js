@@ -17,7 +17,7 @@ $(document).ready(function () {
             .done(function(r){
                 console.log(r)
                 if(r != "states.STOPPING"){
-                    window.location =  url_base;
+                    window.location = url_base + '/';
                 }
             });
         }

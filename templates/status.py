@@ -27,9 +27,7 @@ class Status():
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
-                with ul(id='movie_list'):
-                    self.movie_list()
-
+                self.movie_list()
             div(id='overlay')
             div(id='status_pop_up')
 
@@ -45,8 +43,8 @@ class Status():
             html = 'Error retrieving list of user\'s movies. Check logs for more information'
             return html
 
-        doc = dominate.document(title='Watcher')
-        with doc:
+        movie_list = ul(id='movie_list')
+        with movie_list:
             for data in movies:
                 title_year = u'{} {}'.format(data['title'], data['year'])
                 poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
@@ -70,4 +68,4 @@ class Status():
 
                         span(title_year, cls='title_year')
 
-        return doc.render()
+        return unicode(movie_list)

@@ -46,7 +46,7 @@ class Settings():
     @expose
     @settings_page
     def server(c):
-        p('Server')
+        h1('Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
             with li('Host: ', cls='bbord'):
@@ -109,7 +109,7 @@ class Settings():
     @expose
     @settings_page
     def search(c):
-        p('Search', id='searchform')
+        h1('Search', id='searchform')
         # set the config section at each new section. Just makes everything a little shorter and easier to write.
         c_s = 'Search'
         with ul(id='search', cls='wide'):
@@ -158,7 +158,7 @@ class Settings():
         span('Quality and Filters may be set separately for each movie, this is the '\
           'default setting that will be used to \'Quick-Add\' movies.')
         br()
-        p('Quality')
+        h1('Quality')
         c_s = 'Quality'
         resolutions = ['4K', '1080P', '720P', 'SD']
         with ul(id='quality', cls='wide'):
@@ -187,7 +187,7 @@ class Settings():
 
         div(','.join(resolutions), cls='hidden_data')
 
-        p('Filters', id='filter_form')
+        h1('Filters', id='filter_form')
         # set the config section at each new section. Just makes everything a little shorter and easier to write.
         c_s = 'Filters'
         with ul(id='filters', cls='wide'):
@@ -211,7 +211,7 @@ class Settings():
     @expose
     @settings_page
     def providers(c):
-        p('Indexers')
+        h1('Indexers')
         c_s = 'Indexers'
         with ul(id='indexers', cls='wide'):
             with li():
@@ -234,7 +234,7 @@ class Settings():
     @expose
     @settings_page
     def downloader(c):
-        p('Downloader')
+        h1('Downloader')
         with ul(id='downloader'):
             c_s = 'Sabnzbd'
             with li(cls='bbord'):
@@ -307,7 +307,7 @@ class Settings():
     @expose
     @settings_page
     def postprocessing(c):
-        p('Post-Processing')
+        h1('Post-Processing')
         c_s = 'Postprocessing'
         with ul(id='postprocessing'):
             with li(cls='bbord'):
@@ -345,3 +345,54 @@ class Settings():
         with span(id='save', cat='postprocessing'):
             i(cls='fa fa-save')
             span('Save Settings')
+
+    @expose
+    @settings_page
+    def about(c):
+        with div(cls='about'):
+            h1('About Watcher')
+
+            h2('Source')
+            with p():
+                span('Watcher is hosted and maintained on GitHub. You may view the repository at ')
+                a('https://github.com/', href='https://github.com/nosmokingbandit/watcher')
+
+            h2('License')
+            with p():
+                span('''
+                    Watcher is open-source and licensed under the Apache 2.0 license. The essence of the
+                    Apache 2.0 license is that any user can, for any reason, modify, distribute, or
+                    repackage the licesed software with the condition that this license is included with,
+                    and remains applicable to, any derivative works. You may not use the Watcher logo
+                    or design elements without express approval by the owner. You may not hold the
+                    developers of Watcher liable for any damages incurred from use.
+                    '''
+                     )
+            with p():
+                span('You may view the full, binding license at ')
+                a('http://www.apache.org/', href='http://www.apache.org/licenses/LICENSE-2.0.html')
+                span(' or in license.txt included in the root folder of Watcher.')
+            h2('Attribution')
+            with p():
+                span('''
+                    Watcher is only possible because of the amazing open-source works that are
+                    included in this package. The Watcher license does not apply to these
+                    properties. Please check each package's license requirements when using them
+                    in your own work.
+                    '''
+                     )
+            with ul(id='libraries'):
+                with li():
+                    a('CherryPy', href='http://cherrypy.org/')
+                with li():
+                    a('SQLAlchemy', href='http://www.sqlalchemy.org/')
+                with li():
+                    a('Six', href='https://pypi.python.org/pypi/six')
+                with li():
+                    a('FuzzWuzzy', href='https://pypi.python.org/pypi/fuzzywuzzy')
+                with li():
+                    a('Font-Awesome', href='http://fontawesome.io/')
+                with li():
+                    a('JQuery', href='https://jquery.com/')
+                with li():
+                    a('Parse Torrent Name', href='https://pypi.python.org/pypi/parse-torrent-name')

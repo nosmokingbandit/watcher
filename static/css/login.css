@@ -19,7 +19,7 @@ img#logo{
 
 }
 
-input[type="text"]{
+input[type="text"], input[type="password"]{
     height: 1em;
     width: 12em;
     padding: 8px;

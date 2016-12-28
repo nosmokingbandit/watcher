@@ -43,7 +43,7 @@ i{
     font-size: 1.5em;
 }
 
-p{
+h1{
     font-size: 2em;
     font-weight: 700;
     margin: 0.5em 0 0.5em 0;
@@ -56,6 +56,10 @@ div#content{
     width: 80%;
     max-width: 768px;
     clear: both;
+}
+
+div#content a{
+    font-weight: bold;
 }
 
 div#content ul.wide{
@@ -198,6 +202,22 @@ ul#postprocessing li span.taglist{
     font-family: "Lucida Console", Monaco, monospace;
     font-size: .75em;
 }
+
+/* about */
+div.about p{
+    padding-left: 1em;
+    text-indent: 1em;
+    line-height: 1.25em;
+}
+
+ul#libraries{
+}
+
+ul#libraries li{
+    width: 33%;
+    float: left;
+}
+
 
 /**/
 

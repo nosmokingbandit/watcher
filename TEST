@@ -1,2 +1,4 @@
 TEST UPDATER:
-  beind proxy, auth enabled
+  behind proxy, auth enabled
+  OK
+  behind proxy, no auth

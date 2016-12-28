@@ -27,8 +27,6 @@ class Status():
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
-                ## REMOVE
-                span(str(core.CURRENT_HASH))
                 with ul(id='movie_list'):
                     self.movie_list()
 

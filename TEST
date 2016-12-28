@@ -1,4 +1,5 @@
 TEST UPDATER:
   behind proxy, auth enabled
   OK
+TEST2
   behind proxy, no auth

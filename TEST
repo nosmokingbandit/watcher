@@ -5,3 +5,6 @@ TEST 2
   behind proxy, no auth
 
 TEST 3, no proxy, no auth 2
+OK
+
+TEST 4, no proxy, auth enabled

@@ -172,7 +172,7 @@ class Postprocessing(object):
             'title': '',
             'year': '',
             'resolution': '',
-            'group': '',
+            'releasegroup': '',
             'audiocodec': '',
             'videocodec': '',
             'source': '',
@@ -191,6 +191,8 @@ class Postprocessing(object):
             titledata['audiocodec'] = titledata.pop('audio')
         if 'quality' in titledata:
             titledata['source'] = titledata.pop('quality')
+        if 'group' in titledata:
+            titledata['releasegroup'] = titledata.pop('group')
         data.update(titledata)
 
         return data

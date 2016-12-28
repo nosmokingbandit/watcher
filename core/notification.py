@@ -19,11 +19,11 @@ class Notification(object):
         Does not return
         '''
 
-        base = {'icon': None,
-                'title': None,
-                'title_link': None,
-                'text': None,
-                'button': None
+        base = {'icon': '',
+                'title': '',
+                'title_link': '',
+                'text': '',
+                'button': ''
                 }
 
         base.update(data)
@@ -42,7 +42,30 @@ class Notification(object):
                 return
         # if not just append
         core.NOTIFICATIONS.append(base)
-        print core.NOTIFICATIONS
+        return
+
+    @staticmethod
+    def remove(index):
+        ''' Removes notification from core.notification
+        :param index: int index of notification to remove
+
+        Replaces list item with None as to not affect other indexes.
+
+        When adding new notifs through core.notification, any None values
+            will be overwritten before appending to the end of the list.
+        Removes all trailing 'None' entries in list.
+
+        This ensures the list will always be as small as possible without
+            changing existing indexes.
+
+        Does not return
+        '''
+
+        core.NOTIFICATIONS[int(index)] = None
+
+        while len(core.NOTIFICATIONS) > 0 and core.NOTIFICATIONS[-1] is None:
+            core.NOTIFICATIONS.pop()
+
         return
 
 

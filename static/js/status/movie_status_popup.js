@@ -273,7 +273,10 @@ $(document).ready(function() {
         );
     });
 
-    function refresh_list(list, imdbid = ''){
+    function refresh_list(list, imdbid){
+        if(imdbid === undefined) {
+            imdbid = '';
+        };
         $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid})
         .done(function(html){
             $(list).html(html);

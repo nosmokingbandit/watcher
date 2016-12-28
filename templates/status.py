@@ -27,9 +27,10 @@ class Status():
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
-
-                    with ul(id='movie_list'):
-                        self.movie_list()
+                ## REMOVE
+                span(str(core.CURRENT_HASH))
+                with ul(id='movie_list'):
+                    self.movie_list()
 
             div(id='overlay')
             div(id='status_pop_up')

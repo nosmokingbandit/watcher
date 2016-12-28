@@ -42,6 +42,7 @@ class Notification(object):
                 return
         # if not just append
         core.NOTIFICATIONS.append(base)
+        print core.NOTIFICATIONS
         return
 
 

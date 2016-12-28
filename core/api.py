@@ -60,7 +60,9 @@ class API(object):
             else:
                 imdbid = params['imdbid']
             return self.removemovie(imdbid)
-
+        elif params['mode'] == 'version':
+            return self.getversion()
+        
         else:
             return 'Invalid mode.'
 
@@ -88,3 +90,9 @@ class API(object):
         logging.info('API request remove movie {}'.format(imdbid))
         response = self.ajax.remove_movie(imdbid)
         return json.dumps(response, indent=1)
+
+    def getversion(self):
+        if core.CURRENT_HASH is not None:
+            return '[{"version":"'+core.CURRENT_HASH[0:7]+'"}]'
+        else:
+            return 'updating...'    

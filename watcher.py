@@ -12,11 +12,10 @@ import webbrowser
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
-from core import ajax, api, config, postprocessing, searcher, sqldb
+from core import ajax, api, config, postprocessing, scheduler, searcher, sqldb, version
 from core.auth import AuthController, require
 from core.log import log
 from core.notification import Notification
-from core.scheduler import Scheduler
 from templates import add_movie, restart, settings, shutdown, status, update, fourohfour
 
 if os.name == 'nt':
@@ -52,7 +51,15 @@ class App(object):
         cherrypy.config.update({
             'error_page.404': self.error_page_404
         })
+
+        if core.CONFIG['Server']['checkupdates'] == 'true':
+            self.initial_update_check()
+
         return
+
+    def initial_update_check(self):
+        scheduler.AutoUpdateCheck.update_check()
+
 
     @cherrypy.expose
     def index(self):
@@ -183,11 +190,11 @@ if __name__ == '__main__':
     cherrypy.engine.start()
 
     # Create plugin instances and subscribe
-    scheduler = Scheduler()
+    scheduler_plugin = scheduler.Scheduler()
     scheduler.AutoSearch.create()
     scheduler.AutoUpdateCheck.create()
     scheduler.AutoUpdateInstall.create()
-    scheduler.plugin.subscribe()
+    scheduler_plugin.plugin.subscribe()
 
     # If windows os and daemon selected, start systray
     if passed_args.daemon and os.name == 'nt':

@@ -28,7 +28,7 @@ class Login(object):
                 with form(method='post', action='login', id='login_form'):
                     input(type='text', name='username', placeholder='Username', value=username)
                     br()
-                    input(type='text', name='password', placeholder='Password')
+                    input(type='password', name='password', placeholder='Password')
                     br()
                     with button(type='submit', value='Enter'):
                         i(cls='fa fa-sign-in')

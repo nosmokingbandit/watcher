@@ -90,10 +90,11 @@
 /* Notifications */
 
 ul#notif_list{
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     list-style: none;
+    z-index: 1;
 }
 
 ul#notif_list li{

@@ -17,6 +17,7 @@ input#search_input{
     background-color: #ffffff;
     border-width: 1px 0px 1px 1px;
     outline: none;
+    font-family: Raleway, sans-serif;
 }
 
 button#search_button{

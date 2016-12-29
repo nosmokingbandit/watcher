@@ -75,13 +75,13 @@ class MovieInfoPopup():
                         with ul(id='filters', cls='wide'):
                             with li(cls='bbord'):
                                 span('Required words:')
-                                input(type='text', id='requiredwords', value=core.CONFIG['Filters']['requiredwords'], style='width: 16em')
+                                input(type='text', id='requiredwords', value=core.CONFIG['Filters']['requiredwords'])
                             with li(cls='bbord'):
                                 span('Preferred words:')
-                                input(type='text', id='preferredwords', value=core.CONFIG['Filters']['preferredwords'], style='width: 16em')
+                                input(type='text', id='preferredwords', value=core.CONFIG['Filters']['preferredwords'])
                             with li():
                                 span('Ignored words:')
-                                input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'], style='width: 16em')
+                                input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'])
 
             with div(id='plot'):
                 p(data['plot'])

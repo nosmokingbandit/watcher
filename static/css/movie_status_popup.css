@@ -10,6 +10,14 @@ input[type="number"], input[type="text"]{
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
+    height: 1.5em;
+    padding: 0 0.5em;
+}
+
+input[type='text']{
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 0.75em;
+    height: 2.0em;
 }
 
 div#container{
@@ -176,30 +184,44 @@ ul#resolution_size{
     float: right;
 }
 
-ul#resolution_size li span{
-    width: 3em;
-    display: inline-block;
+ul#resolution_size li{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
+ul#resolution_size li span{
+    width: 6em;
+}
+
+ul#resolution_size li input{
+    order: 0;
+    flex: 1 0 auto;
+    margin: 0 1em;
+}
 
 ul#filters{
     clear: both;
     padding: 1em 0 0 0;
 }
 
-ul#filters li.flexbox{
+ul#filters li{
     display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
 }
 
-ul#filters li.flexbox span{
-    flex-shrink: 0;
+ul#filters li span{
+    order: 0;
+    flex: 0 1 auto;
 }
 
-ul#filters li.flexbox input{
-    flex-grow: 1;
-    margin: 0 2em 0 1em;
-    height: 1.5em;
+ul#filters li input{
+    order: 0;
+    flex: 1 0 auto;
+    margin: 0 1.5em;
 }
 
 @-webkit-keyframes sk-scaleout {
@@ -243,6 +265,4 @@ div#additional_info button{
 
 div#hidden_data{
     display: none;
-    width: 0;
-    height: 0;
 }

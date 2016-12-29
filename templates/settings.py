@@ -182,8 +182,8 @@ class Settings():
                     max = '{}max'.format(res)
                     with li():
                         span(res)
-                        input(type='number', id=min, value=c[c_s][res][2], min='0', style='width: 7.5em')
-                        input(type='number', id=max, value=c[c_s][res][3], min='0', style='width: 7.5em')
+                        input(type='number', id=min, value=c[c_s][res][2], min='0')
+                        input(type='number', id=max, value=c[c_s][res][3], min='0')
 
         div(','.join(resolutions), cls='hidden_data')
 
@@ -193,15 +193,15 @@ class Settings():
         with ul(id='filters', cls='wide'):
             with li(cls='bbord'):
                 span('Required words:')
-                input(type='text', id='requiredwords', value=c[c_s]['requiredwords'], style='width: 16em')
+                input(type='text', id='requiredwords', value=c[c_s]['requiredwords'])
                 span('Releases must contain these words.', cls='tip')
             with li(cls='bbord'):
                 span('Preferred words:')
-                input(type='text', id='preferredwords', value=c[c_s]['preferredwords'], style='width: 16em')
+                input(type='text', id='preferredwords', value=c[c_s]['preferredwords'])
                 span('Releases with these words score higher.', cls='tip')
             with li():
                 span('Ignored words:')
-                input(type='text', id='ignoredwords', value=c[c_s]['ignoredwords'], style='width: 16em')
+                input(type='text', id='ignoredwords', value=c[c_s]['ignoredwords'])
                 span('Releases with these words are ignored.', cls='tip')
 
         with span(id='save', cat='quality'):

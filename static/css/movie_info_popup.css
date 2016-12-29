@@ -6,6 +6,14 @@ input[type="number"], input[type="text"]{
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
+    height: 1.5em;
+    padding: 0 0.5em;
+}
+
+input[type='text']{
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 0.75em;
+    height: 2.0em;
 }
 
 div#container{
@@ -107,22 +115,46 @@ ul#resolution{
     float: left;
 }
 
-ul#resolution_size{
-    width: 65%;
-    float: right;
+ul#resolution_size li{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 ul#resolution_size li span{
-    width: 3em;
-    display: inline-block;
+    width: 6em;
 }
 
+ul#resolution_size li input{
+    order: 0;
+    flex: 1 0 auto;
+    margin: 0 1em;
+}
 
 ul#filters{
     clear: both;
     padding: 1em 0 0 0;
 }
 
+ul#filters li{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+ul#filters li span{
+    order: 0;
+    flex: 0 1 auto;
+}
+
+ul#filters li input{
+    order: 0;
+    flex: 1 0 auto;
+    margin: 0 1em;
+
+}
 
 
 div.hidden_data{

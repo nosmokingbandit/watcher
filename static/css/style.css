@@ -1,9 +1,5 @@
 @import url("header.css");
 
-html{
-    padding-bottom: 3em;
-}
-
 body, input{
     font-family: Raleway, sans-serif;
     font-weight: 500;

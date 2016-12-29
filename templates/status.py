@@ -17,6 +17,7 @@ class Status():
     @expose
     def index(self):
         doc = dominate.document(title='Watcher')
+        doc.attributes['lang'] = 'en'
 
         with doc.head:
             Head.insert()

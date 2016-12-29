@@ -7,7 +7,7 @@
 # Add api information to conf:
 
 conf = {
-    'watcherapi': 'WATCHERAPIKEY',
+    'watcherkey': 'WATCHERAPIKEY',
     'watcheraddress': 'http://localhost:9090/',
     'sabkey': 'SABAPIKEY',
     'sabhost': 'localhost',

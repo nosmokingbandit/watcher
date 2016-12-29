@@ -2,6 +2,7 @@
 
 html{
     padding-bottom: 3em;
+    height: 100%;
 }
 
 body, input{
@@ -17,6 +18,8 @@ body {
     margin: 0;
     padding: 0;
     overflow-y: scroll;
+    min-height: 100%;
+    position: relative;    
 }
 
 a{
@@ -45,6 +48,22 @@ a {
 
 a:visisted {
     color: #212121;
+}
+
+#content {
+    padding-bottom: 100px;
+}
+
+.footer {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 12px;
+    position: absolute;
+    bottom: 0;
+}
+.footer a{
+    text-decoration: underline !important;
 }
 
 ::-webkit-scrollbar {

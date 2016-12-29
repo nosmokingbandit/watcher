@@ -7,7 +7,7 @@ from core import sqldb, version
 from dominate.tags import *
 from header import Header
 from head import Head
-
+from footer import Footer
 
 class Status():
 
@@ -30,7 +30,7 @@ class Status():
                 self.movie_list()
             div(id='overlay')
             div(id='status_pop_up')
-
+            Footer.insert_footer()
         return doc.render()
 
     @staticmethod

@@ -43,7 +43,7 @@ $(document).ready(function() {
                                 $("<i>", {class: 'fa fa-plus button_add'})
                                 ),
                             $('<img>', {src:dict['Poster'],imdbid: dict['imdbID']}),
-                            dict['Title'],' ',dict['Year'].slice(0,4)
+                            dict['Title'],' ',dict['Year'].slice(0,3)
                         )
                     ).appendTo(movie_list)
                 });

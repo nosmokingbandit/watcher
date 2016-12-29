@@ -29,7 +29,7 @@ except:
     sys.exit(1)
 
 watcheraddress = conf['watcheraddress']
-watcherapi = conf['watcherkey']
+watcherapi = conf['watcherapi']
 sabkey = conf['sabkey']
 sabhost = conf['sabhost']
 sabport = conf['sabport']

@@ -25,10 +25,10 @@ class Nzbget():
 
         https = False
         if https:
-            url = "https://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
+            url = "https://{}:{}/{}:{}/xmlrpc".format(host, port, user, passw)
             nzbg_server = ServerProxy(url)
         else:
-            url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
+            url = "http://{}:{}/{}:{}/xmlrpc".format(host, port, user, passw)
             nzbg_server = ServerProxy(url)
 
         try:
@@ -60,9 +60,9 @@ class Nzbget():
 
         https = False
         if https:
-            url = "https://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
+            url = "https://{}:{}/{}:{}/xmlrpc".format(host, port, user, passw)
         else:
-            url = "http://{}:{}@{}:{}/xmlrpc".format(user, passw, host, port)
+            url = "http://{}:{}/{}:{}/xmlrpc".format(host, port, user, passw)
 
         nzbg_server = ServerProxy(url)
 

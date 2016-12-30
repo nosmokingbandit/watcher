@@ -8,7 +8,7 @@ logging = logging.getLogger(__name__)
 class Omdb():
 
     def __init__(self):
-        self.search_base = 'http://www.omdbapi.com/?r=json&plot=short&'
+        self.search_base = 'http://www.omdbapi.com/?r=json&plot=short&type=movie&'
         return
 
     def search(self, search_term):

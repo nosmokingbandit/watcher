@@ -8,8 +8,6 @@ $(document).ready(function () {
 
         $this = $(this);
         $thisi = $this.children(':first');
-        $thisi.removeClass('fa-save')
-        $thisi.addClass('fa-circle faa-burst animated');
 
         cat = $this.attr('cat');
 
@@ -33,6 +31,9 @@ $(document).ready(function () {
 
         post_data = JSON.stringify(data);
 
+        $thisi.removeClass('fa-save')
+        $thisi.addClass('fa-circle faa-burst animated');
+
         $.post(url_base + "/ajax/save_settings", {
             "data": post_data
         })
@@ -53,14 +54,25 @@ $(document).ready(function () {
     });
 
     function server(){
-        var data = {}
-        var server = {}
+        var data = {};
+        var server = {};
+        var blanks = false;
         $("#server i.checkbox").each(function(){
             server[$(this).attr("id")] = $(this).attr("value");
         });
         $("#server :input").each(function(){
+            if($(this).val() == ''){
+                blanks = true;
+                orig_bg = $(this).css('background-color');
+                $(this).animate({'background-color': '#FFEB3B'}, 500);
+                $(this).animate({'background-color': orig_bg}, 1000);
+            }
             server[$(this).attr("id")] = $(this).val();
         });
+
+        if(blanks == true){
+            return false;
+        };
 
         data['Server'] = server
 
@@ -70,23 +82,34 @@ $(document).ready(function () {
     function search(){
         var data = {};
         var search = {};
+        var blanks = false;
         $("ul#search i.checkbox").each(function(){
             search[$(this).attr("id")] = $(this).attr("value");
         })
         $("ul#search :input").each(function(){
+            if($(this).val() == ''){
+                blanks = true;
+                orig_bg = $(this).css('background-color');
+                $(this).animate({'background-color': '#FFEB3B'}, 500);
+                $(this).animate({'background-color': orig_bg}, 1000);
+            }
             search[$(this).attr("id")] = $(this).val();
         });
-        data["Search"] = search;
+        if(blanks == true){
+            return false;
+        };
 
+        data["Search"] = search;
         return data
     }
 
     function quality(){
-        var data = {}
-        var quality = {}
-        var tmp = {}
+        var data = {};
+        var quality = {};
+        var tmp = {};
+        var blanks = false;
 
-        var q_list = []
+        var q_list = [];
         $("ul#resolution i.checkbox").each(function(){
             q_list.push( $(this).attr("id") );
         });
@@ -94,7 +117,8 @@ $(document).ready(function () {
         // enabled resolutions
         $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
-        });
+        }); // ## TODO clean this up
+
         // order of resolutions
         var arr = $("ul#resolution").sortable("toArray");
         arr.shift();
@@ -103,8 +127,18 @@ $(document).ready(function () {
         });
         // min/max sizes
         $("#resolution_size :input").each(function(){
+            if($(this).val() == ''){
+                blanks = true;
+                orig_bg = $(this).css('background-color');
+                $(this).animate({'background-color': '#FFEB3B'}, 500);
+                $(this).animate({'background-color': orig_bg}, 1000);
+            }
             tmp[$(this).attr("id")] = $(this).val();
         });
+
+        if(blanks == true){
+            return false;
+        };
 
         $.each(q_list, function(i, res){
             var enabled = res,

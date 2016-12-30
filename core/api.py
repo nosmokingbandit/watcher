@@ -84,7 +84,6 @@ class API(object):
         Returns str json.dumps(list) or json.dumps(dict) for single movie
         '''
         logging.info('API request movie list.')
-        lst = []
         movies = self.sql.get_user_movies()
         if not movies:
             return 'No movies found.'
@@ -92,11 +91,11 @@ class API(object):
         if imdbid:
             for i in movies:
                 if i['imdbid'] == imdbid:
-                    return json.dumps(i, indent=1)
+                    response = {'response': 'true', 'movie': i}
+                    return json.dumps(response, indent=1)
         else:
-            for movie in movies:
-                lst.append(dict(movie))
-                return json.dumps(lst, indent=1)
+            response = {'response': 'true', 'movies': movies}
+            return json.dumps(response, indent=1)
 
     def addmovie(self, imdbid):
         ''' Add movie with default quality settings

@@ -82,6 +82,9 @@ class NewzNab():
 
         Helper function for parse_newznab_xml().
 
+        Creates dict for sql table SEARCHRESULTS. Makes sure all results contain
+            all neccesary keys and nothing else.
+
         Returns dict.
         '''
 
@@ -102,6 +105,9 @@ class NewzNab():
         del d['link']
         d['score'] = 0
         d['status'] = 'Available'
+        d['torrentfile'] = None
+        d['downloadid'] = None
+
         return d
 
     def get_resolution(self, result):

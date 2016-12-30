@@ -94,9 +94,8 @@ class API(object):
                 if i['imdbid'] == imdbid:
                     return json.dumps(i, indent=1)
         else:
-            for movie in movies:
-                lst.append(dict(movie))
-                return json.dumps(lst, indent=1)
+            response = {'response': 'true', 'movies': movies}
+            return json.dumps(response, indent=1)
 
     def addmovie(self, imdbid):
         ''' Add movie with default quality settings

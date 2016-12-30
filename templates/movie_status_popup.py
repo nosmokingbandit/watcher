@@ -17,7 +17,7 @@ class MovieStatusPopup():
         data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
             poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
-            title_date = data['title'] + " " + str(data['year'])
+            title_date = u'{} {}'.format(data['title'], str(data['year'])
 
             tomatoes_url = data['tomatourl']
 

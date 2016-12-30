@@ -10,7 +10,7 @@ import datetime
 import logging
 import os
 import webbrowser
-
+import ssl
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer
@@ -25,7 +25,6 @@ if os.name == 'nt':
 
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(core.PROG_PATH)
-
 
 class App(object):
     _cp_config = {
@@ -62,7 +61,6 @@ class App(object):
     def initial_update_check(self):
         scheduler.AutoUpdateCheck.update_check()
 
-
     @cherrypy.expose
     def index(self):
         raise cherrypy.HTTPRedirect(core.URL_BASE + "/status")
@@ -73,6 +71,7 @@ class App(object):
 
 
 if __name__ == '__main__':
+    ssl._create_default_https_context = ssl._create_unverified_context
 
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")

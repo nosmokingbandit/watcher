@@ -109,7 +109,7 @@ class Ajax(object):
 
         imdbid = data['imdbid']
         title = data['title'].replace('_', ' ').encode('ascii','ignore')
-        year = data['year']
+        year = data['year'][:4]
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
             logging.info(u'{} {} already exists as a wanted movie'

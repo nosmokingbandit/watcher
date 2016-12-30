@@ -80,8 +80,6 @@ if __name__ == '__main__':
         # Handle target environment that doesn't support HTTPS verification
         ssl._create_default_https_context = _create_unverified_https_context 
 
-    #ssl._create_default_https_context = ssl._create_unverified_context
-
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")
     parser.add_argument('-d', '--daemon', help='Run the server as a daemon.',

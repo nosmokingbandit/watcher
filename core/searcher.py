@@ -120,15 +120,30 @@ class Searcher():
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year (Movie Title 2016)
 
+        Gets new search results from newznab providers.
+        Pulls existing search results and updates new data with old. This way the
+            found_date doesn't change.
+
+        Sends ALL results to scoreresults.score() to be re-scored and filtered.
+
         Checks if guid matches entries in MARKEDRESULTS and
             sets status if found. Default status Available.
 
-        Sends results to self.scoreresults(), then stores them in SEARCHRESULTS
+        Finally stores results in SEARCHRESULTS
 
         Returns Bool if movie is found.
         '''
 
         newznab_results = self.nn.search_all(imdbid)
+        old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
+
+        # update nn results with old info if guids match
+        for i, r in enumerate(newznab_results):
+            for o in old_results:
+                if o['guid'] == r['guid']:
+                    r.update(o)
+                    newznab_results[i] = r
+
         scored_results = self.score.score(newznab_results, imdbid, 'nzb')
         # TODO eventually add search for torrents
 
@@ -167,21 +182,25 @@ class Searcher():
         BATCH_DB_STRING = []
         existing_results = self.sql.get_search_results(imdbid)
 
-        # get list of guids of existing results
-        if existing_results:
-            for res in existing_results:
-                kept_guids.append(res['guid'])
+        # # get list of guids of existing results
+        # if existing_results:
+        #     for res in existing_results:
+        #         kept_guids.append(res['guid'])
+        #
+        # for result in results:
+        #     # if result already exists in table ignore it
+        #     if result['guid'] in kept_guids:
+        #         continue
 
         for result in results:
-            # if result already exists in table ignore it
-            if result['guid'] in kept_guids:
-                continue
-            else:
-                DB_STRING = result
-                DB_STRING['imdbid'] = imdbid
+            DB_STRING = result
+            DB_STRING['imdbid'] = imdbid
+            if 'date_found' not in DB_STRING:
                 DB_STRING['date_found'] = datetime.date.today()
 
-                BATCH_DB_STRING.append(DB_STRING)
+            BATCH_DB_STRING.append(DB_STRING)
+
+        self.sql.purge_search_results(imdbid=imdbid)
 
         if BATCH_DB_STRING:
             if self.sql.write_search_results(BATCH_DB_STRING):

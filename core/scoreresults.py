@@ -54,6 +54,7 @@ class ScoreResults():
         today = datetime.today()
 
         # These all just modify self.results
+        self.remove_inactive()
         self.remove_ignored(ignored)
         self.keep_required(required)
         self.retention_check(retention, today)
@@ -62,6 +63,28 @@ class ScoreResults():
         self.score_preferred(preferred)
 
         return self.results
+
+    def remove_inactive(self):
+        ''' Removes results from indexers no longer enabled
+
+        Pulls active indexers from config, then removes any
+            result that isn't from an active indexer.
+
+        '''
+
+        active = []
+        for i in core.CONFIG['Indexers'].values():
+            if i[2] == 'true':
+                active.append(i[0])
+                
+        keep = []
+        for indexer in active:
+            for result in self.results:
+                if indexer in result['guid']:
+                    keep.append(result)
+
+        self.results = keep
+        return
 
     def remove_ignored(self, words):
         ''' Remove results with ignored 'words'

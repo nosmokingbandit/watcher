@@ -456,9 +456,6 @@ class Ajax(object):
                 return 'Could not save quality to database. ' \
                     'Check logs for more information.'
             else:
-                if not self.sql.purge_search_results(imdbid):
-                    return 'Search criteria has changed, but old search results ' \
-                        'could not be purged. Check logs for more information.'
                 if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
                     return 'Search criteria has changed, old search results ' \
                         'have been purged, but the movie status could not be set. Check logs for more information.'

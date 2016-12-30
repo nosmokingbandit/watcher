@@ -88,7 +88,7 @@ span.quickadd{
     position: absolute;
     cursor: pointer;
     background-color: #212121;
-    bottom: 4em;
+    top: 15em;
     left: 0;
     padding: 0.25em .4em .25em 0.4em;
     color:  white;

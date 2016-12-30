@@ -13,7 +13,7 @@ import webbrowser
 import ssl
 import cherrypy
 import core
-from cherrypy.process.plugins import Daemonizer
+from cherrypy.process.plugins import Daemonizer, PIDFile
 from core import ajax, api, config, postprocessing, scheduler, searcher, sqldb, version
 from core.auth import AuthController, require
 from core.log import log
@@ -85,7 +85,12 @@ if __name__ == '__main__':
                         type=str)
     parser.add_argument('-l', '--log',
                         help='Directory in which to create log files.', type=str)
+    parser.add_argument('--pid',
+                        help='Directory in which to store pid file.', type=str)
     passed_args = parser.parse_args()
+
+    if passed_args.pid:
+        PIDFile(cherrypy.engine, passed_args.pid).subscribe()
 
     # Set up conf file
     if passed_args.conf:

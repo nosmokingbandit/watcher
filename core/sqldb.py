@@ -256,12 +256,20 @@ class SQL(object):
             return False
 
     def remove_movie(self, imdbid):
-        '''
+        ''' Removes movie and search results from DB
+        :param imdbid: str imdb id #
+
         Doesn't access sql directly, but instructs other methods to delete all information that matches imdbid.
-        Removes from MOVIE, SEARCHRESULTS, and deletes poster.
-        Keeps MARKEDRESULTS.
+
+        Removes from MOVIE, SEARCHRESULTS, and deletes poster. Keeps MARKEDRESULTS.
+
+        Returns True/False on success/fail or None if movie doesn't exist in DB.
         '''
+        
         logging.info('Removing {} from {}.'.format(imdbid, 'MOVIES'))
+
+        if not self.row_exists('MOVIES', imdbid=imdbid):
+            return None
 
         if not self.delete('MOVIES', 'imdbid', imdbid):
             return False

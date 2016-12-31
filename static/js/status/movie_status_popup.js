@@ -84,7 +84,7 @@ $(document).ready(function() {
             .done(function(r){
                 response = JSON.parse(r)
 
-                if(response["status"] == "failed"){
+                if(response["response"] == "false"){
                     var message = title + ' could not be removed. Check logs for more information.';
                     swal("Error", message, "error");
                 } else {

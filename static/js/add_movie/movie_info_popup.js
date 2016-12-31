@@ -113,7 +113,7 @@ $(document).ready(function() {
 
             response = JSON.parse(r)
 
-            if(response['status'] == 'success'){
+            if(response['response'] == 'true'){
                 swal("", response['message'], 'success');
             } else {
                 swal("", response['message'], 'error');

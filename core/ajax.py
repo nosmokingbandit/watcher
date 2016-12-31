@@ -115,7 +115,7 @@ class Ajax(object):
             logging.info(u'{} {} already exists as a wanted movie'
                 .format(title, year, imdbid))
 
-            response['status'] = 'failed'
+            response['response'] = 'false'
             response['message'] = u'{} {} is already wanted, cannot add.' \
                 .format(title, year, imdbid)
             return json.dumps(response)
@@ -136,12 +136,12 @@ class Ajax(object):
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
-                response['status'] = 'success'
+                response['response'] = 'true'
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
                 return json.dumps(response)
             else:
-                response['status'] = 'failed'
+                response['response'] = 'false'
                 response['message'] = 'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
@@ -212,9 +212,9 @@ class Ajax(object):
         t.start()
 
         if self.sql.remove_movie(imdbid):
-            response = {'status': 'success'}
+            response = {'response': 'true'}
         else:
-            response = {'status': 'failed'}
+            response = {'response': 'false'}
         return json.dumps(response)
 
     @cherrypy.expose

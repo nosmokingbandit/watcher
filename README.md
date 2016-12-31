@@ -66,6 +66,10 @@ Change path of log directory.
 
 `$ watcher.py --log path/to/logs/`
 
+Create PID file in supplied path (use absolute path).
+
+`$ watcher.py --pid /path/to/pid/file.pid`
+
 #### Docker
 A [Docker container](https://hub.docker.com/r/williambroown/watcherdocker/) has been created and maintained by Williambroown.
 

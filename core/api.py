@@ -1,9 +1,10 @@
 import json
 import logging
+import threading
 
 import cherrypy
 import core
-from core import ajax, sqldb
+from core import ajax, sqldb, poster
 
 logging = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class API(object):
     def __init__(self):
         self.sql = sqldb.SQL()
         self.ajax = ajax.Ajax()
+        self.poster = poster.Poster()
         return
 
     def GET(self, **params):
@@ -81,8 +83,9 @@ class API(object):
         Returns list of movie details from MOVIES table. If imdbid is not supplied
             returns all movie details.
 
-        Returns str json.dumps(list) or json.dumps(dict) for single movie
+        Returns str json.dumps(dict)
         '''
+
         logging.info('API request movie list.')
         movies = self.sql.get_user_movies()
         if not movies:
@@ -101,7 +104,7 @@ class API(object):
         ''' Add movie with default quality settings
         :param imdbid: imdb id number of movie
 
-        Returns ## WHAT DOES THIS RETURN?
+        Returns str json.dumps(dict) {"status": "success", "message": "X added to wanted list."}
         '''
 
         logging.info('API request add movie {}'.format(imdbid))
@@ -111,10 +114,23 @@ class API(object):
         ''' Remove movie from wanted list
         :param imdbid: imdb id number of movie
 
-        Returns ## WHAT DOES THIS RETURN?
+        Returns str json.dumps(dict)
         '''
+
         logging.info('API request remove movie {}'.format(imdbid))
-        response = self.ajax.remove_movie(imdbid)
+
+        t = threading.Thread(target=self.poster.remove_poster, args=(imdbid,))
+        t.start()
+
+        removed = self.sql.remove_movie(imdbid)
+
+        if removed is True:
+            response = {'response': 'true', 'removed': imdbid}
+        elif removed is False:
+            response = {'response': 'false', 'error': 'unable to remove {}'.format(imdbid)}
+        elif removed is None:
+            response = {'response': 'false', 'error': '{} does not exist'.format(imdbid)}
+
         return json.dumps(response, indent=1)
 
     def version(self):

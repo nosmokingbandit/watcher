@@ -83,7 +83,7 @@ $(document).ready(function() {
             $icon.removeClass('fa-circle faa-burst animated');
             $icon.addClass('fa-plus');
 
-            if(response['status'] == 'success'){
+            if(response['response'] == 'true'){
                 swal("", response['message'], 'success');
             } else {
                 swal("", response['message'], 'error');

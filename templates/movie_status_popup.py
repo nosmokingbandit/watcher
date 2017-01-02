@@ -116,7 +116,7 @@ class MovieStatusPopup():
                     else:
                         bbord = 'bbord'
                     with li(cls='title bold'):
-                        span(title, cls='name')
+                        span(title, cls='name', title=title)
                         with span(cls='buttons'):
                             with a(href=info_link, target='_blank'):
                                 i(cls='fa fa-info-circle')

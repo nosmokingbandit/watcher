@@ -47,6 +47,7 @@ class Settings():
     @expose
     @settings_page
     def server(c):
+	themeOptions=core.CONFIG['Server']['cssthemeoptions']
         h1('Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
@@ -102,7 +103,7 @@ class Settings():
                             option(o, value=o)
                 with span(cls='tip'):
                     span('Page refresh required after saving.')	
-		        input(type='hidden', id='cssthemeoptions', value=core.CONFIG['Server']['cssthemeoptions']               
+		        input(type='hidden', id='cssthemeoptions', value=themeOptions               
             with li():
                 with span(id='restart'):
                     i(cls='fa fa-refresh')

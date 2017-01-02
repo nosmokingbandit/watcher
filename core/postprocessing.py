@@ -259,6 +259,14 @@ class Postprocessing(object):
             # remove unnecessary info
             del data['quality']
             del data['plot']
+
+            repl = core.CONFIG['Postprocessing']['replace_illegal']
+
+            for (k, v) in data.iteritems():
+                # but we have to keep the path unmodified
+                if type(v) == str:
+                    data[k] = re.sub(r'[:"*?<>|]+', repl, v)
+
             return data
         else:
             return None

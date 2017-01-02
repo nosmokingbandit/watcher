@@ -313,6 +313,9 @@ class Settings():
             with li(cls='bbord'):
                 i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupfailed'])
                 span('Delete leftover files after a failed download.')
+            with li('Replace illegal characters with: ', cls='bbord'):
+                input(type='text', id='replace_illegal', value=c[c_s]['replace_illegal'], style='width: 2em')
+                span('Leave blank to simply remove characters.', cls='tip')
             with li(cls='bbord'):
                 i(id='renamerenabled', cls='fa fa-square-o checkbox', value=c[c_s]['renamerenabled'])
                 span('Enable Renamer')

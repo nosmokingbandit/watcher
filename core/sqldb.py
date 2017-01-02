@@ -1,3 +1,4 @@
+import core
 import logging
 import time
 import json
@@ -5,8 +6,6 @@ import json
 from sqlalchemy import *
 
 logging = logging.getLogger(__name__)
-
-DB_NAME = 'sqlite:///watcher.sqlite'
 
 
 class SQL(object):
@@ -16,6 +15,7 @@ class SQL(object):
     '''
 
     def __init__(self):
+        DB_NAME = 'sqlite:///{}'.format(core.DB_FILE)
         try:
             self.engine = create_engine(DB_NAME, echo=False, connect_args={'timeout': 30})
             self.metadata = MetaData()
@@ -265,7 +265,7 @@ class SQL(object):
 
         Returns True/False on success/fail or None if movie doesn't exist in DB.
         '''
-        
+
         logging.info('Removing {} from {}.'.format(imdbid, 'MOVIES'))
 
         if not self.row_exists('MOVIES', imdbid=imdbid):

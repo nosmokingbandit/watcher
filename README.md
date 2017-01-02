@@ -60,11 +60,15 @@ Open browser on launch.
 
 Change path to config file. If not present, one will be created.
 
-`$ watcher.py --conf path/to/config.cfg`
+`$ watcher.py --conf /path/to/config.cfg`
 
 Change path of log directory.
 
-`$ watcher.py --log path/to/logs/`
+`$ watcher.py --log /path/to/logs/`
+
+Change path to database.
+
+`$ watcher.py --db /path/to/database.sqlite`
 
 Create PID file in supplied path (use absolute path).
 

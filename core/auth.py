@@ -105,17 +105,6 @@ class AuthController(object):
     def __init__(self):
         self.login_form = login.Login()
 
-        self.conf = {
-                '/': {
-                    'tools.sessions.on': True,
-                    'tools.sessions.timeout': 60,
-                    'tools.staticdir.root': core.PROG_PATH
-                },
-                '/static': {
-                    'tools.staticdir.on': True,
-                    'tools.staticdir.dir': './static'
-                }
-            }
 
     def on_login(self, username):
         """Called on successful login"""

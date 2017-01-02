@@ -15,13 +15,6 @@ logging = logging.getLogger(__name__)
 
 
 class Postprocessing(object):
-
-    conf = {
-        '/': {
-            'request.dispatch': cherrypy.dispatch.MethodDispatcher()
-        }
-    }
-
     exposed = True
 
     def __init__(self):

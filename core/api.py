@@ -14,11 +14,6 @@ class API(object):
     A simple GET/POST api. Used for basic remote interactions.
     This still needs work.
     '''
-    conf = {
-        '/': {
-            'request.dispatch': cherrypy.dispatch.MethodDispatcher()
-        }
-    }
     exposed = True
 
     def __init__(self):

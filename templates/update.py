@@ -4,7 +4,7 @@ import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
-
+from core import config
 
 class Update():
 
@@ -16,11 +16,12 @@ class Update():
             updating = 'false'
 
         doc = dominate.document(title='Watcher')
-
+        doc = dominate.document(title='Watcher')
+        
         with doc.head:
             meta(name='updating', content=updating)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/update.css')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=01.01')
 
         with doc:

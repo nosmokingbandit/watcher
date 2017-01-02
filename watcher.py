@@ -56,8 +56,8 @@ class App(object):
         return
 
     @cherrypy.expose
-    def index(self):
-        raise cherrypy.HTTPRedirect(core.URL_BASE + "/status")
+    def default(self):
+        raise cherrypy.InternalRedirect('/status/')
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):

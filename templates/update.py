@@ -11,9 +11,9 @@ class Update():
     @expose
     def default(self):
         if core.UPDATING:
-            updating = 'false'
-        else:
             updating = 'true'
+        else:
+            updating = 'false'
 
         doc = dominate.document(title='Watcher')
 

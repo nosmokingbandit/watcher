@@ -18,43 +18,43 @@ class Header():
                         cls = 'settings'
                     with li('Settings', cls=cls):
                             with ul(cls='settings_menu'):
-                                with a(href=core.URL_BASE + '/settings/server'):
+                                with a(href=core.URL_BASE + '/settings/server/'):
                                     with li():
                                         i(cls='fa fa-server')
                                         span('Server')
-                                with a(href=core.URL_BASE + '/settings/search'):
+                                with a(href=core.URL_BASE + '/settings/search/'):
                                     with li():
                                         i(cls='fa fa-search')
                                         span('Search')
-                                with a(href=core.URL_BASE + '/settings/quality'):
+                                with a(href=core.URL_BASE + '/settings/quality/'):
                                     with li():
                                         i(cls='fa fa-filter')
                                         span('Quality')
-                                with a(href=core.URL_BASE + '/settings/providers'):
+                                with a(href=core.URL_BASE + '/settings/providers/'):
                                     with li():
                                         i(cls='fa fa-plug')
                                         span('Providers')
-                                with a(href=core.URL_BASE + '/settings/downloader'):
+                                with a(href=core.URL_BASE + '/settings/downloader/'):
                                     with li():
                                         i(cls='fa fa-download')
                                         span('Downloader')
-                                with a(href=core.URL_BASE + '/settings/postprocessing'):
+                                with a(href=core.URL_BASE + '/settings/postprocessing/'):
                                     with li():
                                         i(cls='fa fa-film')
                                         span('Post Processing')
-                                with a(href=core.URL_BASE + '/settings/about'):
+                                with a(href=core.URL_BASE + '/settings/about/'):
                                     with li():
                                         i(cls='fa fa-info-circle')
                                         span('About')
 
-                    with a(href=core.URL_BASE + '/add_movie'):
+                    with a(href=core.URL_BASE + '/add_movie/'):
                         if current == 'add_movie':
                             cls = 'add_movie current'
                         else:
                             cls = 'add_movie'
                         li('Add Movie', cls=cls)
 
-                    with a(href=core.URL_BASE + '/status'):
+                    with a(href=core.URL_BASE + '/status/'):
                         if current == 'status':
                             cls = 'status current'
                         else:

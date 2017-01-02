@@ -9,29 +9,34 @@ class Login(object):
         return
 
     @expose
-    def index(self, username=None, from_page=''):
-        if username == None:
+    def default(self, username=None, from_page=''):
+        if username is None:
             username = ''
 
         doc = dominate.document(title='Watcher')
 
         with doc.head:
-            link(rel='stylesheet', href='static/css/style.css')
-            link(rel='stylesheet', href='static/css/login.css')
+            meta(name='robots', content='noindex, nofollow')
+            meta(name='url_base', content=core.URL_BASE)
+
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/style.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/login.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
-            link(rel='stylesheet', href='static/font-awesome/css/font-awesome.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/font-awesome/css/font-awesome.css')
+            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
+            script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
+            script(type='text/javascript', src=core.URL_BASE + '/auth/static/js/login/main.js?v=01.01')
 
         with doc:
             with div(id='content'):
-                img(src='static/images/logo.png', id='logo')
+                img(src=core.URL_BASE + '/auth/static/images/logo.png', id='logo')
                 br()
-                with form(method='post', action='login', id='login_form'):
-                    input(type='text', name='username', placeholder='Username', value=username)
+                with div(id='login_form'):
+                    input(type='text', id='username', placeholder='Username', value=username)
                     br()
-                    input(type='password', name='password', placeholder='Password')
+                    input(type='password', id='password', placeholder='Password')
                     br()
-                    with button(type='submit', value='Enter'):
-                        i(cls='fa fa-sign-in')
+                    i(cls='fa fa-sign-in', id='send_login')
 
 
 

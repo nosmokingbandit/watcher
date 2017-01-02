@@ -1,5 +1,12 @@
 $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
+    var updating = $("meta[name='updating']").attr("content");
+
+    if(updating == 'false'){
+        window.location = url_base + "/status/";
+        return;
+    }
+
 
     /*
     This repeats every 3 seconds to check if the server is back online.
@@ -25,7 +32,7 @@ $(document).ready(function () {
                 .done(function(r){
                     if(r == "states.STARTED"){
                         $("span.msg").text("Update successful!");
-                        setTimeout(function() {window.location =  url_base + "/restart";},3000);
+                        setTimeout(function() {window.location =  url_base + "/restart/";},3000);
                     }
                 })
                 .fail(function(r){

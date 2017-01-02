@@ -1,10 +1,12 @@
 import cherrypy
 import core
 from templates import login
-
-## TODO add logging
+import logging
 
 SESSION_KEY = '_cp_username'
+LOGIN_URL = '/auth/login/'
+
+logging = logging.getLogger(__name__)
 
 
 def check_credentials(username, password):
@@ -13,20 +15,20 @@ def check_credentials(username, password):
     :param password: str password to check against config
 
 
-    Returns None on success or a string describing the error on failure
+    Returns bool
     '''
 
     if username == core.CONFIG['Server']['authuser'] and password == core.CONFIG['Server']['authpass']:
-        return None
+        return True
     else:
-        return u"Incorrect username or password."
+        return False
 
 
 def check_auth(*args, **kwargs):
-
     """A tool that looks in config for 'auth.require'. If found and it
     is not None, a login is required and the entry is evaluated as a list of
     conditions that the user must fulfill"""
+
     conditions = cherrypy.request.config.get('auth.require', None)
     if conditions is not None:
         username = cherrypy.session.get(SESSION_KEY)
@@ -35,9 +37,9 @@ def check_auth(*args, **kwargs):
             for condition in conditions:
                 # A condition is just a callable that returns true or false
                 if not condition():
-                    raise cherrypy.HTTPRedirect(core.URL_BASE + "/auth/login")
+                    raise cherrypy.InternalRedirect(LOGIN_URL)
         else:
-            raise cherrypy.HTTPRedirect(core.URL_BASE + "/auth/login")
+            raise cherrypy.InternalRedirect(LOGIN_URL)
 
 
 cherrypy.tools.auth = cherrypy.Tool('before_handler', check_auth)
@@ -102,62 +104,80 @@ def all_of(*conditions):
 
 class AuthController(object):
 
+    _cp_config = {
+        'auth.require': None
+    }
+
     def __init__(self):
         self.login_form = login.Login()
 
-        self.conf = {
-                '/': {
-                    'tools.sessions.on': True,
-                    'tools.sessions.timeout': 60,
-                    'tools.staticdir.root': core.PROG_PATH
-                },
-                '/static': {
-                    'tools.staticdir.on': True,
-                    'tools.staticdir.dir': './static'
-                }
-            }
+    def on_login(self, username, origin):
+        ''' Called on successful login
+        :param username: str user that logged in
+        :param origin: str ip address of user
 
-    def on_login(self, username):
-        """Called on successful login"""
+        origin uses headers['X-Forwarded-For'] or headers['Remote-Addr']
+
+        Does not return
+        '''
+
+        log_attempt = 'Successful login from {}'.format(origin)
+        logging.info(log_attempt)
 
     def on_logout(self, username):
         """Called on logout"""
 
-    def get_loginform(self, username, msg="Enter login information", from_page="/"):
-        return self.login_form.index(username=username, from_page=from_page)
-        # """<html>
-        #     <body>
-        #     <form method="post" action="login">
-        #     <input type="hidden" name="from_page" value="%(from_page)s" />
-        #     %(msg)s<br />
-        #     Username: <input type="text" name="username" value="%(username)s" /><br />
-        #     Password: <input type="password" name="password" /><br />
-        #     <input type="submit" value="Log in" />
-        # </body></html>""" % locals()
-
     @cherrypy.expose
-    def login(self, username=None, password=None, from_page="/"):
-        if username is None or password is None:
-            return self.login_form.index(username=username, from_page=from_page)
+    def login(self, username=None, password=None):
+        ''' Tests user data against check_credentials
+        :param username: str submitted username <optional>
+        :param password: str submitted password <optional>
 
-        error_msg = check_credentials(username, password)
-        if error_msg:
-            return self.get_loginform(username, error_msg, from_page)
+        If either 'username' or 'password' is None, returns login form html
+
+        If both are not None, fires check_credentials()
+
+        Since ajax will always submit a value (even if an empty string), strings are
+            returned to the browser to handle success/failure response.
+        Any request with None as a value will be internal and will render the
+            page in the browser.
+
+        Returns str 'true' or 'false'
+        '''
+
+        if username is None or password is None:
+            return self.login_form.default(username=username)
+
+        # get origin ip
+        if 'X-Forwarded-For' in cherrypy.request.headers:
+            origin = cherrypy.request.headers['X-Forwarded-For']
+        else:
+            origin = cherrypy.request.headers['Remote-Addr']
+
+        # on failed attempt
+        if check_credentials(username, password) is False:
+            log_attempt = 'Failed login attempt {}:{} from {}'.format(username, password, origin)
+
+            logging.warning(log_attempt)
+
+            return 'false'
+
+        # on successful login
         else:
             try:
                 cherrypy.session.regenerate()
             except Exception, e:
                 pass
             cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
-            self.on_login(username)
-            raise cherrypy.HTTPRedirect(core.URL_BASE + '/')
+            self.on_login(username, origin)
+            return 'true'
 
     @cherrypy.expose
-    def logout(self, from_page="/"):
+    def logout(self):
         sess = cherrypy.session
         username = sess.get(SESSION_KEY, None)
         sess[SESSION_KEY] = None
         if username:
             cherrypy.request.login = None
             self.on_logout(username)
-        raise cherrypy.HTTPRedirect(core.URL_BASE + '/')
+        raise cherrypy.InternalRedirect(core.URL_BASE + '/')

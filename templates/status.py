@@ -15,7 +15,7 @@ class Status():
         return
 
     @expose
-    def index(self):
+    def default(self):
         doc = dominate.document(title='Watcher')
         doc.attributes['lang'] = 'en'
 

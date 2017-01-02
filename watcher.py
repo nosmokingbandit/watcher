@@ -26,7 +26,11 @@ if os.name == 'nt':
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(core.PROG_PATH)
 
+
 class App(object):
+
+    auth = AuthController()
+
     _cp_config = {
         'auth.require': []
     }
@@ -34,19 +38,12 @@ class App(object):
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
-
-        self.conf = {
-                '/': {
-                    'tools.sessions.on': True,
-                    'tools.sessions.timeout': 60,
-                    'tools.auth.on': False,
-                    'tools.staticdir.root': core.PROG_PATH
-                },
-                '/static': {
-                    'tools.staticdir.on': True,
-                    'tools.staticdir.dir': './static'
-                }
-            }
+        self.add_movie = add_movie.AddMovie()
+        self.status = status.Status()
+        self.settings = settings.Settings()
+        self.restart = restart.Restart()
+        self.shutdown = shutdown.Shutdown()
+        self.update = update.Update()
 
         # point server toward custom 404
         cherrypy.config.update({
@@ -54,20 +51,17 @@ class App(object):
         })
 
         if core.CONFIG['Server']['checkupdates'] == 'true':
-            self.initial_update_check()
+            scheduler.AutoUpdateCheck.update_check()
 
         return
 
-    def initial_update_check(self):
-        scheduler.AutoUpdateCheck.update_check()
-
     @cherrypy.expose
-    def index(self):
-        raise cherrypy.HTTPRedirect(core.URL_BASE + "/status")
+    def default(self):
+        raise cherrypy.InternalRedirect('/status/')
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
-        return fourohfour.FourOhFour.index()
+        return fourohfour.FourOhFour.default()
 
 
 if __name__ == '__main__':
@@ -115,7 +109,7 @@ if __name__ == '__main__':
     log.start(core.LOG_DIR)
     logging = logging.getLogger(__name__)
     cherrypy.log.error_log.propagate = True
-    cherrypy.log.access_log.propagate = True
+    cherrypy.log.access_log.propagate = False
 
     # Set up server
     if passed_args.address:
@@ -126,13 +120,6 @@ if __name__ == '__main__':
         core.SERVER_PORT = passed_args.port
     else:
         core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
-
-    # update cherrypy config based on passed args
-    cherrypy.config.update({
-        'engine.autoreload.on': False,
-        'server.socket_host': core.SERVER_ADDRESS,
-        'server.socket_port': core.SERVER_PORT
-    })
 
     # set up db on first launch
     sql = sqldb.SQL()
@@ -145,40 +132,30 @@ if __name__ == '__main__':
         print 'Database found.'
     del sql
 
-    root = App()
-    root.add_movie = add_movie.AddMovie()
-    root.status = status.Status()
-    root.settings = settings.Settings()
-    root.restart = restart.Restart()
-    root.shutdown = shutdown.Shutdown()
-    root.update = update.Update()
-
-    # Set up root app
-    if core.CONFIG['Server']['authrequired'] == 'true':
-        root.conf['/']['tools.auth.on'] = True
-
     if core.CONFIG['Proxy']['behindproxy'] == 'true':
         core.URL_BASE = core.CONFIG['Proxy']['webroot']
 
-    # mount applications
-    cherrypy.tree.mount(root,
-                        '{}/'.format(core.URL_BASE),
-                        root.conf
-                        )
+    # mount and configure applications
+    root = cherrypy.tree.mount(App(),
+                               '{}/'.format(core.URL_BASE),
+                               'core/conf_app.ini'
+                               )
+    if core.CONFIG['Server']['authrequired'] == 'true':
+        root.merge({'/': {'tools.auth.on': True}})
 
     cherrypy.tree.mount(api.API(),
                         '{}/api'.format(core.URL_BASE),
-                        api.API.conf
+                        'core/conf_api.ini'
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
                         '{}/postprocessing'.format(core.URL_BASE),
-                        postprocessing.Postprocessing.conf
+                        'core/conf_postprocessing.ini'
                         )
-    auth = AuthController()
-    cherrypy.tree.mount(auth,
+
+    cherrypy.tree.mount(App.auth,
                         '{}/auth'.format(core.URL_BASE),
-                        auth.conf
+                        'core/conf_auth.ini'
                         )
 
     # if everything goes well so far, open the browser
@@ -192,6 +169,7 @@ if __name__ == '__main__':
         Daemonizer(cherrypy.engine).subscribe()
 
     # start engine
+    cherrypy.config.update('core/conf_global.ini')
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
 

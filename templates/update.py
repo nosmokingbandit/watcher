@@ -9,17 +9,19 @@ from head import Head
 class Update():
 
     @expose
-    def index(self):
-        if not core.UPDATING:
-            raise cherrypy.HTTPRedirect(core.URL_BASE + '/status')
-            return
+    def default(self):
+        if core.UPDATING:
+            updating = 'true'
+        else:
+            updating = 'false'
 
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='updating', content=updating)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=12.27')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=01.01')
 
         with doc:
             with div(id='content'):

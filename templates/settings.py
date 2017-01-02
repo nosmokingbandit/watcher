@@ -36,7 +36,7 @@ def settings_page(page):
 
 
 class Settings():
-
+    config = core.CONFIG
     def __init__(self):
         return
 

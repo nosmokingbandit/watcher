@@ -13,7 +13,7 @@ class AddMovie():
         theme=str(core.CONFIG['Server']['csstheme'])
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/' + theme + '/css/add_movie.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/add_movie.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/movie_info_popup.css')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=12.30')
 

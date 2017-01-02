@@ -9,7 +9,7 @@ class FourOhFour():
 
     @staticmethod
     @expose
-    def default():
+    def index():
 
         doc = dominate.document(title='Watcher')
 

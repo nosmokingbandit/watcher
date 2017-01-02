@@ -8,7 +8,7 @@ from head import Head
 
 class AddMovie():
     @expose
-    def default(self):
+    def index(self):
         doc = dominate.document(title='Watcher')
 
         with doc.head:

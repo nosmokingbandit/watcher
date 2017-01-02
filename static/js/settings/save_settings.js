@@ -63,9 +63,7 @@ $(document).ready(function () {
         $("#server :input").each(function(){
             if($(this).val() == ''){
                 blanks = true;
-                orig_bg = $(this).css('background-color');
-                $(this).animate({'background-color': '#FFEB3B'}, 500);
-                $(this).animate({'background-color': orig_bg}, 1000);
+                highlight($(this));
             }
             server[$(this).attr("id")] = $(this).val();
         });
@@ -89,9 +87,7 @@ $(document).ready(function () {
         $("ul#search :input").each(function(){
             if($(this).val() == ''){
                 blanks = true;
-                orig_bg = $(this).css('background-color');
-                $(this).animate({'background-color': '#FFEB3B'}, 500);
-                $(this).animate({'background-color': orig_bg}, 1000);
+                highlight($(this));
             }
             search[$(this).attr("id")] = $(this).val();
         });
@@ -129,9 +125,7 @@ $(document).ready(function () {
         $("#resolution_size :input").each(function(){
             if($(this).val() == ''){
                 blanks = true;
-                orig_bg = $(this).css('background-color');
-                $(this).animate({'background-color': '#FFEB3B'}, 500);
-                $(this).animate({'background-color': orig_bg}, 1000);
+                highlight($(this));
             }
             tmp[$(this).attr("id")] = $(this).val();
         });
@@ -254,6 +248,12 @@ $(document).ready(function () {
             return false
         }
         return true
+    }
+
+    function highlight(element){
+        orig_bg = element.css('background-color');
+        element.css('background-color', '#f4693b');
+        element.delay(500).animate({'background-color': orig_bg}, 1000);
     }
 
 });

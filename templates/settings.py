@@ -22,7 +22,7 @@ def settings_page(page):
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=12.29')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.01')
 
         with doc:
             Header.insert_header(current="settings")

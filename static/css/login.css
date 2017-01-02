@@ -29,10 +29,6 @@ input[type="text"], input[type="password"]{
 }
 
 
-button{
-    font-size: 2em;
-    color: #212121;
-    border: none;
-    background: none;
-    outline: none;
+i{
+    font-size: 2.25em;
 }

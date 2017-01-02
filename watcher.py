@@ -31,12 +31,13 @@ class App(object):
 
     auth = AuthController()
 
-    _cp_config = {
-        'auth.require': []
-    }
-
     @cherrypy.expose
     def __init__(self):
+        if core.CONFIG['Server']['authrequired'] == 'true':
+            self._cp_config = {
+                'auth.require': []
+            }
+
         self.ajax = ajax.Ajax()
         self.add_movie = add_movie.AddMovie()
         self.status = status.Status()
@@ -140,9 +141,6 @@ if __name__ == '__main__':
                                '{}/'.format(core.URL_BASE),
                                'core/conf_app.ini'
                                )
-    if core.CONFIG['Server']['authrequired'] == 'true':
-        root.merge({'/': {'tools.auth.on': True}})
-
     cherrypy.tree.mount(api.API(),
                         '{}/api'.format(core.URL_BASE),
                         'core/conf_api.ini'

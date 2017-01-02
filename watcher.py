@@ -51,12 +51,9 @@ class App(object):
         })
 
         if core.CONFIG['Server']['checkupdates'] == 'true':
-            self.initial_update_check()
+            scheduler.AutoUpdateCheck.update_check()
 
         return
-
-    def initial_update_check(self):
-        scheduler.AutoUpdateCheck.update_check()
 
     @cherrypy.expose
     def index(self):

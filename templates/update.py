@@ -9,7 +9,7 @@ from head import Head
 class Update():
 
     @expose
-    def index(self):
+    def default(self):
         if not core.UPDATING:
             raise cherrypy.HTTPRedirect(core.URL_BASE + '/status')
             return

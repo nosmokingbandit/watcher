@@ -103,7 +103,7 @@ class Settings():
                             option(o, value=o)
                 with span(cls='tip'):
                     span('Page refresh required after saving.')	
-		        input(type='hidden', id='cssthemeoptions', value=themeOptions               
+		input(type='hidden', id='cssthemeoptions', value=themeOptions               
             with li():
                 with span(id='restart'):
                     i(cls='fa fa-refresh')

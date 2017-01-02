@@ -78,6 +78,7 @@ Create PID file in supplied path (use absolute path).
 A [Docker container](https://hub.docker.com/r/williambroown/watcherdocker/) has been created and maintained by Williambroown.
 
 ## Post-Processing
+For more descriptive instructions see the [wiki](https://github.com/nosmokingbandit/watcher/wiki/Post-Processing).
 
 Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.
 

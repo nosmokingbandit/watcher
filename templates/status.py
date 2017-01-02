@@ -3,7 +3,7 @@ import datetime
 import core
 import dominate
 from cherrypy import expose
-from core import sqldb, version
+from core import sqldb, version, config
 from dominate.tags import *
 from header import Header
 from head import Head
@@ -18,11 +18,12 @@ class Status():
     def default(self):
         doc = dominate.document(title='Watcher')
         doc.attributes['lang'] = 'en'
-
+        theme=str(core.CONFIG['Server']['csstheme'])
+        
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/status.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/movie_status_popup.css')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=12.27')
 
         with doc:

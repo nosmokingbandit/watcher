@@ -17,10 +17,11 @@ def settings_page(page):
     def page_template(self):
         config = core.CONFIG
         doc = dominate.document(title='Watcher')
-
+        theme=str(core.CONFIG['Server']['csstheme'])
+        
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/settings.css')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.01')
 
@@ -35,7 +36,7 @@ def settings_page(page):
 
 
 class Settings():
-
+    config = core.CONFIG
     def __init__(self):
         return
 
@@ -46,6 +47,7 @@ class Settings():
     @expose
     @settings_page
     def server(c):
+	themeOptions=core.CONFIG['Server']['cssthemeoptions']
         h1('Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
@@ -91,6 +93,17 @@ class Settings():
                 span('Keep ')
                 input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')
                 span(' days of logs.')
+            with li(cls='bbord'):
+                span('Theme: ')
+                with select(id='csstheme', style='width: 6em'):
+                    for o in core.CONFIG['Server']['cssthemeoptions'].split(','):
+                        if o == core.CONFIG['Server']['csstheme']: 
+                                option(o, value=o, selected="selected")
+                        else:
+                            option(o, value=o)
+                with span(cls='tip'):
+                    span('Page refresh required after saving.')	
+		input(type='hidden', id='cssthemeoptions', value=themeOptions)     
             with li():
                 with span(id='restart'):
                     i(cls='fa fa-refresh')
@@ -101,7 +114,6 @@ class Settings():
                 with span('Current version hash: ', cls='tip'):
                     if core.CURRENT_HASH is not None:
                         a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
-
         with span(id='save', cat='server'):
             i(cls='fa fa-save')
             span('Save Settings')

@@ -38,6 +38,12 @@ class App(object):
     @cherrypy.expose
     def __init__(self):
         self.ajax = ajax.Ajax()
+        self.add_movie = add_movie.AddMovie()
+        self.status = status.Status()
+        self.settings = settings.Settings()
+        self.restart = restart.Restart()
+        self.shutdown = shutdown.Shutdown()
+        self.update = update.Update()
 
         # point server toward custom 404
         cherrypy.config.update({
@@ -128,14 +134,6 @@ if __name__ == '__main__':
         logging.info('SQL DB found.')
         print 'Database found.'
     del sql
-
-    root = App()
-    root.add_movie = add_movie.AddMovie()
-    root.status = status.Status()
-    root.settings = settings.Settings()
-    root.restart = restart.Restart()
-    root.shutdown = shutdown.Shutdown()
-    root.update = update.Update()
 
     if core.CONFIG['Proxy']['behindproxy'] == 'true':
         core.URL_BASE = core.CONFIG['Proxy']['webroot']

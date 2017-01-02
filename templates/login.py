@@ -2,6 +2,7 @@ import dominate
 import core
 from cherrypy import expose
 from dominate.tags import *
+from core import config
 
 class Login(object):
 
@@ -14,13 +15,14 @@ class Login(object):
             username = ''
 
         doc = dominate.document(title='Watcher')
-
+        theme=str(core.CONFIG['Server']['csstheme'])
+        
         with doc.head:
             meta(name='robots', content='noindex, nofollow')
             meta(name='url_base', content=core.URL_BASE)
 
-            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/style.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/login.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/' + theme + '/style.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/' + theme + '/login.css')
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
             link(rel='stylesheet', href=core.URL_BASE + '/auth/static/font-awesome/css/font-awesome.css')
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')

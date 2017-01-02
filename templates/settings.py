@@ -40,8 +40,8 @@ class Settings():
         return
 
     @expose
-    def index(self):
-        raise cherrypy.HTTPRedirect(core.URL_BASE + 'settings/server')
+    def default(self):
+        raise cherrypy.InternalRedirect(core.URL_BASE + 'settings/server')
 
     @expose
     @settings_page

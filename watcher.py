@@ -61,7 +61,7 @@ class App(object):
 
     @cherrypy.expose
     def error_page_404(self, *args, **kwargs):
-        return fourohfour.FourOhFour.index()
+        return fourohfour.FourOhFour.default()
 
 
 if __name__ == '__main__':

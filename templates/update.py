@@ -9,10 +9,10 @@ from head import Head
 class Update():
 
     @expose
-    def index(self):
         if not core.UPDATING:
             raise cherrypy.HTTPRedirect(core.URL_BASE + '/status')
             return
+    def default(self):
 
         doc = dominate.document(title='Watcher')
 

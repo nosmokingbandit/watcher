@@ -3,7 +3,7 @@ import core
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
-
+from core import config
 
 class FourOhFour():
 
@@ -12,10 +12,10 @@ class FourOhFour():
     def default():
 
         doc = dominate.document(title='Watcher')
-
+        theme=str(core.CONFIG['Server']['csstheme'])
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/' + theme + '/fourohfour.css')
             style
 
         with doc:

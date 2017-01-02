@@ -4,6 +4,7 @@ from cherrypy import expose
 from dominate.tags import *
 from head import Head
 
+
 class Restart():
 
     @expose
@@ -12,7 +13,7 @@ class Restart():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/restart.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/restart.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/restart/main.js?v=12.27')
 
         with doc:

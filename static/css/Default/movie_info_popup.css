@@ -83,7 +83,7 @@ iframe#trailer{
     position: absolute;
     top: 0px;
     right: 0px;
-    background: url('../images/logo_bg.png') no-repeat 50% 50% #eeeeee;
+    background: url('../../images/logo_bg.png') no-repeat 50% 50% #eeeeee;
 }
 
 /* Quality slide in panel */

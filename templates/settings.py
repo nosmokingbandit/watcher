@@ -6,6 +6,8 @@ from core import config
 from dominate.tags import *
 from header import Header
 from head import Head
+import os
+
 
 def settings_page(page):
     ''' Decorator template for settings subpages
@@ -20,14 +22,14 @@ def settings_page(page):
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.01')
 
         with doc:
             Header.insert_header(current="settings")
             with div(id="content"):
-                page(config)
+                page(self, config)
 
         return doc.render()
 
@@ -36,16 +38,13 @@ def settings_page(page):
 
 class Settings():
 
-    def __init__(self):
-        return
-
     @expose
     def default(self):
         raise cherrypy.InternalRedirect(core.URL_BASE + 'settings/server')
 
     @expose
     @settings_page
-    def server(c):
+    def server(self, c):
         h1('Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
@@ -59,6 +58,14 @@ class Settings():
                 with span(cls='tip'):
                     i(id='generate_new_key', cls='fa fa-refresh')
                     span('Generate new key.')
+            with li('Theme:', cls='bbord'):
+                with select(id='theme', value=c[c_s]['theme']):
+                    tl = self.get_themes()
+                    for opt in tl:
+                        if opt == c[c_s]['theme']:
+                            option(opt, value=opt, selected="selected")
+                        else:
+                            option(opt, value=opt)
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=c[c_s]['authrequired'])
                 span('Password-protect web-ui.')
@@ -108,7 +115,7 @@ class Settings():
 
     @expose
     @settings_page
-    def search(c):
+    def search(self, c):
         h1('Search', id='searchform')
         # set the config section at each new section. Just makes everything a little shorter and easier to write.
         c_s = 'Search'
@@ -154,7 +161,7 @@ class Settings():
 
     @expose
     @settings_page
-    def quality(c):
+    def quality(self, c):
         span('Quality and Filters may be set separately for each movie, this is the '\
           'default setting that will be used to \'Quick-Add\' movies.')
         br()
@@ -210,7 +217,7 @@ class Settings():
 
     @expose
     @settings_page
-    def providers(c):
+    def providers(self, c):
         h1('Indexers')
         c_s = 'Indexers'
         with ul(id='indexers', cls='wide'):
@@ -233,7 +240,7 @@ class Settings():
 
     @expose
     @settings_page
-    def downloader(c):
+    def downloader(self, c):
         h1('Downloader')
         with ul(id='downloader'):
             c_s = 'Sabnzbd'
@@ -306,7 +313,7 @@ class Settings():
 
     @expose
     @settings_page
-    def postprocessing(c):
+    def postprocessing(self, c):
         h1('Post-Processing')
         c_s = 'Postprocessing'
         with ul(id='postprocessing'):
@@ -351,7 +358,7 @@ class Settings():
 
     @expose
     @settings_page
-    def about(c):
+    def about(self, c):
         with div(cls='about'):
             h1('About Watcher')
 
@@ -399,3 +406,11 @@ class Settings():
                     a('JQuery', href='https://jquery.com/')
                 with li():
                     a('Parse Torrent Name', href='https://pypi.python.org/pypi/parse-torrent-name')
+
+    def get_themes(self):
+        theme_path = os.path.join(core.PROG_PATH, 'static', 'css')
+        themes = []
+        for i in os.listdir(theme_path):
+            if os.path.isdir(os.path.join(theme_path, i)):
+                themes.append(i)
+        return themes

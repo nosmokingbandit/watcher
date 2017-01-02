@@ -2,8 +2,7 @@
 
 import os
 import sys
-lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
-sys.path.append(lib_dir)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
 
 import argparse
 import datetime
@@ -80,6 +79,8 @@ if __name__ == '__main__':
                         type=str)
     parser.add_argument('-l', '--log',
                         help='Directory in which to create log files.', type=str)
+    parser.add_argument('--db',
+                        help='Absolute path to database file.', type=str)
     parser.add_argument('--pid',
                         help='Directory in which to store pid file.', type=str)
     passed_args = parser.parse_args()
@@ -123,6 +124,8 @@ if __name__ == '__main__':
         core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
 
     # set up db on first launch
+    if passed_args.db:
+        core.DB_FILE = passed_args.db
     sql = sqldb.SQL()
     if not os.path.isfile('watcher.sqlite'):
         logging.info('SQL DB not found. Creating.')

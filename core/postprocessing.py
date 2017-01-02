@@ -466,7 +466,7 @@ class Postprocessing(object):
             logging.info('Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
-        # delete leftover dir, only is mover was enabled successful
+        # delete leftover dir, only if mover was enabled successful
         if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
             # fail if mover failed

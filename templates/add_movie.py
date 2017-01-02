@@ -13,8 +13,8 @@ class AddMovie():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/add_movie.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_info_popup.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/add_movie.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_info_popup.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=12.30')
 
         with doc:
@@ -23,9 +23,7 @@ class AddMovie():
                 input(id='search_input', type="text", placeholder="Search...", name="search_term")
                 with button(id="search_button"):
                     i(cls='fa fa-search')
-
             div(id='thinker')
-
             with div(id="database_results"):
                 ul(id='movie_list')
 

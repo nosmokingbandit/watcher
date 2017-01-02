@@ -104,6 +104,8 @@ if __name__ == '__main__':
         print 'Config file found, merging any new options.'
         conf.merge_new_options()
     conf.stash()
+    # apply theme
+    core.THEME = core.CONFIG['Server']['theme']
 
     # Set up logging
     if passed_args.log:
@@ -136,10 +138,9 @@ if __name__ == '__main__':
         print 'Database found.'
     del sql
 
+    # mount and configure applications
     if core.CONFIG['Proxy']['behindproxy'] == 'true':
         core.URL_BASE = core.CONFIG['Proxy']['webroot']
-
-    # mount and configure applications
     root = cherrypy.tree.mount(App(),
                                '{}/'.format(core.URL_BASE),
                                'core/conf_app.ini'

@@ -3,6 +3,7 @@ PROG_PATH = None
 CONF_FILE = 'config.cfg'
 LOG_DIR = 'logs'
 DB_FILE = 'watcher.sqlite'
+THEME = 'Default'
 
 # Paths to internet things
 GIT_URL = 'https://github.com/nosmokingbandit/watcher'

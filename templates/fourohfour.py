@@ -15,8 +15,7 @@ class FourOhFour():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css')
-            style
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css'.format(core.THEME))
 
         with doc:
             with div(id='content'):

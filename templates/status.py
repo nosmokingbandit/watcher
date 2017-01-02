@@ -12,7 +12,7 @@ from head import Head
 class Status():
 
     def __init__(self):
-        return
+        THEME = core.CONFIG['Server']['theme']
 
     @expose
     def default(self):
@@ -21,8 +21,8 @@ class Status():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=12.27')
 
         with doc:

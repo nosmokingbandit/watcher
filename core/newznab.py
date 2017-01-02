@@ -85,13 +85,19 @@ class NewzNab():
         Creates dict for sql table SEARCHRESULTS. Makes sure all results contain
             all neccesary keys and nothing else.
 
+        If newznab guid is NOT a permalink, uses the comments link for info_link.
+
         Returns dict.
         '''
 
-        item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate')
+        item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}
         for ic in item:
             if ic.tag in item_keep:
+                if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':
+                    permalink = False
+                else:
+                    permalink = True
                 d[ic.tag.lower()] = ic.text
             if 'newznab' in ic.tag and ic.attrib['name'] == 'size':
                 d['size'] = int(ic.attrib['value'])
@@ -100,7 +106,12 @@ class NewzNab():
         d['imdbid'] = self.imdbid
         d['pubdate'] = d['pubdate'][5:16]
         d['type'] = 'nzb'
-        d['info_link'] = d['guid']
+
+        if not permalink:
+            d['info_link'] = d['comments']
+        else:
+            d['info_link'] = d['guid']
+        del d['comments']
         d['guid'] = d['link']
         del d['link']
         d['score'] = 0

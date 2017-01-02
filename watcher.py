@@ -109,7 +109,7 @@ if __name__ == '__main__':
     log.start(core.LOG_DIR)
     logging = logging.getLogger(__name__)
     cherrypy.log.error_log.propagate = True
-    cherrypy.log.access_log.propagate = True
+    cherrypy.log.access_log.propagate = False
 
     # Set up server
     if passed_args.address:

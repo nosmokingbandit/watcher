@@ -10,7 +10,7 @@ class Shutdown():
     @expose
     def default(self):
         doc = dominate.document(title='Watcher')
-        theme=str(core.CONFIG['Server']['csstheme']
+        theme=str(core.CONFIG['Server']['csstheme'])
                   
         with doc.head:
             Head.insert()

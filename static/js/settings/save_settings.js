@@ -184,9 +184,7 @@ $(document).ready(function () {
             }
         });
         data["Indexers"] = indexers;
-
-        console.log(data)
-
+        
         return data
     }
 

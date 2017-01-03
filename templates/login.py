@@ -17,7 +17,9 @@ class Login(object):
             meta(name='robots', content='noindex, nofollow')
             meta(name='url_base', content=core.URL_BASE)
 
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/style.css')
             link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/{}/style.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/login.css')
             link(rel='stylesheet', href=core.URL_BASE + '/auth/static/css/{}/login.css'.format(core.THEME))
             link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Raleway')
             link(rel='stylesheet', href=core.URL_BASE + '/auth/static/font-awesome/css/font-awesome.css')

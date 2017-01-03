@@ -61,7 +61,10 @@ $(document).ready(function () {
             server[$(this).attr("id")] = $(this).attr("value");
         });
         $("#server :input").each(function(){
-            if($(this).val() == ''){
+            if($(this).attr('id') == 'theme'){
+                
+            }
+            else if($(this).val() == ''){
                 blanks = true;
                 highlight($(this));
             }
@@ -184,7 +187,7 @@ $(document).ready(function () {
             }
         });
         data["Indexers"] = indexers;
-        
+
         return data
     }
 

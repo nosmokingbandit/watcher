@@ -13,6 +13,7 @@ class Shutdown():
 
         with doc.head:
             Head.insert()
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/shutdown.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/shutdown.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/shutdown/main.js?v=12.27')
 

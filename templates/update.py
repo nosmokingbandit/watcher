@@ -20,6 +20,7 @@ class Update():
         with doc.head:
             meta(name='updating', content=updating)
             Head.insert()
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/update.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=01.01')
 

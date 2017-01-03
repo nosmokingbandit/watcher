@@ -22,9 +22,10 @@ def settings_page(page):
 
         with doc.head:
             Head.insert()
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.01')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.02')
 
         with doc:
             Header.insert_header(current="settings")
@@ -59,13 +60,18 @@ class Settings():
                     i(id='generate_new_key', cls='fa fa-refresh')
                     span('Generate new key.')
             with li('Theme:', cls='bbord'):
-                with select(id='theme', value=c[c_s]['theme']):
+                with select(id='theme', value=c[c_s]['theme']) as theme_select:
                     tl = self.get_themes()
                     for opt in tl:
-                        if opt == c[c_s]['theme']:
-                            option(opt, value=opt, selected="selected")
+                        if opt == 'Default':
+                            item = option(opt, value='')
                         else:
-                            option(opt, value=opt)
+                            item = option(opt, value=opt)
+                        if item['value'] == c[c_s]['theme']:
+                            item['selected'] = 'selected'
+                            theme_select['value'] = opt
+                span('*Requires restart.', cls='tip')
+
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=c[c_s]['authrequired'])
                 span('Password-protect web-ui.')
@@ -413,4 +419,5 @@ class Settings():
         for i in os.listdir(theme_path):
             if os.path.isdir(os.path.join(theme_path, i)):
                 themes.append(i)
+        themes.append('Default')
         return themes

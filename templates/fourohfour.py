@@ -14,6 +14,7 @@ class FourOhFour():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css'.format(core.THEME))

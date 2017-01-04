@@ -1,6 +1,11 @@
 $(document).ready(function(){
     var url_base = $("meta[name='url_base']").attr("content");
     window.url_base = url_base;
+    var enabled = $("meta[name='enable_notifs']").attr("content");
+    if(enabled == 'false'){
+        return false;
+    }
+
     var notifs = JSON.parse($("meta[name='notifications']").attr("content"));
 
     $.each(notifs, function(index, notif){

@@ -17,6 +17,7 @@ class Update():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='enable_notifs', content='false')
             meta(name='updating', content=updating)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')

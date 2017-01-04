@@ -12,6 +12,7 @@ class Shutdown():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/shutdown.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/shutdown.css'.format(core.THEME))

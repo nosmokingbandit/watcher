@@ -95,10 +95,7 @@ class NewzNab():
         for ic in item:
             if ic.tag in item_keep:
                 if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':
-                    print ic.tag
                     permalink = False
-                else:
-                    permalink = True
                 d[ic.tag.lower()] = ic.text
             if 'newznab' in ic.tag and ic.attrib['name'] == 'size':
                 d['size'] = int(ic.attrib['value'])
@@ -112,6 +109,7 @@ class NewzNab():
             d['info_link'] = d['comments']
         else:
             d['info_link'] = d['guid']
+
         del d['comments']
         d['guid'] = d['link']
         del d['link']

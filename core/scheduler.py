@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import cherrypy
 import core
@@ -6,6 +7,8 @@ from core.notification import Notification
 
 from core import searcher, version
 from core.plugins import taskscheduler
+
+logging = logging.getLogger(__name__)
 
 
 class Scheduler(object):

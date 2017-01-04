@@ -457,7 +457,7 @@ class Postprocessing(object):
         if core.CONFIG['Postprocessing']['moverenabled'] == 'true':
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
-            if response is None:
+            if response is False:
                 result['tasks']['mover']['response'] = 'false'
             else:
                 data['new_file_location'] = response
@@ -469,8 +469,9 @@ class Postprocessing(object):
         # delete leftover dir, only if mover was enabled successful
         if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
-            # fail if mover failed
-            if core.CONFIG['Postprocessing']['moverenabled'] == 'false':
+            # fail if mover disabled or failed
+            if core.CONFIG['Postprocessing']['moverenabled'] == 'false' or \
+                    result['tasks']['mover']['response'] == 'false':
                 result['tasks']['cleanup']['response'] = 'false'
             else:
                 if self.cleanup(data['path']):
@@ -538,7 +539,7 @@ class Postprocessing(object):
 
         Moves file to location specified in core.CONFIG
 
-        Returns str new file location or None on failure
+        Returns str new file location or False on failure
         '''
 
         abs_path_old = data['filename']
@@ -558,7 +559,7 @@ class Postprocessing(object):
                 os.mkdir(target_folder)
         except Exception, e:
             logging.error('Mover failed: Could not create folder.', exc_info=True)
-            return None
+            return False
 
         # move the file
         try:
@@ -566,7 +567,7 @@ class Postprocessing(object):
             shutil.move(abs_path_old, target_folder)
         except Exception, e: # noqa
             logging.error('Mover failed: Could not move file.', exc_info=True)
-            return None
+            return False
 
         return os.path.join(target_folder, os.path.basename(data['filename']))
 

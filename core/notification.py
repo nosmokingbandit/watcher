@@ -10,17 +10,6 @@ class Notification(object):
     def __init__(self):
         return
 
-
-#
-# compare = git_url + "/compare/" + response["local_hash"] + "..." + response["new_hash"]
-#
-# body = "Click to update now. <br/> Click <a href=" + compare + " target=_blank><u>here</u></a> to view changes."
-#
-# toastr.info(body, title, {closeButton:true,
-#                                             timeOut: 0,
-#                                             extendedTimeOut: 0,
-#                                             onclick: update_now
-#                                         });
     @staticmethod
     def add(data):
         ''' Adds notification to core.NOTIFICATIONS

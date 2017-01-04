@@ -21,11 +21,12 @@ def settings_page(page):
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='git_url', content=core.GIT_URL)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.02')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.03')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
 
         with doc:
             Header.insert_header(current="settings")

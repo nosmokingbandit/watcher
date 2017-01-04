@@ -25,6 +25,8 @@ $(document).ready(function () {
             data = postprocessing()
         }
 
+        console.log(data);
+
         if(data == false){
             return
         }
@@ -40,10 +42,10 @@ $(document).ready(function () {
 
         .done(function(r) {
             if(r == 'failed'){
-                swal("Error", "Unable to save settings. Check log for more information.", "error")
+                toastr.error("Unable to save settings. Check log for more information.");
             }
             else if(r == 'success'){
-                swal("Settings Saved", "", "success")
+                toastr.success("Settings Saved");
             }
 
             $thisi.removeClass('fa-circle faa-burst animated');
@@ -62,7 +64,7 @@ $(document).ready(function () {
         });
         $("#server :input").each(function(){
             if($(this).attr('id') == 'theme'){
-                
+
             }
             else if($(this).val() == ''){
                 blanks = true;
@@ -165,6 +167,7 @@ $(document).ready(function () {
         var data = {};
         var indexers = {};
         var ind = 1;
+        var cancel = false;
 
         $("#newznab_list li").each(function(){
             if ($(this).attr("class") == "newznab_indexer"){
@@ -174,9 +177,9 @@ $(document).ready(function () {
 
                 // check if one field is blank and both are not blank
                 if ( (url == "" || api == "") && (url + api !=="") ){
-                    swal("", "Please complete or clear out incomplete providers.", "warning");
+                    toastr.warning("Please complete or clear out incomplete providers.");
                     indexers = {}
-                    return false;
+                    cancel = true;
                 }
 
                 // but ignore it if both are blank
@@ -188,7 +191,11 @@ $(document).ready(function () {
         });
         data["Indexers"] = indexers;
 
-        return data
+        if(cancel == true){
+            return false;
+        } else {
+            return data
+        };
     }
 
     function downloader(){
@@ -245,7 +252,7 @@ $(document).ready(function () {
         });
 
         if(enabled > 1){
-            swal("", "Please enable only one downloader.", "warning");
+            toastr.warning("Please enable only one downloader.")
             return false
         }
         return true

@@ -307,6 +307,8 @@ class SQL(object):
         TABLE = 'SEARCHRESULTS'
 
         if imdbid:
+            print '========='
+            print imdbid
             command = 'DELETE FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
         else:
             command = 'DELETE FROM {}'.format(TABLE)

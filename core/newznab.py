@@ -26,7 +26,7 @@ class NewzNab():
         self.imdbid = imdbid
 
         results = []
-        imdbid_s = imdbid[2:]  #just imdbid numbers
+        imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
             if indexer[2] == 'false':
@@ -40,7 +40,7 @@ class NewzNab():
 
             logging.info('SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
 
-            request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'})
+            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
                 results_xml = urllib2.urlopen(request).read()
@@ -95,6 +95,7 @@ class NewzNab():
         for ic in item:
             if ic.tag in item_keep:
                 if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':
+                    print ic.tag
                     permalink = False
                 else:
                     permalink = True

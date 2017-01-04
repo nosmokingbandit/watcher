@@ -32,11 +32,6 @@ button{
     text-overflow: clip;
 }
 
-button:hover{
-    background-color: #212121;
-    color: #fff;
-}
-
 i{
     margin: 0 0 0 0;
     font-size: 1.5em;

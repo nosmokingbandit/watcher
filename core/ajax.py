@@ -234,25 +234,31 @@ class Ajax(object):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
 
-        Returns str success/fail message
+        Returns str json.dumps(dict) success/fail message
         '''
 
         data = self.sql.get_single_search_result('guid', guid)
         if data:
-            return self.snatcher.snatch(data)
+            return json.dumps(self.snatcher.snatch(data))
         else:
-            return 'Unable to get download information from the database. ' \
-                'Check logs for more information.'
+            return json.dumps({'response': 'false', 'error': 'Unable to get download '
+                               'information from the database. Check logs for more information.'})
 
     @cherrypy.expose
     def mark_bad(self, guid, imdbid):
         ''' Marks guid as bad in SEARCHRESULTS and MARKEDRESULTS
         :param guid: srt guid to mark
 
-        Returns success/failure message from update.mark_bad()
+        Returns str json.dumps(dict)
         '''
 
-        return self.update.mark_bad(guid, imdbid=imdbid)
+        if self.update.mark_bad(guid, imdbid=imdbid):
+            response = {'response': 'true', 'message': 'Marked as Bad.'}
+        else:
+            response = {'response': 'false', 'error': 'Could not mark release as bad. '
+                        'Check logs for more information.'}
+
+        return json.dumps(response)
 
     @cherrypy.expose
     def notification_remove(self, index):

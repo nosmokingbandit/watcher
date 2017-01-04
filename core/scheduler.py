@@ -70,12 +70,12 @@ class AutoUpdateCheck(object):
         # if data['status'] == 'current', nothing to do.
 
         if data['status'] == 'error':
-            notif = {'icon': 'fa-exclamation-triangle',
+            notif = {'type': 'error',
                      'title': 'Error Checking for Updates',
-                     'text': data['error']
+                     'body': data['error'],
+                     'params': '{closeButton: true, timeOut: 0, extendedTimeOut: 0}'
                      }
             Notification.add(notif)
-
 
         elif data['status'] == 'behind':
             if core.CONFIG['Server']['installupdates'] == 'true':
@@ -90,19 +90,21 @@ class AutoUpdateCheck(object):
             else:
                 title = '{} Updates Available'.format(data['behind_count'])
 
-            title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
+            compare = '{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
 
-            button = ('Update Now', '/update_now', 'fa-arrow-circle-up')
-
-            notif = {'icon': 'fa-star',
+            notif = {'type': 'info',
                      'title': title,
-                     'title_link': title_link,
-                     'text': text,
-                     'button': button
+                     'body': 'Click to update now. <br/> Click <a href="'+compare+'" target="_blank"><u>here</u></a> to view changes.',
+                     'params': {'closeButton': 'true',
+                                'timeOut': 0,
+                                'extendedTimeOut': 0,
+                                'onclick': 'update_now'}
                      }
+
             Notification.add(notif)
 
         return data
+
 
 class AutoUpdateInstall(object):
 

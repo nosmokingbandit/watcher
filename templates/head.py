@@ -26,6 +26,6 @@ class Head(object):
         script(type='text/javascript', src=core.URL_BASE + '/static/js/sweetalert-master/dist/sweetalert-dev.js')
         script(type='text/javascript', src=core.URL_BASE + '/static/js/toastr/toastr.min.js')
         script(type='text/javascript', src=core.URL_BASE + '/static/js/notification/main.js?v=01.03')
-        script("toastr.options.positionClass = 'toast-bottom-left'; toastr['update'] = toastr['info'];", type='text/javascript')
+        script("toastr.options.positionClass = 'toast-bottom-left'; toastr['update'] = toastr['info'];toastr.options.preventDuplicates = true;", type='text/javascript')
 
 # pylama:ignore=W0401

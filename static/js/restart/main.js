@@ -6,7 +6,8 @@ $(document).ready(function () {
     });
 
     /*
-    This repeats every 3 seconds to check. Times out after 10 attempts and shows error message.
+    This repeats every 3 seconds to check. Times out after 10 attempts and
+        shows span.error message.
     */
     var try_count = 0
     var check = setInterval(function(){

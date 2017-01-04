@@ -60,8 +60,9 @@ class Notification(object):
         for i, v in enumerate(core.NOTIFICATIONS):
             if v is None:
                 core.NOTIFICATIONS[i] = base
-            else:
-                core.NOTIFICATIONS.append(base)
+                return
+        core.NOTIFICATIONS.append(base)
+
         return
 
     @staticmethod

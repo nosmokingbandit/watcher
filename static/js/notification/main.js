@@ -24,15 +24,34 @@ $(document).ready(function(){
         toastr[type](body, title, params);
 
     });
+
+
+    $(document).on('click', 'div.toaster-container a', function(e){
+        e.preventDefault();
+        $this = $(this);
+
+        url = $this.attr('href');
+
+        if($this.attr('href') == 'update_now'){
+            update_now();
+            return false
+        } else{
+            window.open(url, '_blank');
+            return false
+        }
+
+    });
+
+
 });
 
+/* starts update process and redirects browser */
 function update_now(){
     $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
     .done(function(){
         window.location = url_base + "/update";
     });
 };
-
 
 /* sends post to remove notification from list */
 function remove_notif(){

@@ -17,6 +17,7 @@ class Scheduler(object):
         # create scheduler plugin
         self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
 
+
 # create classes for each scheduled task
 class AutoSearch(object):
     @staticmethod
@@ -92,11 +93,12 @@ class AutoUpdateCheck(object):
 
             notif = {'type': 'update',
                      'title': title,
-                     'body': 'Click to update now. <br/> Click <a href="'+compare+'" target="_blank"><u>here</u></a> to view changes.',
+                     'body': 'Click <a href="update_now"><u>here</u></a> to update now.'
+                             '<br/> Click <a href="'+compare+'"><u>here</u></a> to view changes.',
                      'params': {'closeButton': 'true',
                                 'timeOut': 0,
                                 'extendedTimeOut': 0,
-                                'onclick': 'update_now'}
+                                'tapToDismiss': 0}
                      }
 
             Notification.add(notif)

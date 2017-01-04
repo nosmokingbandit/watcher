@@ -16,8 +16,9 @@ select{
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
-    height: 1.5em;
-    font-size: 1em;
+    height: 2em;
+    font-size: 0.85em;
+    font-family: "Lucida Console", Monaco, monospace;
 }
 
 button{

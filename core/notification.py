@@ -50,13 +50,18 @@ class Notification(object):
         if base in core.NOTIFICATIONS:
             return
 
-        # if there is a None in the list, overwrite it.
+        # if this is an update notif, remove other update notifs first
+        if base['type'] == 'update':
+            for i, v in enumerate(core.NOTIFICATIONS):
+                if v['type'] == 'update':
+                    core.NOTIFICATIONS[i] = None
+
+        # if there is a None in the list, overwrite it. If not, just append
         for i, v in enumerate(core.NOTIFICATIONS):
             if v is None:
                 core.NOTIFICATIONS[i] = base
-                return
-        # if not just append
-        core.NOTIFICATIONS.append(base)
+            else:
+                core.NOTIFICATIONS.append(base)
         return
 
     @staticmethod

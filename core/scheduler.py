@@ -78,13 +78,6 @@ class AutoUpdateCheck(object):
             Notification.add(notif)
 
         elif data['status'] == 'behind':
-            if core.CONFIG['Server']['installupdates'] == 'true':
-                hour = core.CONFIG['Server']['installupdatehr']
-                minute = core.CONFIG['Server']['installupdatemin']
-                text = 'Updates will install automatically at {}:{}'.format(hour, minute)
-            else:
-                text = ''
-
             if data['behind_count'] == 1:
                 title = '1 Update Available'
             else:
@@ -92,7 +85,7 @@ class AutoUpdateCheck(object):
 
             compare = '{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
 
-            notif = {'type': 'info',
+            notif = {'type': 'update',
                      'title': title,
                      'body': 'Click to update now. <br/> Click <a href="'+compare+'" target="_blank"><u>here</u></a> to view changes.',
                      'params': {'closeButton': 'true',

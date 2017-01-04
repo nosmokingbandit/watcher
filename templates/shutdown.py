@@ -1,5 +1,5 @@
-import dominate
 import core
+import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -12,6 +12,7 @@ class Shutdown():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/shutdown.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/shutdown.css'.format(core.THEME))
@@ -23,3 +24,5 @@ class Shutdown():
                 span('Shutting Down', cls='msg')
 
         return doc.render()
+
+# pylama:ignore=W0401

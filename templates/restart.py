@@ -1,5 +1,5 @@
-import dominate
 import core
+import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -12,6 +12,7 @@ class Restart():
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/restart.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/restart.css'.format(core.THEME))
@@ -25,3 +26,5 @@ class Restart():
                     p('Watcher is taking too long to restart, please check your logs and restart manually.')
 
         return doc.render()
+
+# pylama:ignore=W0401

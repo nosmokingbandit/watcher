@@ -86,9 +86,9 @@ class Status(object):
 
         Calls self method to update both db tables
         Tries to find imdbid if not supplied.
-        If imdbid is available, executes self.movie_status()
+        If imdbid is available or found, executes self.movie_status()
 
-        Returns str success/fail message
+        Returns bool
         '''
 
         if not self.searchresults(guid, 'Bad'):
@@ -98,17 +98,17 @@ class Status(object):
         if imdbid is None:
             result = self.sql.get_single_search_result('guid', guid)
             if not result:
-                return 'Could not get imdbid to update Movie status.'
+                return False
             else:
                 imdbid = result['imdbid']
 
         if not self.movie_status(imdbid):
-            return 'Could not update Movie status.'
+            return False
 
         if not self.markedresults(guid, 'Bad', imdbid=imdbid):
-            return 'Could not update MARKEDRESULTS. See logs for more information.'
+            return False
         else:
-            return 'Successfully marked result as Bad.'.format(guid)
+            return True
 
     def movie_status(self, imdbid):
         ''' Updates Movie status.

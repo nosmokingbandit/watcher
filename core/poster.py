@@ -36,7 +36,7 @@ class Poster():
                 shutil.copy2(poster_url, new_poster_path)
 
             else:
-                request = urllib2.Request( poster_url, headers={'User-Agent' : 'Mozilla/5.0'} )
+                request = urllib2.Request(poster_url, headers={'User-Agent': 'Mozilla/5.0'})
                 try:
                     result = urllib2.urlopen(request).read()
                 except (SystemExit, KeyboardInterrupt):
@@ -49,7 +49,7 @@ class Poster():
                         output.write(result)
                 except (SystemExit, KeyboardInterrupt):
                     raise
-                except Exception, e:
+                except Exception, e: # noqa
                     logging.error('Poster save_poster write', exc_info=True)
 
             logging.info('Poster saved to {}'.format(new_poster_path))
@@ -84,7 +84,7 @@ class Poster():
         search_term = search_term.replace(" ", "+")
         search_string = "https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
 
-        request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         html = urllib2.urlopen(request)
 

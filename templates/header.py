@@ -1,12 +1,13 @@
-from dominate.tags import *
 import core
+from dominate.tags import *
 
 
 class Header():
+    ''' Header for pages with NavBar.
+    '''
+
     @staticmethod
     def insert_header(current):
-
-        Header.notification()
 
         with div(id='header'):
             with div(id='header_container'):
@@ -61,26 +62,4 @@ class Header():
                             cls = 'status'
                         li('Status', cls=cls)
 
-    @staticmethod
-    def notification():
-
-        with ul(id='notif_list'):
-            for index, notif in enumerate(core.NOTIFICATIONS):
-                if notif is None:
-                    continue
-
-                with li(cls='notif', index=index):
-                    with a(href=notif['title_link'], target='_none'):
-                        with div(cls='notif_title'):
-                            i(cls='fa ' + notif['icon'])
-                            span(notif['title'])
-                    div(notif['text'], cls='notif_text')
-                    with div(cls='notif_footer'):
-                        with span(cls='dismiss', index=index):
-                            i(cls='fa fa-times')
-                            span('Dismiss')
-                        if notif['button']:
-                            with a(href=notif['button'][1], cls='button', index=index):
-                                ico = 'fa ' + notif['button'][2]
-                                i(cls=ico)
-                                span(notif['button'][0])
+# pylama:ignore=W0401

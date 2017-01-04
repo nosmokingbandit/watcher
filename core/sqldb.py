@@ -21,7 +21,7 @@ class SQL(object):
             self.metadata = MetaData()
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Opening SQL DB.', exc_info=True)
             raise
 
@@ -307,6 +307,8 @@ class SQL(object):
         TABLE = 'SEARCHRESULTS'
 
         if imdbid:
+            print '========='
+            print imdbid
             command = 'DELETE FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
         else:
             command = 'DELETE FROM {}'.format(TABLE)
@@ -394,3 +396,5 @@ class SQL(object):
             return result.fetchone()
         else:
             return False
+
+# pylama:ignore=W0401

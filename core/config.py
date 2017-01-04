@@ -31,14 +31,14 @@ class Config():
             shutil.copy2(self.base_file, self.file)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             print 'Could not move base_config.'
             raise
 
         self.config.readfp(open(self.file))
 
-        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2) )
-        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
+        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2))
+        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2))
 
         self.config.set('Server', 'installupdatehr', str(random.randint(0, 23)).zfill(2))
         self.config.set('Server', 'installupdatemin', str(random.randint(0, 59)).zfill(2))

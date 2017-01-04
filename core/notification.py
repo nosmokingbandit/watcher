@@ -1,29 +1,44 @@
 import core
 import logging
+import json
 
 logging = logging.getLogger(__name__)
+
 
 class Notification(object):
 
     def __init__(self):
         return
 
+
+#
+# compare = git_url + "/compare/" + response["local_hash"] + "..." + response["new_hash"]
+#
+# body = "Click to update now. <br/> Click <a href=" + compare + " target=_blank><u>here</u></a> to view changes."
+#
+# toastr.info(body, title, {closeButton:true,
+#                                             timeOut: 0,
+#                                             extendedTimeOut: 0,
+#                                             onclick: update_now
+#                                         });
     @staticmethod
     def add(data):
         ''' Adds notification to core.NOTIFICATIONS
         :param data: dict of notification information
 
-        Merges supplied 'data' with 'base' dict t ensure no fields are missing
+        Merges supplied 'data' with 'base' dict to ensure no fields are missing
         Appends 'base' to core.NOTIFICATIONS
+
+        If data['param'] includes an on_click function, remember to add it to the
+            notifications javascript handler.
 
         Does not return
         '''
 
-        base = {'icon': '',
+        base = {'type': 'success',
                 'title': '',
-                'title_link': '',
-                'text': '',
-                'button': ''
+                'body': '',
+                'params': None
                 }
 
         base.update(data)
@@ -35,13 +50,19 @@ class Notification(object):
         if base in core.NOTIFICATIONS:
             return
 
-        # if there is a None in the list, overwrite it.
+        # if this is an update notif, remove other update notifs first
+        if base['type'] == 'update':
+            for i, v in enumerate(core.NOTIFICATIONS):
+                if v['type'] == 'update':
+                    core.NOTIFICATIONS[i] = None
+
+        # if there is a None in the list, overwrite it. If not, just append
         for i, v in enumerate(core.NOTIFICATIONS):
             if v is None:
                 core.NOTIFICATIONS[i] = base
                 return
-        # if not just append
         core.NOTIFICATIONS.append(base)
+
         return
 
     @staticmethod

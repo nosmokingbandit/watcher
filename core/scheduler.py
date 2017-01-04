@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import cherrypy
 import core
@@ -7,12 +8,15 @@ from core.notification import Notification
 from core import searcher, version
 from core.plugins import taskscheduler
 
+logging = logging.getLogger(__name__)
+
 
 class Scheduler(object):
 
     def __init__(self):
         # create scheduler plugin
         self.plugin = taskscheduler.SchedulerPlugin(cherrypy.engine)
+
 
 # create classes for each scheduled task
 class AutoSearch(object):
@@ -25,12 +29,14 @@ class AutoSearch(object):
         min = int(core.CONFIG['Search']['searchtimemin'])
 
         task_search = taskscheduler.ScheduledTask(hr, min, interval,
-                      search.auto_search_and_grab, auto_start=True)
+                                                  search.auto_search_and_grab,
+                                                  auto_start=True)
 
         # update core.NEXT_SEARCH
         delay = task_search.task.delay
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
+
 
 class AutoUpdateCheck(object):
 
@@ -70,39 +76,35 @@ class AutoUpdateCheck(object):
         # if data['status'] == 'current', nothing to do.
 
         if data['status'] == 'error':
-            notif = {'icon': 'fa-exclamation-triangle',
+            notif = {'type': 'error',
                      'title': 'Error Checking for Updates',
-                     'text': data['error']
+                     'body': data['error'],
+                     'params': '{closeButton: true, timeOut: 0, extendedTimeOut: 0}'
                      }
             Notification.add(notif)
 
-
         elif data['status'] == 'behind':
-            if core.CONFIG['Server']['installupdates'] == 'true':
-                hour = core.CONFIG['Server']['installupdatehr']
-                minute = core.CONFIG['Server']['installupdatemin']
-                text = 'Updates will install automatically at {}:{}'.format(hour, minute)
-            else:
-                text = ''
-
             if data['behind_count'] == 1:
                 title = '1 Update Available'
             else:
                 title = '{} Updates Available'.format(data['behind_count'])
 
-            title_link = '{}/compare/{}...{}'.format(core.GIT_API, data['new_hash'], data['local_hash'])
+            compare = '{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
 
-            button = ('Update Now', '/update_now', 'fa-arrow-circle-up')
-
-            notif = {'icon': 'fa-star',
+            notif = {'type': 'update',
                      'title': title,
-                     'title_link': title_link,
-                     'text': text,
-                     'button': button
+                     'body': 'Click <a href="update_now"><u>here</u></a> to update now.'
+                             '<br/> Click <a href="'+compare+'"><u>here</u></a> to view changes.',
+                     'params': {'closeButton': 'true',
+                                'timeOut': 0,
+                                'extendedTimeOut': 0,
+                                'tapToDismiss': 0}
                      }
+
             Notification.add(notif)
 
         return data
+
 
 class AutoUpdateInstall(object):
 

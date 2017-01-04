@@ -1,68 +1,23 @@
-#!/usr/bin/env python
-
-import os
-import sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
-
 import argparse
-import datetime
 import logging
 import os
-import webbrowser
 import ssl
+import sys
+import webbrowser
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
+
 import cherrypy
 import core
 from cherrypy.process.plugins import Daemonizer, PIDFile
-from core import ajax, api, config, postprocessing, scheduler, searcher, sqldb, version
-from core.auth import AuthController, require
+from core import api, config, postprocessing, scheduler, sqldb
+from core.app import App
 from core.log import log
-from core.notification import Notification
-from templates import add_movie, restart, settings, shutdown, status, update, fourohfour
 
 if os.name == 'nt':
     from core.plugins import systray
 
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(core.PROG_PATH)
-
-
-class App(object):
-
-    auth = AuthController()
-
-    @cherrypy.expose
-    def __init__(self):
-        if core.CONFIG['Server']['authrequired'] == 'true':
-            self._cp_config = {
-                'auth.require': []
-            }
-
-        self.ajax = ajax.Ajax()
-        self.add_movie = add_movie.AddMovie()
-        self.status = status.Status()
-        self.settings = settings.Settings()
-        self.restart = restart.Restart()
-        self.shutdown = shutdown.Shutdown()
-        self.update = update.Update()
-
-        # point server toward custom 404
-        cherrypy.config.update({
-            'error_page.404': self.error_page_404
-        })
-
-        if core.CONFIG['Server']['checkupdates'] == 'true':
-            scheduler.AutoUpdateCheck.update_check()
-
-        return
-
-    @cherrypy.expose
-    def default(self):
-        raise cherrypy.InternalRedirect('/status/')
-
-    @cherrypy.expose
-    def error_page_404(self, *args, **kwargs):
-        return fourohfour.FourOhFour.default()
-
 
 if __name__ == '__main__':
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -191,3 +146,5 @@ if __name__ == '__main__':
     os.chdir(core.PROG_PATH)  # have to do this for the daemon
     # finish by blocking
     cherrypy.engine.block()
+
+# pylama:ignore=E402

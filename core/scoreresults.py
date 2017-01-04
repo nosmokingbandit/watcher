@@ -29,7 +29,6 @@ class ScoreResults():
         Orders the list by Score, then by Size. So a 5gb release will have
             a lower index than a 2gb release of the same score.
 
-
         Returns list of dicts.
         '''
 
@@ -70,13 +69,14 @@ class ScoreResults():
         Pulls active indexers from config, then removes any
             result that isn't from an active indexer.
 
+        Does not return, modifies self.results
         '''
 
         active = []
         for i in core.CONFIG['Indexers'].values():
             if i[2] == 'true':
                 active.append(i[0])
-                
+
         keep = []
         for indexer in active:
             for result in self.results:

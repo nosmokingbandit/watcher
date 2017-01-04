@@ -114,9 +114,9 @@ $(document).ready(function() {
             response = JSON.parse(r)
 
             if(response['response'] == 'true'){
-                swal("", response['message'], 'success');
+                toastr.success(response['message']);
             } else {
-                swal("", response['message'], 'error');
+                toastr.error(response['message']);
             };
 
             $this.removeClass('fa-circle faa-burst animated');

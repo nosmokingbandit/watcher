@@ -178,9 +178,7 @@ class Searcher():
         logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
 
         # This iterates through the new search results and submits only results we haven't already stored. This keeps it from overwriting the FoundDate
-        kept_guids = []
         BATCH_DB_STRING = []
-        existing_results = self.sql.get_search_results(imdbid)
 
         # # get list of guids of existing results
         # if existing_results:

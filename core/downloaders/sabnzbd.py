@@ -36,7 +36,7 @@ class Sabnzbd():
             raise
         except Exception, e:
             logging.error('Sabnzbd test_connection', exc_info=True)
-            return '{}. \n\n Please review your settings.'.format(e.reason)
+            return '{}.'.format(e.reason)
 
     # returns dict {'status': <>, 'nzo_ids': [<>] }
     @staticmethod
@@ -44,7 +44,9 @@ class Sabnzbd():
         ''' Adds nzb file to sab to download
         :param data: dict of nzb information
 
-        Returns str response from server
+        Returns dict {'response': 'true', 'download_id': 'id'}
+                     {'response': 'false', 'error': 'exception'}
+
         '''
 
         sab_conf = core.CONFIG['Sabnzbd']
@@ -63,7 +65,7 @@ class Sabnzbd():
 
         mode = 'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))
-        nzbname = urllib2.quote(data['title'].encode('ascii','ignore'))
+        nzbname = urllib2.quote(data['title'].encode('ascii', 'ignore'))
         cat = sab_conf['sabcategory']
         priority_keys = {
             'Paused': '-2',
@@ -82,9 +84,12 @@ class Sabnzbd():
 
         try:
             response = json.loads(urllib2.urlopen(request).read())
-            return response
 
-        except Exception as err:
-            response = {}
-            response['status'] = err
-            return response
+            if response['status'] is True and len(response['nzo_ids']) > 0:
+                downloadid = response['nzo_ids'][0]
+                return {'response': 'true', 'downloadid': downloadid}
+            else:
+                return {'response': 'false', 'error': 'Unable to add NZB.'}
+
+        except Exception as e:
+            return {'response': 'false', 'error': str(e.reason)}

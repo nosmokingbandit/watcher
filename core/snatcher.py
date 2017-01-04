@@ -62,6 +62,8 @@ class Snatcher():
         Takes single result dict and sends it to the active downloader.
         Returns response from download.
         Marks release and movie as 'Snatched'
+
+        Returns dict {'response': 'true', 'message': 'lorem impsum'}
         '''
 
         data = dict(data)
@@ -78,20 +80,19 @@ class Snatcher():
             logging.info('Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
-            if response['status'] is True:
+            if response['response'] is 'true':
 
-                downloadid = response['nzo_ids'][0]
                 # store downloadid in database
-                self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to Sabnzbd.'.format(title))
-                    return 'Successfully sent to Sabnzbd.'
+                    return {'response': 'true', 'message': 'Sent to Sabnzbd.'}
                 else:
-                    return 'Error marking result as Snatched. Check logs for more information.'
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
             else:
-                logging.error('SABNZBD: {}'.format(response['status']))
-                return "SABNZBD: {}".format(response['status'])
+                return response
 
         # If sending to NZBGET
         nzbg_conf = core.CONFIG['NzbGet']
@@ -99,19 +100,19 @@ class Snatcher():
             logging.info('Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
-            if type(response) == int and response > 0:
-                downloadid = response
+            if response['response'] is 'true':
+
                 # store downloadid in database
-                self.sql.update('SEARCHRESULTS', 'downloadid', downloadid, guid=guid)
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
-                    logging.info(u'Successfully sent {} to NzbGet.'.format(title))
-                    return 'Successfully sent to NzbGet.'
+                    logging.info(u'Successfully sent {} to NZBGet.'.format(title))
+                    return {'response': 'true', 'message': 'Sent to NZBGet.'}
                 else:
-                    return 'Error marking result as Snatched. Check logs for more information.'
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
             else:
-                logging.error('NZBGET: Error # {}'.format(response))
-                return "NZBGET: Error {}.".format(response)
+                return response
 
     def update_status_snatched(self, guid, imdbid):
         '''

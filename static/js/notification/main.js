@@ -1,54 +1,62 @@
-$(document).ready(function () {
+$(document).ready(function(){
     var url_base = $("meta[name='url_base']").attr("content");
+    window.url_base = url_base;
+    var enabled = $("meta[name='enable_notifs']").attr("content");
+    if(enabled == 'false'){
+        return false;
+    }
 
-    $("span.dismiss").click(function(){
-        $this = $(this)
-        index = $this.attr("index")
+    var notifs = JSON.parse($("meta[name='notifications']").attr("content"));
 
-        $li = $('li[index='+index+']')
-        remove_notif(index)
+    $.each(notifs, function(index, notif){
+        type = notif['type'];
+        body = notif['body'];
+        title = notif['title'];
+        params = notif['params'];
 
-        $li.animate({
-            height: 0,
-            opacity: 0,
-            "margin-top": "0px",
-            "margin-bottom": "0px",
-            "padding-top": "0px",
-            "padding-bottom": "0px"
-            }, 300, function(){
-
-                $li.remove();
-        });
-
-    });
-
-    /* any anchor.button */
-    $("a.button").click(function(e){
-        $this = $(this);
-        index = $this.attr("index");
-
-        remove_notif(index);
-
-        if($this.attr("href") == "/update_now"){
-            $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
-            .done(function(){
-                window.location = url_base + "/update";
-            });
-        } else {
-
-            window.open = ($this.attr("href"), '_blank');
+        if(params['onclick'] != undefined){
+            params['onclick'] = window[params['onclick']]
         }
 
-        e.preventDefault();
+        params['onCloseClick'] = remove_notif;
+        params['index'] = index;
+
+        toastr[type](body, title, params);
+
     });
 
 
-    /* sends post to remove notification from list */
-    function remove_notif(index){
-        $.post(url_base + "/ajax/notification_remove", {
-            "index": index
-        })
-    }
+    $(document).on('click', 'div.toaster-container a', function(e){
+        e.preventDefault();
+        $this = $(this);
+
+        url = $this.attr('href');
+
+        if($this.attr('href') == 'update_now'){
+            update_now();
+            return false
+        } else{
+            window.open(url, '_blank');
+            return false
+        }
+
+    });
 
 
 });
+
+/* starts update process and redirects browser */
+function update_now(){
+    $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
+    .done(function(){
+        window.location = url_base + "/update";
+    });
+};
+
+/* sends post to remove notification from list */
+function remove_notif(){
+    index = this['index']
+    $.post(window.url_base + "/ajax/notification_remove", {
+        "index": index
+    })
+}

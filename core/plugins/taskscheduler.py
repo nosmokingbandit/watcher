@@ -111,7 +111,6 @@ class Task(object):
         self.func()
 
 
-
 ''' Global commands.
 
 cherrypy.engine.scheduler.{taskname}.stop()

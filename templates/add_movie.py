@@ -1,9 +1,9 @@
+import core
 import dominate
 from cherrypy import expose
-import core
 from dominate.tags import *
-from header import Header
 from head import Head
+from header import Header
 
 
 class AddMovie():
@@ -17,7 +17,7 @@ class AddMovie():
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/add_movie.css'.format(core.THEME))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_info_popup.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_info_popup.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=12.30')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=01.03')
 
         with doc:
             Header.insert_header(current="add_movie")
@@ -34,3 +34,5 @@ class AddMovie():
             div(id='info_pop_up')
 
         return doc.render()
+
+# pylama:ignore=W0401

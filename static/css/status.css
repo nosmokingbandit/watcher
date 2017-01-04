@@ -9,11 +9,6 @@ button{
     cursor: pointer;
 }
 
-button:hover{
-    background-color: #212121;
-    color: #fff;
-}
-
 div#content{
     margin: 0 0 64px 0; /* to clear update footer */
 }

@@ -1,12 +1,13 @@
+import os
+
 import cherrypy
 import core
 import dominate
+
 from cherrypy import expose
-from core import config
 from dominate.tags import *
 from header import Header
 from head import Head
-import os
 
 
 def settings_page(page):
@@ -21,11 +22,12 @@ def settings_page(page):
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='git_url', content=core.GIT_URL)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.02')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.03')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
 
         with doc:
             Header.insert_header(current="settings")
@@ -168,8 +170,8 @@ class Settings():
     @expose
     @settings_page
     def quality(self, c):
-        span('Quality and Filters may be set separately for each movie, this is the '\
-          'default setting that will be used to \'Quick-Add\' movies.')
+        span('Quality and Filters may be set separately for each movie, this is the '
+             'default setting that will be used to \'Quick-Add\' movies.')
         br()
         h1('Quality')
         c_s = 'Quality'
@@ -421,3 +423,5 @@ class Settings():
                 themes.append(i)
         themes.append('Default')
         return themes
+
+# pylama:ignore=W0401

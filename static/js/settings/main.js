@@ -168,10 +168,10 @@ $(document).ready(function () {
 
 
                 toastr.info(body, title, {closeButton:true,
-                                                            timeOut: 0,
-                                                            extendedTimeOut: 0,
-                                                            tapToDismiss: 0}
-                                                        });
+                                          timeOut: 0,
+                                          extendedTimeOut: 0,
+                                          tapToDismiss: 0
+                                          });
 
             }
         $i.addClass("fa-arrow-circle-up");

@@ -166,7 +166,7 @@ class AuthController(object):
         else:
             try:
                 cherrypy.session.regenerate()
-            except Exception, e:
+            except Exception, e: # noqa
                 pass
             cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
             self.on_login(username, origin)

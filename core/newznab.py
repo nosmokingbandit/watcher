@@ -49,7 +49,7 @@ class NewzNab():
                     results.append(result)
             except (SystemExit, KeyboardInterrupt):
                 raise
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('NewzNab search_all get xml', exc_info=True)
         return results
 
@@ -64,7 +64,7 @@ class NewzNab():
         root = ET.fromstring(feed)
 
         # This is so ugly, but some newznab sites don't output json. I don't want to include a huge xml parsing module, so here we are. I'm not happy about it either.
-        res_list =[]
+        res_list = []
         for root_child in root:
             if root_child.tag == 'channel':
                 for channel_child in root_child:

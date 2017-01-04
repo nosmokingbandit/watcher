@@ -1,6 +1,6 @@
-from dominate.tags import *
 import core
 import json
+from dominate.tags import *
 
 
 class Head(object):
@@ -27,3 +27,5 @@ class Head(object):
         script(type='text/javascript', src=core.URL_BASE + '/static/js/toastr/toastr.min.js')
         script(type='text/javascript', src=core.URL_BASE + '/static/js/notification/main.js?v=01.03')
         script("toastr.options.positionClass = 'toast-bottom-left'; toastr['update'] = toastr['info'];", type='text/javascript')
+
+# pylama:ignore=W0401

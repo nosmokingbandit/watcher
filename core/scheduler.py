@@ -25,12 +25,14 @@ class AutoSearch(object):
         min = int(core.CONFIG['Search']['searchtimemin'])
 
         task_search = taskscheduler.ScheduledTask(hr, min, interval,
-                      search.auto_search_and_grab, auto_start=True)
+                                                  search.auto_search_and_grab,
+                                                  auto_start=True)
 
         # update core.NEXT_SEARCH
         delay = task_search.task.delay
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, delay)
+
 
 class AutoUpdateCheck(object):
 

@@ -1,5 +1,5 @@
-import dominate
 import core
+import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -25,3 +25,5 @@ class Restart():
                     p('Watcher is taking too long to restart, please check your logs and restart manually.')
 
         return doc.render()
+
+# pylama:ignore=W0401

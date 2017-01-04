@@ -95,7 +95,7 @@ class MovieStatusPopup():
 
     def result_list(self, imdbid):
         results = self.sql.get_search_results(imdbid)
-        doc = dominate.document(title='Watcher')
+        doc = dominate.document(title='Watcher')  # FIX
         with doc:
 
             if not results:
@@ -142,3 +142,5 @@ class MovieStatusPopup():
                         span(pubdate, cls='bold')
 
         return doc.render()
+
+# pylama:ignore=W0401

@@ -1,6 +1,5 @@
-from dominate.tags import *
 import core
-import json
+from dominate.tags import *
 
 
 class Header():
@@ -62,3 +61,5 @@ class Header():
                         else:
                             cls = 'status'
                         li('Status', cls=cls)
+
+# pylama:ignore=W0401

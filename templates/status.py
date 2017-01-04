@@ -1,18 +1,13 @@
-import datetime
-
 import core
 import dominate
 from cherrypy import expose
-from core import sqldb, version
+from core import sqldb
 from dominate.tags import *
 from header import Header
 from head import Head
 
 
 class Status():
-
-    def __init__(self):
-        THEME = core.CONFIG['Server']['theme']
 
     @expose
     def default(self):
@@ -72,3 +67,5 @@ class Status():
                         span(title_year, cls='title_year')
 
         return unicode(movie_list)
+
+# pylama:ignore=W0401

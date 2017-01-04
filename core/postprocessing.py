@@ -123,7 +123,7 @@ class Postprocessing(object):
             # Find the biggest file in the dir. Assume that this is the movie.
             try:
                 files = os.listdir(path)
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Path not found in filesystem.',
                               exc_info=True)
                 return ''
@@ -241,7 +241,7 @@ class Postprocessing(object):
 
             try:
                 omdbdata = json.loads(urllib2.urlopen(request).read())
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Post-processing omdb request.', exc_info=True)
                 return None
 
@@ -525,7 +525,7 @@ class Postprocessing(object):
             os.rename(abs_path_old, abs_path_new)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Renamer failed: Could not rename file.', exc_info=True)
             return None
 
@@ -564,7 +564,7 @@ class Postprocessing(object):
         try:
             shutil.copystat = self.null
             shutil.move(abs_path_old, target_folder)
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Mover failed: Could not move file.', exc_info=True)
             return None
 
@@ -588,13 +588,13 @@ class Postprocessing(object):
                 logging.error('Could not delete path.', exc_info=True)
                 return False
         elif os.path.isfile(path):
-        # if its a file
+            # if its a file
             try:
                 os.remove(path)
                 return True
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Could not delete path.', exc_info=True)
                 return False
         else:
-        # if it is somehow neither
+            # if it is somehow neither
             return False

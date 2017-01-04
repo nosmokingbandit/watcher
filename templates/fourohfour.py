@@ -1,5 +1,5 @@
-import dominate
 import core
+import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -26,3 +26,5 @@ class FourOhFour():
                     span('Page Not Found')
 
         return doc.render()
+
+# pylama:ignore=W0401

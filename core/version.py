@@ -265,7 +265,7 @@ class ZipUpdater(object):
             hash = response['sha']
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Could not get newest hash from git.', exc_info=True)
             return None
         return hash
@@ -310,7 +310,7 @@ class ZipUpdater(object):
             behind_count = response['behind_by']
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Could not get update information from git.', exc_info=True)
             result['status'] = 'error'
             result['error'] = 'Could not get update information from git.'
@@ -432,7 +432,7 @@ class ZipUpdater(object):
         try:
             shutil.rmtree(update_path)
             os.remove(update_zip)
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Could not delete temporary files.', exc_info=True)
             return False
 

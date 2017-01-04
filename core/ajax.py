@@ -108,12 +108,12 @@ class Ajax(object):
         TABLE = 'MOVIES'
 
         imdbid = data['imdbid']
-        title = data['title'].replace('_', ' ').encode('ascii','ignore')
+        title = data['title'].replace('_', ' ').encode('ascii', 'ignore')
         year = data['year'][:4]
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
             logging.info(u'{} {} already exists as a wanted movie'
-                .format(title, year, imdbid))
+                         .format(title, year, imdbid))
 
             response['response'] = 'false'
             response['message'] = u'{} {} is already wanted, cannot add.' \
@@ -130,7 +130,7 @@ class Ajax(object):
             if self.sql.write(TABLE, DB_STRING):
 
                 t2 = threading.Thread(target=self.poster.save_poster,
-                    args=(imdbid, poster_url))
+                                      args=(imdbid, poster_url))
                 t2.start()
 
                 t = threading.Thread(target=thread_search_grab, args=(data,))
@@ -193,7 +193,7 @@ class Ajax(object):
             return 'success'
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.exception('Writing config.')
             return 'failed'
 
@@ -322,7 +322,7 @@ class Ajax(object):
 
         if mode == 'sabnzbd':
             test = sabnzbd.Sabnzbd.test_connection(data)
-            if test == True:
+            if test is True:
                 response['status'] = 'true'
                 response['message'] = 'Connection successful.'
             else:
@@ -330,7 +330,7 @@ class Ajax(object):
                 response['message'] = test
         if mode == 'nzbget':
             test = nzbget.Nzbget.test_connection(data)
-            if test == True:
+            if test is True:
                 response['status'] = 'true'
                 response['message'] = 'Connection successful.'
             else:

@@ -191,3 +191,5 @@ if __name__ == '__main__':
     os.chdir(core.PROG_PATH)  # have to do this for the daemon
     # finish by blocking
     cherrypy.engine.block()
+
+# pylama:ignore=E402

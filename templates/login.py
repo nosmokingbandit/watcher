@@ -39,3 +39,5 @@ class Login(object):
                     i(cls='fa fa-sign-in', id='send_login')
 
         return doc.render()
+
+# pylama:ignore=W0401

@@ -1,12 +1,13 @@
+import os
+
 import cherrypy
 import core
 import dominate
+
 from cherrypy import expose
-from core import config
 from dominate.tags import *
 from header import Header
 from head import Head
-import os
 
 
 def settings_page(page):
@@ -169,8 +170,8 @@ class Settings():
     @expose
     @settings_page
     def quality(self, c):
-        span('Quality and Filters may be set separately for each movie, this is the '\
-          'default setting that will be used to \'Quick-Add\' movies.')
+        span('Quality and Filters may be set separately for each movie, this is the '
+             'default setting that will be used to \'Quick-Add\' movies.')
         br()
         h1('Quality')
         c_s = 'Quality'
@@ -422,3 +423,5 @@ class Settings():
                 themes.append(i)
         themes.append('Default')
         return themes
+
+# pylama:ignore=W0401

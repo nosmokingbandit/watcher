@@ -1,7 +1,6 @@
 import json
 
 import core
-import dominate
 from core.movieinfo import Omdb, Trailer
 from dominate.tags import *
 
@@ -97,3 +96,5 @@ class MovieInfoPopup():
     def no_data(self):
         message = "<div id='container'><span>Unable to retrive movie information. Try again in a few minutes or check logs for more information.</span></div>"
         return message
+
+# pylama:ignore=W0401

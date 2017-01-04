@@ -1,9 +1,9 @@
+import core
 import dominate
 from cherrypy import expose
-import core
 from dominate.tags import *
-from header import Header
 from head import Head
+from header import Header
 
 
 class AddMovie():
@@ -34,3 +34,5 @@ class AddMovie():
             div(id='info_pop_up')
 
         return doc.render()
+
+# pylama:ignore=W0401

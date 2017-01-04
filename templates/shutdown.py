@@ -1,5 +1,5 @@
-import dominate
 import core
+import dominate
 from cherrypy import expose
 from dominate.tags import *
 from head import Head
@@ -23,3 +23,5 @@ class Shutdown():
                 span('Shutting Down', cls='msg')
 
         return doc.render()
+
+# pylama:ignore=W0401

@@ -1,4 +1,3 @@
-import cherrypy
 import core
 import dominate
 from cherrypy import expose
@@ -30,3 +29,5 @@ class Update():
                 span('Updating', cls='msg')
 
         return doc.render()
+
+# pylama:ignore=W0401

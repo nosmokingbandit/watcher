@@ -43,7 +43,7 @@ class Omdb():
                 return [result]
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('OMDB search.', exc_info=True)
             return 'Search Error.'
 
@@ -65,7 +65,7 @@ class Omdb():
                 return results_json['Search'][:6]  # limits to 6 results
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('OMDB search.', exc_info=True)
             return 'Search Error.'
 
@@ -80,13 +80,13 @@ class Omdb():
 
         search_string = "http://www.omdbapi.com/?i={}&plot=short&tomatoes=true&r=json".format(imdbid)
 
-        request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
             data = json.load(urllib2.urlopen(request))
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('OMDB movie_info.', exc_info=True)
             return None
 
@@ -119,7 +119,7 @@ class Trailer():
 
         search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', k)
 
-        request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'} )
+        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         tries = 0
         while tries < 3:
@@ -129,7 +129,7 @@ class Trailer():
                 return data['items'][0]['id']['videoId']
             except (SystemExit, KeyboardInterrupt):
                 raise
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Tailer get_trailer.', exc_info=True)
                 tries += 1
         return None

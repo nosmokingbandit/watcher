@@ -26,7 +26,7 @@ def settings_page(page):
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.03')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.04')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
 
         with doc:

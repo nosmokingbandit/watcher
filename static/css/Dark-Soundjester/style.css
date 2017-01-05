@@ -1,3 +1,4 @@
+@import url("header.css");
 body { background-color: #111; }
 body, input{ color: #cccccc; }
 input{ color:black; }

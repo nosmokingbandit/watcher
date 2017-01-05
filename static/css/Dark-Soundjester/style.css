@@ -1,16 +1,4 @@
-@import url("header.css");
-@import url("../style.css");
-body, input{
-    color: #cccccc;
-}
-
+body { background-color: #111; }
+body, input{ color: #cccccc; }
 input{ color:black; }
-
-body {
-    background-color: #111;
-}
-
-a {
-    color: white;
-}
-
+a { color: white; }

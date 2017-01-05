@@ -135,6 +135,7 @@ if __name__ == '__main__':
     scheduler.AutoSearch.create()
     scheduler.AutoUpdateCheck.create()
     scheduler.AutoUpdateInstall.create()
+    scheduler.ImdbRssSync.create()
     scheduler_plugin.plugin.subscribe()
 
     # If windows os and daemon selected, start systray

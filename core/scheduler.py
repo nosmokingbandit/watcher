@@ -6,6 +6,7 @@ import core
 from core.notification import Notification
 
 from core import searcher, version
+from core.rss import imdb
 from core.plugins import taskscheduler
 
 logging = logging.getLogger(__name__)
@@ -147,4 +148,34 @@ class AutoUpdateInstall(object):
 
         logging.info('Update successful, restarting.')
         cherrypy.engine.restart()
+        return
+
+
+class ImdbRssSync(object):
+
+    @staticmethod
+    def create():
+        interval = 6 * 3600
+        now = datetime.datetime.now()
+
+        hr = now.hour
+        min = now.minute + 5
+
+        if core.CONFIG['Search']['imdbsync'] == 'true':
+            auto_start = True
+        else:
+            auto_start = False
+
+        taskscheduler.ScheduledTask(hr, min, interval, ImdbRssSync.sync_rss,
+                                    auto_start=auto_start)
+        return
+
+    @staticmethod
+    def sync_rss():
+        logging.info('Running automatic IMDB rss sync.')
+        rss_url = core.CONFIG['Search']['imdbrss']
+
+        imdb_rss = imdb.ImdbRss()
+
+        imdb_rss.get_rss(rss_url)
         return

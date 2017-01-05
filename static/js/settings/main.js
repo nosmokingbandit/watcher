@@ -65,25 +65,18 @@ $(document).ready(function () {
 
     /* toggle downloader slide downs */
     $("i.radio").click(function(){
+        $this = $(this);
         // turn on
-        if( $(this).attr("value") == "false" ){
-            $(this).attr("value", "true");
-            $(this).removeClass("fa-circle-o")
-            $(this).addClass("fa-circle");
+        if( $this.attr("value") == "false" ){
+            $this.attr("value", "true");
+            $this.removeClass("fa-circle-o")
+            $this.addClass("fa-circle");
 
             // and turn off the other one
-            var tog = $(this).attr("tog");
+            var tog = $this.attr("tog");
             $("ul#"+tog).stop().slideDown();
             $("ul#downloader ul").not($("#"+tog)).stop().slideUp()
             $("i.radio[tog!="+tog+"]").attr("value", "false").removeClass("fa-circle").addClass("fa-circle-o");
-
-        // turn off
-        } else if ( $(this).attr("value") == "true" ){
-            $(this).attr("value", "false");
-            $(this).removeClass("fa-circle");
-            $(this).addClass("fa-cricle-o");
-            var tog = $(this).attr("tog");
-            $("ul#"+tog).stop().slideUp();
         }
     });
 

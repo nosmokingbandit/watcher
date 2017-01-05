@@ -142,6 +142,7 @@ class Searcher():
             for o in old_results:
                 if o['guid'] == r['guid']:
                     r.update(o)
+                    r['score'] = 0
                     newznab_results[i] = r
 
         scored_results = self.score.score(newznab_results, imdbid, 'nzb')

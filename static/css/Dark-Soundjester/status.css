@@ -1,6 +1,4 @@
-@import url("../status.css");
-
-ul#movie_list { width: 85%;  max-width: 1440px; justify-content: center; }
+ul#movie_list { justify-content: center; }
 ul#movie_list li div span.status{ color: white; }
 ul#movie_list li div span.found{ background-color: #3fc344; }
 ul#movie_list li div span.finished { background-color: #3c773e; }

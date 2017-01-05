@@ -89,11 +89,14 @@ class Task(object):
     def __init__(self, hour, minute, interval, func):
         self.interval = interval
         self.func = func
-        if minute == 60:
-            minute = 0
+        if minute > 60:
+            minute -= 60
+            rollover = timedelta(hours=1)
+        else:
+            rollover = timedelta()
 
         now = datetime.today().replace(second=0, microsecond=0)
-        next = now.replace(hour=hour, minute=minute)
+        next = now.replace(hour=hour, minute=minute) + rollover
 
         while next < now:
             next += timedelta(seconds=self.interval)

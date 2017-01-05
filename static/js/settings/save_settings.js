@@ -25,8 +25,6 @@ $(document).ready(function () {
             data = postprocessing()
         }
 
-        console.log(data);
-
         if(data == false){
             return
         }
@@ -90,11 +88,13 @@ $(document).ready(function () {
             search[$(this).attr("id")] = $(this).attr("value");
         })
         $("ul#search :input").each(function(){
-            if($(this).val() == ''){
+            $this = $(this);
+
+            if($this.val() == '' && $this.attr('id') != 'imdbrss'){
                 blanks = true;
-                highlight($(this));
+                highlight($this);
             }
-            search[$(this).attr("id")] = $(this).val();
+            search[$this.attr("id")] = $this.val();
         });
         if(blanks == true){
             return false;

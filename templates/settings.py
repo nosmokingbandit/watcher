@@ -26,7 +26,7 @@ def settings_page(page):
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.04')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.04.b')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
 
         with doc:
@@ -157,11 +157,16 @@ class Settings():
                 span('Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(' days for best release.')
-            with li():
+            with li(cls='bbord'):
                 span('Retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
                 span(' days.')
                 span('Use 0 for no limit.', cls='tip')
+            with li():
+                i(id='imdbsync', cls='fa fa-square-o checkbox', value=c[c_s]['imdbsync'])
+                span('Sync imdb watch list.')
+                input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
+                span('*Requires restart. Syncs every 6 hours.', cls='tip')
 
         with span(id='save', cat='search'):
             i(cls='fa fa-save')

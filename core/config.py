@@ -78,6 +78,29 @@ class Config():
         self.stash()
         return
 
+    def write_single(self, category, key, value):
+        ''' Writes single value to config
+        :param category:
+        :param key:
+        :param value:
+
+        Writes single value to config file and updates core.CONFIG
+
+        Does not return
+        '''
+
+        value = str(value)
+
+        self.config.read(self.file)
+
+        self.config.set(category, key, value)
+        core.CONFIG[category][key] = value
+
+        with open(self.file, 'w') as cfgfile:
+            self.config.write(cfgfile)
+
+        return
+
     def merge_new_options(self):
         ''' Merges new options in base_config with config
 

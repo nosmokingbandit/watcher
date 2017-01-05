@@ -4,6 +4,7 @@ from core.movieinfo import Omdb
 from datetime import datetime
 import json
 import logging
+import os
 import urllib2
 import xml.etree.cElementTree as ET
 
@@ -11,7 +12,6 @@ logging = logging.getLogger(__name__)
 
 
 class ImdbRss(object):
-
     def __init__(self):
         self.config = config.Config()
         self.omdb = Omdb()
@@ -96,11 +96,17 @@ class ImdbRss(object):
 
         Does not return
         '''
+        data_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'imdb')
 
         date_format = '%a, %d %b %Y %H:%M:%S %Z'
         new_rss_movies = []
 
-        last_sync = core.CONFIG['Search']['imdblastsync'] or 'Sat, 01 Jan 2000 00:00:00 GMT'
+        if os.path.isfile(data_file):
+            with open(data_file, 'r') as f:
+                last_sync = f.read()
+        else:
+            last_sync = 'Sat, 01 Jan 2000 00:00:00 GMT'
+
         logging.info('Last synced this watchlist on {}+0800'.format(last_sync))
 
         last_sync = datetime.strptime(last_sync, date_format)
@@ -134,9 +140,10 @@ class ImdbRss(object):
             if not movie_info:
                 logging.info('{} not found on omdb. Cannot add.'.format(imdbid))
                 continue
-            #logging.info('Adding {}'.format(imdbid))
+            # logging.info('Adding {}'.format(imdbid))
             movie_info['quality'] = json.dumps(quality)
             self.ajax.add_wanted_movie(json.dumps(movie_info))
 
         logging.info('Storing last synced date')
-        self.config.write_single('Search', 'imdblastsync', self.lastbuilddate)
+        with open(data_file, 'w') as f:
+            f.write(self.lastbuilddate)

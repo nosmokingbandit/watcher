@@ -71,7 +71,7 @@ class Postprocessing(object):
         data['filename'] = self.get_filename(data['path'])
 
         logging.info('Parsing release name for information.')
-        data.update(self.parse_filename(os.path.basename(data['filename'])))
+        data.update(self.parse_filename(data['filename']))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info('Gathering release information.')
@@ -145,9 +145,12 @@ class Postprocessing(object):
                     s = size
 
             logging.info('Post-processing file {}.'.format(biggestfile))
+
+            ## TODO What happens if no file is found?
+
             return biggestfile
 
-    def parse_filename(self, filename):
+    def parse_filename(self, filepath):
         ''' Parses filename for release information
         :param filename: str name of movie file
 
@@ -161,6 +164,7 @@ class Postprocessing(object):
         Returns dict of parsed data
         '''
 
+        # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
         data = {
             'title': '',
             'year': '',
@@ -169,9 +173,18 @@ class Postprocessing(object):
             'audiocodec': '',
             'videocodec': '',
             'source': '',
+            'imdbid': ''
             }
 
-        titledata = PTN.parse(filename)
+        titledata = PTN.parse(os.path.basename(filepath))
+        # this key is useless
+        if 'excess' in titledata:
+            titledata.pop('excess')
+
+        if len(titledata) <= 2:
+            logging.info('Parsing filename doesn\'t look accurate. Parsing parent folder name')
+            parent_folder = filepath.split(os.sep)[-2]
+            titledata = PTN.parse(parent_folder)
 
         # this key is useless
         if 'excess' in titledata:
@@ -197,6 +210,8 @@ class Postprocessing(object):
         Uses guid to look up local details.
         If that fails, uses downloadid.
         If that fails, uses title and year from  to search omdb for imdbid
+
+        If everything fails returns empty dict {}
 
         Returns dict of any gathered information
         '''
@@ -243,11 +258,11 @@ class Postprocessing(object):
                 omdbdata = json.loads(urllib2.urlopen(request).read())
             except Exception, e: # noqa
                 logging.error('Post-processing omdb request.', exc_info=True)
-                return None
+                return {}
 
             if omdbdata['Response'] == 'False':
                 logging.info('Nothing found in OMDB.')
-                return None
+                return {}
             else:
                 logging.info('Data found on OMDB.')
 
@@ -269,7 +284,7 @@ class Postprocessing(object):
 
             return data
         else:
-            return None
+            return {}
 
     def failed(self, data):
         ''' Post-process failed downloads.

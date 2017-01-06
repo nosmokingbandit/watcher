@@ -73,10 +73,6 @@ div#content ul li{
     line-height: 2.5em;
 }
 
-div#content ul li.hidden{
-    display:none;
-}
-
 div#content ul li.bbord{
     border-bottom: 1px solid #bdbdbd;
 }

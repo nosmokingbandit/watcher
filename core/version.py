@@ -1,4 +1,3 @@
-import backup
 import datetime
 import json
 import logging
@@ -9,8 +8,6 @@ import urllib2
 import zipfile
 
 import core
-
-from pdb import set_trace as bp
 
 # get remote hash # git rev-parse origin/master
 # get local hash  # git rev-parse HEAD
@@ -332,44 +329,6 @@ class ZipUpdater(object):
             core.UPDATE_STATUS = result
             return result
 
-    def switch_log(self, new_path=None, handler=None):
-        ''' Changes log path to tmp file
-        :param new_path: string to new log file     <optional>
-        :param handler: object log handler object   <optional>
-
-        One var, and only one var, must be passed.
-
-        Changes the log path the 'new_path/log.txt' or assigns handler
-
-        Used to remove open log file so it can be overwritten
-            if neccesay during update.
-
-        Returns object original log handler object
-        '''
-
-        import logging.handlers
-
-        if new_path is None and handler is None:
-            return False
-
-        if new_path is not None and handler is not None:
-            return False
-
-        if new_path:
-            formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s.%(funcName)s: %(message)s')
-            new_file = os.path.join(new_path, 'log.txt')
-            handler = logging.FileHandler(new_file, 'a')
-            handler.setFormatter(formatter)
-
-        log = logging.getLogger()  # root logger
-        print len(log.handlers)
-        for hdlr in log.handlers[:]:  # remove all old handlers
-            original = hdlr
-            hdlr.close()
-            log.removeHandler(hdlr)
-        log.addHandler(handler)      # set the new handler
-        return original
-
     def execute_update(self):
         os.chdir(core.PROG_PATH)
         update_zip = 'update.zip'
@@ -385,13 +344,9 @@ class ZipUpdater(object):
                 os.remove(update_zip)
             if os.path.isdir(update_path):
                 shutil.rmtree(update_path)
-            os.mkdir(update_path)
         except Exception, e:
             logging.error('Could not delete old update files.', exc_info=True)
             return False
-
-        logging.info('Creating temporary update log file.')
-        orig_log_handler = self.switch_log(new_path=update_path)
 
         logging.info('Downloading latest Zip.')
         zip_url = '{}/archive/{}.zip'.format(core.GIT_URL, core.CONFIG['Server']['gitbranch'])
@@ -413,25 +368,21 @@ class ZipUpdater(object):
             return False
 
         logging.info('Backing up user files.')
-        backup.backup(require_confirm=False)
+        try:
+            os.mkdir(backup_path)
 
-        bp()
-
-        # try:
-        #     os.mkdir(backup_path)
-        #
-        #     if os.path.isfile('watcher.sqlite'):
-        #         shutil.copy2('watcher.sqlite', backup_path)
-        #     if os.path.isfile('config.cfg'):
-        #         shutil.copy2('config.cfg', backup_path)
-        #     if os.path.isdir('logs'):
-        #         shutil.copytree('logs', os.path.join(backup_path, 'logs'))
-        #     posterpath = os.path.join('static', 'images', 'posters')
-        #     if os.path.isdir(posterpath):
-        #         shutil.copytree(posterpath, os.path.join(backup_path, posterpath))
-        # except Exception, e:
-        #     logging.error('Could not back up user files.', exc_info=True)
-        #     return False
+            if os.path.isfile('watcher.sqlite'):
+                shutil.copy2('watcher.sqlite', backup_path)
+            if os.path.isfile('config.cfg'):
+                shutil.copy2('config.cfg', backup_path)
+            if os.path.isdir('logs'):
+                shutil.copytree('logs', os.path.join(backup_path, 'logs'))
+            posterpath = os.path.join('static', 'images', 'posters')
+            if os.path.isdir(posterpath):
+                shutil.copytree(posterpath, os.path.join(backup_path, posterpath))
+        except Exception, e:
+            logging.error('Could not back up user files.', exc_info=True)
+            return False
 
         # reset update status so it doesn't ask us to update again
         core.UPDATE_STATUS = None
@@ -446,42 +397,30 @@ class ZipUpdater(object):
                 dst = file
 
                 if os.path.isfile(src):
-                    if os.path.isfile(dst):
-                        os.remove(dst)
+                    os.remove(dst)
                     shutil.copy2(src, dst)
                 elif os.path.isdir(src):
-                    if os.path.isdir(dst):
-                        print dst
-                        shutil.rmtree(dst)
+                    shutil.rmtree(dst)
                     shutil.copytree(src, dst)
         except Exception, e:
             logging.error('Could not move update files.', exc_info=True)
             return False
 
         logging.info('Restoring user files.')
-        backup.restore(require_confirm=False)
+        try:
+            for file in backup_path:
+                src = os.path.join(backup_path, file)
+                dst = file
 
-        # try:
-        #     for file in os.listdir(backup_path):
-        #         src = os.path.join(backup_path, file)
-        #         dst = file
-        #
-        #         print 'SOURCE: {}'.format(src)
-        #         print 'DESTINATION: {}'.format(dst)
-        #         bp()
-        #
-        #         if os.path.isfile(src):
-        #             if os.path.isfile(dst):
-        #                 os.remove(dst)
-        #             shutil.copy2(src, dst)
-        #         elif os.path.isdir(src):
-        #             if os.path.isdir(dst):
-        #                 print dst
-        #                 shutil.rmtree(dst)
-        #             shutil.copytree(src, dst)
-        # except Exception, e:
-        #     logging.error('Could not restore user files.', exc_info=True)
-        #     return False
+                if os.path.isfile(src):
+                    os.remove(dst)
+                    shutil.copy2(src, dst)
+                elif os.path.isdir(src):
+                    shutil.rmtree(dst)
+                    shutil.copytree(src, dst)
+        except Exception, e:
+            logging.error('Could not restore user files.', exc_info=True)
+            return False
 
         logging.info('Setting new version file.')
         try:
@@ -490,14 +429,6 @@ class ZipUpdater(object):
         except Exception, e:
             logging.error('Could not update version file.', exc_info=True)
             return False
-
-        logging.info('Merging update log with master.')
-        with open(orig_log_handler.baseFilename, 'a') as log:
-            with open(os.path.join(update_path, 'log.txt'), 'r') as u_log:
-                log.write(u_log.read())
-
-        logging.info('Changing log handler back to original.')
-        self.switch_log(handler=orig_log_handler)
 
         logging.info('Cleaning up temporary files.')
         try:

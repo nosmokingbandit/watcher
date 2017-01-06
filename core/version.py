@@ -373,10 +373,10 @@ class ZipUpdater(object):
                 shutil.copy2('watcher.sqlite', backup_path)
             if os.path.isfile('config.cfg'):
                 shutil.copy2('config.cfg', backup_path)
-            if os.path.ispath('logs'):
+            if os.path.isdir('logs'):
                 shutil.copytree('logs', backup_path)
             posterpath = os.path.join('static', 'images', 'posters')
-            if os.path.ispath(posterpath):
+            if os.path.isdir(posterpath):
                 shutil.copytree(posterpath, backup_path)
         except Exception, e:
             logging.error('Could not back up user files.', exc_info=True)

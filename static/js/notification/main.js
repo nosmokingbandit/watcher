@@ -26,11 +26,13 @@ $(document).ready(function(){
     });
 
 
-    $(document).on('click', 'div.toaster-container a', function(e){
+    $(document).on('click', 'div#toast-container a', function(e){
         e.preventDefault();
         $this = $(this);
 
         url = $this.attr('href');
+
+        console.log($this)
 
         if($this.attr('href') == 'update_now'){
             update_now();

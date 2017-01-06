@@ -98,6 +98,8 @@ class Settings():
                 span(':')
                 input(type='number', min='0', max='59', id='installupdatemin', value=c[c_s]['installupdatemin'], style='width: 2.25em')
                 span('24hr time. *Requires restart.', cls='tip')
+            with li(cls='hidden'):
+                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'])
             with li(cls='bbord'):
                 with span(id='update_check'):
                     i(cls='fa fa-arrow-circle-up')

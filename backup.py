@@ -152,28 +152,3 @@ elif args.restore:
     restore()
 else:
     print 'Invalid arguments.'
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    cwd = os.getcwd()
-
-    parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-b', '--backup', help='Back up to watcher.zip.', action="store_true")
-    group.add_argument('-r', '--restore', help='Restore from watcher.zip.', action="store_true")
-    group.add_argument('-y', '--confirm', help='Ignore warnings and answer Y to prompts.', action="store_true")
-    args = parser.parse_args()
-
-    if args.confirm:
-        require_confirm = False
-    else:
-        require_confirm = True
-
-    if args.backup:
-        backup(require_confirm)
-        sys.exit(0)
-    elif args.restore:
-        restore(require_confirm)
-        sys.exit(0)
-    else:
-        print 'Invalid arguments.'
-        sys.exit(0)

@@ -146,8 +146,6 @@ class Postprocessing(object):
 
             logging.info('Post-processing file {}.'.format(biggestfile))
 
-            ## TODO What happens if no file is found?
-
             return biggestfile
 
     def parse_filename(self, filepath):
@@ -155,9 +153,9 @@ class Postprocessing(object):
         :param filename: str name of movie file
 
         PTN only returns information it finds, so we start with a blank dict
-        of keys that we NEED to have, then update it with PTN's data. This
-        way when we rename the file it will insert a blank string instead of
-        throwing a missing key exception.
+            of keys that we NEED to have, then update it with PTN's data. This
+            way when we rename the file it will insert a blank string instead of
+            throwing a missing key exception.
 
         Might eventually replace this with Hachoir-metadata
 
@@ -183,8 +181,12 @@ class Postprocessing(object):
 
         if len(titledata) <= 2:
             logging.info('Parsing filename doesn\'t look accurate. Parsing parent folder name')
-            parent_folder = filepath.split(os.sep)[-2]
-            titledata = PTN.parse(parent_folder)
+            path_list = filepath.split(os.sep)
+            if len(path_list) >=2:
+                titledata = PTN.parse(path_list[-2])
+            else:
+                logging.info('Unable to parse file name or folder.')
+                return data
 
         # this key is useless
         if 'excess' in titledata:
@@ -525,7 +527,15 @@ class Postprocessing(object):
         ext = os.path.splitext(abs_path_old)[1]
 
         # get the new file name
-        new_name = renamer_string.format(**data).replace('  ', ' ')
+        new_name = renamer_string.format(**data)
+
+        while '  ' in new_name:
+            new_name = new_name.replace('  ', ' ')
+
+        if not new_name or new_name == ' ':
+            logging.info('New file name would be blank. Cancelling renamer.')
+            return None
+
         while new_name[-1] == ' ':
             new_name = new_name[:-1]
         new_name = new_name + ext

@@ -1,4 +1,3 @@
-@import url("../add_movie.css");
 ul#movie_list { justify-content: center; }
 #info_pop_up { background: black; }
 #database_results { max-width: 1820px; }

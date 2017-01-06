@@ -137,7 +137,7 @@ class MovieStatusPopup():
                         span(' Score: ')
                         span(res['score'], cls='bold')
                         span(' Source: ')
-                        span(res['indexer'], cls='bold')
+                        span(res['indexer'] or '', cls='bold')
                         span(' Published: ')
                         span(pubdate, cls='bold')
 

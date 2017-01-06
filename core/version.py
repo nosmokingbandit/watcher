@@ -342,7 +342,7 @@ class ZipUpdater(object):
         try:
             if os.path.isfile(update_zip):
                 os.remove(update_zip)
-            elif os.path.isdir(update_path):
+            if os.path.isdir(update_path):
                 shutil.rmtree(update_path)
         except Exception, e:
             logging.error('Could not delete old update files.', exc_info=True)
@@ -369,15 +369,17 @@ class ZipUpdater(object):
 
         logging.info('Backing up user files.')
         try:
+            os.mkdir(backup_path)
+
             if os.path.isfile('watcher.sqlite'):
                 shutil.copy2('watcher.sqlite', backup_path)
             if os.path.isfile('config.cfg'):
                 shutil.copy2('config.cfg', backup_path)
             if os.path.isdir('logs'):
-                shutil.copytree('logs', backup_path)
+                shutil.copytree('logs', os.path.join(backup_path, 'logs'))
             posterpath = os.path.join('static', 'images', 'posters')
             if os.path.isdir(posterpath):
-                shutil.copytree(posterpath, backup_path)
+                shutil.copytree(posterpath, os.path.join(backup_path, posterpath))
         except Exception, e:
             logging.error('Could not back up user files.', exc_info=True)
             return False

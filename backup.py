@@ -4,37 +4,33 @@ import shutil
 import sys
 import zipfile
 
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-cwd = os.getcwd()
 tmpdir = 'backup_tmp'
 posterpath = os.path.join('static', 'images', 'posters')
 
-print '**############################################################**'
-print '**############### Watcher backup/restore tool ################**'
-print '** Confirm that Watcher is not running while restoring backup **'
-print '**############################################################**'
 
-
-def backup():
+def backup(require_confirm=True):
     # check for files and paths
     if not os.path.isfile('watcher.sqlite'):
-        if raw_input('Database watcher.sqlite not found. Continue? (y/N): ').lower() != 'y':
-            sys.exit(0)
+        if require_confirm is True:
+            if raw_input('Database watcher.sqlite not found. Continue? (y/N): ').lower() != 'y':
+                return
         database = False
     else:
         database = True
 
     if not os.path.isfile('config.cfg'):
-        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
-            sys.exit(0)
+        if require_confirm is True:
+            if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
+                return
         config = False
     else:
         config = True
 
     if not os.path.isdir(posterpath):
-        if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
-            sys.exit(0)
+        if require_confirm is True:
+            if raw_input('Config config.cfg not found. Continue? (y/N): ').lower() != 'y':
+                return
         posters = False
     else:
         posters = True
@@ -74,19 +70,21 @@ def backup():
     print '**################# Zip backup: watcher.zip ##################**'
     print '**############################################################**'
 
-    sys.exit(0)
+    return
 
 
-def restore():
+def restore(require_confirm=True):
+    cwd = os.getcwd()
     if not os.path.isfile('watcher.zip'):
         print 'watcher.zip not found. ' \
               'Place watcher.zip in same directory as backup script.'
-        sys.exit(0)
+        return
 
-    ans = raw_input('Restoring backup. This will overwrite existing '
-                    'database, config, and posters. Continue? (y/N):  ')
-    if ans.lower() != 'y':
-        sys.exit(0)
+    if require_confirm is True:
+        ans = raw_input('Restoring backup. This will overwrite existing '
+                        'database, config, and posters. Continue? (y/N):  ')
+        if ans.lower() != 'y':
+            return
 
     # make temp dir
     if os.path.isdir(tmpdir):
@@ -137,18 +135,38 @@ def restore():
     print '**##################### Backup finished ######################**'
     print '**################# Zip backup: watcher.zip ##################**'
     print '**############################################################**'
+
     return
 
 
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group()
-group.add_argument('-b', '--backup', help='Back up to watcher.zip.', action="store_true")
-group.add_argument('-r', '--restore', help='Restore from watcher.zip', action="store_true")
-args = parser.parse_args()
+if __name__ == '__main__':
 
-if args.backup:
-    backup()
-elif args.restore:
-    restore()
-else:
-    print 'Invalid arguments.'
+    print '**############################################################**'
+    print '**############### Watcher backup/restore tool ################**'
+    print '** Confirm that Watcher is not running while restoring backup **'
+    print '**############################################################**'
+
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    cwd = os.getcwd()
+
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-b', '--backup', help='Back up to watcher.zip.', action="store_true")
+    group.add_argument('-r', '--restore', help='Restore from watcher.zip.', action="store_true")
+    group.add_argument('-y', '--confirm', help='Ignore warnings and answer Y to prompts.', action="store_true")
+    args = parser.parse_args()
+
+    if args.confirm:
+        require_confirm = False
+    else:
+        require_confirm = True
+
+    if args.backup:
+        backup(require_confirm)
+        sys.exit(0)
+    elif args.restore:
+        restore(require_confirm)
+        sys.exit(0)
+    else:
+        print 'Invalid arguments.'
+        sys.exit(0)

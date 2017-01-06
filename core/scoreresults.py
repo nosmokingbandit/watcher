@@ -47,7 +47,7 @@ class ScoreResults():
             filters = core.CONFIG['Filters']
 
         retention = int(core.CONFIG['Search']['retention'])
-        score_title = bool(core.CONFIG['Search']['score_title'])
+        score_title = core.CONFIG['Search']['score_title'].lower() == 'true'
         required = filters['requiredwords'].lower().split(',')
         preferred = filters['preferredwords'].lower().split(',')
         ignored = filters['ignoredwords'].lower().split(',')

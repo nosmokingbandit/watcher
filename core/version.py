@@ -10,8 +10,6 @@ import zipfile
 
 import core
 
-from pdb import set_trace as bp
-
 # get remote hash # git rev-parse origin/master
 # get local hash  # git rev-parse HEAD
 # Hash history    # git rev-list @{u}
@@ -415,24 +413,6 @@ class ZipUpdater(object):
         logging.info('Backing up user files.')
         backup.backup(require_confirm=False)
 
-        bp()
-
-        # try:
-        #     os.mkdir(backup_path)
-        #
-        #     if os.path.isfile('watcher.sqlite'):
-        #         shutil.copy2('watcher.sqlite', backup_path)
-        #     if os.path.isfile('config.cfg'):
-        #         shutil.copy2('config.cfg', backup_path)
-        #     if os.path.isdir('logs'):
-        #         shutil.copytree('logs', os.path.join(backup_path, 'logs'))
-        #     posterpath = os.path.join('static', 'images', 'posters')
-        #     if os.path.isdir(posterpath):
-        #         shutil.copytree(posterpath, os.path.join(backup_path, posterpath))
-        # except Exception, e:
-        #     logging.error('Could not back up user files.', exc_info=True)
-        #     return False
-
         # reset update status so it doesn't ask us to update again
         core.UPDATE_STATUS = None
 
@@ -460,28 +440,6 @@ class ZipUpdater(object):
 
         logging.info('Restoring user files.')
         backup.restore(require_confirm=False)
-
-        # try:
-        #     for file in os.listdir(backup_path):
-        #         src = os.path.join(backup_path, file)
-        #         dst = file
-        #
-        #         print 'SOURCE: {}'.format(src)
-        #         print 'DESTINATION: {}'.format(dst)
-        #         bp()
-        #
-        #         if os.path.isfile(src):
-        #             if os.path.isfile(dst):
-        #                 os.remove(dst)
-        #             shutil.copy2(src, dst)
-        #         elif os.path.isdir(src):
-        #             if os.path.isdir(dst):
-        #                 print dst
-        #                 shutil.rmtree(dst)
-        #             shutil.copytree(src, dst)
-        # except Exception, e:
-        #     logging.error('Could not restore user files.', exc_info=True)
-        #     return False
 
         logging.info('Setting new version file.')
         try:

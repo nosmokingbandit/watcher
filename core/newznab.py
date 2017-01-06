@@ -92,6 +92,7 @@ class NewzNab():
 
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}
+        permalink = True
         for ic in item:
             if ic.tag in item_keep:
                 if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':

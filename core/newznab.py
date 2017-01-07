@@ -91,6 +91,9 @@ class NewzNab():
 
         Returns dict.
         '''
+        # TODO Should probably have a base dict then fill it in with d.update()
+
+        permalink = True
 
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}

@@ -53,6 +53,7 @@ class ScoreResults():
         today = datetime.today()
 
         # These all just modify self.results
+        self.reset()
         self.remove_inactive()
         self.remove_ignored(ignored)
         self.keep_required(required)
@@ -62,6 +63,10 @@ class ScoreResults():
         self.score_preferred(preferred)
 
         return self.results
+
+    def reset(self):
+        for i, d in enumerate(self.results):
+            self.results[i]['score'] = 0
 
     def remove_inactive(self):
         ''' Removes results from indexers no longer enabled

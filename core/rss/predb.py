@@ -72,6 +72,7 @@ class PreDB(object):
         search_term = title_year.replace(' ', '+').lower()
 
         search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
+        search_string = search_string.encode('ascii', 'replace')
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:

@@ -36,20 +36,8 @@ ul#movie_list{
     justify-content: space-around;
 }
 
-ul#movie_list li{
-    padding: 5px;
-    font-size: 0;
-}
-
-/* Ugly hack to get rid of whitespace between elements. */
-ul#movie_list li span{
-    font-size: 16px;
-}
-
 ul#movie_list li div{
-    height: 100%;
     width: 168px;
-    float: left;
     padding: 6px 6px 0px 6px;
     margin: 10px;
     cursor: pointer;
@@ -58,14 +46,12 @@ ul#movie_list li div{
 
 ul#movie_list li div span.status{
     height: 24px;
-    font-size: 0.75em;
     line-height: 24px;
     width: 100%;
     border-width: 1px 1px 0px 1px;
     border-style: solid;
     border-color: #212121;
     display: block;
-    font-size: 16px;
     text-align: center;
 }
 
@@ -100,27 +86,10 @@ ul#movie_list li div img{
 }
 
 ul#movie_list li span.title_year{
-    height: 1.5em;
-    font-size: 0.75em;
-    line-height: 1.5em;
-    display: block; /* needed for width */
-    font-size: 16px;
-    text-align: center;
-}
-
-
-div#update_footer{
-    background-color: #eee;
-    padding: 0;
     margin: 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    border-top: 1px solid #bdbdbd;
-    clear: both;
-    height: 64px;
-
+    padding: 0;
+    display: block; /* needed for width */
+    text-align: center;
 }
 
 /* specific movie details */

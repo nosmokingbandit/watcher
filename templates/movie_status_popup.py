@@ -17,7 +17,8 @@ class MovieStatusPopup():
         data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
             poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
-            title_date = u'{} {}'.format(data['title'], str(data['year']))
+            title = data['title']
+            year = str(data['year'])
 
             tomatoes_url = data['tomatourl']
 
@@ -32,7 +33,8 @@ class MovieStatusPopup():
 
             with div(id='title'):
                 with p():
-                    span(title_date, id='title', imdbid=imdbid)
+                    with span(title, id='title', imdbid=imdbid):
+                        span(year, id='title_year')
                     i(cls='fa fa-times', id='close')
                     i(cls='fa fa-trash', id='remove')
                     i(cls='fa fa-cog', id='change_quality')

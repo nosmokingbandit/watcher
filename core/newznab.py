@@ -62,13 +62,15 @@ class NewzNab():
         '''
 
         root = ET.fromstring(feed)
-
+        indexer = ''
         # This is so ugly, but some newznab sites don't output json. I don't want to include a huge xml parsing module, so here we are. I'm not happy about it either.
         res_list = []
         for root_child in root:
             if root_child.tag == 'channel':
                 for channel_child in root_child:
                     if channel_child.tag == 'title':
+                        indexer = channel_child.text
+                    if not indexer and channel_child.tag == 'link':
                         indexer = channel_child.text
                     if channel_child.tag == 'item':
                         result_item = self.make_item_dict(channel_child)

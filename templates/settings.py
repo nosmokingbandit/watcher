@@ -1,12 +1,13 @@
+import os
+
 import cherrypy
 import core
 import dominate
+
 from cherrypy import expose
-from core import config
 from dominate.tags import *
 from header import Header
 from head import Head
-import os
 
 
 def settings_page(page):
@@ -21,11 +22,12 @@ def settings_page(page):
         doc = dominate.document(title='Watcher')
 
         with doc.head:
+            meta(name='git_url', content=core.GIT_URL)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=12.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.02')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.05')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
 
         with doc:
             Header.insert_header(current="settings")
@@ -96,6 +98,8 @@ class Settings():
                 span(':')
                 input(type='number', min='0', max='59', id='installupdatemin', value=c[c_s]['installupdatemin'], style='width: 2.25em')
                 span('24hr time. *Requires restart.', cls='tip')
+            with li(cls='hidden'):
+                input(type='text', id='gitbranch', value=c[c_s]['gitbranch'])
             with li(cls='bbord'):
                 with span(id='update_check'):
                     i(cls='fa fa-arrow-circle-up')
@@ -155,11 +159,16 @@ class Settings():
                 span('Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(' days for best release.')
-            with li():
+            with li(cls='bbord'):
                 span('Retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
                 span(' days.')
                 span('Use 0 for no limit.', cls='tip')
+            with li():
+                i(id='imdbsync', cls='fa fa-square-o checkbox', value=c[c_s]['imdbsync'])
+                span('Sync imdb watch list.')
+                input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
+                span('*Requires restart. Syncs every 6 hours.', cls='tip')
 
         with span(id='save', cat='search'):
             i(cls='fa fa-save')
@@ -168,8 +177,8 @@ class Settings():
     @expose
     @settings_page
     def quality(self, c):
-        span('Quality and Filters may be set separately for each movie, this is the '\
-          'default setting that will be used to \'Quick-Add\' movies.')
+        span('Quality and Filters may be set separately for each movie, this is the '
+             'default setting that will be used to \'Quick-Add\' movies.')
         br()
         h1('Quality')
         c_s = 'Quality'
@@ -421,3 +430,5 @@ class Settings():
                 themes.append(i)
         themes.append('Default')
         return themes
+
+# pylama:ignore=W0401

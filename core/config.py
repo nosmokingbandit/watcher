@@ -31,14 +31,14 @@ class Config():
             shutil.copy2(self.base_file, self.file)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             print 'Could not move base_config.'
             raise
 
         self.config.readfp(open(self.file))
 
-        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2) )
-        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2) )
+        self.config.set('Search', 'searchtimehr', str(random.randint(0, 23)).zfill(2))
+        self.config.set('Search', 'searchtimemin', str(random.randint(0, 59)).zfill(2))
 
         self.config.set('Server', 'installupdatehr', str(random.randint(0, 23)).zfill(2))
         self.config.set('Server', 'installupdatemin', str(random.randint(0, 59)).zfill(2))
@@ -77,6 +77,29 @@ class Config():
         # After writing, copy it back to core.CONFIG
         self.stash()
         return
+
+    # def write_single(self, category, key, value):
+    #     ''' Writes single value to config
+    #     :param category:
+    #     :param key:
+    #     :param value:
+    #
+    #     Writes single value to config file and updates core.CONFIG
+    #
+    #     Does not return
+    #     '''
+    #
+    #     value = str(value)
+    #
+    #     self.config.read(self.file)
+    #
+    #     self.config.set(category, key, value)
+    #     core.CONFIG[category][key] = value
+    #
+    #     with open(self.file, 'w') as cfgfile:
+    #         self.config.write(cfgfile)
+    #
+    #     return
 
     def merge_new_options(self):
         ''' Merges new options in base_config with config

@@ -38,7 +38,7 @@ class Nzbget():
             raise
         except Exception, e:
             logging.error('Nzbget test_connection', exc_info=True)
-            return '{}. \n\n Please review your settings.'.format(e)
+            return '{}.'.format(e)
 
     @staticmethod
     def add_nzb(data):
@@ -86,6 +86,9 @@ class Nzbget():
         dupescore = data['score']
         dupemode = 'All'
 
-        response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
+        try:
+            response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
+            return {'response': 'true', 'downloadid': response}
 
-        return response
+        except Exception, e:
+            return {'response': 'false', 'error': str(e)}

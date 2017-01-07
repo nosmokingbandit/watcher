@@ -199,7 +199,7 @@ $(document).ready(function() {
             else{
                 refresh_list('#result_list', imdbid=imdbid);
                 refresh_list('#movie_list');
-                swal("Error", r, "error");
+                toastr.error(r);
             };
 
             $this.removeClass('fa-circle faa-burst animated');
@@ -231,9 +231,18 @@ $(document).ready(function() {
 
         $.post(url_base + "/ajax/manual_download", {"guid":guid})
         .done(function(r){
+            response = JSON.parse(r);
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
-            swal("", r, "success");
+
+            console.log(r);
+
+            if(response['response'] == 'true'){
+                toastr.success(response['message']);
+            } else {
+                toastr.error(response['error']);
+            }
+
             $this.removeClass('fa-circle faa-burst animated');
         });
         e.preventDefault();
@@ -242,35 +251,27 @@ $(document).ready(function() {
     $('ul#result_list').on('click', 'i#mark_bad', function(e) {
         var $this = $(this);
 
-        swal({
-            title: "Mark result as Bad?",
-            text: "",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            confirmButtonText: "Mark Bad",
-            closeOnConfirm: false
-            }, function(){
-                $this.addClass('fa-circle faa-burst animated');
-                var guid = $this.attr('guid');
-                var imdbid = $('span#title').attr('imdbid')
+        $this.addClass('fa-circle faa-burst animated');
+        var guid = $this.attr('guid');
+        var imdbid = $('span#title').attr('imdbid')
 
-                $.post(url_base + "/ajax/mark_bad", {
-                    "guid":guid,
-                    "imdbid":imdbid
-                })
-                .done(function(r){
-                    refresh_list('#movie_list');
-                    refresh_list('#result_list', imdbid=imdbid);
-                    if (r.includes("Success")){
-                        swal("", r, "success");
-                    } else {
-                        swal("", r, "error");
-                    };
-                    $this.removeClass('fa-circle faa-burst animated');
-                });
-            }
-        );
+        $.post(url_base + "/ajax/mark_bad", {
+            "guid":guid,
+            "imdbid":imdbid
+        })
+        .done(function(r){
+            console.log(r);
+            response = JSON.parse(r);
+
+            refresh_list('#movie_list');
+            refresh_list('#result_list', imdbid=imdbid);
+            if (response['response'] == 'true'){
+                toastr.success(response['message']);
+            } else {
+                toastr.error(response['error']);
+            };
+            $this.removeClass('fa-circle faa-burst animated');
+        });
     });
 
     function refresh_list(list, imdbid){

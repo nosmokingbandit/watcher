@@ -25,6 +25,10 @@ class Searcher():
         Runs search when scheduled. ONLY runs when scheduled.
         Runs in its own thread.
 
+        First checks for all movies on predb.
+
+        Searches only for movies where predb == 'found'.
+
         Searches only for movies that are Wanted, Found,
             or Finished -- if inside user-set date range.
 
@@ -62,9 +66,6 @@ class Searcher():
             title = movie['title']
             status = movie['status']
             finisheddate = movie['finisheddate']
-
-            if movie['predb'] != 'found':
-                continue
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))
@@ -120,6 +121,8 @@ class Searcher():
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year (Movie Title 2016)
 
+        Checks predb value in MOVIES table. If not == 'found', does nothing.
+
         Gets new search results from newznab providers.
         Pulls existing search results and updates new data with old. This way the
             found_date doesn't change.
@@ -133,6 +136,14 @@ class Searcher():
 
         Returns Bool if movie is found.
         '''
+
+        # First check predb
+        movie = self.sql.get_movie_details('imdbid', imdbid)
+        if movie['predb'] != 'found':
+            self.predb.check_one(movie)
+        movie = self.sql.get_movie_details('imdbid', imdbid)
+        if movie['predb'] != 'found':
+            return False
 
         newznab_results = self.nn.search_all(imdbid)
         old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
@@ -178,9 +189,7 @@ class Searcher():
         logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
 
         # This iterates through the new search results and submits only results we haven't already stored. This keeps it from overwriting the FoundDate
-        kept_guids = []
         BATCH_DB_STRING = []
-        existing_results = self.sql.get_search_results(imdbid)
 
         # # get list of guids of existing results
         # if existing_results:

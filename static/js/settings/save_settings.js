@@ -40,10 +40,10 @@ $(document).ready(function () {
 
         .done(function(r) {
             if(r == 'failed'){
-                swal("Error", "Unable to save settings. Check log for more information.", "error")
+                toastr.error("Unable to save settings. Check log for more information.");
             }
             else if(r == 'success'){
-                swal("Settings Saved", "", "success")
+                toastr.success("Settings Saved");
             }
 
             $thisi.removeClass('fa-circle faa-burst animated');
@@ -62,7 +62,7 @@ $(document).ready(function () {
         });
         $("#server :input").each(function(){
             if($(this).attr('id') == 'theme'){
-                
+
             }
             else if($(this).val() == ''){
                 blanks = true;
@@ -88,11 +88,13 @@ $(document).ready(function () {
             search[$(this).attr("id")] = $(this).attr("value");
         })
         $("ul#search :input").each(function(){
-            if($(this).val() == ''){
+            $this = $(this);
+
+            if($this.val() == '' && $this.attr('id') != 'imdbrss'){
                 blanks = true;
-                highlight($(this));
+                highlight($this);
             }
-            search[$(this).attr("id")] = $(this).val();
+            search[$this.attr("id")] = $this.val();
         });
         if(blanks == true){
             return false;
@@ -165,6 +167,7 @@ $(document).ready(function () {
         var data = {};
         var indexers = {};
         var ind = 1;
+        var cancel = false;
 
         $("#newznab_list li").each(function(){
             if ($(this).attr("class") == "newznab_indexer"){
@@ -174,9 +177,9 @@ $(document).ready(function () {
 
                 // check if one field is blank and both are not blank
                 if ( (url == "" || api == "") && (url + api !=="") ){
-                    swal("", "Please complete or clear out incomplete providers.", "warning");
+                    toastr.warning("Please complete or clear out incomplete providers.");
                     indexers = {}
-                    return false;
+                    cancel = true;
                 }
 
                 // but ignore it if both are blank
@@ -188,7 +191,11 @@ $(document).ready(function () {
         });
         data["Indexers"] = indexers;
 
-        return data
+        if(cancel == true){
+            return false;
+        } else {
+            return data
+        };
     }
 
     function downloader(){
@@ -245,7 +252,7 @@ $(document).ready(function () {
         });
 
         if(enabled > 1){
-            swal("", "Please enable only one downloader.", "warning");
+            toastr.warning("Please enable only one downloader.")
             return false
         }
         return true

@@ -16,8 +16,9 @@ select{
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
-    height: 1.5em;
-    font-size: 1em;
+    height: 2em;
+    font-size: 0.85em;
+    font-family: "Lucida Console", Monaco, monospace;
 }
 
 button{
@@ -30,11 +31,6 @@ button{
     font-size: 1.0em;
     cursor: pointer;
     text-overflow: clip;
-}
-
-button:hover{
-    background-color: #212121;
-    color: #fff;
 }
 
 i{
@@ -75,6 +71,10 @@ div#content ul{
 div#content ul li{
     padding: 0 0 0 0;
     line-height: 2.5em;
+}
+
+div#content ul li.hidden{
+    display:none;
 }
 
 div#content ul li.bbord{

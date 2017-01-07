@@ -108,12 +108,12 @@ class Ajax(object):
         TABLE = 'MOVIES'
 
         imdbid = data['imdbid']
-        title = data['title'].replace('_', ' ').encode('ascii','ignore')
+        title = data['title'].replace('_', ' ').encode('ascii', 'ignore')
         year = data['year'][:4]
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
             logging.info(u'{} {} already exists as a wanted movie'
-                .format(title, year, imdbid))
+                         .format(title, year, imdbid))
 
             response['response'] = 'false'
             response['message'] = u'{} {} is already wanted, cannot add.' \
@@ -130,7 +130,7 @@ class Ajax(object):
             if self.sql.write(TABLE, DB_STRING):
 
                 t2 = threading.Thread(target=self.poster.save_poster,
-                    args=(imdbid, poster_url))
+                                      args=(imdbid, poster_url))
                 t2.start()
 
                 t = threading.Thread(target=thread_search_grab, args=(data,))
@@ -193,7 +193,7 @@ class Ajax(object):
             return 'success'
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.exception('Writing config.')
             return 'failed'
 
@@ -223,8 +223,14 @@ class Ajax(object):
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year
 
+        Checks predb, then, if found, starts searching providers for movie.
+
         Returns str 'done' when done.
         '''
+        movie = self.sql.get_movie_details('imdbid', imdbid)
+
+        if movie['predb'] != 'found':
+            self.predb.check_one(movie)
 
         self.searcher.search(imdbid, title)
         return 'done'
@@ -234,25 +240,31 @@ class Ajax(object):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
 
-        Returns str success/fail message
+        Returns str json.dumps(dict) success/fail message
         '''
 
         data = self.sql.get_single_search_result('guid', guid)
         if data:
-            return self.snatcher.snatch(data)
+            return json.dumps(self.snatcher.snatch(data))
         else:
-            return 'Unable to get download information from the database. ' \
-                'Check logs for more information.'
+            return json.dumps({'response': 'false', 'error': 'Unable to get download '
+                               'information from the database. Check logs for more information.'})
 
     @cherrypy.expose
     def mark_bad(self, guid, imdbid):
         ''' Marks guid as bad in SEARCHRESULTS and MARKEDRESULTS
         :param guid: srt guid to mark
 
-        Returns success/failure message from update.mark_bad()
+        Returns str json.dumps(dict)
         '''
 
-        return self.update.mark_bad(guid, imdbid=imdbid)
+        if self.update.mark_bad(guid, imdbid=imdbid):
+            response = {'response': 'true', 'message': 'Marked as Bad.'}
+        else:
+            response = {'response': 'false', 'error': 'Could not mark release as bad. '
+                        'Check logs for more information.'}
+
+        return json.dumps(response)
 
     @cherrypy.expose
     def notification_remove(self, index):
@@ -316,7 +328,7 @@ class Ajax(object):
 
         if mode == 'sabnzbd':
             test = sabnzbd.Sabnzbd.test_connection(data)
-            if test == True:
+            if test is True:
                 response['status'] = 'true'
                 response['message'] = 'Connection successful.'
             else:
@@ -324,7 +336,7 @@ class Ajax(object):
                 response['message'] = test
         if mode == 'nzbget':
             test = nzbget.Nzbget.test_connection(data)
-            if test == True:
+            if test is True:
                 response['status'] = 'true'
                 response['message'] = 'Connection successful.'
             else:

@@ -26,7 +26,7 @@ class NewzNab():
         self.imdbid = imdbid
 
         results = []
-        imdbid_s = imdbid[2:]  #just imdbid numbers
+        imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
             if indexer[2] == 'false':
@@ -40,7 +40,7 @@ class NewzNab():
 
             logging.info('SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
 
-            request = urllib2.Request( search_string, headers={'User-Agent' : 'Mozilla/5.0'})
+            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
                 results_xml = urllib2.urlopen(request).read()
@@ -49,7 +49,7 @@ class NewzNab():
                     results.append(result)
             except (SystemExit, KeyboardInterrupt):
                 raise
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('NewzNab search_all get xml', exc_info=True)
         return results
 
@@ -62,13 +62,15 @@ class NewzNab():
         '''
 
         root = ET.fromstring(feed)
-
+        indexer = ''
         # This is so ugly, but some newznab sites don't output json. I don't want to include a huge xml parsing module, so here we are. I'm not happy about it either.
-        res_list =[]
+        res_list = []
         for root_child in root:
             if root_child.tag == 'channel':
                 for channel_child in root_child:
                     if channel_child.tag == 'title':
+                        indexer = channel_child.text
+                    if not indexer and channel_child.tag == 'link':
                         indexer = channel_child.text
                     if channel_child.tag == 'item':
                         result_item = self.make_item_dict(channel_child)
@@ -89,15 +91,17 @@ class NewzNab():
 
         Returns dict.
         '''
+        # TODO Should probably have a base dict then fill it in with d.update()
+
+        permalink = True
 
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}
+        permalink = True
         for ic in item:
             if ic.tag in item_keep:
                 if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':
                     permalink = False
-                else:
-                    permalink = True
                 d[ic.tag.lower()] = ic.text
             if 'newznab' in ic.tag and ic.attrib['name'] == 'size':
                 d['size'] = int(ic.attrib['value'])
@@ -111,6 +115,7 @@ class NewzNab():
             d['info_link'] = d['comments']
         else:
             d['info_link'] = d['guid']
+
         del d['comments']
         d['guid'] = d['link']
         del d['link']

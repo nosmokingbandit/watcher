@@ -25,7 +25,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=12.30')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.03')
             if not data:
                 span('Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -95,7 +95,7 @@ class MovieStatusPopup():
 
     def result_list(self, imdbid):
         results = self.sql.get_search_results(imdbid)
-        doc = dominate.document(title='Watcher')
+        doc = dominate.document(title='Watcher')  # FIX
         with doc:
 
             if not results:
@@ -116,7 +116,7 @@ class MovieStatusPopup():
                     else:
                         bbord = 'bbord'
                     with li(cls='title bold'):
-                        span(title, cls='name')
+                        span(title, cls='name', title=title)
                         with span(cls='buttons'):
                             with a(href=info_link, target='_blank'):
                                 i(cls='fa fa-info-circle')
@@ -137,8 +137,10 @@ class MovieStatusPopup():
                         span(' Score: ')
                         span(res['score'], cls='bold')
                         span(' Source: ')
-                        span(res['indexer'], cls='bold')
+                        span(res['indexer'] or '', cls='bold')
                         span(' Published: ')
                         span(pubdate, cls='bold')
 
         return doc.render()
+
+# pylama:ignore=W0401

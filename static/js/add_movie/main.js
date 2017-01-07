@@ -84,9 +84,9 @@ $(document).ready(function() {
             $icon.addClass('fa-plus');
 
             if(response['response'] == 'true'){
-                swal("", response['message'], 'success');
+                toastr.success(response['message']);
             } else {
-                swal("", response['message'], 'error');
+                toastr.error(response['message']);
             };
         })
     });

@@ -80,7 +80,7 @@ class PreDB(object):
             return items
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('PREDB search.', exc_info=True)
             return None
 

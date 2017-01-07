@@ -2,7 +2,6 @@ import json
 import logging
 import threading
 
-import cherrypy
 import core
 from core import ajax, sqldb, poster
 

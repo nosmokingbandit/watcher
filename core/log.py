@@ -14,7 +14,7 @@ class log(object):
 
         Does not return
         """
-        
+
         if not os.path.exists(path):
             os.makedirs(path)
 

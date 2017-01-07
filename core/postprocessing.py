@@ -71,7 +71,7 @@ class Postprocessing(object):
         data['filename'] = self.get_filename(data['path'])
 
         logging.info('Parsing release name for information.')
-        data.update(self.parse_filename(os.path.basename(data['filename'])))
+        data.update(self.parse_filename(data['filename']))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info('Gathering release information.')
@@ -123,7 +123,7 @@ class Postprocessing(object):
             # Find the biggest file in the dir. Assume that this is the movie.
             try:
                 files = os.listdir(path)
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Path not found in filesystem.',
                               exc_info=True)
                 return ''
@@ -145,22 +145,24 @@ class Postprocessing(object):
                     s = size
 
             logging.info('Post-processing file {}.'.format(biggestfile))
+
             return biggestfile
 
-    def parse_filename(self, filename):
+    def parse_filename(self, filepath):
         ''' Parses filename for release information
         :param filename: str name of movie file
 
         PTN only returns information it finds, so we start with a blank dict
-        of keys that we NEED to have, then update it with PTN's data. This
-        way when we rename the file it will insert a blank string instead of
-        throwing a missing key exception.
+            of keys that we NEED to have, then update it with PTN's data. This
+            way when we rename the file it will insert a blank string instead of
+            throwing a missing key exception.
 
         Might eventually replace this with Hachoir-metadata
 
         Returns dict of parsed data
         '''
 
+        # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
         data = {
             'title': '',
             'year': '',
@@ -169,9 +171,22 @@ class Postprocessing(object):
             'audiocodec': '',
             'videocodec': '',
             'source': '',
+            'imdbid': ''
             }
 
-        titledata = PTN.parse(filename)
+        titledata = PTN.parse(os.path.basename(filepath))
+        # this key is useless
+        if 'excess' in titledata:
+            titledata.pop('excess')
+
+        if len(titledata) <= 2:
+            logging.info('Parsing filename doesn\'t look accurate. Parsing parent folder name')
+            path_list = filepath.split(os.sep)
+            if len(path_list) >=2:
+                titledata = PTN.parse(path_list[-2])
+            else:
+                logging.info('Unable to parse file name or folder.')
+                return data
 
         # this key is useless
         if 'excess' in titledata:
@@ -197,6 +212,8 @@ class Postprocessing(object):
         Uses guid to look up local details.
         If that fails, uses downloadid.
         If that fails, uses title and year from  to search omdb for imdbid
+
+        If everything fails returns empty dict {}
 
         Returns dict of any gathered information
         '''
@@ -241,13 +258,13 @@ class Postprocessing(object):
 
             try:
                 omdbdata = json.loads(urllib2.urlopen(request).read())
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Post-processing omdb request.', exc_info=True)
-                return None
+                return {}
 
             if omdbdata['Response'] == 'False':
                 logging.info('Nothing found in OMDB.')
-                return None
+                return {}
             else:
                 logging.info('Data found on OMDB.')
 
@@ -269,7 +286,7 @@ class Postprocessing(object):
 
             return data
         else:
-            return None
+            return {}
 
     def failed(self, data):
         ''' Post-process failed downloads.
@@ -457,7 +474,7 @@ class Postprocessing(object):
         if core.CONFIG['Postprocessing']['moverenabled'] == 'true':
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
-            if response is None:
+            if response is False:
                 result['tasks']['mover']['response'] = 'false'
             else:
                 data['new_file_location'] = response
@@ -469,8 +486,9 @@ class Postprocessing(object):
         # delete leftover dir, only if mover was enabled successful
         if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
-            # fail if mover failed
-            if core.CONFIG['Postprocessing']['moverenabled'] == 'false':
+            # fail if mover disabled or failed
+            if core.CONFIG['Postprocessing']['moverenabled'] == 'false' or \
+                    result['tasks']['mover']['response'] == 'false':
                 result['tasks']['cleanup']['response'] = 'false'
             else:
                 if self.cleanup(data['path']):
@@ -509,7 +527,15 @@ class Postprocessing(object):
         ext = os.path.splitext(abs_path_old)[1]
 
         # get the new file name
-        new_name = renamer_string.format(**data).replace('  ', ' ')
+        new_name = renamer_string.format(**data)
+
+        while '  ' in new_name:
+            new_name = new_name.replace('  ', ' ')
+
+        if not new_name or new_name == ' ':
+            logging.info('New file name would be blank. Cancelling renamer.')
+            return None
+
         while new_name[-1] == ' ':
             new_name = new_name[:-1]
         new_name = new_name + ext
@@ -525,7 +551,7 @@ class Postprocessing(object):
             os.rename(abs_path_old, abs_path_new)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Renamer failed: Could not rename file.', exc_info=True)
             return None
 
@@ -538,7 +564,7 @@ class Postprocessing(object):
 
         Moves file to location specified in core.CONFIG
 
-        Returns str new file location or None on failure
+        Returns str new file location or False on failure
         '''
 
         abs_path_old = data['filename']
@@ -558,15 +584,15 @@ class Postprocessing(object):
                 os.mkdir(target_folder)
         except Exception, e:
             logging.error('Mover failed: Could not create folder.', exc_info=True)
-            return None
+            return False
 
         # move the file
         try:
             shutil.copystat = self.null
             shutil.move(abs_path_old, target_folder)
-        except Exception, e:
+        except Exception, e: # noqa
             logging.error('Mover failed: Could not move file.', exc_info=True)
-            return None
+            return False
 
         return os.path.join(target_folder, os.path.basename(data['filename']))
 
@@ -588,13 +614,13 @@ class Postprocessing(object):
                 logging.error('Could not delete path.', exc_info=True)
                 return False
         elif os.path.isfile(path):
-        # if its a file
+            # if its a file
             try:
                 os.remove(path)
                 return True
-            except Exception, e:
+            except Exception, e: # noqa
                 logging.error('Could not delete path.', exc_info=True)
                 return False
         else:
-        # if it is somehow neither
+            # if it is somehow neither
             return False

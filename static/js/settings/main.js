@@ -1,5 +1,7 @@
 $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
+    var git_url = $("meta[name='git_url']").attr("content");
+
 
     /* set up sortable */
     $(function () {
@@ -63,25 +65,18 @@ $(document).ready(function () {
 
     /* toggle downloader slide downs */
     $("i.radio").click(function(){
+        $this = $(this);
         // turn on
-        if( $(this).attr("value") == "false" ){
-            $(this).attr("value", "true");
-            $(this).removeClass("fa-circle-o")
-            $(this).addClass("fa-circle");
+        if( $this.attr("value") == "false" ){
+            $this.attr("value", "true");
+            $this.removeClass("fa-circle-o")
+            $this.addClass("fa-circle");
 
             // and turn off the other one
-            var tog = $(this).attr("tog");
+            var tog = $this.attr("tog");
             $("ul#"+tog).stop().slideDown();
             $("ul#downloader ul").not($("#"+tog)).stop().slideUp()
             $("i.radio[tog!="+tog+"]").attr("value", "false").removeClass("fa-circle").addClass("fa-circle-o");
-
-        // turn off
-        } else if ( $(this).attr("value") == "true" ){
-            $(this).attr("value", "false");
-            $(this).removeClass("fa-circle");
-            $(this).addClass("fa-cricle-o");
-            var tog = $(this).attr("tog");
-            $("ul#"+tog).stop().slideUp();
         }
     });
 
@@ -114,9 +109,9 @@ $(document).ready(function () {
             $thisi.removeClass("fa-circle faa-burst animated");
 
             if(response["status"] == "false"){
-                swal("Error", response["message"], "warning");
+                toastr.error(response["message"]);
             } else {
-                swal("Connected!", response["message"], "success");
+                toastr.success(response["message"]);
             }
         })
     });
@@ -149,34 +144,41 @@ $(document).ready(function () {
 
             response = JSON.parse(r);
             if(response['status'] == 'current'){
-                swal("No updates available", "", "info");
+                toastr.info("No updates available.");
             } else if(response['status'] == 'error'){
-                swal("Error", response['error'], "warning");
+                toastr.error(response['error']);
             } else if(response["status"] == "behind"){
 
-                swal({
-                    title: response["behind_count"] + " Updates Available",
-                    text: "Update now?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4CAF50",
-                    confirmButtonText: "Update",
-                    closeOnConfirm: true
-                }, function(){
-                    $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
-                    .done(function(){
-                        window.location = url_base + "/update";
-                    });
-                });
+                if(response["behind_count"] == 1){
+                    title = response["behind_count"] + " Update Available";
+                } else {
+                    title = response["behind_count"] + " Updates Available";
+                };
+
+                compare = git_url + "/compare/" + response["local_hash"] + "..." + response["new_hash"]
+
+                body = "Click <a href='update_now'><u>here</u></a> to update now. <br/> Click <a href=" + compare + " target=_blank><u>here</u></a> to view changes."
+
+
+                toastr.info(body, title, {closeButton:true,
+                                          timeOut: 0,
+                                          extendedTimeOut: 0,
+                                          tapToDismiss: 0
+                                          });
 
             }
         $i.addClass("fa-arrow-circle-up");
         $i.removeClass("fa-circle faa-burst animated");
 
         })
-
-
     });
+
+    function update_now(){
+        $.post(url_base + "/ajax/update_now", {"mode": "set_true"})
+        .done(function(){
+            window.location = url_base + "/update";
+        });
+    };
 
     /* shutdown / restart */
 

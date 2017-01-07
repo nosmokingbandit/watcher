@@ -223,8 +223,14 @@ class Ajax(object):
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year
 
+        Checks predb, then, if found, starts searching providers for movie.
+
         Returns str 'done' when done.
         '''
+        movie = self.sql.get_movie_details('imdbid', imdbid)
+
+        if movie['predb'] != 'found':
+            self.predb.check_one(movie)
 
         self.searcher.search(imdbid, title)
         return 'done'

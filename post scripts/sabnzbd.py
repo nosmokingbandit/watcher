@@ -8,7 +8,7 @@
 
 conf = {
     'watcherapi': 'WATCHERAPIKEY',
-    'watcheraddress': 'http://localhost:9090/',
+    'watcheraddress': 'localhost:9090',
     'sabkey': 'SABAPIKEY',
     'sabhost': 'localhost',
     'sabport': '8080'

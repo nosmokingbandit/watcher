@@ -47,6 +47,7 @@ class ScoreResults():
             filters = core.CONFIG['Filters']
 
         retention = int(core.CONFIG['Search']['retention'])
+        score_title = core.CONFIG['Search']['score_title'].lower() == 'true'
         required = filters['requiredwords'].lower().split(',')
         preferred = filters['preferredwords'].lower().split(',')
         ignored = filters['ignoredwords'].lower().split(',')
@@ -59,7 +60,8 @@ class ScoreResults():
         self.keep_required(required)
         self.retention_check(retention, today)
         self.score_quality(qualities)
-        self.fuzzy_title(title)
+        if score_title:
+            self.fuzzy_title(title)
         self.score_preferred(preferred)
 
         return self.results

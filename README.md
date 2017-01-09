@@ -6,6 +6,7 @@ Watcher is a work in progress and plans to add more features in the future, but 
 
 Screenshots can be viewed [here](http://imgur.com/a/EQ963)
 
+Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any events that require user interaction.
 
 ## Installation
 

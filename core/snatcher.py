@@ -24,10 +24,10 @@ class Snatcher():
         Returns True or False if movie is snatched
         '''
 
-        logging.info('Selecting best result for {}'.format(imdbid))
+        logging.info(u'Selecting best result for {}'.format(imdbid))
         search_results = self.sql.get_search_results(imdbid)
         if not search_results:
-            logging.info('Unable to automatically grab {}, no results.'.format(imdbid))
+            logging.info(u'Unable to automatically grab {}, no results.'.format(imdbid))
             return False
 
         # Check if we are past the 'waitdays'
@@ -37,7 +37,7 @@ class Snatcher():
         date_found = datetime.strptime(earliest_found, '%Y-%m-%d')
 
         if (datetime.today() - date_found).days < wait_days:
-            logging.info('Earliest found result for {} is {}, waiting {} days to grab best result.'.format(imdbid, date_found, wait_days))
+            logging.info(u'Earliest found result for {} is {}, waiting {} days to grab best result.'.format(imdbid, date_found, wait_days))
             return False
 
         # Since seach_results comes back in order of score we can go
@@ -46,15 +46,15 @@ class Snatcher():
         for result in search_results:
             status = result['status']
 
-            if result['status'] == 'Available' and result['score'] > minscore:
+            if result['status'] == u'Available' and result['score'] > minscore:
                 self.snatch(result)
                 return True
             # if doing a re-search, if top ranked result is Snatched we have nothing to do.
             if status in ['Snatched', 'Finished']:
-                logging.info('Top-scoring release for {} has already been snatched.'.format(imdbid))
+                logging.info(u'Top-scoring release for {} has already been snatched.'.format(imdbid))
                 return False
 
-        logging.info('Unable to automatically grab {}, no Available results.'.format(imdbid))
+        logging.info(u'Unable to automatically grab {}, no Available results.'.format(imdbid))
         return False
 
     def snatch(self, data):
@@ -76,8 +76,8 @@ class Snatcher():
 
         # If sending to SAB
         sab_conf = core.CONFIG['Sabnzbd']
-        if sab_conf['sabenabled'] == 'true' and data['type'] == 'nzb':
-            logging.info('Sending nzb to Sabnzbd.')
+        if sab_conf['sabenabled'] == u'true' and data['type'] == u'nzb':
+            logging.info(u'Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
             if response['response'] is 'true':
@@ -96,8 +96,8 @@ class Snatcher():
 
         # If sending to NZBGET
         nzbg_conf = core.CONFIG['NzbGet']
-        if nzbg_conf['nzbgenabled'] == 'true' and data['type'] == 'nzb':
-            logging.info('Sending nzb to NzbGet.')
+        if nzbg_conf['nzbgenabled'] == u'true' and data['type'] == u'nzb':
+            logging.info(u'Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
             if response['response'] is 'true':

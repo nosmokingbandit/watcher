@@ -23,7 +23,7 @@ class Sabnzbd():
         port = data['sabport']
         api = data['sabapi']
 
-        url = 'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
+        url = u'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -35,7 +35,7 @@ class Sabnzbd():
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error('Sabnzbd test_connection', exc_info=True)
+            logging.error(u'Sabnzbd test_connection', exc_info=True)
             return '{}.'.format(e.reason)
 
     # returns dict {'status': <>, 'nzo_ids': [<>] }
@@ -63,7 +63,7 @@ class Sabnzbd():
 
         base_url = u'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
-        mode = 'addurl'
+        mode = u'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))
         nzbname = urllib2.quote(data['title'].encode('ascii', 'ignore'))
         cat = sab_conf['sabcategory']
@@ -76,7 +76,7 @@ class Sabnzbd():
         }
         priority = priority_keys[sab_conf['sabpriority']]
 
-        command_url = '&mode={}&name={}&nzbname={}&cat={}&priority={}&output=json'.format(mode, name, nzbname, cat, priority)
+        command_url = u'&mode={}&name={}&nzbname={}&cat={}&priority={}&output=json'.format(mode, name, nzbname, cat, priority)
 
         url = base_url + command_url
 

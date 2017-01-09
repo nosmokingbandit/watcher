@@ -20,22 +20,22 @@ class Status(object):
         Returns Bool on success/fail
         '''
 
-        TABLE = 'SEARCHRESULTS'
+        TABLE = u'SEARCHRESULTS'
 
-        logging.info('Marking guid {} as {}.'.format(guid, status))
+        logging.info(u'Marking guid {} as {}.'.format(guid, status))
 
         if self.sql.row_exists(TABLE, guid=guid):
 
             # Mark bad in SEARCHRESULTS
-            logging.info('Marking {} as {} in SEARCHRESULTS.'.format(guid, status))
+            logging.info(u'Marking {} as {} in SEARCHRESULTS.'.format(guid, status))
             if not self.sql.update(TABLE, 'status', status, guid=guid):
-                logging.info('Setting SEARCHRESULTS status of {} to {} failed.'.format(guid, status))
+                logging.info(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid, status))
                 return False
             else:
-                logging.info('Successfully marked {} as {} in SEARCHRESULTS.'.format(guid, status))
+                logging.info(u'Successfully marked {} as {} in SEARCHRESULTS.'.format(guid, status))
                 return True
         else:
-            logging.info('Guid {} not found in SEARCHRESULTS.'.format(guid))
+            logging.info(u'Guid {} not found in SEARCHRESULTS.'.format(guid))
             return False
 
     def markedresults(self, guid, status, imdbid=None):
@@ -52,32 +52,32 @@ class Status(object):
         Returns Bool on success/fail
         '''
 
-        TABLE = 'MARKEDRESULTS'
+        TABLE = u'MARKEDRESULTS'
 
         if self.sql.row_exists(TABLE, guid=guid):
             # Mark bad in MARKEDRESULTS
-            logging.info('Marking {} as {} in MARKEDRESULTS.'.format(guid, status))
+            logging.info(u'Marking {} as {} in MARKEDRESULTS.'.format(guid, status))
             if not self.sql.update(TABLE, 'status', status, guid=guid):
-                logging.info('Setting MARKEDRESULTS status of {} to {} failed.'.format(guid, status))
+                logging.info(u'Setting MARKEDRESULTS status of {} to {} failed.'.format(guid, status))
                 return False
             else:
-                logging.info('Successfully marked {} as {} in MARKEDRESULTS.'.format(guid, status))
+                logging.info(u'Successfully marked {} as {} in MARKEDRESULTS.'.format(guid, status))
                 return True
         else:
-            logging.info('Guid {} not found in MARKEDRESULTS, creating entry.'.format(guid))
+            logging.info(u'Guid {} not found in MARKEDRESULTS, creating entry.'.format(guid))
             if imdbid:
                 DB_STRING = {}
                 DB_STRING['imdbid'] = imdbid
                 DB_STRING['guid'] = guid
                 DB_STRING['status'] = status
                 if self.sql.write(TABLE, DB_STRING):
-                    logging.info('Successfully created entry in MARKEDRESULTS for {}.'.format(guid))
+                    logging.info(u'Successfully created entry in MARKEDRESULTS for {}.'.format(guid))
                     return True
                 else:
-                    logging.info('Unable to create entry in MARKEDRESULTS for {}.'.format(guid))
+                    logging.info(u'Unable to create entry in MARKEDRESULTS for {}.'.format(guid))
                     return False
             else:
-                logging.info('Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')
+                logging.info(u'Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')
                 return False
 
     def mark_bad(self, guid, imdbid=None):
@@ -122,23 +122,23 @@ class Status(object):
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
         if result_status is False:
-            logging.info('Could not get SEARCHRESULT statuses for {}'.format(imdbid))
+            logging.info(u'Could not get SEARCHRESULT statuses for {}'.format(imdbid))
             return False
         elif result_status is None:
-            status = 'Wanted'
+            status = u'Wanted'
         else:
             if 'Finished' in result_status:
-                status = 'Finished'
+                status = u'Finished'
             elif 'Snatched' in result_status:
-                status = 'Snatched'
+                status = u'Snatched'
             elif 'Available' in result_status:
-                status = 'Found'
+                status = u'Found'
             else:
-                status = 'Wanted'
+                status = u'Wanted'
 
-        logging.info('Setting MOVIES {} status to {}.'.format(imdbid, status))
+        logging.info(u'Setting MOVIES {} status to {}.'.format(imdbid, status))
         if self.sql.update('MOVIES', 'status', status, imdbid=imdbid):
             return True
         else:
-            logging.info('Could not set {} to {}'.format(imdbid, status))
+            logging.info(u'Could not set {} to {}'.format(imdbid, status))
             return False

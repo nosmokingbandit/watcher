@@ -22,14 +22,14 @@ class PreDB(object):
         Returns bool False is movies cannot be retrieved
         '''
 
-        logging.info('Checking predb.me for new available releases.')
+        logging.info(u'Checking predb.me for new available releases.')
 
         movies = self.sql.get_user_movies()
         if not movies:
             return False
 
         for movie in movies:
-            if movie['predb'] != 'found':
+            if movie['predb'] != u'found':
                 self.check_one(movie)
 
     def check_one(self, data):
@@ -53,7 +53,7 @@ class PreDB(object):
         if not rss_titles:
             return False
 
-        test = title_year.replace(' ', '.').lower()
+        test = title_year.replace(u' ', u'.').lower()
 
         if self.fuzzy_match(rss_titles, test):
             logging.info(u'{} {} found on predb.me.'.format(title, year))
@@ -69,7 +69,7 @@ class PreDB(object):
         Returns list of found rss entries or None if not found.
         '''
 
-        search_term = title_year.replace(' ', '+').lower()
+        search_term = title_year.replace(u' ', u'+').lower()
 
         search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
         search_string = search_string.encode('ascii', 'replace')
@@ -82,7 +82,7 @@ class PreDB(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('PREDB search.', exc_info=True)
+            logging.error(u'PREDB search.', exc_info=True)
             return None
 
     def parse_predb_xml(self, feed):
@@ -98,7 +98,7 @@ class PreDB(object):
         items = []
         for item in root.iter('item'):
             for i_c in item:
-                if i_c.tag == 'title':
+                if i_c.tag == u'title':
                     items.append(i_c.text)
         return items
 

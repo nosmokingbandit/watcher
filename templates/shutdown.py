@@ -21,7 +21,7 @@ class Shutdown():
         with doc:
             with div(id='content'):
                 div(id='thinker')
-                span('Shutting Down', cls='msg')
+                span(u'Shutting Down', cls='msg')
 
         return doc.render()
 

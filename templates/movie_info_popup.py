@@ -50,7 +50,7 @@ class MovieInfoPopup():
                     with ul(id='quality', cls='wide'):
                         # Resolution Block
                         with ul(id='resolution', cls='sortable'):
-                            span('Resolutions', cls='sub_cat not_sortable')
+                            span(u'Resolutions', cls='sub_cat not_sortable')
 
                             for res in resolutions:
                                 prior = '{}priority'.format(res)
@@ -61,7 +61,7 @@ class MovieInfoPopup():
 
                         # Size restriction block
                         with ul(id='resolution_size'):
-                            with li('Size Restrictions (MB)', cls='sub_cat'):
+                            with li(u'Size Restrictions (MB)', cls='sub_cat'):
 
                                 for res in resolutions:
                                     min = '{}min'.format(res)
@@ -73,22 +73,22 @@ class MovieInfoPopup():
 
                         with ul(id='filters', cls='wide'):
                             with li(cls='bbord'):
-                                span('Required words:')
+                                span(u'Required words:')
                                 input(type='text', id='requiredwords', value=core.CONFIG['Filters']['requiredwords'])
                             with li(cls='bbord'):
-                                span('Preferred words:')
+                                span(u'Preferred words:')
                                 input(type='text', id='preferredwords', value=core.CONFIG['Filters']['preferredwords'])
                             with li():
-                                span('Ignored words:')
+                                span(u'Ignored words:')
                                 input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'])
 
             with div(id='plot'):
                 p(data['plot'])
             with div(id='additional_info'):
                 with a(href=data['tomatourl'], target='_blank'):
-                    p('Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
-                p('Theatrical Release Date: {}'.format(data['released']))
-                p('DVD Release Date: {}'.format(data['dvd']))
+                    p(u'Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
+                p(u'Theatrical Release Date: {}'.format(data['released']))
+                p(u'DVD Release Date: {}'.format(data['dvd']))
             div(data_json, id='hidden_data')
 
         return unicode(container)

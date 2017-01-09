@@ -23,7 +23,7 @@ class SysTrayPlugin(plugins.SimplePlugin):
         closes cherrypy. Cherrypy will try to close SysTrayIcon by calling
         stop(), so stop() gets reassigned to None.
 
-    If the app is closed by cherrypy (wether catching a kb interrupt or the GUI
+    If the app is closed by cherrypy (whether catching a kb interrupt or the GUI
         shutdown button), cherrypy stops the plugin by calling stop(). Stop()
         reassigns SysTrayIcon._on_quit to None and calls SysTrayIcon.shutdown().
         SysTrayIcon is then destroyed (twice for reasons I can't figure out),

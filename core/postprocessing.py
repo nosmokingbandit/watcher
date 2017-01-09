@@ -78,16 +78,16 @@ class Postprocessing(object):
         # remove any invalid characters
         for (k, v) in data.iteritems():
             # but we have to keep the path unmodified
-            if k != 'path' and type(v) == str:
+            if k != u'path' and type(v) == str:
                 data[k] = re.sub(r'[:"*?<>|]+', '', v)
 
         # At this point we have all of the information we're going to get.
-        if data['mode'] == 'failed':
+        if data['mode'] == u'failed':
             logging.info(u'Post-processing as Failed.')
             # returns to url:
             response = json.dumps(self.failed(data), indent=2, sort_keys=True)
             logging.info(response)
-        elif data['mode'] == 'complete':
+        elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
             # returns to url:
             response = json.dumps(self.complete(data), indent=2, sort_keys=True)
@@ -160,16 +160,16 @@ class Postprocessing(object):
         # remove any invalid characters
         for (k, v) in data.iteritems():
             # but we have to keep the path unmodified
-            if k != 'path' and type(v) == str:
+            if k != u'path' and type(v) == str:
                 data[k] = re.sub(r'[:"*?<>|]+', '', v)
 
         # At this point we have all of the information we're going to get.
-        if data['mode'] == 'failed':
+        if data['mode'] == u'failed':
             logging.info(u'Post-processing as Failed.')
             # returns to url:
             response = json.dumps(self.failed(data), indent=2, sort_keys=True)
             logging.info(response)
-        elif data['mode'] == 'complete':
+        elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
             # returns to url:
             response = json.dumps(self.complete(data), indent=2, sort_keys=True)
@@ -224,7 +224,7 @@ class Postprocessing(object):
                     biggestfile = file
                     s = size
 
-            logging.info('Post-processing file {}.'.format(biggestfile))
+            logging.info(u'Post-processing file {}.'.format(biggestfile))
 
             return biggestfile
 
@@ -260,12 +260,12 @@ class Postprocessing(object):
             titledata.pop('excess')
 
         if len(titledata) <= 2:
-            logging.info('Parsing filename doesn\'t look accurate. Parsing parent folder name')
+            logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name')
             path_list = filepath.split(os.sep)
             if len(path_list) >= 2:
                 titledata = PTN.parse(path_list[-2])
             else:
-                logging.info('Unable to parse file name or folder.')
+                logging.info(u'Unable to parse file name or folder.')
                 return data
 
         # this key is useless
@@ -299,54 +299,54 @@ class Postprocessing(object):
         '''
 
         # try to get searchresult using guid first then downloadid
-        logging.info('Searching local database for guid.')
+        logging.info(u'Searching local database for guid.')
         result = self.sql.get_single_search_result('guid', data['guid'])
         if not result:
             # try to get result from downloadid
-            logging.info('Searching local database for downloadid.')
+            logging.info(u'Searching local database for downloadid.')
             result = self.sql.get_single_search_result('downloadid', data['downloadid'])
             if result:
-                logging.info('Searchresult found by downloadid.')
+                logging.info(u'Searchresult found by downloadid.')
                 if result['guid'] != data['guid']:
-                    logging.info('Guid for downloadid does not match local data. '
+                    logging.info(u'Guid for downloadid does not match local data. '
                                  'Adding guid2 to processing data.')
                     data['guid2'] = result['guid']
         else:
-            logging.info('Searchresult found by guid.')
+            logging.info(u'Searchresult found by guid.')
 
         # if we found it, get local movie info
         if result:
-            logging.info('Searching local database by imdbid.')
+            logging.info(u'Searching local database by imdbid.')
             data = self.sql.get_movie_details('imdbid', result['imdbid'])
             if data:
-                logging.info('Movie data found locally by imdbid.')
+                logging.info(u'Movie data found locally by imdbid.')
                 data['finishedscore'] = result['score']
             else:
-                logging.info('Unable to find movie in local db.')
+                logging.info(u'Unable to find movie in local db.')
 
         else:
             # Still no luck? Try to get the imdbid from OMDB
-            logging.info('Unable to find local data for release. Searching OMDB.')
+            logging.info(u'Unable to find local data for release. Searching OMDB.')
 
             title = data['title']
             year = data['year']
 
             logging.info(u'Searching omdb for {} {}'.format(title, year))
-            search_string = u'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(' ', '+')
+            search_string = u'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(u' ', u'+')
 
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
                 omdbdata = json.loads(urllib2.urlopen(request).read())
             except Exception, e: # noqa
-                logging.error('Post-processing omdb request.', exc_info=True)
+                logging.error(u'Post-processing omdb request.', exc_info=True)
                 return {}
 
-            if omdbdata['Response'] == 'False':
-                logging.info('Nothing found in OMDB.')
+            if omdbdata['Response'] == u'False':
+                logging.info(u'Nothing found in OMDB.')
                 return {}
             else:
-                logging.info('Data found on OMDB.')
+                logging.info(u'Data found on OMDB.')
 
                 # make the keys all lower case
                 omdbdata_lower = dict((k.lower(), v) for (k, v) in omdbdata.iteritems())
@@ -384,79 +384,79 @@ class Postprocessing(object):
 
         # dict we will json.dump and send back to downloader
         result = {}
-        result['status'] = 'finished'
+        result['status'] = u'finished'
         result['data'] = data
         result['tasks'] = {}
 
         # mark guid in both results tables
-        logging.info('Marking guid as Bad.')
+        logging.info(u'Marking guid as Bad.')
         guid_result = {'url': data['guid']}
         if self.update.searchresults(data['guid'], 'Bad'):
-            guid_result['update_SEARCHRESULTS'] = 'true'
+            guid_result['update_SEARCHRESULTS'] = u'true'
         else:
-            guid_result['update_SEARCHRESULTS'] = 'false'
+            guid_result['update_SEARCHRESULTS'] = u'false'
 
         if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'):
-            guid_result['update_MARKEDRESULTS'] = 'true'
+            guid_result['update_MARKEDRESULTS'] = u'true'
         else:
-            guid_result['update_MARKEDRESULTS'] = 'false'
+            guid_result['update_MARKEDRESULTS'] = u'false'
 
         # create result entry for guid
         result['tasks']['guid'] = guid_result
 
         # if we have a guid2, do it all again
         if 'guid2' in data.keys():
-            logging.info('Marking guid2 as Bad.')
+            logging.info(u'Marking guid2 as Bad.')
             guid2_result = {'url': data['guid2']}
             if self.update.searchresults(data['guid2'], 'Bad'):
-                guid2_result['update SEARCHRESULTS'] = 'true'
+                guid2_result['update SEARCHRESULTS'] = u'true'
             else:
-                guid2_result['update SEARCHRESULTS'] = 'false'
+                guid2_result['update SEARCHRESULTS'] = u'false'
 
             if self.update.markedresults(data['guid2'], data['imdbid'], 'Bad'):
-                guid2_result['update_MARKEDRESULTS'] = 'true'
+                guid2_result['update_MARKEDRESULTS'] = u'true'
             else:
-                guid2_result['update_MARKEDRESULTS'] = 'false'
+                guid2_result['update_MARKEDRESULTS'] = u'false'
             # create result entry for guid2
             result['tasks']['guid2'] = guid2_result
 
         # set movie status
         if data['imdbid']:
-            logging.info('Setting MOVIE status.')
+            logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
         else:
-            logging.info('Imdbid not supplied or found, unable to update Movie status.')
-            r = 'false'
+            logging.info(u'Imdbid not supplied or found, unable to update Movie status.')
+            r = u'false'
         result['tasks']['update_movie_status'] = r
 
         # delete failed files
-        if core.CONFIG['Postprocessing']['cleanupfailed'] == 'true':
+        if core.CONFIG['Postprocessing']['cleanupfailed'] == u'true':
             result['tasks']['cleanup'] = {'enabled': 'true', 'path': data['path']}
 
-            logging.info('Deleting leftover files from failed download.')
+            logging.info(u'Deleting leftover files from failed download.')
             if self.cleanup(data['path']) is True:
-                result['tasks']['cleanup']['response'] = 'true'
+                result['tasks']['cleanup']['response'] = u'true'
             else:
-                result['tasks']['cleanup']['response'] = 'false'
+                result['tasks']['cleanup']['response'] = u'false'
         else:
             result['tasks']['cleanup'] = {'enabled': 'false'}
 
         # grab the next best release
-        if core.CONFIG['Search']['autograb'] == 'true':
+        if core.CONFIG['Search']['autograb'] == u'true':
             result['tasks']['autograb'] = {'enabled': 'true'}
             if data['imdbid']:
                 if self.snatcher.auto_grab(data['imdbid']):
-                    r = 'true'
+                    r = u'true'
                 else:
-                    r = 'false'
+                    r = u'false'
             else:
-                r = 'false'
+                r = u'false'
             result['tasks']['autograb']['response'] = r
         else:
             result['tasks']['autograb'] = {'enabled': 'false'}
 
         # all done!
-        result['status'] = 'finished'
+        result['status'] = u'finished'
         return result
 
     def complete(self, data):
@@ -485,102 +485,102 @@ class Postprocessing(object):
 
         # dict we will json.dump and send back to downloader
         result = {}
-        result['status'] = 'incomplete'
+        result['status'] = u'incomplete'
         result['data'] = data
         result['data']['finisheddate'] = str(datetime.date.today())
         result['tasks'] = {}
 
         # mark guid in both results tables
-        logging.info('Marking guid as Finished.')
+        logging.info(u'Marking guid as Finished.')
         guid_result = {}
         if self.update.searchresults(data['guid'], 'Finished'):
-            guid_result['update_SEARCHRESULTS'] = 'true'
+            guid_result['update_SEARCHRESULTS'] = u'true'
         else:
-            guid_result['update_SEARCHRESULTS'] = 'false'
+            guid_result['update_SEARCHRESULTS'] = u'false'
 
         if self.update.markedresults(data['guid'], data['imdbid'], 'Finished'):
-            guid_result['update_MARKEDRESULTS'] = 'true'
+            guid_result['update_MARKEDRESULTS'] = u'true'
         else:
-            guid_result['update_MARKEDRESULTS'] = 'false'
+            guid_result['update_MARKEDRESULTS'] = u'false'
 
         # create result entry for guid
         result['tasks'][data['guid']] = guid_result
 
         # if we have a guid2, do it all again
         if 'guid2' in data.keys():
-            logging.info('Marking guid2 as Finished.')
+            logging.info(u'Marking guid2 as Finished.')
             guid2_result = {}
             if self.update.searchresults(data['guid2'], 'Finished'):
-                guid2_result['update_SEARCHRESULTS'] = 'true'
+                guid2_result['update_SEARCHRESULTS'] = u'true'
             else:
-                guid2_result['update_SEARCHRESULTS'] = 'false'
+                guid2_result['update_SEARCHRESULTS'] = u'false'
 
             if self.update.markedresults(data['guid2'], data['imdbid'],
                                          'Finished'):
-                guid2_result['update_MARKEDRESULTS'] = 'true'
+                guid2_result['update_MARKEDRESULTS'] = u'true'
             else:
-                guid2_result['update_MARKEDRESULTS'] = 'false'
+                guid2_result['update_MARKEDRESULTS'] = u'false'
 
             # create result entry for guid2
             result['tasks'][data['guid2']] = guid2_result
 
         # set movie status and add finished date
         if data['imdbid']:
-            logging.info('Setting MOVIE status.')
+            logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
             self.sql.update('MOVIES', 'finisheddate', result['data']['finisheddate'],
                             imdbid=data['imdbid'])
         else:
-            logging.info('Imdbid not supplied or found, unable to update Movie status.')
-            r = 'false'
+            logging.info(u'Imdbid not supplied or found, unable to update Movie status.')
+            r = u'false'
         result['tasks']['update_movie_status'] = r
 
         # renamer
-        if core.CONFIG['Postprocessing']['renamerenabled'] == 'true':
+        if core.CONFIG['Postprocessing']['renamerenabled'] == u'true':
             result['tasks']['renamer'] = {'enabled': 'true'}
             result['data']['orig_filename'] = result['data']['filename']
             response = self.renamer(data)
             if response is None:
-                result['tasks']['renamer']['response'] = 'false'
+                result['tasks']['renamer']['response'] = u'false'
             else:
                 path = os.path.split(data['filename'])[0]
                 data['filename'] = os.path.join(path, response)
-                result['tasks']['renamer']['response'] = 'true'
+                result['tasks']['renamer']['response'] = u'true'
         else:
-            logging.info('Renamer disabled.')
+            logging.info(u'Renamer disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
         # mover
-        if core.CONFIG['Postprocessing']['moverenabled'] == 'true':
+        if core.CONFIG['Postprocessing']['moverenabled'] == u'true':
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
             if response is False:
-                result['tasks']['mover']['response'] = 'false'
+                result['tasks']['mover']['response'] = u'false'
             else:
                 data['new_file_location'] = response
-                result['tasks']['mover']['response'] = 'true'
+                result['tasks']['mover']['response'] = u'true'
         else:
-            logging.info('Mover disabled.')
+            logging.info(u'Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
-        # delete leftover dir, only if mover was enabled successful
-        if core.CONFIG['Postprocessing']['cleanupenabled'] == 'true':
+        # delete leftover dir, only if mover was enabled & successful
+        if core.CONFIG['Postprocessing']['cleanupenabled'] == u'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
             # fail if mover disabled or failed
-            if core.CONFIG['Postprocessing']['moverenabled'] == 'false' or \
-                    result['tasks']['mover']['response'] == 'false':
-                result['tasks']['cleanup']['response'] = 'false'
+            if core.CONFIG['Postprocessing']['moverenabled'] == u'false' or \
+                    result['tasks']['mover']['response'] == u'false':
+                result['tasks']['cleanup']['response'] = u'false'
             else:
                 if self.cleanup(data['path']):
-                    r = 'true'
+                    r = u'true'
                 else:
-                    r = 'false'
+                    r = u'false'
                 result['tasks']['cleanup']['response'] = r
         else:
             result['tasks']['cleanup'] = {'enabled': 'false'}
 
         # all done!
-        result['status'] = 'finished'
+        result['status'] = u'finished'
         return result
 
     def compile_path(self, string, data):
@@ -606,7 +606,7 @@ class Postprocessing(object):
         while '  ' in new_string:
             new_string = new_string.replace('  ', ' ')
 
-        while len(string) > 1 and new_string[-1] == ' ':
+        while len(string) > 1 and new_string[-1] == u' ':
             new_string = new_string[:-1]
 
         repl = core.CONFIG['Postprocessing']['replaceillegal']
@@ -627,7 +627,7 @@ class Postprocessing(object):
 
         # check to see if we have a valid renamerstring
         if re.match(r'{(.*?)}', renamer_string) is None:
-            logging.info('Invalid renamer string {}'.format(renamer_string))
+            logging.info(u'Invalid renamer string {}'.format(renamer_string))
             return None
 
         # existing absolute path
@@ -655,7 +655,7 @@ class Postprocessing(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('Renamer failed: Could not rename file.', exc_info=True)
+            logging.error(u'Renamer failed: Could not rename file.', exc_info=True)
             return None
 
         # return the new name so the mover knows what our file is
@@ -680,30 +680,30 @@ class Postprocessing(object):
             if not os.path.exists(target_folder):
                 os.mkdir(target_folder)
         except Exception, e:
-            logging.error('Mover failed: Could not create folder.', exc_info=True)
+            logging.error(u'Mover failed: Could not create missing directory {}.'.format(target_folder), exc_info=True)
             return False
 
-        # move the file
+        # Move Movie
+        logging.info(u'Moving {} to {}'.format(data['filename'], target_folder))
         try:
             shutil.copystat = self.null
             shutil.move(data['filename'], target_folder)
         except Exception, e: # noqa
-            logging.error('Mover failed: Could not move file.', exc_info=True)
+            logging.error(u'Mover failed: Could not move file.', exc_info=True)
             return False
-
 
         logging.info(u'Moving and renaming any extra files.')
 
         moveextensions = core.CONFIG['Postprocessing']['moveextensions']
-        keep_extentions = [i for i in moveextensions.split(',') if i != '']
+        keep_extentions = [i for i in moveextensions.split(u',') if i != u'']
 
         renamer_string = core.CONFIG['Postprocessing']['renamerstring']
-        new_name =  self.compile_path(renamer_string, data)
+        new_name = self.compile_path(renamer_string, data)
 
         for root, dirs, filenames in os.walk(data['path']):
             for name in filenames:
                 old_abs_path = os.path.join(root, name)
-                ext = os.path.splitext(old_abs_path)[1] # '.ext'
+                ext = os.path.splitext(old_abs_path)[1]  # '.ext'
 
                 target_file = u'{}{}'.format(os.path.join(target_folder, new_name), ext)
 
@@ -737,7 +737,7 @@ class Postprocessing(object):
                 shutil.rmtree(path)
                 return True
             except Exception, e:
-                logging.error('Could not delete path.', exc_info=True)
+                logging.error(u'Could not delete path.', exc_info=True)
                 return False
         elif os.path.isfile(path):
             # if its a file
@@ -745,7 +745,7 @@ class Postprocessing(object):
                 os.remove(path)
                 return True
             except Exception, e: # noqa
-                logging.error('Could not delete path.', exc_info=True)
+                logging.error(u'Could not delete path.', exc_info=True)
                 return False
         else:
             # if it is somehow neither

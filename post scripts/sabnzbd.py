@@ -25,7 +25,7 @@ try:
     status = int(sys.argv[7])
     guid = sys.argv[3].replace('-', ':').replace('+', '/')
 except:
-    print 'Post-processing failed. Incorrect args.'
+    print u'Post-processing failed. Incorrect args.'
     sys.exit(1)
 
 watcheraddress = conf['watcheraddress']
@@ -51,7 +51,7 @@ for dl in slots:
         break
 
 if not guid:
-    print 'Download GUID not found.'
+    print u'Download GUID not found.'
     sys.exit(1)
 
 
@@ -61,13 +61,13 @@ path = urllib2.quote(sys.argv[1], safe='')
 
 # send it to Watcher
 if status == 0:
-    print 'Sending {} to Watcher as Complete.'.format(name)
+    print u'Sending {} to Watcher as Complete.'.format(name)
     mode = 'complete'
 else:
-    print 'Sending {} to Watcher as Failed.'.format(name)
+    print u'Sending {} to Watcher as Failed.'.format(name)
     mode = 'failed'
 
-url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
+url = u'{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 

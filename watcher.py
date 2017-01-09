@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # set up config file on first launch
     conf = config.Config()
     if not os.path.isfile(core.CONF_FILE):
-        print 'Config file not found. Creating new basic config {}. ' \
+        print u'Config file not found. Creating new basic config {}. ' \
             'Please review settings.'.format(core.CONF_FILE)
         conf.new_config()
     else:
@@ -85,11 +85,11 @@ if __name__ == '__main__':
         core.DB_FILE = passed_args.db
     sql = sqldb.SQL()
     if not os.path.isfile('watcher.sqlite'):
-        logging.info('SQL DB not found. Creating.')
+        logging.info(u'SQL DB not found. Creating.')
         sql = sqldb.SQL()
         sql.create_database()
     else:
-        logging.info('SQL DB found.')
+        logging.info(u'SQL DB found.')
         print 'Database found.'
     del sql
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
         webbrowser.open("http://{}:{}{}".format(
             core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
-        logging.info('Launching web browser.')
+        logging.info(u'Launching web browser.')
 
     # daemonize in *nix if desired
     if passed_args.daemon and os.name == 'posix':

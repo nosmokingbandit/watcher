@@ -42,39 +42,39 @@ class Postprocessing(object):
         Returns str json.dumps(dict) to post-process reqesting application.
         '''
 
-        logging.info('#################################')
-        logging.info('Post-processing request received.')
-        logging.info('#################################')
+        logging.info(u'#################################')
+        logging.info(u'Post-processing request received.')
+        logging.info(u'#################################')
 
         # check for required keys
         required_keys = ['apikey', 'mode', 'guid', 'path']
 
         for key in required_keys:
             if key not in data:
-                logging.info('Missing key {}'.format(key))
+                logging.info(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
                                   'error': 'missing key: {}'.format(key)})
 
         # check if api key is correct
         if data['apikey'] != core.CONFIG['Server']['apikey']:
-            logging.info('Incorrect API key.'.format(key))
+            logging.info(u'Incorrect API key.'.format(key))
             return json.dumps({'response': 'false',
                               'error': 'incorrect api key'})
 
         # check if mode is valid
         if data['mode'] not in ['failed', 'complete']:
-            logging.info('Invalid mode value: {}.'.format(data['mode']))
+            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                               'error': 'invalid mode value'})
 
         # get the actual movie file name
         data['filename'] = self.get_filename(data['path'])
 
-        logging.info('Parsing release name for information.')
+        logging.info(u'Parsing release name for information.')
         data.update(self.parse_filename(data['filename']))
 
         # Get possible local data or get OMDB data to merge with self.params.
-        logging.info('Gathering release information.')
+        logging.info(u'Gathering release information.')
         data.update(self.get_movie_info(data))
 
         # remove any invalid characters
@@ -85,24 +85,24 @@ class Postprocessing(object):
 
         # At this point we have all of the information we're going to get.
         if data['mode'] == 'failed':
-            logging.info('Post-processing as Failed.')
+            logging.info(u'Post-processing as Failed.')
             # returns to url:
             response = json.dumps(self.failed(data), indent=2, sort_keys=True)
             logging.info(response)
         elif data['mode'] == 'complete':
-            logging.info('Post-processing as Complete.')
+            logging.info(u'Post-processing as Complete.')
             # returns to url:
             response = json.dumps(self.complete(data), indent=2, sort_keys=True)
             logging.info(response)
         else:
-            logging.info('Invalid mode value: {}.'.format(data['mode']))
+            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                                'error': 'invalid mode value'})
 
-        logging.info('#################################')
-        logging.info('Post-processing complete.')
+        logging.info(u'#################################')
+        logging.info(u'Post-processing complete.')
         logging.info(response)
-        logging.info('#################################')
+        logging.info(u'#################################')
 
         return response
 
@@ -116,7 +116,7 @@ class Postprocessing(object):
         Returns str absolute path /home/user/filename.ext
         '''
 
-        logging.info('Finding movie file name.')
+        logging.info(u'Finding movie file name.')
         if os.path.isfile(path):
             return path
         else:
@@ -124,7 +124,7 @@ class Postprocessing(object):
             try:
                 files = os.listdir(path)
             except Exception, e: # noqa
-                logging.error('Path not found in filesystem.',
+                logging.error(u'Path not found in filesystem.',
                               exc_info=True)
                 return ''
 
@@ -182,7 +182,7 @@ class Postprocessing(object):
         if len(titledata) <= 2:
             logging.info('Parsing filename doesn\'t look accurate. Parsing parent folder name')
             path_list = filepath.split(os.sep)
-            if len(path_list) >=2:
+            if len(path_list) >= 2:
                 titledata = PTN.parse(path_list[-2])
             else:
                 logging.info('Unable to parse file name or folder.')
@@ -277,10 +277,9 @@ class Postprocessing(object):
             del data['quality']
             del data['plot']
 
-            repl = core.CONFIG['Postprocessing']['replace_illegal']
+            repl = core.CONFIG['Postprocessing']['replaceillegal']
 
             for (k, v) in data.iteritems():
-                # but we have to keep the path unmodified
                 if type(v) == str:
                     data[k] = re.sub(r'[:"*?<>|]+', repl, v)
 
@@ -397,8 +396,9 @@ class Postprocessing(object):
         Checks to see if we found a movie file. If not, ends here.
 
         If Renamer is enabled, renames movie file according to core.CONFIG
-        If Mover is enabled, moves file to location in core.CONFIG
-        If Clean Up enabled, deletes path after Mover finishes.
+        If Mover is enabled, moves file to location in core.CONFIG, then...
+            If Clean Up enabled, deletes path after Mover finishes.
+            Clean Up will not execute without Mover success.
 
         Returns dict of post-processing results
         '''
@@ -503,6 +503,37 @@ class Postprocessing(object):
         result['status'] = 'finished'
         return result
 
+    def compile_path(self, string, data):
+        ''' Compiles string to file/path names
+        :param string: str brace-formatted string to substitue values
+        :data data: dict of values to sub into string
+
+        Takes a renamer/mover path and adds values.
+            ie '{title} {year} {resolution}' -> 'Movie 2017 1080P'
+        Subs double spaces. Trims trailing spaces. Removes any invalid characters.
+
+        Can return blank string ''
+
+        Returns str new path
+        '''
+
+        # ## left off
+        # Use this to replace Mover and Renamer paths. Also use to get plain filename
+        # for moving extra files.
+
+        new_string = string.format(**data)
+
+        while '  ' in new_string:
+            new_string = new_string.replace('  ', ' ')
+
+        while len(string) > 1 and new_string[-1] == ' ':
+            new_string = new_string[:-1]
+
+        repl = core.CONFIG['Postprocessing']['replaceillegal']
+        new_string = re.sub(r'["*?<>|]+', repl, new_string)
+
+        return new_string
+
     def renamer(self, data):
         ''' Renames movie file based on renamerstring.
         :param data: dict of movie information.
@@ -527,21 +558,13 @@ class Postprocessing(object):
         ext = os.path.splitext(abs_path_old)[1]
 
         # get the new file name
-        new_name = renamer_string.format(**data)
+        new_name = self.compile_path(renamer_string, data)
 
-        while '  ' in new_name:
-            new_name = new_name.replace('  ', ' ')
-
-        if not new_name or new_name == ' ':
-            logging.info('New file name would be blank. Cancelling renamer.')
+        if not new_name:
+            logging.info(u'New file name would be blank. Cancelling renamer.')
             return None
 
-        while new_name[-1] == ' ':
-            new_name = new_name[:-1]
         new_name = new_name + ext
-
-        # remove invalid chars
-        new_name = re.sub(r'[:"*?<>|]+', '', new_name)
 
         # new absolute path
         abs_path_new = os.path.join(file_path, new_name)
@@ -567,16 +590,10 @@ class Postprocessing(object):
         Returns str new file location or False on failure
         '''
 
-        abs_path_old = data['filename']
+        # get target dir, remove illegal chars, and normalize
         mover_path = core.CONFIG['Postprocessing']['moverpath']
 
-        target_folder = mover_path.format(**data)
-
-        # remove invalid chars and normalize
-        target_folder = re.sub(r'["*?<>|]+', '', target_folder)
-        target_folder = os.path.normpath(target_folder)
-
-        logging.info(u'Moving {} to {}'.format(abs_path_old, target_folder))
+        target_folder = os.path.normpath(self.compile_path(mover_path, data))
 
         # if the new folder doesn't exist, make it
         try:
@@ -589,10 +606,39 @@ class Postprocessing(object):
         # move the file
         try:
             shutil.copystat = self.null
-            shutil.move(abs_path_old, target_folder)
+            shutil.move(data['filename'], target_folder)
         except Exception, e: # noqa
             logging.error('Mover failed: Could not move file.', exc_info=True)
             return False
+
+
+        logging.info(u'Moving and renaming any extra files.')
+
+        moveextensions = core.CONFIG['Postprocessing']['moveextensions']
+        keep_extentions = [i for i in moveextensions.split(',') if i != '']
+
+        renamer_string = core.CONFIG['Postprocessing']['renamerstring']
+        new_name =  self.compile_path(renamer_string, data)
+
+        for root, dirs, filenames in os.walk(data['path']):
+            for name in filenames:
+                old_abs_path = os.path.join(root, name)
+                ext = os.path.splitext(old_abs_path)[1] # '.ext'
+
+                target_file = u'{}{}'.format(os.path.join(target_folder, new_name), ext)
+
+                if ext.replace('.', '') in keep_extentions:
+                    append = 0
+                    while os.path.isfile(target_file):
+                        append += 1
+                        new_filename = u'{}({})'.format(new_name, str(append))
+                        target_file = u'{}{}'.format(os.path.join(target_folder, new_filename), ext)
+                    try:
+                        logging.info(u'Moving {} to {}'.format(old_abs_path, target_file))
+                        shutil.copystat = self.null
+                        shutil.move(old_abs_path, target_file)
+                    except Exception, e: # noqa
+                        logging.error(u'Mover failed: Could not move {}.'.format(old_abs_path), exc_info=True)
 
         return os.path.join(target_folder, os.path.basename(data['filename']))
 

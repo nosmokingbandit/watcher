@@ -233,7 +233,12 @@ $(document).ready(function () {
             postprocessing[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#postprocessing li input").not("[type=button]").each(function(){
-            postprocessing[$(this).attr("id")] = $(this).val();
+            $this = $(this);
+            if($this.attr('id') == 'moveextensions'){
+                postprocessing['moveextensions'] = $this.val().split(", ").join(",");
+            } else {
+            postprocessing[$this.attr("id")] = $this.val();
+            }
         });
 
         data["Postprocessing"] = postprocessing;

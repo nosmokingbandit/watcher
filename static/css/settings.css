@@ -21,18 +21,6 @@ select{
     font-family: "Lucida Console", Monaco, monospace;
 }
 
-button{
-    height: 2em;
-    line-height: 2em;
-    margin: 0 0 0 0;
-    background-color: white;
-    border: 1px solid #212121;
-    outline: none;
-    font-size: 1.0em;
-    cursor: pointer;
-    text-overflow: clip;
-}
-
 i{
     margin: 0 0 0 0;
     font-size: 1.5em;

@@ -1,0 +1,38 @@
+ul#movie_list li div span.status{
+    border-color: #ccc;
+    color: #080f18;
+}
+
+ul#movie_list li div span.wanted{
+    background-color: #FF9800;
+}
+
+ul#movies_list li div span.searching{
+    background-color: #FFC107;
+}
+
+ul#movie_list li div span.found{
+    background-color: #CDDC39;
+}
+
+ul#movie_list li div span.snatched{
+    background-color: #00BCD4;
+}
+
+ul#movie_list li div span.finished{
+    background-color: #4CAF50;
+}
+
+ul#movie_list li div img{
+    border-color: #ffffff;
+}
+
+/* specific movie details */
+#overlay {
+    background-color: #000;
+}
+
+#status_pop_up {
+    background: #080f18;
+    border-top: 1px solid #ccc;
+}

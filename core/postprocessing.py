@@ -25,9 +25,89 @@ class Postprocessing(object):
     def null(*args, **kwargs): return
 
     @cherrypy.expose
+    def POST(self, **data):
+        ''' Handles post-processing requests.
+        :kwparam **dara: keyword params send through POST request URL
+
+        required kw params:
+            apikey: str Watcher api key
+            mode: str post-processing mode (complete, failed)
+            guid: str download link of file. Can be url or magnet link.
+            path: str path to downloaded files. Can be single file or dir
+
+        optional kw params:
+            imdbid: str imdb identification number (tt123456)
+            downloadid: str id number from downloader
+
+        Returns str json.dumps(dict) to post-process reqesting application.
+        '''
+
+        logging.info(u'#################################')
+        logging.info(u'Post-processing request received.')
+        logging.info(u'#################################')
+
+        # check for required keys
+        for key in ['apikey', 'mode', 'guid', 'path']:
+            if key not in data:
+                logging.info(u'Missing key {}'.format(key))
+                return json.dumps({'response': 'false',
+                                  'error': 'missing key: {}'.format(key)})
+
+        # check if api key is correct
+        if data['apikey'] != core.CONFIG['Server']['apikey']:
+            logging.info(u'Incorrect API key.'.format(key))
+            return json.dumps({'response': 'false',
+                              'error': 'incorrect api key'})
+
+        # check if mode is valid
+        if data['mode'] not in ['failed', 'complete']:
+            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            return json.dumps({'response': 'false',
+                              'error': 'invalid mode value'})
+
+        # get the actual movie file name
+        data['filename'] = self.get_filename(data['path'])
+
+        logging.info(u'Parsing release name for information.')
+        data.update(self.parse_filename(data['filename']))
+
+        # Get possible local data or get OMDB data to merge with self.params.
+        logging.info(u'Gathering release information.')
+        data.update(self.get_movie_info(data))
+
+        # remove any invalid characters
+        for (k, v) in data.iteritems():
+            # but we have to keep the path unmodified
+            if k != 'path' and type(v) == str:
+                data[k] = re.sub(r'[:"*?<>|]+', '', v)
+
+        # At this point we have all of the information we're going to get.
+        if data['mode'] == 'failed':
+            logging.info(u'Post-processing as Failed.')
+            # returns to url:
+            response = json.dumps(self.failed(data), indent=2, sort_keys=True)
+            logging.info(response)
+        elif data['mode'] == 'complete':
+            logging.info(u'Post-processing as Complete.')
+            # returns to url:
+            response = json.dumps(self.complete(data), indent=2, sort_keys=True)
+            logging.info(response)
+        else:
+            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            return json.dumps({'response': 'false',
+                               'error': 'invalid mode value'})
+
+        logging.info(u'#################################')
+        logging.info(u'Post-processing complete.')
+        logging.info(response)
+        logging.info(u'#################################')
+
+        return response
+
+    @cherrypy.expose
     def GET(self, **data):
         ''' Handles post-processing requests.
-        :kwparam **params: keyword params send through GET request URL
+        :kwparam **data: keyword params send through GET request URL
 
         required kw params:
             apikey: str Watcher api key

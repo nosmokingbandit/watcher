@@ -6,9 +6,9 @@ DB_FILE = u'watcher.sqlite'
 THEME = u'Default'
 
 # Paths to internet things
-GIT_URL = u'https://github.com/nosmokingbandit/watcher'
-GIT_REPO = u'https://github.com/nosmokingbandit/watcher.git'
-GIT_API = u'https://api.github.com/repos/nosmokingbandit/watcher'
+GIT_URL = u'https://github.com/vertigo235/watcher'
+GIT_REPO = u'https://github.com/vertigo235/watcher.git'
+GIT_API = u'https://api.github.com/repos/vertigo235/watcher'
 
 # Server settings
 SERVER_ADDRESS = None

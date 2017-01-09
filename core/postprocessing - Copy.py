@@ -99,6 +99,7 @@ class Postprocessing(object):
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
+        logging.info(response)
         logging.info(u'#################################')
 
         return response
@@ -301,16 +302,15 @@ class Postprocessing(object):
         logging.info(u'Searching local database for guid.')
         result = self.sql.get_single_search_result('guid', data['guid'])
         if not result:
-            if 'downloadid' in data.keys():
-                # try to get result from downloadid
-                logging.info(u'Searching local database for downloadid.')
-                result = self.sql.get_single_search_result('downloadid', data['downloadid'])
-                if result:
-                    logging.info(u'Searchresult found by downloadid.')
-                    if result['guid'] != data['guid']:
-                        logging.info(u'Guid for downloadid does not match local data. '
-                                     'Adding guid2 to processing data.')
-                        data['guid2'] = result['guid']
+            # try to get result from downloadid
+            logging.info(u'Searching local database for downloadid.')
+            result = self.sql.get_single_search_result('downloadid', data['downloadid'])
+            if result:
+                logging.info(u'Searchresult found by downloadid.')
+                if result['guid'] != data['guid']:
+                    logging.info(u'Guid for downloadid does not match local data. '
+                                 'Adding guid2 to processing data.')
+                    data['guid2'] = result['guid']
         else:
             logging.info(u'Searchresult found by guid.')
 
@@ -391,17 +391,20 @@ class Postprocessing(object):
         # mark guid in both results tables
         logging.info(u'Marking guid as Bad.')
         guid_result = {'url': data['guid']}
+        if self.update.searchresults(data['guid'], 'Bad'):
+            guid_result['update_SEARCHRESULTS'] = u'true'
+        else:
+            guid_result['update_SEARCHRESULTS'] = u'false'
 
-        if data['guid']:  # guid can be empty string
-            if self.update.searchresults(data['guid'], 'Bad'):
-                guid_result['update_SEARCHRESULTS'] = u'true'
-            else:
-                guid_result['update_SEARCHRESULTS'] = u'false'
-
-            if self.update.markedresults(data['guid'], 'Bad', data['imdbid']):
-                guid_result['update_MARKEDRESULTS'] = u'true'
-            else:
-                guid_result['update_MARKEDRESULTS'] = u'false'
+<<<<<<< HEAD
+        if self.update.markedresults(data['guid'], 'Bad', data['imdbid']):
+            guid_result['update_MARKEDRESULTS'] = 'true'
+=======
+        if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'):
+            guid_result['update_MARKEDRESULTS'] = u'true'
+>>>>>>> 6732436b718a891397121cac332d847a242d21d1
+        else:
+            guid_result['update_MARKEDRESULTS'] = u'false'
 
         # create result entry for guid
         result['tasks']['guid'] = guid_result
@@ -415,9 +418,13 @@ class Postprocessing(object):
             else:
                 guid2_result['update SEARCHRESULTS'] = u'false'
 
+<<<<<<< HEAD
             if self.update.markedresults(data['guid2'], 'Bad', data['imdbid']):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
-
+=======
+            if self.update.markedresults(data['guid2'], data['imdbid'], 'Bad'):
+                guid2_result['update_MARKEDRESULTS'] = u'true'
+>>>>>>> 6732436b718a891397121cac332d847a242d21d1
             else:
                 guid2_result['update_MARKEDRESULTS'] = u'false'
             # create result entry for guid2
@@ -496,19 +503,23 @@ class Postprocessing(object):
         # mark guid in both results tables
         logging.info(u'Marking guid as Finished.')
         guid_result = {}
-        if data['guid']:
-            if self.update.searchresults(data['guid'], 'Finished'):
-                guid_result['update_SEARCHRESULTS'] = u'true'
-            else:
-                guid_result['update_SEARCHRESULTS'] = u'false'
+        if self.update.searchresults(data['guid'], 'Finished'):
+            guid_result['update_SEARCHRESULTS'] = u'true'
+        else:
+            guid_result['update_SEARCHRESULTS'] = u'false'
 
+<<<<<<< HEAD
         if self.update.markedresults(data['guid'], 'Finished', data['imdbid']):
             guid_result['update_MARKEDRESULTS'] = 'true'
+=======
+        if self.update.markedresults(data['guid'], data['imdbid'], 'Finished'):
+            guid_result['update_MARKEDRESULTS'] = u'true'
+>>>>>>> 6732436b718a891397121cac332d847a242d21d1
         else:
             guid_result['update_MARKEDRESULTS'] = u'false'
 
-            # create result entry for guid
-            result['tasks'][data['guid']] = guid_result
+        # create result entry for guid
+        result['tasks'][data['guid']] = guid_result
 
         # if we have a guid2, do it all again
         if 'guid2' in data.keys():
@@ -519,8 +530,14 @@ class Postprocessing(object):
             else:
                 guid2_result['update_SEARCHRESULTS'] = u'false'
 
+<<<<<<< HEAD
             if self.update.markedresults(data['guid2'], 'Finished', data['imdbid']):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
+=======
+            if self.update.markedresults(data['guid2'], data['imdbid'],
+                                         'Finished'):
+                guid2_result['update_MARKEDRESULTS'] = u'true'
+>>>>>>> 6732436b718a891397121cac332d847a242d21d1
             else:
                 guid2_result['update_MARKEDRESULTS'] = u'false'
 

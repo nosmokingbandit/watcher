@@ -19,3 +19,5 @@ Thumbs.db
 
 # Readme #
 README.md
+.project
+*.pydevproject

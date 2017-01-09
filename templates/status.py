@@ -44,7 +44,6 @@ class Status():
         movie_list = ul(id='movie_list')
         with movie_list:
             for data in movies:
-                title_year = u'{} {}'.format(data['title'], data['year'])
                 poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
                 with li(cls='movie', imdbid=data['imdbid']):
                     with div():
@@ -64,7 +63,9 @@ class Status():
 
                         img(src=poster_path, alt='Poster for {}'.format(data['imdbid']))
 
-                        span(title_year, cls='title_year')
+                        with span(data['title'], cls='title_year'):
+                            br()
+                            span(data['year'])
 
         return unicode(movie_list)
 

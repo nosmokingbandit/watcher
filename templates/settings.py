@@ -27,7 +27,7 @@ def settings_page(page):
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.05')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.03')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.08')
 
         with doc:
             Header.insert_header(current="settings")
@@ -335,15 +335,12 @@ class Settings():
             with li(cls='bbord'):
                 i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupfailed'])
                 span('Delete leftover files after a failed download.')
-            with li('Replace illegal characters with: ', cls='bbord'):
-                input(type='text', id='replace_illegal', value=c[c_s]['replace_illegal'], style='width: 2em')
-                span('Leave blank to simply remove characters.', cls='tip')
             with li(cls='bbord'):
                 i(id='renamerenabled', cls='fa fa-square-o checkbox', value=c[c_s]['renamerenabled'])
                 span('Enable Renamer')
             with ul(id='renamer'):
                 with li():
-                    input(id='renamerstring', type='text', style='width: 80%', value=c[c_s]['renamerstring'])
+                    input(id='renamerstring', type='text', style='width: 80%', value=c[c_s]['renamerstring'], placeholder='{title} ({year}) {resolution}')
                     br()
                     span('Example: ')
                     br()
@@ -362,8 +359,15 @@ class Settings():
                     br()
                     span('/home/user/movies/{title} {year} = /home/user/movies/Black Swan 2010/',  cls='taglist')
                     br()
+                    span('Move additional files:')
+                    input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
+                    span('Files will be renamed with Renamer settings.', cls='tip')
+                    br()
                     i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupenabled'])
                     span('Clean up after move.')
+            with li('Replace illegal characters with: ', cls='bbord'):
+                input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
+                span('Leave blank to simply remove characters.', cls='tip')
             with li('Available tags:'):
                 span('{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
 

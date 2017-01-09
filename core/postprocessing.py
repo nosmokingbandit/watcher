@@ -396,13 +396,8 @@ class Postprocessing(object):
         else:
             guid_result['update_SEARCHRESULTS'] = u'false'
 
-<<<<<<< HEAD
         if self.update.markedresults(data['guid'], 'Bad', data['imdbid']):
             guid_result['update_MARKEDRESULTS'] = 'true'
-=======
-        if self.update.markedresults(data['guid'], data['imdbid'], 'Bad'):
-            guid_result['update_MARKEDRESULTS'] = u'true'
->>>>>>> 6732436b718a891397121cac332d847a242d21d1
         else:
             guid_result['update_MARKEDRESULTS'] = u'false'
 
@@ -418,13 +413,9 @@ class Postprocessing(object):
             else:
                 guid2_result['update SEARCHRESULTS'] = u'false'
 
-<<<<<<< HEAD
             if self.update.markedresults(data['guid2'], 'Bad', data['imdbid']):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
-=======
-            if self.update.markedresults(data['guid2'], data['imdbid'], 'Bad'):
-                guid2_result['update_MARKEDRESULTS'] = u'true'
->>>>>>> 6732436b718a891397121cac332d847a242d21d1
+
             else:
                 guid2_result['update_MARKEDRESULTS'] = u'false'
             # create result entry for guid2
@@ -508,13 +499,8 @@ class Postprocessing(object):
         else:
             guid_result['update_SEARCHRESULTS'] = u'false'
 
-<<<<<<< HEAD
         if self.update.markedresults(data['guid'], 'Finished', data['imdbid']):
             guid_result['update_MARKEDRESULTS'] = 'true'
-=======
-        if self.update.markedresults(data['guid'], data['imdbid'], 'Finished'):
-            guid_result['update_MARKEDRESULTS'] = u'true'
->>>>>>> 6732436b718a891397121cac332d847a242d21d1
         else:
             guid_result['update_MARKEDRESULTS'] = u'false'
 
@@ -530,14 +516,8 @@ class Postprocessing(object):
             else:
                 guid2_result['update_SEARCHRESULTS'] = u'false'
 
-<<<<<<< HEAD
             if self.update.markedresults(data['guid2'], 'Finished', data['imdbid']):
                 guid2_result['update_MARKEDRESULTS'] = 'true'
-=======
-            if self.update.markedresults(data['guid2'], data['imdbid'],
-                                         'Finished'):
-                guid2_result['update_MARKEDRESULTS'] = u'true'
->>>>>>> 6732436b718a891397121cac332d847a242d21d1
             else:
                 guid2_result['update_MARKEDRESULTS'] = u'false'
 

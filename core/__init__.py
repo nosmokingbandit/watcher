@@ -1,19 +1,19 @@
 # Paths to local things
 PROG_PATH = None
-CONF_FILE = 'config.cfg'
-LOG_DIR = 'logs'
-DB_FILE = 'watcher.sqlite'
-THEME = 'Default'
+CONF_FILE = u'config.cfg'
+LOG_DIR = u'logs'
+DB_FILE = u'watcher.sqlite'
+THEME = u'Default'
 
 # Paths to internet things
-GIT_URL = 'https://github.com/nosmokingbandit/watcher'
-GIT_REPO = 'https://github.com/nosmokingbandit/watcher.git'
-GIT_API = 'https://api.github.com/repos/nosmokingbandit/watcher'
+GIT_URL = u'https://github.com/nosmokingbandit/watcher'
+GIT_REPO = u'https://github.com/nosmokingbandit/watcher.git'
+GIT_API = u'https://api.github.com/repos/nosmokingbandit/watcher'
 
 # Server settings
 SERVER_ADDRESS = None
 SERVER_PORT = None
-URL_BASE = ''
+URL_BASE = u''
 
 # Update info
 UPDATE_STATUS = None

@@ -10,7 +10,7 @@ logging = logging.getLogger(__name__)
 class Poster():
 
     def __init__(self):
-        self.poster_folder = 'static/images/posters/'
+        self.poster_folder = u'static/images/posters/'
 
         if not os.path.exists(self.poster_folder):
             os.makedirs(self.poster_folder)
@@ -25,14 +25,14 @@ class Poster():
         Does not return.
         '''
 
-        logging.info('Grabbing poster for {}.'.format(imdbid))
+        logging.info(u'Grabbing poster for {}.'.format(imdbid))
 
-        new_poster_path = '{}{}.jpg'.format(self.poster_folder, imdbid)
+        new_poster_path = u'{}{}.jpg'.format(self.poster_folder, imdbid)
 
         if os.path.exists(new_poster_path) is False:
-            logging.info('Saving poster to {}'.format(new_poster_path))
+            logging.info(u'Saving poster to {}'.format(new_poster_path))
 
-            if poster_url == 'static/images/missing_poster.jpg':
+            if poster_url == u'static/images/missing_poster.jpg':
                 shutil.copy2(poster_url, new_poster_path)
 
             else:
@@ -42,7 +42,7 @@ class Poster():
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e:
-                    logging.error('Poster save_poster get', exc_info=True)
+                    logging.error(u'Poster save_poster get', exc_info=True)
 
                 try:
                     with open(new_poster_path, 'wb') as output:
@@ -50,11 +50,11 @@ class Poster():
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e: # noqa
-                    logging.error('Poster save_poster write', exc_info=True)
+                    logging.error(u'Poster save_poster write', exc_info=True)
 
-            logging.info('Poster saved to {}'.format(new_poster_path))
+            logging.info(u'Poster saved to {}'.format(new_poster_path))
         else:
-            logging.info('{} already exists.'.format(new_poster_path))
+            logging.info(u'{} already exists.'.format(new_poster_path))
 
     def remove_poster(self, imdbid):
         ''' Deletes poster from disk.
@@ -63,12 +63,12 @@ class Poster():
         Does not return.
         '''
 
-        logging.info('Removing poster for {}'.format(imdbid))
-        path = '{}{}.jpg'.format(self.poster_folder, imdbid)
+        logging.info(u'Removing poster for {}'.format(imdbid))
+        path = u'{}{}.jpg'.format(self.poster_folder, imdbid)
         if os.path.exists(path):
             os.remove(path)
         else:
-            logging.info('{} doesn\'t seem to exist.'.format(path))
+            logging.info(u'{} doesn\'t seem to exist.'.format(path))
 
     def find_poster(self, search_term):
         ''' Searches Yahoo images for movie poster.
@@ -102,7 +102,7 @@ class parseImages(HTMLParser):
     '''
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'img':
+        if tag == u'img':
             attrs = dict(attrs)
             if 'class' in attrs:
                 if 'process' in attrs['class']:

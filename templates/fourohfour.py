@@ -17,14 +17,14 @@ class FourOhFour():
             meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css'.format(core.CONFIG['Server']['theme']))
 
         with doc:
             with div(id='content'):
                 with span(cls='msg'):
-                    span('404')
+                    span(u'404')
                     br()
-                    span('Page Not Found')
+                    span(u'Page Not Found')
 
         return doc.render()
 

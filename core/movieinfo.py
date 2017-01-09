@@ -8,7 +8,7 @@ logging = logging.getLogger(__name__)
 class Omdb():
 
     def __init__(self):
-        self.search_base = 'http://www.omdbapi.com/?r=json&plot=short&type=movie&'
+        self.search_base = u'http://www.omdbapi.com/?r=json&plot=short&type=movie&'
         return
 
     def search(self, search_term):
@@ -24,7 +24,7 @@ class Omdb():
 
         search_term = search_term.replace(" ", "+")
 
-        if search_term[:2] == 'tt' and search_term[2:].isdigit():
+        if search_term[:2] == u'tt' and search_term[2:].isdigit():
             return self.find_imdbid(search_term)
         else:
             return self.find_title(search_term)
@@ -37,36 +37,36 @@ class Omdb():
 
         try:
             result = json.load(urllib2.urlopen(request))
-            if result['Response'] == 'False':
+            if result['Response'] == u'False':
                 return 'Nothing Found'
             else:
                 return [result]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('OMDB search.', exc_info=True)
+            logging.error(u'OMDB search.', exc_info=True)
             return 'Search Error.'
 
     def find_title(self, title):
 
         if title[-4:].isdigit():
-            query = 's={}&y={}'.format(title[:-5], title[-4:])
+            query = u's={}&y={}'.format(title[:-5], title[-4:])
         else:
-            query = 's={}'.format(title)
+            query = u's={}'.format(title)
 
         search_string = self.search_base + query
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
             results_json = json.load(urllib2.urlopen(request))
-            if results_json['Response'] == 'False':
+            if results_json['Response'] == u'False':
                 return 'Nothing Found'
             else:
                 return results_json['Search'][:6]  # limits to 6 results
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('OMDB search.', exc_info=True)
+            logging.error(u'OMDB search.', exc_info=True)
             return 'Search Error.'
 
     def movie_info(self, imdbid):
@@ -87,7 +87,7 @@ class Omdb():
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('OMDB movie_info.', exc_info=True)
+            logging.error(u'OMDB movie_info.', exc_info=True)
             return None
 
         keep = ('Title', 'Year', 'Released', 'Plot', 'Rated',
@@ -96,7 +96,7 @@ class Omdb():
         for k, v in data.items():
             if k not in keep:
                 del data[k]
-        data['status'] = 'wanted'
+        data['status'] = u'wanted'
 
         results_lower = {k.lower(): v for k, v in data.iteritems()}
         return results_lower
@@ -115,7 +115,7 @@ class Trailer():
 
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
 
-        k = 'AIzaSyCOu5KhaS9WcTfNvnRKzzJMf6z-6NGb28M'
+        k = u'AIzaSyCOu5KhaS9WcTfNvnRKzzJMf6z-6NGb28M'
 
         search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', k)
 
@@ -130,6 +130,6 @@ class Trailer():
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error('Tailer get_trailer.', exc_info=True)
+                logging.error(u'Tailer get_trailer.', exc_info=True)
                 tries += 1
         return None

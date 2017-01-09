@@ -15,13 +15,13 @@ class Shutdown():
             meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/shutdown.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/shutdown.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/shutdown.css'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/shutdown/main.js?v=12.27')
 
         with doc:
             with div(id='content'):
                 div(id='thinker')
-                span('Shutting Down', cls='msg')
+                span(u'Shutting Down', cls='msg')
 
         return doc.render()
 

@@ -32,7 +32,6 @@ div#title p{
     margin: 0 0 1em 0;
     height: 2em;
     line-height: 2em;
-    vertical-align: middle;
 }
 
 div#title span#title{
@@ -42,6 +41,12 @@ div#title span#title{
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 80%;
+}
+
+div#title span#title_year{
+    font-size: 0.65em;
+    opacity: 0.65;
+    margin-left: 0.25em;
 }
 
 div#title i{

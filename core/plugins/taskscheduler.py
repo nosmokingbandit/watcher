@@ -71,8 +71,8 @@ class ScheduledTask(object):
         self.task.timer.start()
 
     def stop(self):
-        logging.info('Stopping scheduled task {}.'.format(self.name))
-        print 'Stopping scheduled task: {}'.format(self.name)
+        logging.info(u'Stopping scheduled task {}.'.format(self.name))
+        print u'Stopping scheduled task: {}'.format(self.name)
         self.task.timer.cancel()
 
     def reload(self):

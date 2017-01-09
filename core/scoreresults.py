@@ -47,12 +47,13 @@ class ScoreResults():
             filters = core.CONFIG['Filters']
 
         retention = int(core.CONFIG['Search']['retention'])
-        required = filters['requiredwords'].lower().split(',')
-        preferred = filters['preferredwords'].lower().split(',')
-        ignored = filters['ignoredwords'].lower().split(',')
+        required = filters['requiredwords'].lower().split(u',')
+        preferred = filters['preferredwords'].lower().split(u',')
+        ignored = filters['ignoredwords'].lower().split(u',')
         today = datetime.today()
 
         # These all just modify self.results
+        self.reset()
         self.remove_inactive()
         self.remove_ignored(ignored)
         self.keep_required(required)
@@ -62,6 +63,10 @@ class ScoreResults():
         self.score_preferred(preferred)
 
         return self.results
+
+    def reset(self):
+        for i, d in enumerate(self.results):
+            self.results[i]['score'] = 0
 
     def remove_inactive(self):
         ''' Removes results from indexers no longer enabled
@@ -74,7 +79,7 @@ class ScoreResults():
 
         active = []
         for i in core.CONFIG['Indexers'].values():
-            if i[2] == 'true':
+            if i[2] == u'true':
                 active.append(i[0])
 
         keep = []
@@ -99,7 +104,7 @@ class ScoreResults():
         if not words:
             return
         for word in words:
-            if word == '':
+            if word == u'':
                 continue
             else:
                 self.results = [r for r in self.results if word not in r['title'].lower()]
@@ -117,7 +122,7 @@ class ScoreResults():
         if not words:
             return
         for word in words:
-            if word == '':
+            if word == u'':
                 continue
             else:
                 self.results = [r for r in self.results if word in r['title'].lower()]
@@ -137,7 +142,7 @@ class ScoreResults():
             return
         lst = []
         for result in self.results:
-            if result['type'] != 'nzb':
+            if result['type'] != u'nzb':
                 lst.append(result)
             else:
                 pubdate = datetime.strptime(result['pubdate'], '%d %b %Y')
@@ -159,7 +164,7 @@ class ScoreResults():
         if not words:
             return
         for word in words:
-            if word == '':
+            if word == u'':
                 continue
             else:
                 for result in self.results:
@@ -179,8 +184,8 @@ class ScoreResults():
 
         lst = []
         for result in self.results:
-            title = title.replace(' ', '.').replace(':', '.').lower()
-            test = result['title'].replace(' ', '.').lower()
+            title = title.replace(u' ', u'.').replace(u':', u'.').lower()
+            test = result['title'].replace(u' ', u'.').lower()
             match = fuzz.partial_ratio(title, test)
             if match > 60:
                 result['score'] += (match / 20)
@@ -204,7 +209,7 @@ class ScoreResults():
             size = result['size'] / 1000000
             for quality in qualities:
                 qlist = qualities[quality]
-                if qlist[0] != 'true':
+                if qlist[0] != u'true':
                     continue
                 priority = int(qlist[1])
                 min_size = int(qlist[2])

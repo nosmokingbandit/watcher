@@ -17,7 +17,8 @@ class MovieStatusPopup():
         data = self.sql.get_movie_details('imdbid', imdbid)
         if data:
             poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
-            title_date = u'{} {}'.format(data['title'], str(data['year']))
+            title = data['title']
+            year = str(data['year'])
 
             tomatoes_url = data['tomatourl']
 
@@ -27,12 +28,13 @@ class MovieStatusPopup():
         with container:
             script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.03')
             if not data:
-                span('Unable to get movie information from database. Check logs for more information.')
+                span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
 
             with div(id='title'):
                 with p():
-                    span(title_date, id='title', imdbid=imdbid)
+                    with span(title, id='title', imdbid=imdbid):
+                        span(year, id='title_year')
                     i(cls='fa fa-times', id='close')
                     i(cls='fa fa-trash', id='remove')
                     i(cls='fa fa-cog', id='change_quality')
@@ -51,10 +53,10 @@ class MovieStatusPopup():
                     with ul(id='quality', cls='wide'):
                         # Resolution Block
                         with ul(id='resolution', cls='sortable'):
-                            span('Resolutions', cls='sub_cat not_sortable')
+                            span(u'Resolutions', cls='sub_cat not_sortable')
 
                             for res in resolutions:
-                                prior = '{}priority'.format(res)
+                                prior = u'{}priority'.format(res)
                                 with li(cls='rbord', id=prior, sort=quality_settings['Quality'][res][1]):
                                     i(cls='fa fa-bars')
                                     i(id=res, cls='fa fa-square-o checkbox', value=quality_settings['Quality'][res][0])
@@ -62,7 +64,7 @@ class MovieStatusPopup():
 
                         # Size restriction block
                         with ul(id='resolution_size'):
-                            with li('Size Restrictions (MB)', cls='sub_cat'):
+                            with li(u'Size Restrictions (MB)', cls='sub_cat'):
 
                                 for res in resolutions:
                                     min = '{}min'.format(res)
@@ -74,22 +76,22 @@ class MovieStatusPopup():
 
                         with ul(id='filters', cls='wide'):
                             with li(cls='bbord flexbox'):
-                                span('Required words:')
+                                span(u'Required words:')
                                 input(type='text', id='requiredwords', value=quality_settings['Filters']['requiredwords'], style='width: 16em')
                             with li(cls='bbord flexbox'):
-                                span('Preferred words:')
+                                span(u'Preferred words:')
                                 input(type='text', id='preferredwords', value=quality_settings['Filters']['preferredwords'], style='width: 16em')
                             with li(cls='flexbox'):
-                                span('Ignored words:')
+                                span(u'Ignored words:')
                                 input(type='text', id='ignoredwords', value=quality_settings['Filters']['ignoredwords'], style='width: 16em')
 
             with div(id='plot'):
                 p(data['plot'])
             with div(id='additional_info'):
                 with a(href=tomatoes_url, target='_blank'):
-                    span('Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
-                span('Theatrical Release Date: {}'.format(data['released']))
-                span('DVD Release Date: {}'.format(data['dvd']))
+                    span(u'Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
+                span(u'Theatrical Release Date: {}'.format(data['released']))
+                span(u'DVD Release Date: {}'.format(data['dvd']))
 
         return unicode(container)
 
@@ -99,8 +101,8 @@ class MovieStatusPopup():
         with doc:
 
             if not results:
-                li('Nothing found yet.', cls='title bold')
-                li('Next automatic search scheduled for: {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
+                li(u'Nothing found yet.', cls='title bold')
+                li(u'Next automatic search scheduled for: {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
             else:
                 for idx, res in enumerate(results):
                     info_link = res['info_link']
@@ -112,9 +114,9 @@ class MovieStatusPopup():
 
                     # applied bottom border to all but last element
                     if idx == len(results) - 1:
-                        bbord = ''
+                        bbord = u''
                     else:
-                        bbord = 'bbord'
+                        bbord = u'bbord'
                     with li(cls='title bold'):
                         span(title, cls='name', title=title)
                         with span(cls='buttons'):
@@ -123,7 +125,7 @@ class MovieStatusPopup():
                             i(cls='fa fa-download', id='manual_download', imdbid=imdbid, guid=guid)
                             i(cls='fa fa-ban', id='mark_bad', guid=guid)
                     with li(cls='data ' + bbord):
-                        span(' Status: ')
+                        span(u' Status: ')
                         if status == 'Snatched':
                             span(status, cls='bold snatched')
                         elif status == 'Bad':
@@ -132,13 +134,13 @@ class MovieStatusPopup():
                             span(status, cls='bold finished')
                         else:
                             span(status, cls='bold')
-                        span(' Size: ')
+                        span(u' Size: ')
                         span(size, cls='bold')
-                        span(' Score: ')
+                        span(u' Score: ')
                         span(res['score'], cls='bold')
-                        span(' Source: ')
+                        span(u' Source: ')
                         span(res['indexer'] or '', cls='bold')
-                        span(' Published: ')
+                        span(u' Published: ')
                         span(pubdate, cls='bold')
 
         return doc.render()

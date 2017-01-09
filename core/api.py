@@ -25,13 +25,13 @@ class API(object):
         serverkey = core.CONFIG['Server']['apikey']
 
         if 'apikey' not in params:
-            logging.warning('API request failed, no key supplied.')
+            logging.warning(u'API request failed, no key supplied.')
             return json.dumps({'response': 'false',
                                'error': 'no api key supplied'})
 
         # check for api key
         if serverkey != params['apikey']:
-            logging.warning('Invalid API key in request: {}'.format(params['apikey']))
+            logging.warning(u'Invalid API key in request: {}'.format(params['apikey']))
             return json.dumps({'response': 'false',
                                'error': 'incorrect api key'})
 
@@ -40,14 +40,14 @@ class API(object):
             return json.dumps({'response': 'false',
                                'error': 'no api mode specified'})
 
-        if params['mode'] == 'liststatus':
+        if params['mode'] == u'liststatus':
 
             if 'imdbid' in params:
                 return self.liststatus(imdbid=params['imdbid'])
             else:
                 return self.liststatus()
 
-        elif params['mode'] == 'addmovie':
+        elif params['mode'] == u'addmovie':
             if 'imdbid' not in params:
                 return json.dumps({'response': 'false',
                                    'error': 'no imdbid supplied'})
@@ -55,7 +55,7 @@ class API(object):
                 imdbid = params['imdbid']
             return self.addmovie(imdbid)
 
-        elif params['mode'] == 'removemovie':
+        elif params['mode'] == u'removemovie':
             if 'imdbid' not in params:
                 return json.dumps({'response': 'false',
                                    'error': 'no imdbid supplied'})
@@ -63,7 +63,7 @@ class API(object):
                 imdbid = params['imdbid']
             return self.removemovie(imdbid)
 
-        elif params['mode'] == 'version':
+        elif params['mode'] == u'version':
             return self.version()
 
         else:
@@ -80,7 +80,7 @@ class API(object):
         Returns str json.dumps(dict)
         '''
 
-        logging.info('API request movie list.')
+        logging.info(u'API request movie list.')
         movies = self.sql.get_user_movies()
         if not movies:
             return 'No movies found.'
@@ -101,7 +101,7 @@ class API(object):
         Returns str json.dumps(dict) {"status": "success", "message": "X added to wanted list."}
         '''
 
-        logging.info('API request add movie {}'.format(imdbid))
+        logging.info(u'API request add movie {}'.format(imdbid))
         return self.ajax.quick_add(imdbid)
 
     def removemovie(self, imdbid):
@@ -111,7 +111,7 @@ class API(object):
         Returns str json.dumps(dict)
         '''
 
-        logging.info('API request remove movie {}'.format(imdbid))
+        logging.info(u'API request remove movie {}'.format(imdbid))
 
         t = threading.Thread(target=self.poster.remove_poster, args=(imdbid,))
         t.start()

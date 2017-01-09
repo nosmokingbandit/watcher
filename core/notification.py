@@ -32,7 +32,7 @@ class Notification(object):
 
         base.update(data)
 
-        logging.info('Creating notification:')
+        logging.info(u'Creating notification:')
         logging.info(base)
 
         # if it already exists, ignore it
@@ -40,9 +40,9 @@ class Notification(object):
             return
 
         # if this is an update notif, remove other update notifs first
-        if base['type'] == 'update':
+        if base['type'] == u'update':
             for i, v in enumerate(core.NOTIFICATIONS):
-                if v['type'] == 'update':
+                if v['type'] == u'update':
                     core.NOTIFICATIONS[i] = None
 
         # if there is a None in the list, overwrite it. If not, just append

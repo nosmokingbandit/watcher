@@ -53,14 +53,14 @@ path = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
 
 # set the post-processing mode
 if os.environ['NZBPP_TOTALSTATUS'] == 'SUCCESS':
-    print 'Sending {} to Watcher as Complete.'.format(name)
+    print u'Sending {} to Watcher as Complete.'.format(name)
     mode = 'complete'
 else:
-    print 'Sending {} to Watcher as Failed.'.format(name)
+    print u'Sending {} to Watcher as Failed.'.format(name)
     mode = 'failed'
 
 # send it to watcher
-url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherapi, mode, guid, downloadid, path)
+url = u'{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherapi, mode, guid, downloadid, path)
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 

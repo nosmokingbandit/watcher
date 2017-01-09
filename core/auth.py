@@ -3,8 +3,8 @@ import core
 from templates import login
 import logging
 
-SESSION_KEY = u'_cp_username'
-LOGIN_URL = u'/auth/login/'
+SESSION_KEY = '_cp_username'
+LOGIN_URL = '/auth/login/'
 
 logging = logging.getLogger(__name__)
 

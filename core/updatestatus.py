@@ -41,8 +41,8 @@ class Status(object):
     def markedresults(self, guid, status, imdbid=None):
         ''' Marks markedresults status
         :param guid: str download link guid
-        :param imdbid: str imdb identification number (tt123456)
         :param status: str status to set
+        :param imdbid: str imdb identification number   <optional>
 
         imdbid can be None
 

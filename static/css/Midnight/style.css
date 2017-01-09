@@ -1,0 +1,47 @@
+/*
+#151c25 Dark Blue BG
+#080f18 Darker Blue BG
+#cccccc Light Gray Text/Border
+
+*/
+
+@import url("header.css");
+
+body{
+    color: #ccc;
+}
+body, ::-webkit-scrollbar-track, ::-webkit-scrollbar-track:hover{
+    background-color: #080f18;
+}
+
+input{
+    color: #ccc;
+}
+
+::selection {
+    background: #ccc; /* WebKit/Blink Browsers */
+    color: #080f18;
+}
+::-moz-selection {
+    background: #080f18; /* Gecko Browsers */
+    color: #080f18;
+}
+
+a {
+    color: #ccc;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #071010;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+}
+::-webkit-scrollbar-thumb:active {
+    background: #fff;
+}
+
+div.sweet-alert{
+    color: #080f18;
+}

@@ -59,8 +59,6 @@ if __name__ == '__main__':
         print 'Config file found, merging any new options.'
         conf.merge_new_options()
     conf.stash()
-    # apply theme
-    core.THEME = core.CONFIG['Server']['theme']
 
     # Set up logging
     if passed_args.log:

@@ -15,7 +15,7 @@ class Restart():
             meta(name='enable_notifs', content='false')
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/restart.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/restart.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/restart.css'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/restart/main.js?v=12.27')
 
         with doc:

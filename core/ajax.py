@@ -108,7 +108,7 @@ class Ajax(object):
         TABLE = u'MOVIES'
 
         imdbid = data['imdbid']
-        title = data['title'].replace(u'_', u' ').encode('ascii', 'ignore')  ## TODO can remove encode?
+        title = data['title'].replace(u'_', u' ')
         year = data['year'][:4]
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):

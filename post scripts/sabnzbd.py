@@ -19,6 +19,7 @@ conf = {
 
 import json
 import sys
+import urllib
 import urllib2
 
 try:
@@ -33,7 +34,7 @@ watcherapi = conf['watcherapi']
 sabkey = conf['sabkey']
 sabhost = conf['sabhost']
 sabport = conf['sabport']
-
+data = {'apikey': watcherapi, 'guid': ''}
 
 # get guid and nzo_id from sab history:
 name = urllib2.quote(sys.argv[3], safe='')
@@ -46,32 +47,29 @@ slots = json.loads(response)['history']['slots']
 
 for dl in slots:
     if dl['loaded'] is True:
-        guid = dl['url']
-        downloadid = dl['nzo_id']
+        data['guid'] = dl['url']
+        data['downloadid'] = dl['nzo_id']
         break
 
-if not guid:
-    print u'Download GUID not found.'
-    sys.exit(1)
-
-
-# prep all other params
-guid = urllib2.quote(guid, safe='')
-path = urllib2.quote(sys.argv[1], safe='')
+data['path'] = sys.argv[1]
 
 # send it to Watcher
 if status == 0:
     print u'Sending {} to Watcher as Complete.'.format(name)
-    mode = 'complete'
+    data['mode'] = 'complete'
 else:
     print u'Sending {} to Watcher as Failed.'.format(name)
-    mode = 'failed'
+    data['mode'] = 'failed'
 
-url = u'{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcheraddress, watcherapi, mode, guid, downloadid, path)
-request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+url = u'{}/postprocessing/'.format(watcheraddress)
+post_data = urllib.urlencode(data)
+
+request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':
     sys.exit(0)
 else:
     sys.exit(1)
+
+# pylama:ignore=E402

@@ -118,7 +118,7 @@ $(document).ready(function () {
         // enabled resolutions
         $("ul#resolution i.checkbox").each(function(){
             tmp[$(this).attr("id")] = $(this).attr("value");
-        }); // ## TODO clean this up
+        });
 
         // order of resolutions
         var arr = $("ul#resolution").sortable("toArray");

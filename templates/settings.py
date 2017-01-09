@@ -25,7 +25,7 @@ def settings_page(page):
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.05')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.08')
 
@@ -72,7 +72,6 @@ class Settings():
                         if item['value'] == c[c_s]['theme']:
                             item['selected'] = 'selected'
                             theme_select['value'] = opt
-                span(u'*Requires restart.', cls='tip')
 
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=c[c_s]['authrequired'])

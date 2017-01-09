@@ -27,7 +27,7 @@ class Searcher():
 
         First checks for all movies on predb.
 
-        Searches only for movies where predb == 'found'.
+        Searches only for movies where predb == u'found'.
 
         Searches only for movies that are Wanted, Found,
             or Finished -- if inside user-set date range.
@@ -51,9 +51,9 @@ class Searcher():
         auto_grab = core.CONFIG['Search']['autograb']
 
         self.predb.check_all()
-        logging.info('Running automatic search.')
-        if keepsearching == 'true':
-            logging.info('Search for finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
+        logging.info(u'Running automatic search.')
+        if keepsearching == u'true':
+            logging.info(u'Search for finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
         movies = self.sql.get_user_movies()
         if not movies:
             return False
@@ -72,11 +72,11 @@ class Searcher():
                     self.search(imdbid, title)
                     continue
 
-            if status == 'Finished' and keepsearching == 'true':
+            if status == u'Finished' and keepsearching == u'true':
                 logging.info(u'{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
-                    logging.info('{} finished on {}, searching again.'.format(title, finisheddate))
+                    logging.info(u'{} finished on {}, searching again.'.format(title, finisheddate))
                     self.search(imdbid, title)
                     continue
                 else:
@@ -87,8 +87,8 @@ class Searcher():
         '''
         If autograb is enabled, loops through movies and grabs any appropriate releases.
         '''
-        if auto_grab == 'true':
-            logging.info('Running automatic snatcher.')
+        if auto_grab == u'true':
+            logging.info(u'Running automatic snatcher.')
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
             if not movies:
@@ -96,12 +96,12 @@ class Searcher():
             for movie in movies:
                 status = movie['status']
 
-                if status == 'Found':
+                if status == u'Found':
                     logging.info(u'{} status is Found. Running automatic snatcher.'.format(title))
                     self.snatcher.auto_grab(imdbid)
                     continue
 
-                if status == 'Finished' and keepsearching == 'true':
+                if status == u'Finished' and keepsearching == u'true':
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta >= today:
                         logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
@@ -113,7 +113,7 @@ class Searcher():
                 else:
                     continue
 
-        logging.info('Autosearch complete.')
+        logging.info(u'Autosearch complete.')
         return
 
     def search(self, imdbid, title):
@@ -121,7 +121,7 @@ class Searcher():
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year (Movie Title 2016)
 
-        Checks predb value in MOVIES table. If not == 'found', does nothing.
+        Checks predb value in MOVIES table. If not == u'found', does nothing.
 
         Gets new search results from newznab providers.
         Pulls existing search results and updates new data with old. This way the
@@ -139,10 +139,10 @@ class Searcher():
 
         # First check predb
         movie = self.sql.get_movie_details('imdbid', imdbid)
-        if movie['predb'] != 'found':
+        if movie['predb'] != u'found':
             self.predb.check_one(movie)
         movie = self.sql.get_movie_details('imdbid', imdbid)
-        if movie['predb'] != 'found':
+        if movie['predb'] != u'found':
             return False
 
         newznab_results = self.nn.search_all(imdbid)
@@ -170,7 +170,7 @@ class Searcher():
                 return False
 
         if not self.update.movie_status(imdbid):
-            logging.info('No acceptable results found for {}'.format(imdbid))
+            logging.info(u'No acceptable results found for {}'.format(imdbid))
             return False
 
         return True
@@ -186,7 +186,7 @@ class Searcher():
         Returns Bool on success/failure.
         '''
 
-        logging.info('{} results found for {}. Storing results.'.format(len(results), imdbid))
+        logging.info(u'{} results found for {}. Storing results.'.format(len(results), imdbid))
 
         # This iterates through the new search results and submits only results we haven't already stored. This keeps it from overwriting the FoundDate
         BATCH_DB_STRING = []

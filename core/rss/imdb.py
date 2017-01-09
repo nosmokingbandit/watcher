@@ -28,7 +28,7 @@ class ImdbRss(object):
         Returns True or None on success or failure (due to exception or empty movie list)
         '''
 
-        logging.info('Syncing IMDB watchlist {}'.format(rss_url))
+        logging.info(u'Syncing IMDB watchlist {}'.format(rss_url))
 
         request = urllib2.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -39,13 +39,13 @@ class ImdbRss(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('IMDB rss request.', exc_info=True)
+            logging.error(u'IMDB rss request.', exc_info=True)
             return None
 
         if movies:
-            logging.info('Found {} movies in watchlist.'.format(len(movies)))
+            logging.info(u'Found {} movies in watchlist.'.format(len(movies)))
             self.sync_new_movies(movies)
-            logging.info('IMDB rss sync complete.')
+            logging.info(u'IMDB rss sync complete.')
             return True
         else:
             return None
@@ -98,16 +98,16 @@ class ImdbRss(object):
         '''
         data_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'imdb')
 
-        date_format = '%a, %d %b %Y %H:%M:%S %Z'
+        date_format = u'%a, %d %b %Y %H:%M:%S %Z'
         new_rss_movies = []
 
         if os.path.isfile(data_file):
             with open(data_file, 'r') as f:
                 last_sync = f.read()
         else:
-            last_sync = 'Sat, 01 Jan 2000 00:00:00 GMT'
+            last_sync = u'Sat, 01 Jan 2000 00:00:00 GMT'
 
-        logging.info('Last synced this watchlist on {}+0800'.format(last_sync))
+        logging.info(u'Last synced this watchlist on {}+0800'.format(last_sync))
 
         last_sync = datetime.strptime(last_sync, date_format)
 
@@ -121,7 +121,7 @@ class ImdbRss(object):
             link = i['link']
             imdbid = link.split('/')[-2]
 
-            logging.info('Found new watchlist movie: {} {}'.format(title, imdbid))
+            logging.info(u'Found new watchlist movie: {} {}'.format(title, imdbid))
 
             new_rss_movies.append(imdbid)
 
@@ -138,12 +138,12 @@ class ImdbRss(object):
         for imdbid in movies_to_add:
             movie_info = self.omdb.movie_info(imdbid)
             if not movie_info:
-                logging.info('{} not found on omdb. Cannot add.'.format(imdbid))
+                logging.info(u'{} not found on omdb. Cannot add.'.format(imdbid))
                 continue
-            # logging.info('Adding {}'.format(imdbid))
+            # logging.info(u'Adding {}'.format(imdbid))
             movie_info['quality'] = json.dumps(quality)
             self.ajax.add_wanted_movie(json.dumps(movie_info))
 
-        logging.info('Storing last synced date')
+        logging.info(u'Storing last synced date')
         with open(data_file, 'w') as f:
             f.write(self.lastbuilddate)

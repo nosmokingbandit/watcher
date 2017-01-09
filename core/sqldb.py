@@ -15,14 +15,14 @@ class SQL(object):
     '''
 
     def __init__(self):
-        DB_NAME = 'sqlite:///{}'.format(core.DB_FILE)
+        DB_NAME = u'sqlite:///{}'.format(core.DB_FILE)
         try:
             self.engine = create_engine(DB_NAME, echo=False, connect_args={'timeout': 30})
             self.metadata = MetaData()
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error('Opening SQL DB.', exc_info=True)
+            logging.error(u'Opening SQL DB.', exc_info=True)
             raise
 
         self.MOVIES = Table('MOVIES', self.metadata,
@@ -66,7 +66,7 @@ class SQL(object):
                                    )
 
     def create_database(self):
-        logging.info('Creating tables.')
+        logging.info(u'Creating tables.')
         self.metadata.create_all(self.engine)
         return
 
@@ -91,13 +91,13 @@ class SQL(object):
                 return result
 
             except Exception as e:
-                logging.error('SQL Databse Query: {}'.format(command), exc_info=True)
+                logging.error(u'SQL Databse Query: {}'.format(command), exc_info=True)
                 if 'database is locked' in e.args[0]:
-                    logging.info('SQL Query attempt # {}'.format(tries))
+                    logging.info(u'SQL Query attempt # {}'.format(tries))
                     tries += 1
                     time.sleep(1)
                 else:
-                    logging.error('SQL Databse Query: {}'.format(command), exc_info=True)
+                    logging.error(u'SQL Databse Query: {}'.format(command), exc_info=True)
                     raise
         # all tries exhausted
         return False
@@ -109,12 +109,12 @@ class SQL(object):
         Returns Bool on success.
         '''
 
-        logging.info('Writing data to {}'.format(TABLE))
+        logging.info(u'Writing data to {}'.format(TABLE))
 
-        cols = ', '.join(DB_STRING.keys())
+        cols = u', '.join(DB_STRING.keys())
         vals = DB_STRING.values()
 
-        qmarks = ', '.join(['?'] * len(DB_STRING))
+        qmarks = u', '.join(['?'] * len(DB_STRING))
 
         sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % (TABLE, cols, qmarks)
 
@@ -123,7 +123,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error('EXECUTE SQL.WRITE FAILED.')
+            logging.error(u'EXECUTE SQL.WRITE FAILED.')
             return False
 
     def write_search_results(self, LIST):
@@ -131,7 +131,7 @@ class SQL(object):
         Takes list of dicts to write into SEARCHRESULTS.
         '''
 
-        logging.info('Writing batch into SEARCHRESULTS')
+        logging.info(u'Writing batch into SEARCHRESULTS')
 
         INSERT = self.SEARCHRESULTS.insert()
 
@@ -140,7 +140,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error('EXECUTE SQL.WRITE_SEARCH_RESULTS FAILED.')
+            logging.error(u'EXECUTE SQL.WRITE_SEARCH_RESULTS FAILED.')
             return False
 
     def update(self, TABLE, COLUMN, VALUE, imdbid='', guid=''):
@@ -152,17 +152,17 @@ class SQL(object):
         '''
 
         if imdbid:
-            idcol = 'imdbid'
+            idcol = u'imdbid'
             idval = imdbid
         elif guid:
-            idcol = 'guid'
+            idcol = u'guid'
             idval = guid
         else:
             return 'ID ERROR'
 
-        logging.info('Updating {} to {} in {}.'.format(idval, VALUE, TABLE))
+        logging.info(u'Updating {} to {} in {}.'.format(idval, VALUE, TABLE))
 
-        sql = 'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
+        sql = u'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
         vals = (VALUE, idval)
 
         command = [sql, vals]
@@ -170,7 +170,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error('EXECUTE SQL.UPDATE FAILED.')
+            logging.error(u'EXECUTE SQL.UPDATE FAILED.')
             return False
 
     def get_user_movies(self):
@@ -178,10 +178,10 @@ class SQL(object):
         Returns list of dicts with all information in MOVIES
         '''
 
-        logging.info('Retreving list of user\'s movies.')
-        TABLE = 'MOVIES'
+        logging.info(u'Retreving list of user\'s movies.')
+        TABLE = u'MOVIES'
 
-        command = 'SELECT * FROM {} ORDER BY title ASC'.format(TABLE)
+        command = u'SELECT * FROM {} ORDER BY title ASC'.format(TABLE)
 
         result = self.execute(command)
 
@@ -193,7 +193,7 @@ class SQL(object):
                 lst.append(i)
             return lst
         else:
-            logging.error('EXECUTE SQL.GET_USER_MOVIES FAILED.')
+            logging.error(u'EXECUTE SQL.GET_USER_MOVIES FAILED.')
             return False
 
     def get_movie_details(self, idcol, idval):
@@ -203,9 +203,9 @@ class SQL(object):
         Returns dict of first match
         '''
 
-        logging.info('Retreving details for {}.'.format(idval))
+        logging.info(u'Retreving details for {}.'.format(idval))
 
-        command = 'SELECT * FROM MOVIES WHERE {}="{}"'.format(idcol, idval)
+        command = u'SELECT * FROM MOVIES WHERE {}="{}"'.format(idcol, idval)
 
         result = self.execute(command)
 
@@ -221,10 +221,10 @@ class SQL(object):
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
 
-        logging.info('Retreving Search Results for {}.'.format(imdbid))
-        TABLE = 'SEARCHRESULTS'
+        logging.info(u'Retreving Search Results for {}.'.format(imdbid))
+        TABLE = u'SEARCHRESULTS'
 
-        command = 'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
+        command = u'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
 
         results = self.execute(command)
 
@@ -238,13 +238,13 @@ class SQL(object):
         Returns dict of MARKEDRESULTS
         {guid:status, guid:status, etc}
         '''
-        logging.info('Retreving Marked Results for {}.'.format(imdbid))
+        logging.info(u'Retreving Marked Results for {}.'.format(imdbid))
 
-        TABLE = 'MARKEDRESULTS'
+        TABLE = u'MARKEDRESULTS'
 
         results = {}
 
-        command = 'SELECT * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
+        command = u'SELECT * FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
 
         data = self.execute(command)
 
@@ -266,7 +266,7 @@ class SQL(object):
         Returns True/False on success/fail or None if movie doesn't exist in DB.
         '''
 
-        logging.info('Removing {} from {}.'.format(imdbid, 'MOVIES'))
+        logging.info(u'Removing {} from {}.'.format(imdbid, 'MOVIES'))
 
         if not self.row_exists('MOVIES', imdbid=imdbid):
             return None
@@ -274,13 +274,13 @@ class SQL(object):
         if not self.delete('MOVIES', 'imdbid', imdbid):
             return False
 
-        logging.info('Removing any stored search results for {}.'.format(imdbid))
+        logging.info(u'Removing any stored search results for {}.'.format(imdbid))
 
         if self.row_exists('SEARCHRESULTS', imdbid):
             if not self.purge_search_results(imdbid=imdbid):
                 return False
 
-        logging.info('{} removed.'.format(imdbid))
+        logging.info(u'{} removed.'.format(imdbid))
         return True
 
     def delete(self, TABLE, idcol, idval):
@@ -289,9 +289,9 @@ class SQL(object):
         Returns Bool.
         '''
 
-        logging.info('Removing from {} where {} is {}.'.format(TABLE, idcol, idval))
+        logging.info(u'Removing from {} where {} is {}.'.format(TABLE, idcol, idval))
 
-        command = 'DELETE FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
+        command = u'DELETE FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
 
         if self.execute(command):
             return True
@@ -304,12 +304,12 @@ class SQL(object):
 
         BE CAREFUL.
         '''
-        TABLE = 'SEARCHRESULTS'
+        TABLE = u'SEARCHRESULTS'
 
         if imdbid:
-            command = 'DELETE FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
+            command = u'DELETE FROM {} WHERE imdbid="{}"'.format(TABLE, imdbid)
         else:
-            command = 'DELETE FROM {}'.format(TABLE)
+            command = u'DELETE FROM {}'.format(TABLE)
 
         if self.execute(command):
             return True
@@ -322,9 +322,9 @@ class SQL(object):
         ['val1', 'val2', 'val3']
         '''
 
-        logging.info('Getting distinct values for {} in {}'.format(idval, TABLE))
+        logging.info(u'Getting distinct values for {} in {}'.format(idval, TABLE))
 
-        command = 'SELECT DISTINCT {} FROM {} WHERE {}="{}"'.format(column, TABLE, idcol, idval)
+        command = u'SELECT DISTINCT {} FROM {} WHERE {}="{}"'.format(column, TABLE, idcol, idval)
 
         data = self.execute(command)
 
@@ -339,7 +339,7 @@ class SQL(object):
                 lst.append(i[column])
             return lst
         else:
-            logging.error('EXECUTE SQL.GET_DISTINCT FAILED.')
+            logging.error(u'EXECUTE SQL.GET_DISTINCT FAILED.')
             return False
 
     def row_exists(self, TABLE, imdbid='', guid='', downloadid=''):
@@ -358,19 +358,19 @@ class SQL(object):
         '''
 
         if imdbid:
-            idcol = 'imdbid'
+            idcol = u'imdbid'
             idval = imdbid
         elif guid:
-            idcol = 'guid'
+            idcol = u'guid'
             idval = guid
         elif downloadid:
-            idcol = 'downloadid'
+            idcol = u'downloadid'
             idval = downloadid
 
         else:
             return 'ID ERROR'
 
-        command = 'SELECT 1 FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
+        command = u'SELECT 1 FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
 
         row = self.execute(command)
 
@@ -384,9 +384,9 @@ class SQL(object):
         Returns dict from SEARCHRESULTS for single row.
         '''
 
-        logging.info('Retreving search result details for {}.'.format(idval))
+        logging.info(u'Retreving search result details for {}.'.format(idval))
 
-        command = 'SELECT * FROM SEARCHRESULTS WHERE {}="{}"'.format(idcol, idval)
+        command = u'SELECT * FROM SEARCHRESULTS WHERE {}="{}"'.format(idcol, idval)
 
         result = self.execute(command)
 

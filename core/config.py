@@ -16,7 +16,7 @@ class Config():
         self.config.optionxform = str
 
         self.file = core.CONF_FILE
-        self.base_file = 'core/base_config.cfg'
+        self.base_file = u'core/base_config.cfg'
 
     def new_config(self):
         ''' Copies base_file to config directory.

@@ -29,16 +29,16 @@ class NewzNab():
         imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
-            if indexer[2] == 'false':
+            if indexer[2] == u'false':
                 continue
             url = indexer[0]
-            if url[-1] != '/':
+            if url[-1] != u'/':
                 url = url + '/'
             apikey = indexer[1]
 
-            search_string = '{}api?apikey={}&t=movie&imdbid={}'.format(url, apikey, imdbid_s)
+            search_string = u'{}api?apikey={}&t=movie&imdbid={}'.format(url, apikey, imdbid_s)
 
-            logging.info('SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
+            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
 
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -50,7 +50,7 @@ class NewzNab():
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error('NewzNab search_all get xml', exc_info=True)
+                logging.error(u'NewzNab search_all get xml', exc_info=True)
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
@@ -62,17 +62,17 @@ class NewzNab():
         '''
 
         root = ET.fromstring(feed)
-        indexer = ''
+        indexer = u''
         # This is so ugly, but some newznab sites don't output json. I don't want to include a huge xml parsing module, so here we are. I'm not happy about it either.
         res_list = []
         for root_child in root:
-            if root_child.tag == 'channel':
+            if root_child.tag == u'channel':
                 for channel_child in root_child:
-                    if channel_child.tag == 'title':
+                    if channel_child.tag == u'title':
                         indexer = channel_child.text
-                    if not indexer and channel_child.tag == 'link':
+                    if not indexer and channel_child.tag == u'link':
                         indexer = channel_child.text
-                    if channel_child.tag == 'item':
+                    if channel_child.tag == u'item':
                         result_item = self.make_item_dict(channel_child)
                         result_item['indexer'] = indexer
                         res_list.append(result_item)
@@ -100,16 +100,16 @@ class NewzNab():
         permalink = True
         for ic in item:
             if ic.tag in item_keep:
-                if ic.tag == 'guid' and ic.attrib['isPermaLink'] == 'false':
+                if ic.tag == u'guid' and ic.attrib['isPermaLink'] == u'false':
                     permalink = False
                 d[ic.tag.lower()] = ic.text
-            if 'newznab' in ic.tag and ic.attrib['name'] == 'size':
+            if 'newznab' in ic.tag and ic.attrib['name'] == u'size':
                 d['size'] = int(ic.attrib['value'])
 
         d['resolution'] = self.get_resolution(d)
         d['imdbid'] = self.imdbid
         d['pubdate'] = d['pubdate'][5:16]
-        d['type'] = 'nzb'
+        d['type'] = u'nzb'
 
         if not permalink:
             d['info_link'] = d['comments']
@@ -120,7 +120,7 @@ class NewzNab():
         d['guid'] = d['link']
         del d['link']
         d['score'] = 0
-        d['status'] = 'Available'
+        d['status'] = u'Available'
         d['torrentfile'] = None
         d['downloadid'] = None
 
@@ -137,13 +137,13 @@ class NewzNab():
 
         title = result['title']
         if result['category'] and 'SD' in result['category']:
-            resolution = 'SD'
+            resolution = u'SD'
         elif '4K' in title or 'UHD' in title or '2160P' in title:
-            resolution = '4K'
+            resolution = u'4K'
         elif '1080' in title:
-            resolution = '1080P'
+            resolution = u'1080P'
         elif '720' in title:
-            resolution = '720P'
+            resolution = u'720P'
         else:
-            resolution = 'Unknown'
+            resolution = u'Unknown'
         return resolution

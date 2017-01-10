@@ -102,9 +102,6 @@ class ScoreResults():
         Does not return
         '''
 
-        for i in self.results:
-            print i['title'].lower()
-
         if not words:
             return
         for word in words:

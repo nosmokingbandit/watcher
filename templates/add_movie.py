@@ -14,9 +14,9 @@ class AddMovie():
         with doc.head:
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/add_movie.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/add_movie.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/add_movie.css'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_info_popup.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_info_popup.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_info_popup.css'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/main.js?v=01.03')
 
         with doc:

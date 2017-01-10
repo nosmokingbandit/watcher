@@ -186,8 +186,9 @@ $(document).ready(function () {
         swal({
             title: "Restart Watcher?",
             text: "",
-            type: "info",
+            type: "",
             showCancelButton: true,
+            imageUrl: '',
             confirmButtonColor: "#4CAF50",
             confirmButtonText: "Restart",
             closeOnConfirm: true
@@ -200,7 +201,7 @@ $(document).ready(function () {
         swal({
             title: "Shut Down Watcher?",
             text: "",
-            type: "info",
+            type: "",
             showCancelButton: true,
             confirmButtonColor: "#4CAF50",
             confirmButtonText: "Shut Down",

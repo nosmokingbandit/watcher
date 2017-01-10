@@ -68,7 +68,7 @@ def require(*conditions):
 def member_of(groupname):
     def check():
         # replace with actual check if <username> is in <groupname>
-        return cherrypy.request.login == 'joe' and groupname == 'admin'
+        return cherrypy.request.login == u'joe' and groupname == u'admin'
     return check
 
 
@@ -121,7 +121,7 @@ class AuthController(object):
         Does not return
         '''
 
-        log_attempt = 'Successful login from {}'.format(origin)
+        log_attempt = u'Successful login from {}'.format(origin)
         logging.info(log_attempt)
 
     def on_logout(self, username):
@@ -156,7 +156,7 @@ class AuthController(object):
 
         # on failed attempt
         if check_credentials(username, password) is False:
-            log_attempt = 'Failed login attempt {}:{} from {}'.format(username, password, origin)
+            log_attempt = u'Failed login attempt {}:{} from {}'.format(username, password, origin)
 
             logging.warning(log_attempt)
 

@@ -1,0 +1,33 @@
+input[type="number"], input[type="text"]{
+    border: 1px solid #ccc;
+    background-color: #080f18;
+}
+
+ul#result_list{
+    border: 1px solid #bdbdbd;
+}
+
+ul#result_list li.bbord{
+    border-bottom: 1px solid #bdbdbd;
+}
+
+span.bad{
+    color: #F44336;
+}
+
+li.data span.snatched{
+    color: #00BCD4;
+}
+
+li.data span.finished{
+    color: #4CAF50;
+}
+
+div#results_thinker{
+    background-color: #ccc;
+}
+
+/* Quality slide in panel */
+ul#quality li.rbord{
+    border-right: 1px solid #bdbdbd;
+}

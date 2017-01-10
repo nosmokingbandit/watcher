@@ -37,7 +37,7 @@ class Nzbget():
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error('Nzbget test_connection', exc_info=True)
+            logging.error(u'Nzbget test_connection', exc_info=True)
             return '{}.'.format(e)
 
     @staticmethod
@@ -78,13 +78,13 @@ class Nzbget():
             'Forced': 900
         }
         priority = priority_keys[nzbg_conf['nzbgpriority']]
-        if nzbg_conf['nzbgaddpaused'] == 'true':
+        if nzbg_conf['nzbgaddpaused'] == u'true':
             paused = True
         else:
             paused = False
         dupekey = data['imdbid']
         dupescore = data['score']
-        dupemode = 'All'
+        dupemode = u'All'
 
         try:
             response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)

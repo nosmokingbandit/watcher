@@ -52,7 +52,7 @@ class AutoUpdateCheck(object):
         if now.second > 30:
             min += 1
 
-        if core.CONFIG['Server']['checkupdates'] == 'true':
+        if core.CONFIG['Server']['checkupdates'] == u'true':
             auto_start = True
         else:
             auto_start = False
@@ -74,9 +74,9 @@ class AutoUpdateCheck(object):
         ver = version.Version()
 
         data = ver.manager.update_check()
-        # if data['status'] == 'current', nothing to do.
+        # if data['status'] == u'current', nothing to do.
 
-        if data['status'] == 'error':
+        if data['status'] == u'error':
             notif = {'type': 'error',
                      'title': 'Error Checking for Updates',
                      'body': data['error'],
@@ -84,13 +84,13 @@ class AutoUpdateCheck(object):
                      }
             Notification.add(notif)
 
-        elif data['status'] == 'behind':
+        elif data['status'] == u'behind':
             if data['behind_count'] == 1:
-                title = '1 Update Available'
+                title = u'1 Update Available'
             else:
-                title = '{} Updates Available'.format(data['behind_count'])
+                title = u'{} Updates Available'.format(data['behind_count'])
 
-            compare = '{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
+            compare = u'{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
 
             notif = {'type': 'update',
                      'title': title,
@@ -116,7 +116,7 @@ class AutoUpdateInstall(object):
         hr = int(core.CONFIG['Server']['installupdatehr'])
         min = int(core.CONFIG['Server']['installupdatemin'])
 
-        if core.CONFIG['Server']['installupdates'] == 'true':
+        if core.CONFIG['Server']['installupdates'] == u'true':
             auto_start = True
         else:
             auto_start = False
@@ -129,24 +129,24 @@ class AutoUpdateInstall(object):
     def install():
         ver = version.Version()
 
-        if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != 'behind':
+        if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != u'behind':
             return
 
-        logging.info('Running automatic updater.')
+        logging.info(u'Running automatic updater.')
 
-        logging.info('Currently {} commits behind. Updating to {}.'.format(
+        logging.info(u'Currently {} commits behind. Updating to {}.'.format(
                      core.UPDATE_STATUS['behind_count'], core.UPDATE_STATUS['new_hash']))
 
         core.UPDATING = True
 
-        logging.info('Executing update.')
+        logging.info(u'Executing update.')
         update = ver.manager.execute_update()
         core.UPDATING = False
 
         if not update:
-            logging.error('Update failed.')
+            logging.error(u'Update failed.')
 
-        logging.info('Update successful, restarting.')
+        logging.info(u'Update successful, restarting.')
         cherrypy.engine.restart()
         return
 
@@ -161,7 +161,7 @@ class ImdbRssSync(object):
         hr = now.hour
         min = now.minute + 5
 
-        if core.CONFIG['Search']['imdbsync'] == 'true':
+        if core.CONFIG['Search']['imdbsync'] == u'true':
             auto_start = True
         else:
             auto_start = False
@@ -172,7 +172,7 @@ class ImdbRssSync(object):
 
     @staticmethod
     def sync_rss():
-        logging.info('Running automatic IMDB rss sync.')
+        logging.info(u'Running automatic IMDB rss sync.')
         rss_url = core.CONFIG['Search']['imdbrss']
 
         imdb_rss = imdb.ImdbRss()

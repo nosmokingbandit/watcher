@@ -43,14 +43,14 @@ class Ajax(object):
 
         Returns str json-encoded list of dicts that contain omdb's data.
         '''
-        results = self.omdb.search(search_term.replace(' ', '+'))
+        results = self.omdb.search(search_term.replace(u' ', u'+'))
 
         if type(results) is str:
-            logging.info('No Results found for {}'.format(search_term))
+            logging.info(u'No Results found for {}'.format(search_term))
             return None
         else:
             for i in results:
-                if i['Poster'] == 'N/A':
+                if i['Poster'] == u'N/A':
                     i['Poster'] = core.URL_BASE + '/static/images/missing_poster.jpg'
 
             return json.dumps(results)
@@ -98,33 +98,33 @@ class Ajax(object):
             imdbid = data['imdbid']
             title = data['title']
             self.predb.check_one(data)
-            if core.CONFIG['Search']['searchafteradd'] == 'true':
+            if core.CONFIG['Search']['searchafteradd'] == u'true':
                 if self.searcher.search(imdbid, title):
                     # if we don't need to wait to grab the movie do it now.
-                    if core.CONFIG['Search']['autograb'] == 'true' and \
-                            core.CONFIG['Search']['waitdays'] == '0':
+                    if core.CONFIG['Search']['autograb'] == u'true' and \
+                            core.CONFIG['Search']['waitdays'] == u'0':
                         self.snatcher.auto_grab(imdbid)
 
-        TABLE = 'MOVIES'
+        TABLE = u'MOVIES'
 
         imdbid = data['imdbid']
-        title = data['title'].replace('_', ' ').encode('ascii', 'ignore')
+        title = data['title'].replace(u'_', u' ')
         year = data['year'][:4]
 
         if self.sql.row_exists(TABLE, imdbid=imdbid):
             logging.info(u'{} {} already exists as a wanted movie'
                          .format(title, year, imdbid))
 
-            response['response'] = 'false'
+            response['response'] = u'false'
             response['message'] = u'{} {} is already wanted, cannot add.' \
                 .format(title, year, imdbid)
             return json.dumps(response)
 
         else:
-            data['status'] = 'Wanted'
-            data['predb'] = 'None'
+            data['status'] = u'Wanted'
+            data['predb'] = u'None'
             poster_url = data['poster']
-            data['poster'] = 'images/poster/{}.jpg'.format(imdbid)
+            data['poster'] = u'images/poster/{}.jpg'.format(imdbid)
 
             DB_STRING = data
             if self.sql.write(TABLE, DB_STRING):
@@ -136,13 +136,13 @@ class Ajax(object):
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
-                response['response'] = 'true'
+                response['response'] = u'true'
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
                 return json.dumps(response)
             else:
-                response['response'] = 'false'
-                response['message'] = 'Could not write to database. ' \
+                response['response'] = u'false'
+                response['message'] = u'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
 
@@ -164,8 +164,8 @@ class Ajax(object):
         movie_info = self.omdb.movie_info(imdbid)
 
         if not movie_info:
-            response['status'] = 'failed'
-            response['message'] = '{} not found on omdb.'.format(imdbid)
+            response['status'] = u'failed'
+            response['message'] = u'{} not found on omdb.'.format(imdbid)
             return response
 
         quality = {}
@@ -185,7 +185,7 @@ class Ajax(object):
         Returns str 'failed' or 'success'
         '''
 
-        logging.info('Saving settings.')
+        logging.info(u'Saving settings.')
         data = json.loads(data)
 
         try:
@@ -194,7 +194,7 @@ class Ajax(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.exception('Writing config.')
+            logging.error(u'Writing config.')
             return 'failed'
 
     @cherrypy.expose
@@ -229,7 +229,7 @@ class Ajax(object):
         '''
         movie = self.sql.get_movie_details('imdbid', imdbid)
 
-        if movie['predb'] != 'found':
+        if movie['predb'] != u'found':
             self.predb.check_one(movie)
 
         self.searcher.search(imdbid, title)
@@ -305,9 +305,9 @@ class Ajax(object):
         Returns str html content.
         '''
 
-        if list == '#movie_list':
+        if list == u'#movie_list':
             return status.Status.movie_list()
-        if list == '#result_list':
+        if list == u'#result_list':
             return movie_status_popup.MovieStatusPopup().result_list(imdbid)
 
     @cherrypy.expose
@@ -326,21 +326,21 @@ class Ajax(object):
 
         data = json.loads(data)
 
-        if mode == 'sabnzbd':
+        if mode == u'sabnzbd':
             test = sabnzbd.Sabnzbd.test_connection(data)
             if test is True:
-                response['status'] = 'true'
-                response['message'] = 'Connection successful.'
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
             else:
-                response['status'] = 'false'
+                response['status'] = u'false'
                 response['message'] = test
-        if mode == 'nzbget':
+        if mode == u'nzbget':
             test = nzbget.Nzbget.test_connection(data)
             if test is True:
-                response['status'] = 'true'
-                response['message'] = 'Connection successful.'
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
             else:
-                response['status'] = 'false'
+                response['status'] = u'false'
                 response['message'] = test
 
         return json.dumps(response)
@@ -353,7 +353,7 @@ class Ajax(object):
         Restarts or Shuts Down server in separate thread.
             Delays by one second to allow browser to redirect.
 
-        If mode == 'online', asks server for status.
+        If mode == u'online', asks server for status.
             (ENGINE.started, ENGINE.stopped, etc.)
 
         Returns nothing for mode == restart || shutdown
@@ -371,17 +371,17 @@ class Ajax(object):
             cherrypy.engine.exit()
             sys.exit(0)
 
-        if mode == 'restart':
-            logging.info('Restarting Server...')
+        if mode == u'restart':
+            logging.info(u'Restarting Server...')
             threading.Timer(1, server_restart).start()
             return
 
-        elif mode == 'shutdown':
-            logging.info('Shutting Down Server...')
+        elif mode == u'shutdown':
+            logging.info(u'Shutting Down Server...')
             threading.Timer(1, server_shutdown).start()
             return
 
-        elif mode == 'online':
+        elif mode == u'online':
             return str(cherrypy.engine.state)
 
     @cherrypy.expose
@@ -412,22 +412,22 @@ class Ajax(object):
             they will be redirected back to status.
         Yields 'true' back to browser
 
-        If mode == 'update_now', starts update process.
+        If mode == u'update_now', starts update process.
         Yields 'true' or 'failed'. If true, restarts server.
         '''
 
-        if mode == 'set_true':
+        if mode == u'set_true':
             core.UPDATING = True
             yield 'success'  # can be return?
-        if mode == 'update_now':
+        if mode == u'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
             if update_status is False:
-                logging.info('Update Failed.')
+                logging.info(u'Update Failed.')
                 yield 'failed'
             elif update_status is True:
                 yield 'success'
-                logging.info('Respawning process...')
+                logging.info(u'Respawning process...')
                 cherrypy.engine.stop()
                 python = sys.executable
                 os.execl(python, python, * sys.argv)
@@ -463,7 +463,7 @@ class Ajax(object):
             return 'same'
 
         else:
-            logging.info('Updating quality for {}.'.format(imdbid))
+            logging.info(u'Updating quality for {}.'.format(imdbid))
             if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
                 return 'Could not save quality to database. ' \
                     'Check logs for more information.'

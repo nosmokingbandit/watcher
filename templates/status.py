@@ -17,9 +17,9 @@ class Status():
         with doc.head:
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css'.format(core.THEME))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=12.27')
 
         with doc:
@@ -49,17 +49,17 @@ class Status():
                     with div():
                         status = data['status']
                         if status == 'Wanted':
-                            span('Wanted', cls='status wanted')
+                            span(u'Wanted', cls='status wanted')
                         elif status == 'Found':
-                            span('Found', cls='status found')
+                            span(u'Found', cls='status found')
                         elif status == 'Snatched':
-                            span('Snatched', cls='status snatched')
+                            span(u'Snatched', cls='status snatched')
                         elif status == 'Downloading':
-                            span('Downloading', cls='status downloading')
+                            span(u'Downloading', cls='status downloading')
                         elif status == 'Finished':
-                            span('Finished', cls='status finished')
+                            span(u'Finished', cls='status finished')
                         else:
-                            span('Status Unknown', cls='status wanted')
+                            span(u'Status Unknown', cls='status wanted')
 
                         img(src=poster_path, alt='Poster for {}'.format(data['imdbid']))
 

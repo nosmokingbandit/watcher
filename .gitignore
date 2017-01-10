@@ -4,6 +4,8 @@ config.cfg
 static/images/posters/*
 logs/*
 watcher.zip
+core/version
+core/rss/imdb
 
 # Compiled #
 *.pyc

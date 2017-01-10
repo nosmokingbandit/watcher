@@ -17,49 +17,49 @@ class Header():
                         cls = 'settings current'
                     else:
                         cls = 'settings'
-                    with li('Settings', cls=cls):
+                    with li(u'Settings', cls=cls):
                             with ul(cls='settings_menu'):
                                 with a(href=core.URL_BASE + '/settings/server/'):
                                     with li():
                                         i(cls='fa fa-server')
-                                        span('Server')
+                                        span(u'Server')
                                 with a(href=core.URL_BASE + '/settings/search/'):
                                     with li():
                                         i(cls='fa fa-search')
-                                        span('Search')
+                                        span(u'Search')
                                 with a(href=core.URL_BASE + '/settings/quality/'):
                                     with li():
                                         i(cls='fa fa-filter')
-                                        span('Quality')
+                                        span(u'Quality')
                                 with a(href=core.URL_BASE + '/settings/providers/'):
                                     with li():
                                         i(cls='fa fa-plug')
-                                        span('Providers')
+                                        span(u'Providers')
                                 with a(href=core.URL_BASE + '/settings/downloader/'):
                                     with li():
                                         i(cls='fa fa-download')
-                                        span('Downloader')
+                                        span(u'Downloader')
                                 with a(href=core.URL_BASE + '/settings/postprocessing/'):
                                     with li():
                                         i(cls='fa fa-film')
-                                        span('Post Processing')
+                                        span(u'Post Processing')
                                 with a(href=core.URL_BASE + '/settings/about/'):
                                     with li():
                                         i(cls='fa fa-info-circle')
-                                        span('About')
+                                        span(u'About')
 
                     with a(href=core.URL_BASE + '/add_movie/'):
                         if current == 'add_movie':
                             cls = 'add_movie current'
                         else:
                             cls = 'add_movie'
-                        li('Add Movie', cls=cls)
+                        li(u'Add Movie', cls=cls)
 
                     with a(href=core.URL_BASE + '/status/'):
                         if current == 'status':
                             cls = 'status current'
                         else:
                             cls = 'status'
-                        li('Status', cls=cls)
+                        li(u'Status', cls=cls)
 
 # pylama:ignore=W0401

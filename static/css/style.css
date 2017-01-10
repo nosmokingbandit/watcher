@@ -1,5 +1,10 @@
 @import url("header.css");
 
+body, html{
+    width: 100%;
+    min-height: 100%;
+}
+
 body, input{
     font-family: Raleway, sans-serif;
     font-weight: 500;
@@ -9,7 +14,6 @@ body, input{
 
 body {
     background-color: #fff;
-    width: 100%;
     margin: 0;
     padding: 0;
     overflow-y: scroll;
@@ -25,8 +29,17 @@ i{
 }
 
 button{
+    height: 2em;
+    line-height: 2em;
+    margin: 0 0 0 1em;
+    background-color: white;
     border-radius: 4px;
+    border: none;
+    outline: none;
+    font-size: 1.0em;
+    cursor: pointer;
 }
+
 
 ::selection {
   background: #f4693b; /* WebKit/Blink Browsers */

@@ -26,42 +26,38 @@
 import json
 import os
 import sys
+import urllib
 import urllib2
 
 POSTPROCESS_SUCCESS = 93
 POSTPROCESS_ERROR = 94
 POSTPROCESS_NONE = 95
 
-
 watcherhost = os.environ['NZBPO_HOST']
 watcherapi = os.environ['NZBPO_APIKEY']
 name = os.environ['NZBPP_NZBNAME']
-
-# The values are are going to try to get:
-downloadid = ''
-guid = ''
-path = ''
-
-downloadid = os.environ['NZBPP_NZBID']
+data = {'apikey': watcherapi, 'guid': ''}
 
 # can be blank it from an uploaded nzb file
 if os.environ['NZBPP_URL']:
-    # since it is a path it must be encoded to send via GET
-    guid = urllib2.quote(os.environ['NZBPP_URL'], safe='')
+    data['guid'] = os.environ['NZBPP_URL']
 
-path = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
+data['downloadid'] = os.environ['NZBPP_NZBID']
+
+data['path'] = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
 
 # set the post-processing mode
 if os.environ['NZBPP_TOTALSTATUS'] == 'SUCCESS':
-    print 'Sending {} to Watcher as Complete.'.format(name)
-    mode = 'complete'
+    print u'Sending {} to Watcher as Complete.'.format(name)
+    data['mode'] = 'complete'
 else:
-    print 'Sending {} to Watcher as Failed.'.format(name)
-    mode = 'failed'
+    print u'Sending {} to Watcher as Failed.'.format(name)
+    data['mode'] = 'failed'
 
-# send it to watcher
-url = '{}/postprocessing?apikey={}&mode={}&guid={}&downloadid={}&path={}'.format(watcherhost, watcherapi, mode, guid, downloadid, path)
-request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+url = u'{}/postprocessing/'.format(watcherhost)
+post_data = urllib.urlencode(data)
+
+request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':

@@ -161,14 +161,17 @@ class Settings():
             with li(cls='bbord'):
                 span(u'Retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
-                span(u' days.')
-                span(u'Use 0 for no limit.', cls='tip')
-            with li():
+                span(' days.')
+                span('Use 0 for no limit.', cls='tip')
+            with li(cls='bbord'):
                 i(id='imdbsync', cls='fa fa-square-o checkbox', value=c[c_s]['imdbsync'])
                 span(u'Sync imdb watch list.')
                 input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
-                span(u'*Requires restart. Syncs every 6 hours.', cls='tip')
-
+                span('*Requires restart. Syncs every 6 hours.', cls='tip')
+            with li():
+                i(id='score_title', cls='fa fa-square-o checkbox', value=c[c_s]['score_title'])
+                span('Score titles.')
+                span('Fuzzy match and score titles, remove search results that don\'t match.', cls='tip')
         with span(id='save', cat='search'):
             i(cls='fa fa-save')
             span(u'Save Settings')

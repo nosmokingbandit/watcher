@@ -165,9 +165,8 @@ class Searcher():
                 if result['guid'] in marked_results:
                     result['status'] = marked_results[result['guid']]
 
-        if scored_results:
-            if not self.store_results(scored_results, imdbid):
-                return False
+        if not self.store_results(scored_results, imdbid):
+            return False
 
         if not self.update.movie_status(imdbid):
             logging.info(u'No acceptable results found for {}'.format(imdbid))

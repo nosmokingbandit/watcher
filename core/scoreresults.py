@@ -59,7 +59,8 @@ class ScoreResults():
         self.keep_required(required)
         self.retention_check(retention, today)
         self.score_quality(qualities)
-        self.fuzzy_title(title)
+        if core.CONFIG['Search']['score_title'] == 'true':
+            self.fuzzy_title(title)
         self.score_preferred(preferred)
 
         return self.results
@@ -100,6 +101,9 @@ class ScoreResults():
 
         Does not return
         '''
+
+        for i in self.results:
+            print i['title'].lower()
 
         if not words:
             return

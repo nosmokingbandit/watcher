@@ -198,6 +198,27 @@ class Ajax(object):
             return 'failed'
 
     @cherrypy.expose
+    def save_single(self, cat, key, val):
+        ''' Saves single setting to config
+        :param cat: str config category
+        :param key: str config key
+        :param val: str config values
+
+        Returns str 'failed' or 'success'
+        '''
+
+        logging.info('Saving {}:{}:{}'.format(cat, key, val))
+
+        try:
+            self.config.write_single(cat, key, val)
+            return 'success'
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Writing config.')
+            return 'failed'
+
+    @cherrypy.expose
     def remove_movie(self, imdbid):
         ''' Removes movie
         :param imdbid: str imdb identification number (tt123456)

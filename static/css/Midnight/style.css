@@ -31,15 +31,20 @@ a {
     color: #ccc;
 }
 
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
 ::-webkit-scrollbar-thumb {
-    background: #071010;
+    background: #ccc;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #fff;
+    background: #ccc;
 }
 ::-webkit-scrollbar-thumb:active {
-    background: #fff;
+    background: #ccc;
 }
 
 div.sweet-alert{

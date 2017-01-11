@@ -174,7 +174,8 @@ class SQL(object):
             return False
 
     def get_user_movies(self):
-        '''
+        ''' Gets all info in MOVIES
+
         Returns list of dicts with all information in MOVIES
         '''
 
@@ -197,8 +198,11 @@ class SQL(object):
             return False
 
     def get_movie_details(self, idcol, idval):
-        '''
-        Returns dict of single movie details from MOVIES.
+        ''' Returns dict of single movie details from MOVIES.
+        :param idcol: str identifying column
+        :param idval: str identifying value
+
+        Looks through MOVIES for idcol:idval
 
         Returns dict of first match
         '''
@@ -216,8 +220,9 @@ class SQL(object):
             return False
 
     def get_search_results(self, imdbid):
+        ''' Gets all search results for a given movie
+        :param imdbid: str imdb id #
 
-        '''
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
 
@@ -234,10 +239,12 @@ class SQL(object):
             return False
 
     def get_marked_results(self, imdbid):
+        ''' Gets all entries in MARKEDRESULTS for given movie
+        :param imdbid: str imdb id #
+
+        Returns dict {guid:status, guid:status, etc}
         '''
-        Returns dict of MARKEDRESULTS
-        {guid:status, guid:status, etc}
-        '''
+
         logging.info(u'Retreving Marked Results for {}.'.format(imdbid))
 
         TABLE = u'MARKEDRESULTS'
@@ -284,8 +291,10 @@ class SQL(object):
         return True
 
     def delete(self, TABLE, idcol, idval):
-        '''
-        Deletes row where idcol == idval
+        ''' Deletes row where idcol == idval
+        :param idcol: str identifying column
+        :param idval: str identifying value
+
         Returns Bool.
         '''
 
@@ -299,11 +308,17 @@ class SQL(object):
             return False
 
     def purge_search_results(self, imdbid=''):
-        '''
-        Be careful with this one. Supplying an imdbid deletes search results for that movie. If you do not supply an imdbid it purges FOR ALL MOVIES.
+        ''' Deletes all search results
+        :param imdbid: str imdb id # <optional>
+
+        Be careful with this one. Supplying an imdbid deletes search results for that
+            movie. If you do not supply an imdbid it purges FOR ALL MOVIES.
 
         BE CAREFUL.
+
+        Returns Bool
         '''
+
         TABLE = u'SEARCHRESULTS'
 
         if imdbid:
@@ -317,9 +332,15 @@ class SQL(object):
             return False
 
     def get_distinct(self, TABLE, column, idcol, idval):
-        '''
-        Returns list of dictinct values from TABLE where idcol == idval.
-        ['val1', 'val2', 'val3']
+        ''' Gets unique values in TABLE
+        :param TABLE: str table name
+        :param column: str column to return
+        :param idcol: str identifying column
+        :param idval: str identifying value
+
+        Gets values in TABLE:column where idcol == idval
+
+        Returns list ['val1', 'val2', 'val3']
         '''
 
         logging.info(u'Getting distinct values for {} in {}'.format(idval, TABLE))
@@ -343,7 +364,7 @@ class SQL(object):
             return False
 
     def row_exists(self, TABLE, imdbid='', guid='', downloadid=''):
-        '''
+        ''' Checks if row exists in table
         :param TABLE: str name of sql table to look through
         :param imdbid: str imdb identification number <optional>
         :param guid: str download guid <optional>
@@ -380,8 +401,13 @@ class SQL(object):
             return True
 
     def get_single_search_result(self, idcol, idval):
-        '''
-        Returns dict from SEARCHRESULTS for single row.
+        ''' Gets single search result
+        :param idcol: str identifying column
+        :param idval: str identifying value
+
+        Finds in SEARCHRESULTS a row where idcol == idval
+
+        Returns dict
         '''
 
         logging.info(u'Retreving search result details for {}.'.format(idval))

@@ -182,25 +182,41 @@ class Ajax(object):
         :param data: dict of Section with nested dict of keys and values:
         {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
 
-        Returns str 'failed' or 'success'
+        Returns json.dumps(dict)
         '''
 
         logging.info(u'Saving settings.')
         data = json.loads(data)
+        diff = None
+
+        existing_data = {}
+        for i in data.keys():
+            existing_data.update({i: core.CONFIG[i]})
+            for k, v in core.CONFIG[i].iteritems():
+                if type(v) == list:
+                    existing_data[i][k] = ','.join(v)
+
+        if data == existing_data:
+            return json.dumps({'response': 'success'})
+        else:
+            diff = Comparisons.compare_dict(data, existing_data)
 
         try:
             self.config.write_dict(data)
-            return 'success'
+            if diff:
+                return json.dumps({'response': 'change', 'changes': diff})
+            else:
+                return json.dumps({'response': 'success'})
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Writing config.')
-            return 'failed'
+            logging.error(u'Writing config.', exc_info=True)
+            return json.dumps({'response': 'fail'})
 
     @cherrypy.expose
     def save_single(self, cat, key, val):
         ''' Saves single setting to config
-        :param cat: str config category
+        :param conf: str config category
         :param key: str config key
         :param val: str config values
 
@@ -456,11 +472,11 @@ class Ajax(object):
             return
 
     @cherrypy.expose
-    def update_quality_settings(self, quality, imdbid):
+    def update_quality_settings(self, quality, imdbid=None):
         ''' Updates quality settings for individual title
         :param quality: str json-formatted dict of quality
                         settings as described below.
-        :param imdbid: str imdb identification number (tt123456).
+        :param imdbid: str imdb identification number <optional>
 
         Takes entered information from /movie_status_popup and
             updates database table if it has changed.
@@ -468,7 +484,7 @@ class Ajax(object):
         quality must be formatted as:
             json.dumps({'Quality': {'key': 'val'}, 'Filters': {'key': 'val'}})
 
-        Returns str 'same', error message, or change alert message.
+        Returns str 'same', error message, or change alert message (human datetime conversion).
         '''
 
         tabledata = self.sql.get_movie_details('imdbid', imdbid)
@@ -477,10 +493,13 @@ class Ajax(object):
             return 'Could not get existing information from sql table. ' \
                 'Check logs for more information.'
         else:
-            tabledata = tabledata['quality']
+            existing_quality = tabledata['quality']
+
+        for k, v in quality['Quality'].iteritems():
+            quality['Quality'][k] = v.split(',')
 
         # check if we need to purge old results and alert the user.
-        if tabledata == quality:
+        if existing_quality == quality:
             return 'same'
 
         else:
@@ -494,3 +513,43 @@ class Ajax(object):
                         'have been purged, but the movie status could not be set. Check logs for more information.'
                 else:
                     return Conversions.human_datetime(core.NEXT_SEARCH)
+
+    @cherrypy.expose
+    def update_all_quality(self, quality):
+        ''' Updates individual keys in every movie's quality settings
+        :param quality: str json.dumps(dict) of quality changes.
+
+        'quality' comes from POST request, therefore must be parsed before use.
+
+        Pulls every movie's quality setting and merges 'quality' into it. Then Writes
+            back to database.
+
+        Returns str json.dumps(dict)
+        '''
+
+        errors = False
+
+        quality = json.loads(quality)
+
+        if 'Quality' in quality.keys():
+            for k, v in quality['Quality'].iteritems():
+                quality['Quality'][k] = v.split(',')
+
+        movies = self.sql.get_user_movies()
+
+        for movie in movies:
+            imdbid = movie['imdbid']
+            table_quality = movie['quality']
+
+            for k in quality.keys():
+                table_quality[k].update(quality[k])
+
+            quality_string = json.dumps(table_quality)
+
+            if not self.sql.update('MOVIES', 'quality', quality_string, imdbid=imdbid):
+                errors = True
+
+        if errors:
+            return json.dumps({'response': 'fail'})
+        else:
+            return json.dumps({'response': 'success'})

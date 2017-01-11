@@ -96,8 +96,7 @@ class AutoUpdateCheck(object):
                      'title': title,
                      'body': 'Click <a href="update_now"><u>here</u></a> to update now.'
                              '<br/> Click <a href="'+compare+'"><u>here</u></a> to view changes.',
-                     'params': {'closeButton': 'true',
-                                'timeOut': 0,
+                     'params': {'timeOut': 0,
                                 'extendedTimeOut': 0,
                                 'tapToDismiss': 0}
                      }

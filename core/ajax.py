@@ -7,7 +7,7 @@ import threading
 import cherrypy
 import core
 from core import config, poster, searcher, snatcher, sqldb, updatestatus, version
-from core.conversions import Conversions
+from core.helpers import Conversions, Comparisons
 from core.downloaders import nzbget, sabnzbd
 from core.movieinfo import Omdb
 from core.notification import Notification

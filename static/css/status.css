@@ -8,7 +8,11 @@ div#content{
 div#view_config{
     height: 3em;
     line-height: 3em;
+}
 
+div#view_config select{
+    margin-right: 1em;
+    border-radius: 4px;
 }
 
 ul#movie_list{

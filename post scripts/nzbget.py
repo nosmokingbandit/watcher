@@ -57,7 +57,7 @@ else:
 url = u'{}/postprocessing/'.format(watcherhost)
 post_data = urllib.urlencode(data)
 
-request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
+request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'}, timeout=600)
 response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':

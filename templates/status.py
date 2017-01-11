@@ -20,28 +20,22 @@ class Status():
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=01.10')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=01.11')
 
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
                 with div(id='view_config'):
                     span('Display: ')
-                    with select(id='statuslist', value=core.CONFIG['UI']['statuslist']):
+                    with select(id='list_style'):
                         options = ['Posters', 'List']
                         for opt in options:
-                            if opt.lower() == core.CONFIG['UI']['statuslist']:
-                                option(opt, value=opt.lower(), selected='selected')
-                            else:
-                                option(opt, value=opt.lower())
+                            option(opt, value=opt.lower())
                     span('Order By: ')
-                    with select(id='statusorder', value=core.CONFIG['UI']['statusorder']):
-                        options = ['Title', 'Status', 'Year']
+                    with select(id='list_sort'):
+                        options = ['Status', 'Title', 'Year']
                         for opt in options:
-                            if opt.lower() == core.CONFIG['UI']['statusorder']:
-                                option(opt, value=opt.lower(), selected='selected')
-                            else:
-                                option(opt, value=opt.lower())
+                            option(opt, value=opt.lower())
                 self.movie_list()
             div(id='overlay')
             div(id='status_pop_up')
@@ -58,7 +52,7 @@ class Status():
             html = 'Error retrieving list of user\'s movies. Check logs for more information'
             return html
 
-        movie_list = ul(id='movie_list', cls=core.CONFIG['UI']['statuslist'])
+        movie_list = ul(id='movie_list')
         with movie_list:
             for data in movies:
                 poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])

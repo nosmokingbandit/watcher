@@ -78,6 +78,7 @@ class AutoUpdateCheck(object):
 
         if data['status'] == u'error':
             notif = {'type': 'error',
+                     'closeButton': 'true',
                      'title': 'Error Checking for Updates',
                      'body': data['error'],
                      'params': '{closeButton: true, timeOut: 0, extendedTimeOut: 0}'

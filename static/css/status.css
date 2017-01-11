@@ -16,6 +16,7 @@ ul#movie_list{
     margin: 0;
     list-style: none;
     clear: both;
+    display: none;
 }
 
 /* Posters layout */
@@ -69,6 +70,7 @@ ul#movie_list.posters li span.title span.rated{
 
 /* List layout */
 ul#movie_list.list{
+    display: block;
     border: 1px solid #eee;
 }
 

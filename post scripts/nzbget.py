@@ -44,7 +44,7 @@ if os.environ['NZBPP_URL']:
 
 data['downloadid'] = os.environ['NZBPP_NZBID']
 
-data['path'] = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
+data['path'] = os.environ['NZBPP_DIRECTORY']
 
 # set the post-processing mode
 if os.environ['NZBPP_TOTALSTATUS'] == 'SUCCESS':

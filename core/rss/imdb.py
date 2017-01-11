@@ -19,7 +19,7 @@ class ImdbRss(object):
         self.ajax = ajax.Ajax()
         return
 
-    def get_rss(self, rss_url):
+    def get_rss(self, list_url):
         ''' Gets rss feed from imdb
         :param rss_url: str url to rss feed
 
@@ -28,24 +28,28 @@ class ImdbRss(object):
         Returns True or None on success or failure (due to exception or empty movie list)
         '''
 
-        logging.info(u'Syncing IMDB watchlist {}'.format(rss_url))
+        if 'rss' in list_url:
+            logging.info(u'Syncing rss IMDB watchlist {}'.format(list_url))
+            request = urllib2.Request(list_url, headers={'User-Agent': 'Mozilla/5.0'})
+            try:
+                response = urllib2.urlopen(request).read()
+            except (SystemExit, KeyboardInterrupt):
+                raise
+            except Exception, e: # noqa
+                logging.error(u'IMDB rss request.', exc_info=True)
+                return None
 
-        request = urllib2.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
+            movies = self.parse_xml(response)
 
-        try:
-            results_xml = urllib2.urlopen(request).read()
-            movies = self.parse_xml(results_xml)
-            self.lastbuilddate = self.parse_build_date(results_xml)
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e: # noqa
-            logging.error(u'IMDB rss request.', exc_info=True)
+        else:
             return None
+
+        self.lastbuilddate = self.parse_build_date(response)
 
         if movies:
             logging.info(u'Found {} movies in watchlist.'.format(len(movies)))
             self.sync_new_movies(movies)
-            logging.info(u'IMDB rss sync complete.')
+            logging.info(u'IMDB sync complete.')
             return True
         else:
             return None

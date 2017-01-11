@@ -28,6 +28,11 @@ i{
     vertical-align: middle;
 }
 
+ul{
+    list-style: none;
+    clear: both;
+}
+
 button{
     height: 2em;
     line-height: 2em;

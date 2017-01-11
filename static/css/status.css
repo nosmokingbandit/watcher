@@ -1,31 +1,37 @@
 div#content{
-    margin: 0 0 64px 0; /* to clear update footer */
-}
-
-ul{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-ul#movie_list{
-    list-style: none;
-    clear: both;
-    padding: 0;
     margin: 0 auto;
     width: 60%;
     max-width: 1024px;
     min-width: 650px;
 }
 
+div#view_config{
+    height: 3em;
+    line-height: 3em;
+}
+
+div#view_config select{
+    margin-right: 1em;
+    border-radius: 4px;
+}
+
 ul#movie_list{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    clear: both;
+    display: none;
+}
+
+/* Posters layout */
+ul#movie_list.posters{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
 }
 
-ul#movie_list li div{
+ul#movie_list.posters li div{
     width: 168px;
     padding: 6px 6px 0px 6px;
     margin: 10px;
@@ -33,7 +39,7 @@ ul#movie_list li div{
     overflow: hidden;
 }
 
-ul#movie_list li div span.status{
+ul#movie_list.posters li div span.status{
     height: 24px;
     line-height: 24px;
     width: 100%;
@@ -44,6 +50,84 @@ ul#movie_list li div span.status{
     text-align: center;
 }
 
+ul#movie_list.posters li div img{
+    width: 100%;
+    height: 256px;
+    margin: 0;
+    padding: 0;
+    border-width: 0px 1px 1px 1px;
+    border-color: #212121;
+    border-style: solid;
+}
+
+ul#movie_list.posters li span.title{
+    margin: 0;
+    padding: 0;
+    display: block; /* needed for width */
+    text-align: center;
+}
+
+ul#movie_list.posters li span.title span.tomatorating,
+ul#movie_list.posters li span.title span.rated{
+    display: none;
+}
+
+/* List layout */
+ul#movie_list.list{
+    display: block;
+    border: 1px solid #eee;
+}
+
+ul#movie_list.list li{
+    cursor: pointer;
+}
+
+ul#movie_list.list li div{
+    height: 64px;
+    padding: 0.5em;
+}
+
+
+ul#movie_list.list li:nth-child(odd) div{
+    background-color: #eee;
+}
+
+ul#movie_list.list li div span.status{
+    font-size: 0.8em;
+    transform: rotate(90deg);
+	transform-origin: left top 0;
+    display: block;
+    height: 2.5em;
+    line-height: 2.5em;
+    width: 64px;
+    text-align: center;
+    float: left;
+    margin: 0 -80px 0 32px;
+}
+
+ul#movie_list.list li div img{
+    float: left;
+    height: 100%;
+    width: 42px;
+    margin: 0 1em 0 28px;
+}
+
+ul#movie_list.list li span.title{
+    display: block;
+    font-size: 1.5em;
+    line-height: 32px;
+    white-space: nowrap;;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+ul#movie_list.list li span.title span{
+    font-size: 0.75em;
+    opacity: 0.65;
+    margin-right: 0.5em;
+}
+
+/* Status colors */
 ul#movie_list li div span.wanted{
     background-color: #FF9800;
 }
@@ -62,23 +146,6 @@ ul#movie_list li div span.snatched{
 
 ul#movie_list li div span.finished{
     background-color: #4CAF50;
-}
-
-ul#movie_list li div img{
-    width: 100%;
-    height: 256px;
-    margin: 0;
-    padding: 0;
-    border-width: 0px 1px 1px 1px;
-    border-color: #212121;
-    border-style: solid;
-}
-
-ul#movie_list li span.title_year{
-    margin: 0;
-    padding: 0;
-    display: block; /* needed for width */
-    text-align: center;
 }
 
 /* specific movie details */

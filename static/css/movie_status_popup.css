@@ -1,4 +1,8 @@
-i{
+ul{
+    clear: none;
+}
+
+div#container i{
     font-size: 1.5em;
 }
 

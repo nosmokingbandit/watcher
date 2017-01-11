@@ -1,10 +1,11 @@
 input[type="number"], input[type="text"]{
     border: 1px solid #ccc;
-    background-color: #080f18;
+    background-color: #151c25;
 }
 
 ul#result_list{
     border: 1px solid #bdbdbd;
+    background-color: #151c25;
 }
 
 ul#result_list li.bbord{

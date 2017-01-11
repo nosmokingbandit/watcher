@@ -44,7 +44,7 @@ if os.environ['NZBPP_URL']:
 
 data['downloadid'] = os.environ['NZBPP_NZBID']
 
-data['path'] = urllib2.quote(os.environ['NZBPP_DIRECTORY'], safe='')
+data['path'] = os.environ['NZBPP_DIRECTORY']
 
 # set the post-processing mode
 if os.environ['NZBPP_TOTALSTATUS'] == 'SUCCESS':
@@ -57,7 +57,7 @@ else:
 url = u'{}/postprocessing/'.format(watcherhost)
 post_data = urllib.urlencode(data)
 
-request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
+request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'}, timeout=600)
 response = json.loads(urllib2.urlopen(request).read())
 
 if response['status'] == 'finished':

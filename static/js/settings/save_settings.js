@@ -2,6 +2,7 @@ $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
 
     $("span#save").click(function(e){
+        var change_check = false;
         if(verify_data() == false){
             return;
         }
@@ -10,19 +11,19 @@ $(document).ready(function () {
         $thisi = $this.children(':first');
 
         cat = $this.attr('cat');
-
         if(cat == 'server'){
             data = server();
         } else if(cat == 'search'){
             data = search();
         } else if(cat == 'quality'){
-            data = quality()
+            change_check = true;
+            data = quality();
         } else if(cat == 'providers'){
-            data = providers()
+            data = providers();
         } else if(cat == 'downloader'){
-            data = downloader()
+            data = downloader();
         }else if(cat == 'postprocessing') {
-            data = postprocessing()
+            data = postprocessing();
         }
 
         if(data == false){
@@ -39,10 +40,49 @@ $(document).ready(function () {
         })
 
         .done(function(r) {
-            if(r == 'failed'){
+            response = JSON.parse(r);
+            console.log(response)
+            if(response['response'] == 'fail'){
                 toastr.error("Unable to save settings. Check log for more information.");
             }
-            else if(r == 'success'){
+            else if(response['response'] == 'change' && change_check == true){
+                toastr.success("Settings Saved");
+                diff = response['changes']
+
+                diff_string = ""
+                for(k in diff){
+                    s = JSON.stringify(diff[k])
+                    console.log(s)
+                    s = s.replace(/","/g, '<br/>').replace(/"/g, '').replace(/{/g, '').replace(/}/g, '<br/>').replace(/:/g, ': ')
+                    diff_string = diff_string + s
+                }
+
+                swal({
+                    title: "Apply to all movies?",
+                    text: "Would you like to apply these changes to all movies?<br/><br/>" + diff_string + "<br/> Changes will not affect results until next search.",
+                    html: true,
+                    type: "",
+                    showCancelButton: true,
+                    cancelButtonText: "No",
+                    confirmButtonColor: "#03A9F4",
+                    confirmButtonText: "Apply to all",
+                    closeOnConfirm: true
+                }, function(){
+                    $.post(url_base + "/ajax/update_all_quality", {
+                        "quality": JSON.stringify(diff)
+                    })
+                    .done(function(r){
+                        response = JSON.parse(r);
+                        console.log(response)
+
+                        if(response['response'] == 'success'){
+                            toastr.success("All movies updated.");
+                        } else {
+                            toastr.error("Unable to update movies. Check log for more information.");
+                        }
+                    })
+                });
+            } else {
                 toastr.success("Settings Saved");
             }
 

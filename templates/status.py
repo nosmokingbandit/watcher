@@ -78,16 +78,20 @@ class Status():
                             br()
                             span(data['year'], cls='year')
                             with span(cls='tomatorating'):
-                                score = int(data['tomatorating'][0])
-                                count = 0
-                                for star in range(score / 2):
-                                    count += 1
-                                    i(cls='fa fa-star')
-                                if score % 2 == 1:
-                                    count += 1
-                                    i(cls='fa fa-star-half-o')
-                                for nostar in range(5 - count):
-                                    i(cls='fa fa-star-o')
+                                if data['tomatorating'] == 'N/A':
+                                    for nostar in range(5):
+                                        i(cls='fa fa-star-o')
+                                else:
+                                    score = int(data['tomatorating'][0])
+                                    count = 0
+                                    for star in range(score / 2):
+                                        count += 1
+                                        i(cls='fa fa-star')
+                                    if score % 2 == 1:
+                                        count += 1
+                                        i(cls='fa fa-star-half-o')
+                                    for nostar in range(5 - count):
+                                        i(cls='fa fa-star-o')
 
                             span(data['rated'], cls='rated')
 

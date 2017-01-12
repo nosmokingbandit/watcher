@@ -278,10 +278,30 @@ $(document).ready(function() {
         if(imdbid === undefined) {
             imdbid = '';
         };
+
+        var $list = $(list)
+        cls_obj = $list.prop('classList');
+
+        classes = ''
+
+        $.each(cls_obj, function(k,v){
+            classes = classes + v + ' '
+        })
+
+        console.log(classes)
+
         $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid})
         .done(function(html){
-            $(list).html(html);
-            $(list).fadeIn();
+            var $parent = $list.parent()
+            $list.remove();
+            $parent.append(html);
+            $(list).addClass(classes);
+            if(list == '#movie_list'){
+                order = $("select#list_sort").find("option:selected").val();
+                $parent = $(list);
+                children = 'li';
+                sortOrder(order, $parent, children);
+            }
         });
     }
 });

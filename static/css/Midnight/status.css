@@ -20,6 +20,19 @@ ul#movie_list.list li:nth-child(odd) div{
     background-color: #151c25;
 }
 
+/* Compact layout */
+ul#movie_list.compact{
+    border: none;
+}
+
+ul#movie_list.compact li div{
+    border-color: #080f18; /* border: none breaks layout */
+}
+
+ul#movie_list.compact li:nth-child(odd) div{
+    background-color: #151c25;
+}
+
 /* status colors */
 ul#movie_list li div span.wanted{
     background-color: #FF9800;

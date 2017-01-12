@@ -26,7 +26,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.03')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.11')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -44,8 +44,7 @@ class MovieStatusPopup():
                 img(id='poster', src=poster_path)
                 with div(id='search_results'):
 
-                    with ul(id='result_list'):
-                        self.result_list(imdbid)
+                    self.result_list(imdbid)
                     div(id='results_thinker')
 
                     # Panel that swaps in with quality adjustments
@@ -97,8 +96,9 @@ class MovieStatusPopup():
 
     def result_list(self, imdbid):
         results = self.sql.get_search_results(imdbid)
-        doc = dominate.document(title='Watcher')  # FIX
-        with doc:
+
+        result_list = ul(id='result_list')
+        with result_list:
 
             if not results:
                 li(u'Nothing found yet.', cls='title bold')
@@ -143,6 +143,6 @@ class MovieStatusPopup():
                         span(u' Published: ')
                         span(pubdate, cls='bold')
 
-        return doc.render()
+        return unicode(result_list)
 
 # pylama:ignore=W0401

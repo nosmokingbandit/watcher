@@ -21,9 +21,14 @@ function read_cookie()
    }
    return cookie_obj
 }
-
 function sortOrder(order, $parent, children) {
-	// parent must be jquery object
+	/* order : how to sort children
+	parent : must be jquery object. Where to find children
+	children : element of chilren to sort (li, span, etc)
+
+	each child must have a span with class 'order'. text is taken from span to sort by.
+	*/
+
 		$element = $parent.children(children);
 
 	$element.sort(function(a, b) {
@@ -44,35 +49,34 @@ function sortOrder(order, $parent, children) {
 $(document).ready(function() {
     var url_base = $("meta[name='url_base']").attr("content");
     var $movielist = $("ul#movie_list");
-	var $select_list_style = $("select#list_style")
-	var $select_list_sort = $("select#list_sort")
 	var cookie = read_cookie();
 
-	/* set up list style from cookies */
+	/* set up list style and sort from cookies */
 	style = cookie["list_style"] || "posters";
 	$movielist.removeClass();
 	$movielist.addClass(style);
 
-	$select_list_style.find("option").each(function(){
+	$("select#list_style").find("option").each(function(){
 		$this = $(this);
 		if($this.val() == cookie["list_style"]){
 			$this.prop("selected", true);
 		}
+		if(cookie["list_style"] == 'compact'){
+			$('div#key').css('display', 'block');
+		}
 	});
 
-	/* sort order */
 	order = cookie["list_sort"] || "title";
 	sortOrder(order, $movielist, "li");
 
-	$select_list_sort.find("option").each(function(){
+	$("select#list_sort").find("option").each(function(){
 		$this = $(this);
 		if($this.val() == order){
 			$this.prop("selected", true)
 		}
 	});
 
-
-    // applies add movie overlay
+    /* applies add movie overlay */
     $("div#content").on("click", "li", function(){
         $("div#overlay").fadeIn();
 
@@ -94,22 +98,30 @@ $(document).ready(function() {
     });
 
 	/* Set cookies for list style and sort */
+    $("select#list_style").change(function(){
+		var $movielist = $("ul#movie_list")
+        style = $("select#list_style").find("option:selected").val()
 
-    $select_list_style.change(function(){
-        style = $select_list_style.find("option:selected").val()
-
-		document.cookie = "list_style=" + style
+		document.cookie = "list_style=" + style + ";path='/'";
+		console.log(document.cookie)
 
         $movielist.removeClass();
         $movielist.addClass(style);
+
+		if(style == 'compact'){
+			$('div#key').css('display', 'block');
+		} else {
+			$('div#key').css('display', 'none');
+		}
+
     });
 
-    $select_list_sort.change(function(){
-        order = $select_list_sort.find("option:selected").val()
+    $("select#list_sort").change(function(){
+        order = $(this).find("option:selected").val()
 
 		document.cookie = "list_sort=" + order
 
-        sortOrder(order, $movielist, "li")
+        sortOrder(order, $('ul#movie_list'), "li")
 
     });
 

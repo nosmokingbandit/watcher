@@ -495,11 +495,9 @@ class Ajax(object):
         else:
             existing_quality = tabledata['quality']
 
-        for k, v in quality['Quality'].iteritems():
-            quality['Quality'][k] = v.split(',')
-
         # check if we need to purge old results and alert the user.
-        if existing_quality == quality:
+        if json.dumps(existing_quality) == json.dumps(quality):
+            print 'SAME'
             return 'same'
 
         else:

@@ -28,7 +28,7 @@ class Status():
                 with div(id='view_config'):
                     span('Display: ')
                     with select(id='list_style'):
-                        options = ['Posters', 'List']
+                        options = ['Posters', 'List', 'Compact']
                         for opt in options:
                             option(opt, value=opt.lower())
                     span('Order By: ')
@@ -36,6 +36,15 @@ class Status():
                         options = ['Status', 'Title', 'Year']
                         for opt in options:
                             option(opt, value=opt.lower())
+                with div(id='key'):
+                    span(cls='wanted')
+                    span('Wanted')
+                    span(cls='found')
+                    span('Found')
+                    span(cls='snatched')
+                    span('Snatched')
+                    span(cls='finished')
+                    span('Finished')
                 self.movie_list()
             div(id='overlay')
             div(id='status_pop_up')
@@ -74,8 +83,8 @@ class Status():
 
                         img(src=poster_path, alt='Poster for {}'.format(data['imdbid']))
 
-                        with span(data['title'], cls='title', title=data['title']):
-                            br()
+                        with span(cls='movie_info'):
+                            span(data['title'], cls='title', title=data['title'])
                             span(data['year'], cls='year')
                             with span(cls='tomatorating'):
                                 if data['tomatorating'] == 'N/A':

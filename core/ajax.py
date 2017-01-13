@@ -264,10 +264,6 @@ class Ajax(object):
 
         Returns str 'done' when done.
         '''
-        movie = self.sql.get_movie_details('imdbid', imdbid)
-
-        if movie['predb'] != u'found':
-            self.predb.check_one(movie)
 
         self.searcher.search(imdbid, title)
         return 'done'

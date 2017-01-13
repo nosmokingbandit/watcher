@@ -46,6 +46,10 @@ function sortOrder(order, $parent, children) {
 	$element.detach().appendTo($parent);
 }
 
+var exp_date = new Date();
+exp_date.setFullYear(exp_date.getFullYear() + 10);
+exp_date = exp_date.toUTCString();
+
 $(document).ready(function() {
     var url_base = $("meta[name='url_base']").attr("content");
     var $movielist = $("ul#movie_list");
@@ -102,7 +106,7 @@ $(document).ready(function() {
 		var $movielist = $("ul#movie_list")
         style = $("select#list_style").find("option:selected").val()
 
-		document.cookie = "list_style=" + style + ";path='/'";
+		document.cookie = "list_style=" + style + "; expires=" + exp_date + ";path=/";
 		console.log(document.cookie)
 
         $movielist.removeClass();
@@ -119,7 +123,7 @@ $(document).ready(function() {
     $("select#list_sort").change(function(){
         order = $(this).find("option:selected").val()
 
-		document.cookie = "list_sort=" + order
+		document.cookie = "list_sort=" + order + ";path=/";
 
         sortOrder(order, $('ul#movie_list'), "li")
 

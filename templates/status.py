@@ -86,12 +86,12 @@ class Status():
                         with span(cls='movie_info'):
                             span(data['title'], cls='title', title=data['title'])
                             span(data['year'], cls='year')
-                            with span(cls='tomatorating'):
-                                if data['tomatorating'] == 'N/A':
+                            with span(cls='score'):
+                                if data['score'] == 'N/A':
                                     for nostar in range(5):
                                         i(cls='fa fa-star-o')
                                 else:
-                                    score = int(data['tomatorating'][0])
+                                    score = int(data['score'][0])
                                     count = 0
                                     for star in range(score / 2):
                                         count += 1

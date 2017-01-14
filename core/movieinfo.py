@@ -1,18 +1,69 @@
 import json
 import logging
 import urllib2
+from core.helpers import Comparisons
+_k = Comparisons._k
 
 logging = logging.getLogger(__name__)
 
 
-class Omdb():
+class OMDB():
 
     def __init__(self):
-        self.search_base = u'http://www.omdbapi.com/?r=json&plot=short&type=movie&'
+        return
+
+    def get_info(self, title=None, year=None, imdbid=None, tags=[]):
+        ''' Search OMDB for every key in tags
+        title: str title of movie <optional>
+        year: str year of movie's release_date <optional>
+        imdbid: imdb id # <optional>
+        tags: list or tuple of strings to pull from OMDB json
+
+        Finds movie in OMDB using imdbid, or title and year, then looks in json for all
+            keys in 'tags' and returns them as a tuple.
+
+        Either imdbid or title *and* year must be supplied. If not, returns None.
+
+        It is advised to use imdbid when possible.
+
+        Any returned value can be None.
+
+        Returns tuple matching 'tags'
+
+        '''
+
+        if imdbid:
+            search_string = 'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
+        elif title and year:
+            search_string = 'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
+        else:
+            return None
+
+        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+
+        try:
+            result = json.load(urllib2.urlopen(request))
+            if result['Response'] == u'False':
+                return None
+            else:
+                response = []
+                for tag in tags:
+                    response.append(result.get(tag))
+                return tuple(response)
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'OMDB search.', exc_info=True)
+            return None
+
+
+class TMDB(object):
+
+    def __init__(self):
         return
 
     def search(self, search_term):
-        ''' Search OMDB for all matches
+        ''' Search TMDB for all matches
         :param search_term: str title of movie to search for.
 
         Can accept imdbid, title, or title year.
@@ -29,77 +80,52 @@ class Omdb():
         else:
             return self.find_title(search_term)
 
-    def find_imdbid(self, imdbid):
-
-        search_string = self.search_base + 'i={}'.format(imdbid)
-
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
-
-        try:
-            result = json.load(urllib2.urlopen(request))
-            if result['Response'] == u'False':
-                return 'Nothing Found'
-            else:
-                return [result]
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e: # noqa
-            logging.error(u'OMDB search.', exc_info=True)
-            return 'Search Error.'
-
     def find_title(self, title):
+        ''' Search TMDB for title
+        title: str movie title
 
-        if title[-4:].isdigit():
-            query = u's={}&y={}'.format(title[:-5], title[-4:])
-        else:
-            query = u's={}'.format(title)
+        Title can include year ie Move Title 2017
 
-        search_string = self.search_base + query
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
-
-        try:
-            results_json = json.load(urllib2.urlopen(request))
-            if results_json['Response'] == u'False':
-                return 'Nothing Found'
-            else:
-                return results_json['Search'][:6]  # limits to 6 results
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e: # noqa
-            logging.error(u'OMDB search.', exc_info=True)
-            return 'Search Error.'
-
-    def movie_info(self, imdbid):
-        ''' Searches OMDB for single movie details.
-        :param imdbid: str imdb identification number (tt123456)
-
-        Gives more information than search(), but only for one movie.
-
-        Returns dict.
+        Returns list results or str error/fail message
         '''
 
-        search_string = "http://www.omdbapi.com/?i={}&plot=short&tomatoes=true&r=json".format(imdbid)
+        url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(_k('tmdb'))
 
+        if title[-4:].isdigit():
+            query = u'query={}&year={}'.format(title[:-5], title[-4:])
+        else:
+            query = u'query={}'.format(title)
+
+        search_string = url + query
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
-            data = json.load(urllib2.urlopen(request))
+            results = json.load(urllib2.urlopen(request))
+            if results.get('success') == 'false':
+                return None
+            else:
+                return results['results'][:6]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'OMDB movie_info.', exc_info=True)
-            return None
+            logging.error(u'TMDB search.', exc_info=True)
+            return 'Search Error.'
 
-        keep = ('Title', 'Year', 'Released', 'Plot', 'Rated',
-                'DVD', 'Poster', 'imdbID', 'tomatoURL', 'tomatoRating')
+    def find_imdbid(self, imdbid):
+        search_string = 'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
-        for k, v in data.items():
-            if k not in keep:
-                del data[k]
-        data['status'] = u'wanted'
-
-        results_lower = {k.lower(): v for k, v in data.iteritems()}
-        return results_lower
+        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            results = json.load(urllib2.urlopen(request))
+            if results['movie_results'] == []:
+                return None
+            else:
+                return [results['movie_results'][0]]
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'TMDB find.', exc_info=True)
+            return 'Search Error.'
 
 
 class Trailer():
@@ -115,9 +141,7 @@ class Trailer():
 
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
 
-        k = u'AIzaSyCOu5KhaS9WcTfNvnRKzzJMf6z-6NGb28M'
-
-        search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', k)
+        search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', _k('youtube'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 

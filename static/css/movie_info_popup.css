@@ -87,6 +87,10 @@ iframe#trailer{
 }
 
 /* Quality slide in panel */
+ul{
+    clear: none;
+}
+
 ul#quality{
     position: absolute;
     width: 640px;
@@ -94,8 +98,8 @@ ul#quality{
     top: 0px;
     right: 0px;
     display: none;
-    clear: none;
 }
+
 ul#quality li{
     height: 2.5em;
     line-height: 2.5em;

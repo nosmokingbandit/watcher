@@ -31,6 +31,8 @@ i{
 ul{
     list-style: none;
     clear: both;
+    padding: 0;
+    margin: 0;
 }
 
 button{

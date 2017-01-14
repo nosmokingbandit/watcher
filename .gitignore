@@ -6,6 +6,7 @@ logs/*
 watcher.zip
 core/version
 core/rss/imdb
+db/*
 
 # Compiled #
 *.pyc

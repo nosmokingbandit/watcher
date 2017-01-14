@@ -36,6 +36,8 @@ class PreDB(object):
         ''' Searches predb for releases and marks row in MOVIES
         :param data: dict data from row in MOVIES
 
+        'data' requires key 'title', 'year', 'imdbid'
+
         Checks predb rss for releases. Marks row 'found' if found.
 
         Returns bool on success/failure

@@ -1,7 +1,7 @@
 import json
 
 import core
-from core.movieinfo import Omdb, Trailer
+from core.movieinfo import Trailer
 from dominate.tags import *
 
 
@@ -10,27 +10,27 @@ class MovieInfoPopup():
     def __init__(self):
         return
 
-    def html(self, imdbid):
+    def html(self, data_json):
+        '''
+        data: str json object movie data dict
+        '''
 
-        omdb = Omdb()
+        data = json.loads(data_json)
+
         trailer = Trailer()
 
-        data = omdb.movie_info(imdbid)
-        if not data:
-            return self.no_data()
-
-        data_json = json.dumps(data)
-
-        title_date = data['title'] + ' ' + data['year']
-        imdbid = data['imdbid']
+        title_date = data['title'] + ' ' + data['release_date'][:4]
         youtube_id = trailer.get_trailer(title_date)
+        tmdb_url = "https://www.themoviedb.org/movie/{}".format(data['id'])
 
         if youtube_id:
             trailer_embed = "https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
         else:
             trailer_embed = ''
-        if data['poster'] == 'N/A':
-            data['poster'] = core.URL_BASE + '/static/images/missing_poster.jpg'
+        if data['poster_path'] is None:
+            data['poster_path'] = core.URL_BASE + '/static/images/missing_poster.jpg'
+        else:
+            data['poster_path'] = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
         container = div(id='container')
         with container:
@@ -39,9 +39,9 @@ class MovieInfoPopup():
                 with p():
                     span(title_date, id='title')
                     i(cls='fa fa-plus', id='button_add')
-                    i(cls='fa fa-floppy-o', id='button_submit', imdbid=imdbid)
+                    i(cls='fa fa-floppy-o', id='button_submit')
             with div(id='media'):
-                img(id='poster', src=data['poster'])
+                img(id='poster', src=data['poster_path'])
                 with div(id='trailer_container'):
                     iframe(id='trailer', width="640", height="360", src=trailer_embed, frameborder="0")
 
@@ -83,12 +83,11 @@ class MovieInfoPopup():
                                 input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'])
 
             with div(id='plot'):
-                p(data['plot'])
+                p(data['overview'])
             with div(id='additional_info'):
-                with a(href=data['tomatourl'], target='_blank'):
-                    p(u'Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
-                p(u'Theatrical Release Date: {}'.format(data['released']))
-                p(u'DVD Release Date: {}'.format(data['dvd']))
+                with a(href=tmdb_url, target='_blank'):
+                    p(u'TMDB Rating: {}'.format(data['vote_average']))
+                p(u'Theatrical Release Date: {}'.format(data['release_date']))
             div(data_json, id='hidden_data')
 
         return unicode(container)

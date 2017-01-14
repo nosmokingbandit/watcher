@@ -102,7 +102,8 @@ class API(object):
         '''
 
         logging.info(u'API request add movie {}'.format(imdbid))
-        return self.ajax.quick_add(imdbid)
+
+        return self.ajax.add_wanted_imdbid(imdbid)
 
     def removemovie(self, imdbid):
         ''' Remove movie from wanted list

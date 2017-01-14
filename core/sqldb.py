@@ -74,7 +74,8 @@ class SQL(object):
         self.convert_names = {'MOVIES':
                               [('url', 'tomatourl'),
                                ('score', 'tomatorating'),
-                               ('release_date', 'released')
+                               ('release_date', 'released'),
+                               ('finished_date', 'finisheddate')
                                ]}
 
     def create_database(self):

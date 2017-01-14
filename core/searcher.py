@@ -65,7 +65,7 @@ class Searcher():
             imdbid = movie['imdbid']
             title = movie['title']
             status = movie['status']
-            finisheddate = movie['finisheddate']
+            finisheddate = movie['finished_date']
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))

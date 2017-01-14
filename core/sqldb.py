@@ -421,4 +421,117 @@ class SQL(object):
         else:
             return False
 
+    def _get_existing_schema(self):
+        table_dict = {}
+
+        # get list of tables in db:
+        command = 'SELECT name FROM sqlite_master WHERE type="table"'
+        tables = self.execute(command)
+
+        table_dict = {}
+
+        if not tables:
+            return False
+
+        for i in tables:
+            i = i[0]
+            command = 'PRAGMA table_info({})'.format(i)
+            columns = self.execute(command)
+            if not columns:
+                continue
+            tmp_dict = {}
+            for col in columns:
+                tmp_dict[col['name']] = col['type']
+            table_dict[i] = tmp_dict
+
+        return table_dict
+
+    def _get_intended_schema(self):
+        d = {}
+        for table in self.metadata.tables.keys():
+            selftable = getattr(self, table)
+            d2 = {}
+            for i in selftable.c:
+                d2[i.name] = str(i.type)
+            d[table] = d2
+        return d
+
+    def update_tables(self):
+
+        existing = self._get_existing_schema()
+        intended = self._get_intended_schema()
+
+        diff = Comparisons.compare_dict(intended, existing)
+
+        if not diff:
+            return True
+
+        print 'Database update required. This may take some time.'
+
+        backup_dir = os.path.join(core.PROG_PATH, 'db')
+        logging.info('Backing up database to {}.'.format(backup_dir))
+        print 'Backing up database to {}.'.format(backup_dir)
+        try:
+            if not os.path.isdir(backup_dir):
+                os.mkdir(backup_dir)
+            backup = '{}.{}'.format(core.DB_FILE, datetime.date.today())
+            shutil.copyfile(core.DB_FILE, os.path.join(backup_dir, backup))
+        except Exception, e: # noqa
+            print 'Error backing up database.'
+            logging.error(u'Copying SQL DB.', exc_info=True)
+            raise
+
+        logging.info('Modifying tables.')
+        print 'Modifying tables.'
+
+        '''
+        For each item in diff, create new column.
+        Then, if the new columns name is in self.convert_names, copy data from old column
+        Create the new table, then copy data from TMP table
+        '''
+        for table, schema in diff.iteritems():
+            logging.info('Modifying table {}'.format(table))
+            print 'Modifying table {}'.format(table)
+            for name, kind in schema.iteritems():
+                command = 'ALTER TABLE {} ADD COLUMN {} {}'.format(table, name, kind)
+
+                self.execute(command)
+
+                if table in self.convert_names.keys():
+                    for pair in self.convert_names[table]:
+                        if pair[0] == name:
+                            command = 'UPDATE {} SET {} = {}'.format(table, pair[0], pair[1])
+                            self.execute(command)
+
+            # move TABLE to TABLE_TMP
+            table_tmp = '{}_TMP'.format(table)
+            logging.info('Renaming table to {}'.format(table_tmp))
+            print 'Renaming table to {}'.format(table_tmp)
+            command = 'ALTER TABLE {} RENAME TO {}'.format(table, table_tmp)
+            self.execute(command)
+
+            # create new table
+            logging.info('Creating new table {}'.format(table))
+            print 'Creating new table {}'.format(table)
+            table_meta = getattr(self, table)
+            table_meta.create(self.engine)
+
+            # copy data over
+            logging.info('Merging data from {} to {}'.format(table_tmp, table))
+            print 'Merging data from {} to {}'.format(table_tmp, table)
+            names = ', '.join(intended[table].keys())
+            command = 'INSERT INTO {} ({}) SELECT {} FROM {}'.format(table, names, names, table_tmp)
+            self.execute(command)
+
+            logging.info('Dropping table {}'.format(table_tmp))
+            print 'Dropping table {}'.format(table_tmp)
+            command = 'DROP TABLE {}'.format(table_tmp)
+            self.execute(command)
+
+            logging.info('Finished updating table {}'.format(table))
+            print 'Finished updating table {}'.format(table)
+
+        logging.info('Database updated')
+        print 'Database updated.'
+
 # pylama:ignore=W0401

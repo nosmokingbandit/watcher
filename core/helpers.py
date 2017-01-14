@@ -58,7 +58,7 @@ class Comparisons():
         diff = {}
         for k in new.keys():
             if k not in existing.keys():
-                continue
+                diff.update({k: new[k]})
             else:
                 if type(new[k]) is dict:
                     diff.update(Comparisons.compare_dict(new[k], existing[k], parent=k))

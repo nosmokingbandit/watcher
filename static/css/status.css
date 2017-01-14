@@ -102,7 +102,7 @@ ul#movie_list.posters li span.movie_info span.title{
     display: block;
 }
 
-ul#movie_list.posters li span.movie_info span.tomatorating,
+ul#movie_list.posters li span.movie_info span.score,
 ul#movie_list.posters li span.movie_info span.rated{
     display: none;
 }
@@ -166,7 +166,7 @@ ul#movie_list.list li span.movie_info span.title{
 }
 
 ul#movie_list.list li span.movie_info span.year,
-ul#movie_list.list li span.movie_info span.tomatorating,
+ul#movie_list.list li span.movie_info span.score,
 ul#movie_list.list li span.movie_info span.rated{
     font-size: 0.75em;
     opacity: 0.65;
@@ -222,14 +222,14 @@ ul#movie_list.compact li span.movie_info span.year{
     margin-left: 0.5em;
 }
 
-ul#movie_list.compact li span.movie_info span.tomatorating,
+ul#movie_list.compact li span.movie_info span.score,
 ul#movie_list.compact li span.movie_info span.rated{
     float: right;
     margin-right: 1em;
 }
 
 ul#movie_list.compact li span.movie_info span.year,
-ul#movie_list.compact li span.movie_info span.tomatorating,
+ul#movie_list.compact li span.movie_info span.score,
 ul#movie_list.compact li span.movie_info span.rated{
     font-size: 0.8em;
     opacity: 0.65;

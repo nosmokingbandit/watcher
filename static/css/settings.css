@@ -55,13 +55,8 @@ div#content ul.wide{
     margin: 0 0 2.5em 0;
 }
 
-div#content ul{
-    list-style: none;
-    padding: 0 0 0 0;
-}
-
 div#content ul li{
-    padding: 0 0 0 0;
+    padding: 0;
     line-height: 2.5em;
 }
 

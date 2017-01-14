@@ -83,8 +83,6 @@ div#search_results {
 ul#result_list{
     border: 1px solid #bdbdbd;
     list-style: none;
-    padding: 0;
-    margin: 0;
     font-size: .9em;
     overflow-y: scroll;
     height: 360px;

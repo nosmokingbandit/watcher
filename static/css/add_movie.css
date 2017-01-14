@@ -54,12 +54,6 @@ button#search_button i{
     padding: 0 0 2em 0;
 }
 
-ul{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
 ul#movie_list{
     display: flex;
     flex-direction: row;
@@ -95,18 +89,17 @@ span.quickadd{
     height: 1.5em;
     line-height: 1.5em;
     border-radius: 0 .5em .5em 0;
-    overflow: hidden;
+    overflow-y: hidden;
+
 }
 
 span.quickadd_text{
     display: none;
-    text-overflow: clip;
-    overflow-x: hidden;
-    float: left;
 }
 
 i.button_add{
     margin-left: 0.4em;
+    float: right;
 }
 
 

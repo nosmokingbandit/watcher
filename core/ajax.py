@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -9,7 +10,7 @@ import core
 from core import config, poster, searcher, snatcher, sqldb, updatestatus, version
 from core.helpers import Conversions, Comparisons
 from core.downloaders import nzbget, sabnzbd
-from core.movieinfo import Omdb
+from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
 from core.rss import predb
 from templates import movie_info_popup, movie_status_popup, status
@@ -27,7 +28,8 @@ class Ajax(object):
     '''
 
     def __init__(self):
-        self.omdb = Omdb()
+        self.omdb = OMDB()
+        self.tmdb = TMDB()
         self.config = config.Config()
         self.predb = predb.PreDB()
         self.searcher = searcher.Searcher()
@@ -43,20 +45,16 @@ class Ajax(object):
 
         Returns str json-encoded list of dicts that contain omdb's data.
         '''
-        results = self.omdb.search(search_term.replace(u' ', u'+'))
 
-        if type(results) is str:
+        results = self.tmdb.search(search_term)
+        if not results:
             logging.info(u'No Results found for {}'.format(search_term))
             return None
         else:
-            for i in results:
-                if i['Poster'] == u'N/A':
-                    i['Poster'] = core.URL_BASE + '/static/images/missing_poster.jpg'
-
             return json.dumps(results)
 
     @cherrypy.expose
-    def movie_info_popup(self, imdbid):
+    def movie_info_popup(self, data):
         ''' Calls movie_info_popup to render html
         :param imdbid: str imdb identification number (tt123456)
 
@@ -64,7 +62,7 @@ class Ajax(object):
         '''
 
         mip = movie_info_popup.MovieInfoPopup()
-        return mip.html(imdbid)
+        return mip.html(data)
 
     @cherrypy.expose
     def movie_status_popup(self, imdbid):
@@ -91,6 +89,9 @@ class Ajax(object):
         '''
 
         data = json.loads(data)
+        title = data['title']
+        data['year'] = data['release_date'][:4]
+        year = data['year']
 
         response = {}
 
@@ -107,30 +108,45 @@ class Ajax(object):
 
         TABLE = u'MOVIES'
 
-        imdbid = data['imdbid']
-        title = data['title'].replace(u'_', u' ')
-        year = data['year'][:4]
+        if data.get('imdbid') is None:
+            data['imdbid'], data['rated'] = self.omdb.get_info(title, year, tags=['imdbID', 'Rated'])
+        else:
+            data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])
 
-        if self.sql.row_exists(TABLE, imdbid=imdbid):
-            logging.info(u'{} {} already exists as a wanted movie'
-                         .format(title, year, imdbid))
+        if not data['imdbid']:
+            response['response'] = u'false'
+            response['message'] = u'Could not find imdbid for {}.'.format(title)
+            return json.dumps(response)
+
+        if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
+            logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
             response['response'] = u'false'
-            response['message'] = u'{} {} is already wanted, cannot add.' \
-                .format(title, year, imdbid)
+            response['message'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
         else:
+            poster_url = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+
+            data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
+            data['plot'] = data['overview']
+            data['url'] = u'https://www.themoviedb.org/movie/{}'.format(data['id'])
+            data['score'] = data['vote_average']
             data['status'] = u'Wanted'
-            data['predb'] = u'None'
-            poster_url = data['poster']
-            data['poster'] = u'images/poster/{}.jpg'.format(imdbid)
+            data['added_date'] = str(datetime.date.today())
 
-            DB_STRING = data
-            if self.sql.write(TABLE, DB_STRING):
+            required_keys = ['imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate']
 
+            for i in data.keys():
+                if i not in required_keys:
+                    del data[i]
+
+            if data.get('quality') is None:
+                data['quality'] = self._default_quality()
+
+            if self.sql.write(TABLE, data):
                 t2 = threading.Thread(target=self.poster.save_poster,
-                                      args=(imdbid, poster_url))
+                                      args=(data['imdbid'], poster_url))
                 t2.start()
 
                 t = threading.Thread(target=thread_search_grab, args=(data,))
@@ -147,12 +163,13 @@ class Ajax(object):
                 return json.dumps(response)
 
     @cherrypy.expose
-    def quick_add(self, imdbid):
+    def add_wanted_imdbid(self, imdbid):
         ''' Method to quckly add movie with just imdbid
-        :param imdbid: str imdb identification number (tt123456)
+        :param imdbid: str imdb id #
 
         Submits movie with base quality options
-        Gets info from omdb and sends to self.add_wanted_movie
+
+        Generally just used for the api
 
         Returns dict of success/fail with message.
 
@@ -161,20 +178,22 @@ class Ajax(object):
 
         response = {}
 
-        movie_info = self.omdb.movie_info(imdbid)
+        data = self.tmdb.find_imdbid(imdbid)[0]
 
-        if not movie_info:
+        if not data:
             response['status'] = u'failed'
-            response['message'] = u'{} not found on omdb.'.format(imdbid)
+            response['message'] = u'{} not found on TMDB.'.format(imdbid)
             return response
 
+        data['quality'] = self._default_quality()
+
+        return self.add_wanted_movie(json.dumps(data))
+
+    def _default_quality(self):
         quality = {}
         quality['Quality'] = core.CONFIG['Quality']
         quality['Filters'] = core.CONFIG['Filters']
-
-        movie_info['quality'] = json.dumps(quality)
-
-        return self.add_wanted_movie(json.dumps(movie_info))
+        return json.dumps(quality)
 
     @cherrypy.expose
     def save_settings(self, data):
@@ -493,7 +512,6 @@ class Ajax(object):
 
         # check if we need to purge old results and alert the user.
         if json.dumps(existing_quality) == json.dumps(quality):
-            print 'SAME'
             return 'same'
 
         else:

@@ -1,14 +1,13 @@
 $(document).ready(function() {
     var url_base = $("meta[name='url_base']").attr("content");
 
-// sends post to SearchDatabase.post() in main.py and displays results
-
     $("#search_input").keyup(function(event){
         if(event.keyCode == 13){
             $("#search_button").click();
         }
     });
 
+    // Sends request to search ajax handler
     $("#search_button").click(function(e) {
         var movie_results_dict = {};
         if ( $("input[name='search_term']").val() == "" ){
@@ -27,24 +26,27 @@ $(document).ready(function() {
             "search_term": $("input[name='search_term']").val()
         })
 
-        .done(function(l) {
-            if (l != ''){
-                movie_results_dict = JSON.parse(l);
-                l = JSON.parse(l);
-                var results_html;
+        .done(function(r) {
+            if (r != ''){
+
+                movie_results_dict = JSON.parse(r);
+                results = JSON.parse(r);
                 var movie_list = $("#movie_list")
                 // move this to a py template or just have the post function return the html ?
-                $.each(l, function(ind, dict){
-                    $('<li>', {class: 'movie'}).append(
-                        $('<span>').append(
-                            $("<span>", {class:'quickadd',imdbid: dict['imdbID']})
-                                .append(
-                                $("<span>", {class: 'quickadd_text'}).text('Quick-Add'),
-                                $("<i>", {class: 'fa fa-plus button_add'})
-                                ),
-                            $('<img>', {src:dict['Poster'],imdbid: dict['imdbID']}),
-                            dict['Title'],' ',dict['Year'].slice(0,4)
-                        )
+                $.each(results, function(ind, dict){
+                    if(dict['poster_path'] != null){
+                        img_url = "http://image.tmdb.org/t/p/w300" + dict['poster_path']
+                    } else {
+                        img_url = url_base + "/static/images/missing_poster.jpg"
+                    }
+
+                    $('<li>', {class: 'movie'}).attr('data', JSON.stringify(dict)).append(
+                        $("<span>", {class:'quickadd'}).append(
+                            $("<span>", {class: 'quickadd_text'}).text('Quick-Add'),
+                            $("<i>", {class: 'fa fa-plus button_add'})
+                            ),
+                        $('<img>', {src:img_url}),
+                        dict['title'],' ',dict['release_date'].slice(0,4)
                     ).appendTo(movie_list)
                 });
             }
@@ -70,13 +72,16 @@ $(document).ready(function() {
     });
 
     $("ul#movie_list").on("click", "span.quickadd", function(){
-        imdbid = $(this).attr('imdbid');
+        $this = $(this);
+        imdbid = $this.attr('imdbid');
 
-        $icon = $(this).children("i");
+        $icon = $this.children("i");
         $icon.removeClass('fa-plus');
         $icon.addClass('fa-circle faa-burst animated');
 
-        $.post(url_base + "/ajax/quick_add", {"imdbid":imdbid})
+        data = $this.parent().attr('data')
+
+        $.post(url_base + "/ajax/add_wanted_movie", {"data":data})
         .done(function(r){
             response = JSON.parse(r)
 
@@ -96,9 +101,11 @@ $(document).ready(function() {
     $('div#database_results').on('click', 'img', function(){
         $('div#overlay').fadeIn();
 
-        imdbid = $(this).attr('imdbid')
+        data = $(this).parent().attr('data')
 
-        $.post(url_base + "/ajax/movie_info_popup", {'imdbid': imdbid})
+        console.log(data)
+
+        $.post(url_base + "/ajax/movie_info_popup", {"data": data})
             .done(function(html){
                 $('div#info_pop_up').html(html);
                 $('div#info_pop_up').slideDown();

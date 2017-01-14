@@ -1,6 +1,8 @@
 import json
 import logging
 import urllib2
+from core.helpers import Comparisons
+_k = Comparisons._k
 
 logging = logging.getLogger(__name__)
 
@@ -87,7 +89,7 @@ class TMDB(object):
         Returns list results or str error/fail message
         '''
 
-        url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(self.k())
+        url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(_k('tmdb'))
 
         if title[-4:].isdigit():
             query = u'query={}&year={}'.format(title[:-5], title[-4:])
@@ -110,7 +112,7 @@ class TMDB(object):
             return 'Search Error.'
 
     def find_imdbid(self, imdbid):
-        search_string = 'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, self.k())
+        search_string = 'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -124,10 +126,6 @@ class TMDB(object):
         except Exception, e: # noqa
             logging.error(u'TMDB find.', exc_info=True)
             return 'Search Error.'
-
-    def k(self):
-        k = '1841eeba9ba26337fbd42d060a6741fc'
-        return k
 
 
 class Trailer():
@@ -143,9 +141,7 @@ class Trailer():
 
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
 
-        k = u'AIzaSyCOu5KhaS9WcTfNvnRKzzJMf6z-6NGb28M'
-
-        search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', k)
+        search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', _k('youtube'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 

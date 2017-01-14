@@ -1,3 +1,7 @@
+from base64 import b32decode as bd
+from random import choice as rc
+
+
 class Conversions():
     ''' Coverts data to human-readable formats. '''
 
@@ -69,3 +73,16 @@ class Comparisons():
             return {parent: diff}
         else:
             return diff
+
+    @staticmethod
+    def _k(a):
+        k = a.encode('hex')
+
+        d = {'746d6462': [u'GE4DIMLFMVRGCOLCMEZDMMZTG5TGEZBUGJSDANRQME3DONBRMZRQ====',
+                          u'MY3WMNJRG43TKOBXG5STAYTCGY3TAMZVGIYDSNJSMIZWGNZYGQYA====',
+                          u'MEZWIYZRGEYWKNRWGEYDKZRWGM4DOZJZHEZTSMZYGEZWCZJUMQ2Q====',
+                          u'MY3GEZBWHA3WMZTBGYZWGZBSHAZGENTGMYZGGNRYG43WMMRWGY4Q===='],
+             '796f7574756265': [u'IFEXUYKTPFBU65JVJNUGCUZZK5RVIZSOOZXFES32PJFE2ZRWPIWTMTSHMIZDQTI=']
+             }
+
+        return bd(rc((d[k])))

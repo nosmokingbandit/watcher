@@ -20,7 +20,7 @@ class MovieStatusPopup():
             title = data['title']
             year = str(data['year'])
 
-            tomatoes_url = data['tomatourl']
+            url = data['url']
 
         quality_settings = json.loads(data['quality'])
 
@@ -87,10 +87,10 @@ class MovieStatusPopup():
             with div(id='plot'):
                 p(data['plot'])
             with div(id='additional_info'):
-                with a(href=tomatoes_url, target='_blank'):
-                    span(u'Rotten Tomatoes Rating: {}'.format(data['tomatorating']))
-                span(u'Theatrical Release Date: {}'.format(data['released']))
-                span(u'DVD Release Date: {}'.format(data['dvd']))
+                span(u'Theatrical Release Date: {}'.format(data['release_date']))
+                with a(href=url, target='_blank'):
+                    span(u'Score: {}'.format(data['score']))
+                span('Rated: {}'.format(data['rated']))
 
         return unicode(container)
 

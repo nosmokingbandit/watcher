@@ -1,8 +1,12 @@
 import core
+import datetime
 import logging
 import time
 import json
+import os
+import shutil
 
+from core.helpers import Comparisons
 from sqlalchemy import *
 
 logging = logging.getLogger(__name__)
@@ -25,22 +29,23 @@ class SQL(object):
             logging.error(u'Opening SQL DB.', exc_info=True)
             raise
 
+        # These definitions only exist to CREATE tables.
         self.MOVIES = Table('MOVIES', self.metadata,
+                            Column('added_date', TEXT),
                             Column('imdbid', TEXT),
                             Column('title', TEXT),
                             Column('year', TEXT),
                             Column('poster', TEXT),
                             Column('plot', TEXT),
-                            Column('tomatourl', TEXT),
-                            Column('tomatorating', TEXT),
-                            Column('released', TEXT),
-                            Column('dvd', TEXT),
+                            Column('url', TEXT),
+                            Column('score', TEXT),
+                            Column('release_date', TEXT),
                             Column('rated', TEXT),
                             Column('status', TEXT),
                             Column('predb', TEXT),
                             Column('quality', TEXT),
-                            Column('finisheddate', TEXT),
-                            Column('finishedscore', SMALLINT)
+                            Column('finished_date', TEXT),
+                            Column('finished_score', SMALLINT)
                             )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                    Column('score', SMALLINT),
@@ -65,13 +70,22 @@ class SQL(object):
                                    Column('status', TEXT)
                                    )
 
+        # {TABLENAME: [(new_col, old_col), (new_col, old_col)]}
+        self.convert_names = {'MOVIES':
+                              [('url', 'tomatourl'),
+                               ('score', 'tomatorating'),
+                               ('release_date', 'released')
+                               ]}
+
     def create_database(self):
         logging.info(u'Creating tables.')
         self.metadata.create_all(self.engine)
         return
 
     def execute(self, command):
-        '''
+        ''' Executes SQL command
+        command: str or list of SQL commands
+
         We are going to loop this up to 5 times in case the database is locked.
         After each attempt we wait 1 second to try again. This allows the query
             that has the database locked to (hopefully) finish. It might
@@ -79,6 +93,8 @@ class SQL(object):
             queries. So if we are writing searchresults to every movie at once,
             the get_user_movies request may be able to jump in between them to
             get the user's movies to the browser. Maybe.
+
+        Returns result of command, or False if unable to execute
         '''
 
         tries = 0

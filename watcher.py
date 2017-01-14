@@ -78,7 +78,7 @@ if __name__ == '__main__':
     else:
         core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
 
-    # set up db on first launch
+    # set up db on first launch, check for updates afterward
     if passed_args.db:
         core.DB_FILE = passed_args.db
     sql = sqldb.SQL()
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     else:
         logging.info(u'SQL DB found.')
         print 'Database found.'
+        sql.update_tables()
     del sql
 
     # mount and configure applications

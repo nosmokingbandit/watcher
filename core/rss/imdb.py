@@ -1,6 +1,6 @@
 import core
 from core import ajax, config, sqldb
-from core.movieinfo import Omdb
+from core.movieinfo import TMDB
 from datetime import datetime
 import json
 import logging
@@ -14,7 +14,7 @@ logging = logging.getLogger(__name__)
 class ImdbRss(object):
     def __init__(self):
         self.config = config.Config()
-        self.omdb = Omdb()
+        self.tmdb = TMDB()
         self.sql = sqldb.SQL()
         self.ajax = ajax.Ajax()
         return
@@ -140,9 +140,9 @@ class ImdbRss(object):
         quality['Quality'] = core.CONFIG['Quality']
         quality['Filters'] = core.CONFIG['Filters']
         for imdbid in movies_to_add:
-            movie_info = self.omdb.movie_info(imdbid)
+            movie_info = self.tmdb.find_imdbid(imdbid)[0]
             if not movie_info:
-                logging.info(u'{} not found on omdb. Cannot add.'.format(imdbid))
+                logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
             # logging.info(u'Adding {}'.format(imdbid))
             movie_info['quality'] = json.dumps(quality)

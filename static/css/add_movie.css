@@ -11,7 +11,7 @@ input#search_input{
     width: calc(100% - 65px);
     font-size: 2em;
     padding: 8px;
-    margin: 32px 0 0 0;
+    margin: 32px 0;
     border-style: solid;
     border-color:  #212121;
     background-color: #ffffff;
@@ -25,7 +25,7 @@ button#search_button{
     width: 48px;
     height: 50px;
     padding: 0;
-    margin: 32px 0 0 0;
+    margin: 32px 0;
     background-color: white;
     border-style: solid;
     border-color:  #212121;
@@ -64,7 +64,7 @@ ul#movie_list{
 ul#movie_list li{
     width: 200px;
     float: left;
-    margin: 20px;
+    margin: 0 1.5em 1.5em 1.5em;
     text-align: center;
     position: relative;
 }

@@ -320,7 +320,7 @@ class Postprocessing(object):
             data = self.sql.get_movie_details('imdbid', result['imdbid'])
             if data:
                 logging.info(u'Movie data found locally by imdbid.')
-                data['finishedscore'] = result['score']
+                data['finished_score'] = result['score']
             else:
                 logging.info(u'Unable to find movie in local db.')
 
@@ -489,7 +489,7 @@ class Postprocessing(object):
         result = {}
         result['status'] = u'incomplete'
         result['data'] = data
-        result['data']['finisheddate'] = str(datetime.date.today())
+        result['data']['finished_date'] = str(datetime.date.today())
         result['tasks'] = {}
 
         # mark guid in both results tables
@@ -527,11 +527,13 @@ class Postprocessing(object):
             # create result entry for guid2
             result['tasks'][data['guid2']] = guid2_result
 
-        # set movie status and add finished date
+        # set movie status and add finished date/score
         if data['imdbid']:
             logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
-            self.sql.update('MOVIES', 'finisheddate', result['data']['finisheddate'],
+            self.sql.update('MOVIES', 'finished_date', result['data']['finisheddate'],
+                            imdbid=data['imdbid'])
+            self.sql.update('MOVIES', 'finished_score', result['data']['finished_score'],
                             imdbid=data['imdbid'])
         else:
             logging.info(u'Imdbid not supplied or found, unable to update Movie status.')

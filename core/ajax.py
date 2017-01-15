@@ -565,3 +565,11 @@ class Ajax(object):
             return json.dumps({'response': 'fail'})
         else:
             return json.dumps({'response': 'success'})
+
+    @cherrypy.expose
+    def get_log_text(self, logfile):
+
+        with open(os.path.join(core.LOG_DIR, logfile), 'r') as f:
+            log_text = f.read()
+
+        return log_text

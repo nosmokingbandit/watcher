@@ -43,14 +43,15 @@ class Header():
                                     with li():
                                         i(cls='fa fa-film')
                                         span(u'Post Processing')
-                                with a(href=core.URL_BASE + '/settings/about/'):
-                                    with li():
-                                        i(cls='fa fa-info-circle')
-                                        span(u'About')
                                 with a(href=core.URL_BASE + '/settings/logs/'):
                                     with li():
                                         i(cls='fa fa-file-text')
                                         span(u'Logs')
+                                with a(href=core.URL_BASE + '/settings/about/'):
+                                    with li():
+                                        i(cls='fa fa-info-circle')
+                                        span(u'About')
+
 
                     with a(href=core.URL_BASE + '/add_movie/'):
                         if current == 'add_movie':

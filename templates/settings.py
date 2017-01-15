@@ -434,12 +434,11 @@ class Settings():
     def logs(self, c):
         with div(cls='logs'):
             h1(u'Log File')
-            with div(id='log-display'):
-                logfile = os.path.join(core.PROG_PATH, core.LOG_DIR, 'log.txt')
-                with open(logfile, 'r') as f:
-                    page = '%s' % f.read()
-                    pre(page)                    
-                    
+            logfile = os.path.join(core.PROG_PATH, core.LOG_DIR, 'log.txt')
+            with open(logfile, 'r') as f:
+                page = '%s' % f.read()
+                pre(page, id='log_display')
+
     def get_themes(self):
         theme_path = os.path.join(core.PROG_PATH, 'static', 'css')
         themes = []

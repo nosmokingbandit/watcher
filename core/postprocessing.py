@@ -611,7 +611,7 @@ class Postprocessing(object):
         while '  ' in new_string:
             new_string = new_string.replace('  ', ' ')
 
-        while len(string) > 1 and new_string[-1] == u' ':
+        while len(new_string) > 1 and new_string[-1] == u' ':
             new_string = new_string[:-1]
 
         repl = core.CONFIG['Postprocessing']['replaceillegal']

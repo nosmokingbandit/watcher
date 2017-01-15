@@ -214,6 +214,26 @@ ul#postprocessing li span.taglist{
     font-size: .75em;
 }
 
+/*For log file viewing*/
+
+div.logs{
+    display: inline-block;
+}
+
+div#log_display{
+}
+
+pre#log_display {
+    max-height: 768px;
+    max-width: 768px;
+    padding: 2px;
+    border: 1px solid #212121;
+    overflow: scroll;
+    font-size: .75em;
+    font-family: monospace;
+    background-color: #eee;
+}
+
 /* about */
 div.about p{
     padding-left: 1em;
@@ -221,17 +241,7 @@ div.about p{
     line-height: 1.25em;
 }
 
-ul#libraries{
-}
-
-ul#libraries li{
-    width: 33%;
-    float: left;
-}
-
-
 /**/
-
 span.tip{
     font-size: 0.75em;
     margin: 0 0.25em 0 2em;

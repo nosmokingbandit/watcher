@@ -20,3 +20,9 @@ div#content ul li.rbord{
 div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
 }
+
+/* For log file viewing */
+pre#log_display {
+    border: 1px solid #ccc;
+    background-color: #151c25;
+}

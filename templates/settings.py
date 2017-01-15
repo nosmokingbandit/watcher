@@ -429,6 +429,16 @@ class Settings():
                 with li():
                     a(u'Parse Torrent Name', href='https://pypi.python.org/pypi/parse-torrent-name')
 
+    @expose
+    @settings_page
+    def logs(self, c):
+        with div(cls='logs'):
+            h1(u'Log File')
+            logfile = os.path.join(core.PROG_PATH, core.LOG_DIR, 'log.txt')
+            with open(logfile, 'r') as f:
+                page = '%s' % f.read()
+                pre(page, id='log_display')
+
     def get_themes(self):
         theme_path = os.path.join(core.PROG_PATH, 'static', 'css')
         themes = []

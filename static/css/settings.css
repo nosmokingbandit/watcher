@@ -246,3 +246,15 @@ div#footer{
     bottom: 1em;
     left: 1em;
 }
+
+/*For log file viewing*/
+pre {
+    padding: 2px;
+    border: 1px solid #666;
+    overflow: scroll;
+    max-height: 600px;
+    width: 135%;
+    max-width: 1000px;
+    font-size: .75em;
+    font-family: monospace;
+}

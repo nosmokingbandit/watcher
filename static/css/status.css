@@ -1,7 +1,22 @@
+@media (min-width: 768px) and (max-width: 991px) {
+    div#content{
+        max-width: 768px;
+        width: 60%;
+    }         
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+    div#content{
+        max-width: 1024px;
+        width: 80%;
+    }        
+}
+@media (min-width: 1200px) {
+    div#content{
+        width: 90%;
+    }      
+}
 div#content{
     margin: 0 auto;
-    width: 60%;
-    max-width: 1024px;
     min-width: 650px;
     text-align: center;
 }

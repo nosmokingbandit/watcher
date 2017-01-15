@@ -643,7 +643,7 @@ class Postprocessing(object):
         ext = os.path.splitext(abs_path_old)[1]
 
         # get the new file name
-        new_name = self.compile_path(renamer_string, data)
+        new_name = self.compile_path(renamer_string, data).replace(':', core.CONFIG['Postprocessing']['replaceillegal'])
 
         if not new_name:
             logging.info(u'New file name would be blank. Cancelling renamer.')

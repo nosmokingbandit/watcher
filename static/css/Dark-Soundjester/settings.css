@@ -1,3 +1,9 @@
 input[type='text']{
     color: #212121;
 }
+
+/* For log file viewing */
+pre#log_display {
+    border: 1px solid #bdbdbd;
+    background-color: #000;
+}

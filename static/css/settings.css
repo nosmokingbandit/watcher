@@ -5,7 +5,7 @@
     }
     div#content ul.wide{
         max-width: 768px;
-    }    
+    }
     pre#log_display {
         max-width: 768px;
     }
@@ -250,7 +250,7 @@ ul#postprocessing li span.taglist{
 /*For log file viewing*/
 
 div.logs{
-    display: inline-block;
+    /* display: inline-block; */
 }
 
 div#log_display{

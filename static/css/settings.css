@@ -1,3 +1,39 @@
+@media (min-width: 768px) and (max-width: 991px) {
+    div#content{
+        width: 80%;
+        max-width: 768px;
+    }
+    div#content ul.wide{
+        max-width: 768px;
+    }    
+    pre#log_display {
+        max-width: 768px;
+    }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+    div#content{
+        width: 80%;
+        max-width: 1024px;
+    }
+    div#content ul.wide{
+        max-width: 1024px;
+    }
+    pre#log_display {
+        max-width: 1024px;
+    }    
+}
+@media (min-width: 1200px) {
+    div#content{
+        width: 80%;
+        max-width: 1200px;
+    }    
+    div#content ul.wide{
+        max-width: 1200px;
+    }
+    pre#log_display {
+        max-width: 1200px;
+    }       
+}
 input[type="number"], input[type="text"]{
     border: 1px solid #212121;
     outline: none;
@@ -40,8 +76,6 @@ ul{
 
 div#content{
     margin: 1.5em auto 0 auto;
-    width: 80%;
-    max-width: 768px;
     clear: both;
 }
 
@@ -50,7 +84,6 @@ div#content a{
 }
 
 div#content ul.wide{
-    max-width: 768px;
     min-width: 640px;
     margin: 0 0 2.5em 0;
 }
@@ -225,7 +258,6 @@ div#log_display{
 
 pre#log_display {
     max-height: 768px;
-    max-width: 768px;
     padding: 2px;
     border: 1px solid #212121;
     overflow: scroll;

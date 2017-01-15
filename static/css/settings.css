@@ -41,7 +41,7 @@ ul{
 div#content{
     margin: 1.5em auto 0 auto;
     width: 80%;
-    max-width: 768px;
+    max-width: 1024px;
     clear: both;
 }
 
@@ -50,7 +50,7 @@ div#content a{
 }
 
 div#content ul.wide{
-    max-width: 768px;
+    max-width: 1024px;
     min-width: 640px;
     margin: 0 0 2.5em 0;
 }
@@ -214,24 +214,49 @@ ul#postprocessing li span.taglist{
     font-size: .75em;
 }
 
-/*For log file viewing*/
+/* logs */
+
+i{
+    font-size: 1em;
+}
 
 div.logs{
     display: inline-block;
 }
 
-div#log_display{
+div.logs .bold{
+    font-weight: bold;
 }
 
-pre#log_display {
-    max-height: 768px;
-    max-width: 768px;
-    padding: 2px;
-    border: 1px solid #212121;
-    overflow: scroll;
-    font-size: .75em;
+div.logs p{
+    margin-bottom: 2em;
+}
+
+span.log_dir{
     font-family: monospace;
+}
+
+select{
+    margin: 0 1.5em 2em 0;
+
+}
+
+ span#view_log, span#download_log{
+    margin-right: 1.5em;
+    cursor: pointer;
+}
+
+
+pre#log_display {
+    display: none;
+    padding: 3px;
+    font-family: monospace;
+    font-size: 0.75em;
+    max-width: 1024px;
     background-color: #eee;
+    border: 1px solid #bdbdbd;
+    white-space: pre-wrap;
+    text-indent: 2em;
 }
 
 /* about */
@@ -239,6 +264,15 @@ div.about p{
     padding-left: 1em;
     text-indent: 1em;
     line-height: 1.25em;
+}
+
+ul#libraries{
+    margin-left: 1em;
+}
+
+ul#libraries li{
+    width: 30%;
+    float: left;
 }
 
 /**/

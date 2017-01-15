@@ -26,7 +26,7 @@ def settings_page(page):
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.05')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.15')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.11')
 
         with doc:
@@ -432,14 +432,28 @@ class Settings():
     @expose
     @settings_page
     def logs(self, c):
+        options = self.get_logfiles()
         with div(cls='logs'):
             h1(u'Log File')
-            logfile = os.path.join(core.PROG_PATH, core.LOG_DIR, 'log.txt')
-            with open(logfile, 'r') as f:
-                page = '%s' % f.read()
-                pre(page, id='log_display')
+            with p():
+                span('Log directory: ', cls='bold')
+                span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
+            with select(id='log_file'):
+                for opt in options:
+                    option(opt, value=opt)
+            with span(id='view_log'):
+                i(cls='fa fa-file-text-o')
+                span('View log')
+            with span(id='download_log'):
+                i(cls='fa fa-download')
+                span('Download log')
+
+            pre(id='log_display')
 
     def get_themes(self):
+        ''' Returns list of folders in static/css/
+        '''
+
         theme_path = os.path.join(core.PROG_PATH, 'static', 'css')
         themes = []
         for i in os.listdir(theme_path):
@@ -447,5 +461,26 @@ class Settings():
                 themes.append(i)
         themes.append(u'Default')
         return themes
+
+    def get_logfiles(self):
+        ''' Returns list of logfiles in core.LOG_DIR
+        '''
+
+        logfiles = []
+        logfiles_tmp = []
+        files = os.listdir(core.LOG_DIR)
+
+        for i in files:
+            if os.path.isfile(os.path.join(core.LOG_DIR, i)):
+                logfiles_tmp.append(i)
+
+        logfiles.append(logfiles_tmp.pop(0))
+
+        for i in logfiles_tmp[::-1]:
+            logfiles.append(i)
+
+        return logfiles
+
+
 
 # pylama:ignore=W0401

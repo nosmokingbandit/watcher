@@ -6,6 +6,9 @@
     div#content ul.wide{
         max-width: 768px;
     }    
+    pre#log_display {
+        max-width: 768px;
+    }
 }
 @media (min-width: 992px) and (max-width: 1199px) {
     div#content{
@@ -14,7 +17,10 @@
     }
     div#content ul.wide{
         max-width: 1024px;
-    }         
+    }
+    pre#log_display {
+        max-width: 1024px;
+    }    
 }
 @media (min-width: 1200px) {
     div#content{
@@ -23,7 +29,10 @@
     }    
     div#content ul.wide{
         max-width: 1200px;
-    }          
+    }
+    pre#log_display {
+        max-width: 1200px;
+    }       
 }
 input[type="number"], input[type="text"]{
     border: 1px solid #212121;
@@ -249,7 +258,6 @@ div#log_display{
 
 pre#log_display {
     max-height: 768px;
-    max-width: 768px;
     padding: 2px;
     border: 1px solid #212121;
     overflow: scroll;

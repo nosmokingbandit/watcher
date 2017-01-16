@@ -216,7 +216,7 @@ ul#postprocessing li span.taglist{
 
 /* logs */
 
-i{
+div.logs i{
     font-size: 1em;
 }
 

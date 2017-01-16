@@ -115,7 +115,7 @@ class Ajax(object):
 
         if not data['imdbid']:
             response['response'] = u'false'
-            response['message'] = u'Could not find imdb id for {}. Try entering imdb id in search bar.'.format(title)
+            response['message'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
             return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):

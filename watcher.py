@@ -81,6 +81,8 @@ if __name__ == '__main__':
     # set up db on first launch, check for updates afterward
     if passed_args.db:
         core.DB_FILE = passed_args.db
+    else:
+        core.DB_FILE = os.path.join(core.PROG_PATH, core.DB_FILE)
     sql = sqldb.SQL()
     if not os.path.isfile('watcher.sqlite'):
         logging.info(u'SQL DB not found. Creating.')

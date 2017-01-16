@@ -531,7 +531,7 @@ class Postprocessing(object):
         if data['imdbid']:
             logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
-            self.sql.update('MOVIES', 'finished_date', result['data']['finisheddate'],
+            self.sql.update('MOVIES', 'finished_date', result['data']['finished_date'],
                             imdbid=data['imdbid'])
             self.sql.update('MOVIES', 'finished_score', result['data']['finished_score'],
                             imdbid=data['imdbid'])

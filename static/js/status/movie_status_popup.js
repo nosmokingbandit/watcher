@@ -219,7 +219,7 @@ $(document).ready(function() {
 
 
 /* search result actions */
-    $('ul#result_list').on('click', 'i#manual_download', function(e){
+    $('div#status_pop_up').on('click', 'i#manual_download', function(e){
         var $this = $(this);
         var download = $this.attr('download');
         var type = $this.attr('type');
@@ -248,7 +248,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $('ul#result_list').on('click', 'i#mark_bad', function(e) {
+    $('div#status_pop_up').on('click', 'i#mark_bad', function(e) {
         var $this = $(this);
 
         $this.addClass('fa-circle faa-burst animated');

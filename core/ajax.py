@@ -111,7 +111,7 @@ class Ajax(object):
         if data.get('imdbid') is None:
             data['imdbid'], data['rated'] = self.omdb.get_info(title, year, tags=['imdbID', 'Rated'])
         else:
-            data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])
+            data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
 
         if not data['imdbid']:
             response['response'] = u'false'

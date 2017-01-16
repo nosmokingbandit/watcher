@@ -28,23 +28,30 @@ class OMDB():
 
         Any returned value can be None.
 
-        Returns tuple matching 'tags'
+        Will *ALWAYS* return tuple, even in fail conditions. Test the data in the calling method.
+
+        Returns tuple matching 'tags'.
 
         '''
+
+        if not tags:
+            return (None)
+        else:
+            length = len(tags)
 
         if imdbid:
             search_string = 'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
         elif title and year:
             search_string = 'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
         else:
-            return None
+            return self._null_tuple(length)
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
             result = json.load(urllib2.urlopen(request))
             if result['Response'] == u'False':
-                return None
+                return self._null_tuple(length)
             else:
                 response = []
                 for tag in tags:
@@ -54,7 +61,10 @@ class OMDB():
             raise
         except Exception, e: # noqa
             logging.error(u'OMDB search.', exc_info=True)
-            return None
+            return self._null_tuple(length)
+
+    def _null_tuple(self, length):
+        return (None,) * length
 
 
 class TMDB(object):
@@ -120,7 +130,9 @@ class TMDB(object):
             if results['movie_results'] == []:
                 return None
             else:
-                return [results['movie_results'][0]]
+                response = results['movie_results'][0]
+                response['imdbid'] = imdbid
+                return [response]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa

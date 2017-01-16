@@ -130,7 +130,9 @@ class TMDB(object):
             if results['movie_results'] == []:
                 return None
             else:
-                return [results['movie_results'][0]]
+                response = results['movie_results'][0]
+                response['imdbid'] = imdbid
+                return [response]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa

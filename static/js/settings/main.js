@@ -146,7 +146,7 @@ $(document).ready(function () {
             if(response['status'] == 'current'){
                 toastr.info("No updates available.");
             } else if(response['status'] == 'error'){
-                toastr.error(response['error']);
+                toastr.warning(response['error']);
             } else if(response["status"] == "behind"){
 
                 if(response["behind_count"] == 1){

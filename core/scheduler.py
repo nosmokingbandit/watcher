@@ -77,7 +77,7 @@ class AutoUpdateCheck(object):
         # if data['status'] == u'current', nothing to do.
 
         if data['status'] == u'error':
-            notif = {'type': 'error',
+            notif = {'type': 'warning',
                      'closeButton': 'true',
                      'title': 'Error Checking for Updates',
                      'body': data['error'],
@@ -121,12 +121,12 @@ class AutoUpdateInstall(object):
         else:
             auto_start = False
 
-        taskscheduler.ScheduledTask(hr, min, interval, AutoUpdateInstall.install,
+        taskscheduler.ScheduledTask(hr, min, interval, AutoUpdateInstall.update_install,
                                     auto_start=auto_start)
         return
 
     @staticmethod
-    def install():
+    def update_install():
         ver = version.Version()
 
         if not core.UPDATE_STATUS or core.UPDATE_STATUS['status'] != u'behind':

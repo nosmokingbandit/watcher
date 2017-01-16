@@ -71,14 +71,15 @@ class PreDB(object):
         Returns list of found rss entries or None if not found.
         '''
 
-        search_term = title_year.replace(u' ', u'+').lower()
+        search_term = urllib2.quote(title_year.replace(u' ', u'+').lower(), safe='')
 
         search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
         search_string = search_string.encode('ascii', 'replace')
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
-            results_xml = urllib2.urlopen(request).read()
+            results_xml = urllib2.urlopen(request).read().replace('&', '%26')
+            print results_xml
             items = self.parse_predb_xml(results_xml)
             return items
         except (SystemExit, KeyboardInterrupt):

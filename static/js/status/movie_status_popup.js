@@ -279,7 +279,7 @@ $(document).ready(function() {
         var $list = $(list)
         cls_obj = $list.prop('classList');
 
-        classes = ''
+        var classes = ''
 
         $.each(cls_obj, function(k,v){
             classes = classes + v + ' '

@@ -678,7 +678,7 @@ class Postprocessing(object):
         # get target dir, remove illegal chars, and normalize
         mover_path = core.CONFIG['Postprocessing']['moverpath']
 
-        target_folder = os.path.normpath(self.compile_path(mover_path, data))
+        target_folder = os.path.normpath(self.compile_path(mover_path, data).replace(':', core.CONFIG['Postprocessing']['replaceillegal']))
 
         # if the new folder doesn't exist, make it
         try:

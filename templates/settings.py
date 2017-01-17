@@ -24,9 +24,9 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.16')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.17')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.16'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.15')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.17')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.11')
 
         with doc:
@@ -249,6 +249,8 @@ class Settings():
                             i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
                             input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" http://www.indexer-url.com/")
                             input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
+                            i(cls='newznab_clear fa fa-trash-o')
+                            i(cls='newznab_test fa fa-plug')
                     with li(id='add_newznab_row'):
                         i(cls='fa fa-plus-square', id='add_row')
 

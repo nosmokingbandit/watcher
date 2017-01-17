@@ -93,6 +93,11 @@ span#update_check{
     cursor: pointer;
 }
 
+/* Search */
+input#retention{
+    width: 4em;
+}
+
 /* Providers */
 
 div#content ul#providers{
@@ -104,22 +109,29 @@ div#content ul#newznab_list{
     width: 100%;
 }
 
-input#retention{
-    width: 4em;
+ul#newznab_list li{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
 }
 
-.newznab_check{
-    width: 5%;
+
+i.newznab_check{
+    width: 1.2em;
+    text-align: left;
+    flex: 0 1 auto;
 }
 
-.newznab_url{
-    width: 40%;
-    margin: 0 2.5%;
+i.newznab_clear, i.newznab_test{
+    width: 1.5em;
+    text-align: center;
+    flex: 0 1 auto;
 }
 
-.newznab_api{
-    width: 40%;
-    margin: 0 2.5%;
+input.newznab_url, input.newznab_api{
+    flex: 1 0 auto;
+    margin: 0 0.5em;
 }
 
 li#add_newznab_row{

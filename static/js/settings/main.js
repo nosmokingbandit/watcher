@@ -57,9 +57,54 @@ $(document).ready(function () {
 
     /* add new newznab row */
     $("i#add_row").click(function (){
-        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'>\n</li>"
+        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'><i class='newznab_test fa fa-plug'/>\n</li>"
 
         $("ul#newznab_list li:nth-last-child(2)").after(row);
+    });
+
+    /* clear newznab row */
+    $("ul#newznab_list").on("click", "i.newznab_clear", function(){
+        $li = $(this).parent();
+        $li.find('input').each(function(){
+            $(this).val("");
+        });
+    });
+
+    /* test newznab connection */
+    $("ul#newznab_list").on("click", "i.newznab_test", function(){
+        $this = $(this);
+
+        $this.removeClass("fa-plug");
+        $this.addClass("fa-circle faa-burst animated");
+
+        var url = "";
+        var api = "";
+
+        $li = $(this).parent();
+        $li.find('input.newznab_url').each(function(){
+            url = $(this).val();
+        });
+
+        $li.find('input.newznab_api').each(function(){
+            api = $(this).val();
+        });
+
+        $.post(url_base + "/ajax/newznab_test", {"indexer": url, "apikey": api})
+        .done(function(r){
+            response = JSON.parse(r);
+            if(response["code"] == 10061){
+                toastr.error(response["description"]);
+            } else if(response["code"] == 100){
+                toastr.warning(response["description"]);
+            } else if(response["code"] == 200){
+                toastr.success("Connection successful.");
+            }
+
+        $this.addClass("fa-plug");
+        $this.removeClass("fa-circle faa-burst animated");
+
+        })
+
     });
 
 

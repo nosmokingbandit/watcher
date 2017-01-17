@@ -7,7 +7,7 @@ import threading
 
 import cherrypy
 import core
-from core import config, poster, searcher, snatcher, sqldb, updatestatus, version
+from core import config, newznab, poster, searcher, snatcher, sqldb, updatestatus, version
 from core.helpers import Conversions, Comparisons
 from core.downloaders import nzbget, sabnzbd
 from core.movieinfo import OMDB, TMDB
@@ -31,6 +31,7 @@ class Ajax(object):
         self.omdb = OMDB()
         self.tmdb = TMDB()
         self.config = config.Config()
+        self.nn = newznab.NewzNab()
         self.predb = predb.PreDB()
         self.searcher = searcher.Searcher()
         self.sql = sqldb.SQL()
@@ -573,3 +574,7 @@ class Ajax(object):
             log_text = f.read()
 
         return log_text
+
+    @cherrypy.expose
+    def newznab_test(self, indexer, apikey):
+        return json.dumps(self.nn.test_connection(indexer, apikey))

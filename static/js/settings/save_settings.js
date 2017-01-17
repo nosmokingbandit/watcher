@@ -41,7 +41,6 @@ $(document).ready(function () {
 
         .done(function(r) {
             response = JSON.parse(r);
-            console.log(response)
             if(response['response'] == 'fail'){
                 toastr.error("Unable to save settings. Check log for more information.");
             }
@@ -52,7 +51,6 @@ $(document).ready(function () {
                 diff_string = ""
                 for(k in diff){
                     s = JSON.stringify(diff[k])
-                    console.log(s)
                     s = s.replace(/","/g, '<br/>').replace(/"/g, '').replace(/{/g, '').replace(/}/g, '<br/>').replace(/:/g, ': ')
                     diff_string = diff_string + s
                 }
@@ -73,7 +71,6 @@ $(document).ready(function () {
                     })
                     .done(function(r){
                         response = JSON.parse(r);
-                        console.log(response)
 
                         if(response['response'] == 'success'){
                             toastr.success("All movies updated.");

@@ -235,8 +235,6 @@ $(document).ready(function() {
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
 
-            console.log(r);
-
             if(response['response'] == 'true'){
                 toastr.success(response['message']);
             } else {
@@ -260,7 +258,6 @@ $(document).ready(function() {
             "imdbid":imdbid
         })
         .done(function(r){
-            console.log(r);
             response = JSON.parse(r);
 
             refresh_list('#movie_list');
@@ -288,7 +285,6 @@ $(document).ready(function() {
             classes = classes + v + ' '
         })
 
-        console.log(classes)
 
         $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid})
         .done(function(html){

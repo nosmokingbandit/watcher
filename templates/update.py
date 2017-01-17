@@ -20,8 +20,8 @@ class Update():
             meta(name='enable_notifs', content='false')
             meta(name='updating', content=updating)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/update.css'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/update.css?v=01.16')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/update.css?v=01.16'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/update/main.js?v=01.01')
 
         with doc:

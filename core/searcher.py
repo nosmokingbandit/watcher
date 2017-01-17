@@ -94,6 +94,8 @@ class Searcher():
             if not movies:
                 return False
             for movie in movies:
+                imdbid = movie['imdbid']
+                title = movie['title']
                 status = movie['status']
 
                 if status == u'Found':
@@ -103,12 +105,12 @@ class Searcher():
 
                 if status == u'Finished' and keepsearching == u'true':
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
-                    if finisheddateobj + keepsearchingdelta >= today:
+                    if finisheddateobj + keepsearchingdelta <= today:
                         logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
                         self.snatcher.auto_grab(imdbid)
                         continue
                     else:
-                        logging.info(u'{} finished on {} and is not within the snatch again window.'.format(title, finisheddate))
+                        logging.info(u'{} finished on {} and is not within the Keep Searching window.'.format(title, finisheddate))
                         continue
                 else:
                     continue
@@ -148,12 +150,12 @@ class Searcher():
         newznab_results = self.nn.search_all(imdbid)
         old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
 
-        # update nn results with old info if guids match
-        for i, r in enumerate(newznab_results):
-            for o in old_results:
-                if o['guid'] == r['guid']:
-                    r.update(o)
-                    newznab_results[i] = r
+        # update results with old info if guids match
+        for idx, result in enumerate(newznab_results):
+            for old in old_results:
+                if old['guid'] == result['guid']:
+                    result.update(old)
+                    newznab_results[idx] = result
 
         scored_results = self.score.score(newznab_results, imdbid, 'nzb')
         # TODO eventually add search for torrents

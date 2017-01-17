@@ -103,8 +103,6 @@ $(document).ready(function() {
 
         data = $(this).parent().attr('data')
 
-        console.log(data)
-
         $.post(url_base + "/ajax/movie_info_popup", {"data": data})
             .done(function(html){
                 $('div#info_pop_up').html(html);

@@ -107,7 +107,6 @@ $(document).ready(function() {
         style = $("select#list_style").find("option:selected").val()
 
 		document.cookie = "list_style=" + style + "; expires=" + exp_date + ";path=/";
-		console.log(document.cookie)
 
         $movielist.removeClass();
         $movielist.addClass(style);

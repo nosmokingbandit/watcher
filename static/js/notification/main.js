@@ -32,8 +32,6 @@ $(document).ready(function(){
 
         url = $this.attr('href');
 
-        console.log($this)
-
         if($this.attr('href') == 'update_now'){
             update_now();
             return false

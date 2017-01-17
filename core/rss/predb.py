@@ -79,7 +79,6 @@ class PreDB(object):
 
         try:
             results_xml = urllib2.urlopen(request).read().replace('&', '%26')
-            print results_xml
             items = self.parse_predb_xml(results_xml)
             return items
         except (SystemExit, KeyboardInterrupt):

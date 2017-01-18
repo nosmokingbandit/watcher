@@ -79,6 +79,3 @@ class SysTrayPlugin(plugins.SimplePlugin):
         webbrowser.open('http://{}:{}{}'.format(
             core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
         return
-
-    def restart(self, systray):
-        return

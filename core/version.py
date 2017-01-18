@@ -47,12 +47,14 @@ class Git(object):
         Returns: tuple (output, error message, exit_status).
         '''
 
-        command = ['git -q']
+        CREATE_NO_WINDOW = 0x08000000
+
+        command = ['git']
         for i in args.split(u' '):
             command.append(i)
         try:
             p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT, shell=False, cwd=core.PROG_PATH)
+                                 stderr=subprocess.STDOUT, shell=False, cwd=core.PROG_PATH, creationflags=CREATE_NO_WINDOW)
             output, error = p.communicate()
             exit_status = p.returncode
             return (output.rstrip(), error, exit_status)

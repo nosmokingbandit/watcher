@@ -120,13 +120,18 @@ class ScoreResults():
         Does not return
         '''
 
-        if not words:
+        keep = []
+
+        if not words or words == [u'']:
             return
         for word in words:
             if word == u'':
                 continue
             else:
-                self.results = [r for r in self.results if word in r['title'].lower()]
+                for r in self.results:
+                    if word in r['title'].lower() and r not in keep:
+                        keep.append(r)
+        self.results = keep
 
     def retention_check(self, retention, today):
         ''' Remove results older than 'retention' days

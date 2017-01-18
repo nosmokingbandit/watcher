@@ -97,7 +97,6 @@ $(document).ready(function() {
         $(this).fadeOut();
         $("div#status_pop_up").slideUp();
         $("div#status_pop_up").empty();
-        /* Don"t ask me why slide Up slides it down. I give up. It works. That is all we need to know :) */
 
     });
 

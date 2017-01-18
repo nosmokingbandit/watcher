@@ -53,8 +53,23 @@ class Git(object):
         for i in args.split(u' '):
             command.append(i)
         try:
-            p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT, shell=False, cwd=core.PROG_PATH, creationflags=CREATE_NO_WINDOW)
+            if os.name == 'nt':
+                p = subprocess.Popen(command,
+                                     stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT,
+                                     shell=False,
+                                     cwd=core.PROG_PATH,
+                                     creationflags=CREATE_NO_WINDOW
+                                     )
+            else:
+                p = subprocess.Popen(command,
+                                     stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT,
+                                     shell=False,
+                                     cwd=core.PROG_PATH
+                                     )
             output, error = p.communicate()
             exit_status = p.returncode
             return (output.rstrip(), error, exit_status)

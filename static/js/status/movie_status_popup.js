@@ -1,5 +1,6 @@
 $(document).ready(function() {
     var url_base = $("meta[name='url_base']").attr("content");
+    $('div#status_pop_up').off();
 
     /* set up sortable */
     $(function () {

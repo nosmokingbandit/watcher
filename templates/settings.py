@@ -219,7 +219,7 @@ class Settings():
             with li(cls='bbord'):
                 span(u'Required words:')
                 input(type='text', id='requiredwords', value=c[c_s]['requiredwords'])
-                span(u'Releases must contain these words.', cls='tip')
+                span(u'Releases must contain one of these words.', cls='tip')
             with li(cls='bbord'):
                 span(u'Preferred words:')
                 input(type='text', id='preferredwords', value=c[c_s]['preferredwords'])

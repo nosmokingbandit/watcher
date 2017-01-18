@@ -47,7 +47,7 @@ class Git(object):
         Returns: tuple (output, error message, exit_status).
         '''
 
-        command = ['git']
+        command = ['git -q']
         for i in args.split(u' '):
             command.append(i)
         try:

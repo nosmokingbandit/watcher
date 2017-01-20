@@ -91,7 +91,7 @@ class AutoUpdateCheck(object):
             else:
                 title = u'{} Updates Available'.format(data['behind_count'])
 
-            compare = u'{}/compare/{}...{}'.format(core.GIT_URL, data['new_hash'], data['local_hash'])
+            compare = u'{}/compare/{}...{}'.format(core.GIT_URL, data['local_hash'], data['new_hash'])
 
             notif = {'type': 'update',
                      'title': title,

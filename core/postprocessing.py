@@ -617,6 +617,11 @@ class Postprocessing(object):
         repl = core.CONFIG['Postprocessing']['replaceillegal']
         new_string = re.sub(r'["*?<>|]+', repl, new_string)
 
+        drive, path = os.path.splitdrive(new_string)
+        path.replace(':', repl)
+
+        new_string = os.path.join(drive, path)
+
         return new_string
 
     def renamer(self, data):
@@ -643,7 +648,7 @@ class Postprocessing(object):
         ext = os.path.splitext(abs_path_old)[1]
 
         # get the new file name
-        new_name = self.compile_path(renamer_string, data).replace(':', core.CONFIG['Postprocessing']['replaceillegal'])
+        new_name = self.compile_path(renamer_string, data)
 
         if not new_name:
             logging.info(u'New file name would be blank. Cancelling renamer.')

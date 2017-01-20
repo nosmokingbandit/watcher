@@ -604,12 +604,12 @@ class Postprocessing(object):
 
         Returns str new path
         '''
+        new_string = string
 
-        # ## left off
-        # Use this to replace Mover and Renamer paths. Also use to get plain filename
-        # for moving extra files.
-
-        new_string = string.format(**data)
+        for k, v in data.iteritems():
+            k = "{"+k+"}"
+            if k in string:
+                string = string.replace(k, v)
 
         while '  ' in new_string:
             new_string = new_string.replace('  ', ' ')

@@ -60,9 +60,9 @@ post_data = urllib.urlencode(data)
 request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
 response = json.loads(urllib2.urlopen(request, timeout=600).read())
 
-if response['status'] == 'finished':
+if response.get('status') == 'finished':
     sys.exit(POSTPROCESS_SUCCESS)
-elif response['status'] == 'incomplete':
+elif response.get('status') == 'incomplete':
     sys.exit(POSTPROCESS_ERROR)
 else:
     sys.exit(POSTPROCESS_NONE)

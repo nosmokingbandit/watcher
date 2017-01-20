@@ -259,13 +259,15 @@ class Postprocessing(object):
             titledata.pop('excess')
 
         if len(titledata) <= 2:
-            logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name')
+            logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name.')
             path_list = filepath.split(os.sep)
             if len(path_list) >= 2:
                 titledata = PTN.parse(path_list[-2])
             else:
                 logging.info(u'Unable to parse file name or folder.')
                 return data
+        else:
+            logging.info(u'Found {} in filname.'.format(titledata))
 
         # this key is useless
         if 'excess' in titledata:
@@ -301,6 +303,7 @@ class Postprocessing(object):
         logging.info(u'Searching local database for guid.')
         result = self.sql.get_single_search_result('guid', data['guid'])
         if not result:
+            logging.info('Guid not found.')
             if 'downloadid' in data.keys():
                 # try to get result from downloadid
                 logging.info(u'Searching local database for downloadid.')

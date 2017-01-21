@@ -50,9 +50,6 @@ class Nzbget():
 
         nzbg_conf = core.CONFIG['NzbGet']
 
-        if not Nzbget.test_connection(nzbg_conf):
-            return "Could not connect to NZBGet."
-
         host = nzbg_conf['nzbghost']
         port = nzbg_conf['nzbgport']
         user = nzbg_conf['nzbguser']

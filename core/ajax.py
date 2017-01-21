@@ -296,7 +296,7 @@ class Ajax(object):
         Returns str json.dumps(dict) success/fail message
         '''
 
-        data = self.sql.get_single_search_result('guid', guid)
+        data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
             return json.dumps(self.snatcher.snatch(data))
         else:

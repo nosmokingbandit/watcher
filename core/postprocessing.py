@@ -195,7 +195,7 @@ class Postprocessing(object):
         Returns str absolute path /home/user/filename.ext
         '''
 
-        logging.info(u'Finding movie file name.')
+        logging.info(u'Finding movie file.')
         if os.path.isfile(path):
             return path
         else:

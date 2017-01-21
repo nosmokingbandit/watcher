@@ -160,12 +160,11 @@ class NewzNab():
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             xml = urllib2.urlopen(request).read()
+            response = ET.fromstring(xml).attrib
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'NewzNab connection check.', exc_info=True)
             return response
-
-        response = ET.fromstring(xml).attrib
 
         return response

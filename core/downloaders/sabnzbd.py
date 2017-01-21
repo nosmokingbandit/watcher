@@ -12,7 +12,7 @@ class Sabnzbd():
     @staticmethod
     def test_connection(data):
         ''' Tests connectivity to Sabnzbd
-        :para data: dict of nzbget server information
+        :para data: dict of Sab server information
 
         Tests if we can get Sab's stats using server info in 'data'
 
@@ -50,12 +50,6 @@ class Sabnzbd():
         '''
 
         sab_conf = core.CONFIG['Sabnzbd']
-
-        con_test = Sabnzbd.test_connection(sab_conf)
-        if not con_test:
-            d = {}
-            d['status'] = con_test
-            return d
 
         host = sab_conf['sabhost']
         port = sab_conf['sabport']

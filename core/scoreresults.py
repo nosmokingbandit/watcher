@@ -38,6 +38,7 @@ class ScoreResults():
 
         title = tableresults['title']
 
+        # get quality settings from database, or config if not found
         if tableresults['quality']:
             quality_dict = json.loads(tableresults['quality'])
             qualities = quality_dict['Quality']

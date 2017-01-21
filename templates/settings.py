@@ -24,14 +24,14 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.17')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.16'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.17')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.11')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.20')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.20'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.20')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.20')
 
         with doc:
             Header.insert_header(current="settings")
-            with div(id="content"):
+            with div(id="content", cls=page.__name__):
                 page(self, config)
 
         return doc.render()
@@ -116,9 +116,9 @@ class Settings():
                     span(u'Shutdown')
                 with span(u'Current version hash: ', cls='tip'):
                     if core.CURRENT_HASH is not None:
-                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
+                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
 
-        with span(id='save', cat='server'):
+        with div(id='save', cat='server'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -173,7 +173,7 @@ class Settings():
                 input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
                 span('*Requires restart. Syncs every 6 hours.', cls='tip')
 
-        with span(id='save', cat='search'):
+        with div(id='save', cat='search'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -229,7 +229,7 @@ class Settings():
                 input(type='text', id='ignoredwords', value=c[c_s]['ignoredwords'])
                 span(u'Releases with these words are ignored.', cls='tip')
 
-        with span(id='save', cat='quality'):
+        with div(id='save', cat='quality'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -243,7 +243,6 @@ class Settings():
                 with ul(id='newznab_list'):
                     with li(cls='sub_cat'):
                         span(u'NewzNab Indexers')
-
                     for n in c[c_s]:
                         with li(cls='newznab_indexer'):
                             i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
@@ -327,7 +326,7 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-        with span(id='save', cat='downloader'):
+        with div(id='save', cat='downloader'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -376,7 +375,7 @@ class Settings():
             with li(u'Available tags:'):
                 span(u'{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
 
-        with span(id='save', cat='postprocessing'):
+        with div(id='save', cat='postprocessing'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -440,15 +439,16 @@ class Settings():
             with p():
                 span('Log directory: ', cls='bold')
                 span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
-            with select(id='log_file'):
-                for opt in options:
-                    option(opt, value=opt)
-            with span(id='view_log'):
-                i(cls='fa fa-file-text-o')
-                span('View log')
-            with span(id='download_log'):
-                i(cls='fa fa-download')
-                span('Download log')
+            with div(id='log_actions'):
+                with select(id='log_file'):
+                    for opt in options:
+                        option(opt, value=opt)
+                with span(id='view_log'):
+                    i(cls='fa fa-file-text-o')
+                    span('View log')
+                with span(id='download_log'):
+                    i(cls='fa fa-download')
+                    span('Download log')
 
             pre(id='log_display')
 

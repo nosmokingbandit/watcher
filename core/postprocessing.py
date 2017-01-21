@@ -605,23 +605,22 @@ class Postprocessing(object):
 
         Returns str new path
         '''
-        new_string = string
 
         for k, v in data.iteritems():
             k = "{"+k+"}"
             if k in string:
                 string = string.replace(k, v)
 
-        while '  ' in new_string:
-            new_string = new_string.replace('  ', ' ')
+        while '  ' in string:
+            string = string.replace('  ', ' ')
 
-        while len(new_string) > 1 and new_string[-1] == u' ':
-            new_string = new_string[:-1]
+        while len(string) > 1 and string[-1] == u' ':
+            string = string[:-1]
 
         repl = core.CONFIG['Postprocessing']['replaceillegal']
-        new_string = re.sub(r'["*?<>|]+', repl, new_string)
+        string = re.sub(r'["*?<>|]+', repl, string)
 
-        drive, path = os.path.splitdrive(new_string)
+        drive, path = os.path.splitdrive(string)
         path.replace(':', repl)
 
         new_string = os.path.join(drive, path)

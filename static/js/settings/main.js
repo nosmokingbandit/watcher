@@ -128,7 +128,7 @@ $(document).ready(function () {
 
     // Add new rows
     $("div.providers i#add_row").click(function (){
-        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'><i class='newznab_test fa fa-plug'/>\n</li>"
+        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'><i class='newznab_clear fa fa-trash-o'></i><i class='newznab_test fa fa-plug'/>\n</li>"
 
         $("ul#newznab_list li:nth-last-child(2)").after(row);
     });

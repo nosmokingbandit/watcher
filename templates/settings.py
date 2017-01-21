@@ -24,10 +24,10 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.17')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.16'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.17')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.11')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.20')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.20'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.20')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.20')
 
         with doc:
             Header.insert_header(current="settings")
@@ -116,7 +116,7 @@ class Settings():
                     span(u'Shutdown')
                 with span(u'Current version hash: ', cls='tip'):
                     if core.CURRENT_HASH is not None:
-                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
+                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
 
         with div(id='save', cat='server'):
             i(cls='fa fa-save')
@@ -439,15 +439,16 @@ class Settings():
             with p():
                 span('Log directory: ', cls='bold')
                 span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
-            with select(id='log_file'):
-                for opt in options:
-                    option(opt, value=opt)
-            with span(id='view_log'):
-                i(cls='fa fa-file-text-o')
-                span('View log')
-            with span(id='download_log'):
-                i(cls='fa fa-download')
-                span('Download log')
+            with div(id='log_actions'):
+                with select(id='log_file'):
+                    for opt in options:
+                        option(opt, value=opt)
+                with span(id='view_log'):
+                    i(cls='fa fa-file-text-o')
+                    span('View log')
+                with span(id='download_log'):
+                    i(cls='fa fa-download')
+                    span('Download log')
 
             pre(id='log_display')
 

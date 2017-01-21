@@ -39,7 +39,7 @@ ul{
 }
 
 div#content{
-    margin: 1.5em auto 0 auto;
+    margin: 1.5em auto 1.5em auto;
     width: 80%;
     max-width: 1024px;
     clear: both;
@@ -248,12 +248,11 @@ span.log_dir{
     font-family: monospace;
 }
 
-select{
+div#log_actions{
     margin: 0 1.5em 2em 0;
-
 }
 
- span#view_log, span#download_log{
+ select#log_file, span#view_log, span#download_log{
     margin-right: 1.5em;
     cursor: pointer;
 }
@@ -268,6 +267,7 @@ pre#log_display {
     background-color: #eee;
     border: 1px solid #bdbdbd;
     white-space: pre-wrap;
+    word-wrap: break-word;
     text-indent: 2em;
 }
 
@@ -297,8 +297,9 @@ span.tip{
     font-weight: 500;
 }
 
-div#footer{
-    position: fixed;
-    bottom: 1em;
-    left: 1em;
+div#save{
+    display: inline-block;
+    margin-top: 3em;
+    cursor: pointer;
+    clear: both;
 }

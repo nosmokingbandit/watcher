@@ -118,7 +118,7 @@ class Settings():
                     if core.CURRENT_HASH is not None:
                         a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
 
-        with span(id='save', cat='server'):
+        with div(id='save', cat='server'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -173,7 +173,7 @@ class Settings():
                 input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
                 span('*Requires restart. Syncs every 6 hours.', cls='tip')
 
-        with span(id='save', cat='search'):
+        with div(id='save', cat='search'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -229,7 +229,7 @@ class Settings():
                 input(type='text', id='ignoredwords', value=c[c_s]['ignoredwords'])
                 span(u'Releases with these words are ignored.', cls='tip')
 
-        with span(id='save', cat='quality'):
+        with div(id='save', cat='quality'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -327,7 +327,7 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-        with span(id='save', cat='downloader'):
+        with div(id='save', cat='downloader'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 
@@ -376,7 +376,7 @@ class Settings():
             with li(u'Available tags:'):
                 span(u'{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
 
-        with span(id='save', cat='postprocessing'):
+        with div(id='save', cat='postprocessing'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 

@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
 
-    $("span#save").click(function(e){
+    $("div#save").click(function(e){
         var change_check = false;
         if(verify_data() == false){
             return;

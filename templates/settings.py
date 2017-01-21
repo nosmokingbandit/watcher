@@ -169,9 +169,12 @@ class Settings():
                 span('May need to disable for non-English results. Disabling can cause incorrect downloads.', cls='tip')
             with li():
                 i(id='imdbsync', cls='fa fa-square-o checkbox', value=c[c_s]['imdbsync'])
-                span(u'Sync imdb watch list.')
-                input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/list/...", style="width:25em;")
-                span('*Requires restart. Syncs every 6 hours.', cls='tip')
+                span(u'Sync imdb watch list ')
+                input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/user/...", style="width:20em;")
+                span(' every ')
+                input(type='number', min='15', id='imdbfrequency', value=c[c_s]['imdbfrequency'], style='width: 3.0em')
+                span(' minutes.')
+                span('*Requires restart.', cls='tip')
 
         with div(id='save', cat='search'):
             i(cls='fa fa-save')

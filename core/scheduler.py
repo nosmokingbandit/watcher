@@ -155,6 +155,7 @@ class ImdbRssSync(object):
 
     @staticmethod
     def create():
+        interval = core.CONFIG['Search']['imdbfrequency']
         interval = 6 * 3600
         now = datetime.datetime.now()
 

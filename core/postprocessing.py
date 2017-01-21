@@ -263,6 +263,7 @@ class Postprocessing(object):
             path_list = filepath.split(os.sep)
             if len(path_list) >= 2:
                 titledata = PTN.parse(path_list[-2])
+                logging.info(u'Found {} in parent folder.'.format(titledata))
             else:
                 logging.info(u'Unable to parse file name or folder.')
                 return data

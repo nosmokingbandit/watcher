@@ -31,7 +31,7 @@ def settings_page(page):
 
         with doc:
             Header.insert_header(current="settings")
-            with div(id="content"):
+            with div(id="content", cls=page.__name__):
                 page(self, config)
 
         return doc.render()
@@ -243,7 +243,6 @@ class Settings():
                 with ul(id='newznab_list'):
                     with li(cls='sub_cat'):
                         span(u'NewzNab Indexers')
-
                     for n in c[c_s]:
                         with li(cls='newznab_indexer'):
                             i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])

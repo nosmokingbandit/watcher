@@ -320,7 +320,7 @@ class ZipUpdater(object):
             core.UPDATE_STATUS = result
             return result
 
-        compare_url = u'{}/compare/{}...{}'.format(core.GIT_API, newest_hash, local_hash)
+        compare_url = u'{}/compare/{}...{}'.format(core.GIT_API, local_hash, newest_hash)
 
         request = urllib2.Request(compare_url, headers={'User-Agent': 'Mozilla/5.0'})
         try:

@@ -623,9 +623,7 @@ class Postprocessing(object):
         drive, path = os.path.splitdrive(string)
         path.replace(':', repl)
 
-        new_string = os.path.join(drive, path)
-
-        return new_string
+        return ''.join([drive, path])
 
     def renamer(self, data):
         ''' Renames movie file based on renamerstring.

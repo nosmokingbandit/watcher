@@ -232,10 +232,6 @@ div.logs i{
     font-size: 1em;
 }
 
-div.logs{
-    display: inline-block;
-}
-
 div.logs .bold{
     font-weight: bold;
 }

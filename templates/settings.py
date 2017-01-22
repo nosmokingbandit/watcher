@@ -256,7 +256,7 @@ class Settings():
                     with li(id='add_newznab_row'):
                         i(cls='fa fa-plus-square', id='add_row')
 
-        with span(id='save', cat='providers'):
+        with div(id='save', cat='providers'):
             i(cls='fa fa-save')
             span(u'Save Settings')
 

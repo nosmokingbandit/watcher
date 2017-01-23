@@ -273,19 +273,17 @@ $(document).ready(function() {
     });
 
     function refresh_list(list, imdbid){
+        scroll_position = $(list).scrollTop();
         if(imdbid === undefined) {
             imdbid = '';
         };
-
-        var $list = $(list)
+        var $list = $(list);
         cls_obj = $list.prop('classList');
-
         var classes = ''
 
         $.each(cls_obj, function(k,v){
             classes = classes + v + ' '
         })
-
 
         $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid})
         .done(function(html){
@@ -299,6 +297,8 @@ $(document).ready(function() {
                 children = 'li';
                 sortOrder(order, $parent, children);
             }
+            setTimeout(function(){
+                $(list).scrollTop(scroll_position)}, 20);
         });
     }
 });

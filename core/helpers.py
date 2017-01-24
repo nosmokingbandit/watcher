@@ -1,9 +1,12 @@
 from base64 import b32decode as bd
 from random import choice as rc
+import hashlib
+import urllib2
+from lib import bencode
 
 
-class Conversions():
-    ''' Coverts data to human-readable formats. '''
+class Conversions(object):
+    ''' Coverts data formats. '''
 
     @staticmethod
     def human_file_size(value, format='%.1f'):
@@ -40,7 +43,24 @@ class Conversions():
         return dt.strftime('%A, %b %d, at %H:%M')
 
 
-class Comparisons():
+class Torrent(object):
+
+    @staticmethod
+    def get_hash(url, mode='torrent'):
+        if url.startswith('magnet'):
+            return url.split('&')[0].split(':')[-1]
+        else:
+            try:
+                req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                torrent = urllib2.urlopen(req).read()
+                metadata = bencode.bdecode(torrent)
+                hashcontents = bencode.bencode(metadata['info'])
+                return hashlib.sha1(hashcontents).hexdigest()
+            except Exception, e: #noqa
+                return None
+
+
+class Comparisons(object):
 
     @staticmethod
     def compare_dict(new, existing, parent=''):

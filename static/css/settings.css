@@ -34,6 +34,16 @@ h1{
     display: inline-block;
 }
 
+h2{
+    font-size: 1.35em;
+    padding: 0;
+    margin: .75em 0 .25em 0;
+}
+
+.hidden{
+    display: none;
+}
+
 ul{
     clear: none;
 }
@@ -104,12 +114,14 @@ div#content ul#providers{
     overflow: hidden;
 }
 
-div#content ul#newznab_list{
+div#content ul#newznab_list,
+div#content ul#potato_list,{
     float: left;
     width: 100%;
 }
 
-ul#newznab_list li{
+ul#newznab_list li,
+ul#potato_list li{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -117,24 +129,29 @@ ul#newznab_list li{
 }
 
 
-i.newznab_check{
+i.newznab_check,
+i.potato_check,
+i.torrent_check{
     width: 1.2em;
     text-align: left;
     flex: 0 1 auto;
 }
 
-i.newznab_clear, i.newznab_test{
+i.newznab_clear, i.newznab_test,
+i.potato_clear, i.potato_test{
     width: 1.5em;
     text-align: center;
     flex: 0 1 auto;
 }
 
-input.newznab_url, input.newznab_api{
+input.newznab_url, input.newznab_api,
+input.potato_url, input.potato_api{
     flex: 1 0 auto;
     margin: 0 0.5em;
 }
 
-li#add_newznab_row{
+li.add_newznab_row,
+li.add_potato_row{
     margin: 0 0 2em 0;
 }
 
@@ -196,11 +213,17 @@ div.hidden_data{
 }
 
 /* downloader */
-ul#downloader{
+
+ul#enabled_source span{
+    margin: 0 2em 0 0;
 
 }
 
-ul#sabnzbd, ul#nzbget{
+ul#usenet, ul#torrent{
+    margin: 0 0 4em 0;
+}
+
+ul#sabnzbd, ul#nzbget, ul#transmission, ul#delugerpc, ul#delugeweb, ul#qbittorrent{
     margin: 0 0 1em 2em;
     display: none;
     width: 100%;

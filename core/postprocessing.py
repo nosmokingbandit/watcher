@@ -578,12 +578,19 @@ class Postprocessing(object):
             logging.info(u'Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
-        # delete leftover dir, only if mover was enabled & successful
+        # Delete leftover dir. Skip if createhardlinks enabled or if mover disabled/failed
         if config['cleanupenabled'] == u'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
+
+            if config['createhardlink'] == u'true':
+                logging.info('Hardlink creation enabled. Skipping Cleanup.')
+                result['tasks']['cleanup']['response'] = 'skipped'
+                return result
+
             # fail if mover disabled or failed
             if config['moverenabled'] == u'false' or \
                     result['tasks']['mover']['response'] == u'false':
+                logging.info('Mover either disabled or failed. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = u'false'
             else:
                 if self.cleanup(data['path']):
@@ -717,12 +724,24 @@ class Postprocessing(object):
             logging.error(u'Mover failed: Could not move file.', exc_info=True)
             return False
 
-        logging.info(u'Moving and renaming any extra files.')
+        new_file_location = os.path.join(target_folder, os.path.basename(data['filename']))
 
-        moveextensions = core.CONFIG['Postprocessing']['moveextensions']
+        # Create hardlink
+
+        if config['createhardlink'] == u'true':
+            logging.info('Creating hardlink from {} to {}.'.format(new_file_location, data['orig_filename']))
+            if os.name == 'nt':
+                import ctypes
+                ctypes.windll.kernel32.CreateHardLinkA(data['orig_filename'], new_file_location, 0)
+            else:
+                os.link(new_file_location, data['orig_filename'])
+
+        logging.info(u'Copying and renaming any extra files.')
+
+        moveextensions = config['moveextensions']
         keep_extentions = [i for i in moveextensions.split(u',') if i != u'']
 
-        renamer_string = core.CONFIG['Postprocessing']['renamerstring']
+        renamer_string = config['renamerstring']
         new_name = self.compile_path(renamer_string, data)
 
         for root, dirs, filenames in os.walk(data['path']):
@@ -740,12 +759,11 @@ class Postprocessing(object):
                         target_file = u'{}{}'.format(os.path.join(target_folder, new_filename), ext)
                     try:
                         logging.info(u'Moving {} to {}'.format(old_abs_path, target_file))
-                        shutil.copystat = self.null
-                        shutil.move(old_abs_path, target_file)
+                        shutil.copyfile(old_abs_path, target_file)
                     except Exception, e: # noqa
-                        logging.error(u'Mover failed: Could not move {}.'.format(old_abs_path), exc_info=True)
+                        logging.error(u'Mover failed: Could not copy {}.'.format(old_abs_path), exc_info=True)
 
-        return os.path.join(target_folder, os.path.basename(data['filename']))
+        return new_file_location
 
     def cleanup(self, path):
         ''' Deletes specified path

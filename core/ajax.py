@@ -7,7 +7,6 @@ import threading
 
 import cherrypy
 import core
-from core import config, newznab, poster, searcher, snatcher, sqldb, updatestatus, version
 from core import config, newznab, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.helpers import Conversions, Comparisons
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
@@ -32,7 +31,6 @@ class Ajax(object):
         self.omdb = OMDB()
         self.tmdb = TMDB()
         self.config = config.Config()
-        self.nn = newznab.NewzNab()
         self.predb = predb.PreDB()
         self.searcher = searcher.Searcher()
         self.sql = sqldb.SQL()

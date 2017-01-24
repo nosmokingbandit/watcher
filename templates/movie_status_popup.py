@@ -25,7 +25,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.23')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.24')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -104,6 +104,7 @@ class MovieStatusPopup():
                 li(u'Next automatic search scheduled for: {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
             else:
                 for idx, res in enumerate(results):
+                    kind = res['type']
                     info_link = res['info_link']
                     title = res['title']
                     guid = res['guid']
@@ -121,9 +122,11 @@ class MovieStatusPopup():
                         with span(cls='buttons'):
                             with a(href=info_link, target='_blank'):
                                 i(cls='fa fa-info-circle')
-                            i(cls='fa fa-download', id='manual_download', imdbid=imdbid, guid=guid)
+                            i(cls='fa fa-download', id='manual_download', kind=kind, guid=guid)
                             i(cls='fa fa-ban', id='mark_bad', guid=guid)
                     with li(cls='data ' + bbord):
+                        span(u'Type: ')
+                        span(kind, cls='bold')
                         span(u' Status: ')
                         if status == 'Snatched':
                             span(status, cls='bold snatched')
@@ -139,8 +142,9 @@ class MovieStatusPopup():
                         span(res['score'], cls='bold')
                         span(u' Source: ')
                         span(res['indexer'] or '', cls='bold')
-                        span(u' Published: ')
-                        span(pubdate, cls='bold')
+                        if pubdate:
+                            span(u' Published: ')
+                            span(pubdate, cls='bold')
 
         return unicode(result_list)
 

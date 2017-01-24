@@ -154,6 +154,8 @@ class NewzNab():
 
         '''
 
+        response = {}
+
         url = u'{}/api?apikey={}&t=user'.format(indexer, apikey)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -163,13 +165,13 @@ class NewzNab():
             raise
         except Exception, e: # noqa
             logging.error(u'NewzNab connection check.', exc_info=True)
-            return 'No connection could be made because the target machine actively refused it.'
+            return {'response': 'false', 'message': 'No connection could be made because the target machine actively refused it.'}
 
         if '<error code="' in response:
             error = ET.fromstring(response)
             if error.attrib['description'] == 'Missing parameter':
-                return "Connection successful."
+                return {'response': 'true', 'message': 'Connection successful.'}
             else:
-                return error.attrib['description']
+                return {'response': 'false', 'message': error.attrib['description']}
         else:
-            return "Connection successful."
+            return {'response': 'true', 'message': 'Connection successful.'}

@@ -18,7 +18,7 @@ if os.name == 'nt':
 
 MIN_PYTHON = (2, 7, 9)
 if sys.version_info < MIN_PYTHON:
-    sys.stderr.write("Python %s.%s or later is required\n" % MIN_PYTHON)
+    sys.stderr.write("Python 2.7.9 or later is required \n")
     sys.exit(1)
 
 core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))

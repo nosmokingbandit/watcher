@@ -222,15 +222,13 @@ $(document).ready(function() {
 /* search result actions */
     $('div#status_pop_up').on('click', 'i#manual_download', function(e){
         var $this = $(this);
-        var download = $this.attr('download');
-        var type = $this.attr('type');
+        var kind = $this.attr('kind');
         var guid = $this.attr('guid');
-        var title = $this.attr('title');
         var imdbid = $('span#title').attr('imdbid')
 
         $this.addClass('fa-circle faa-burst animated');
 
-        $.post(url_base + "/ajax/manual_download", {"guid":guid})
+        $.post(url_base + "/ajax/manual_download", {"guid":guid, "kind":kind})
         .done(function(r){
             response = JSON.parse(r);
             refresh_list('#movie_list');

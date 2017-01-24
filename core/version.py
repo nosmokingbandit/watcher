@@ -377,7 +377,6 @@ class ZipUpdater(object):
             handler.setFormatter(formatter)
 
         log = logging.getLogger()  # root logger
-        print len(log.handlers)
         for hdlr in log.handlers[:]:  # remove all old handlers
             original = hdlr
             hdlr.close()
@@ -448,7 +447,6 @@ class ZipUpdater(object):
                     shutil.copy2(src, dst)
                 elif os.path.isdir(src):
                     if os.path.isdir(dst):
-                        print dst
                         shutil.rmtree(dst)
                     shutil.copytree(src, dst)
         except Exception, e:

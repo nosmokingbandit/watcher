@@ -127,10 +127,16 @@ $(document).ready(function () {
     /* Providers */
 
     // Add new rows
-    $("div.providers i#add_row").click(function (){
+    $("div.providers i#add_newznab_row").click(function (){
         var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'><i class='newznab_clear fa fa-trash-o'></i><i class='newznab_test fa fa-plug'/>\n</li>"
 
         $("ul#newznab_list li:nth-last-child(2)").after(row);
+    });
+
+    $("div.providers i#add_potato_row").click(function (){
+        var row = "<li class='potato_indexer'>\n<i class='fa fa-square-o potato_check checkbox' value='false'></i>\n<input class='potato_url' placeholder=' http://indexer.url' type='text'>\n<input class='potato_api' placeholder=' Api Key' type='text'><i class='potato_clear fa fa-trash-o'></i><i class='potato_test fa fa-plug'/>\n</li>"
+
+        $("div.providers ul#potato_list li:nth-last-child(2)").after(row);
     });
 
     // clear row
@@ -141,36 +147,34 @@ $(document).ready(function () {
         });
     });
 
-    // test newznab connection
-    $("div.providers ul#newznab_list").on("click", "i.newznab_test", function(){
+    // test indexer connection
+    $("div.providers").on("click", "i.indexer_test", function(){
         $this = $(this);
-        var name = $this.attr('name');
 
         $this.removeClass("fa-plug");
         $this.addClass("fa-circle faa-burst animated");
-
+        var mode = $this.attr('type');
         var url = "";
         var api = "";
 
         $li = $(this).parent();
-        $li.find('input.newznab_url').each(function(){
+        $li.find('input:eq(0)').each(function(){
             url = $(this).val();
         });
 
-        $li.find('input.newznab_api').each(function(){
+        $li.find('input:eq(1)').each(function(){
             api = $(this).val();
         });
 
-        $.post(url_base + "/ajax/newznab_test", {"indexer": url, "apikey": api})
+        $.post(url_base + "/ajax/indexer_test", {"indexer": url, "apikey": api, "mode": mode})
         .done(function(r){
             response = JSON.parse(r);
-            if(response["code"] == 10061){
-                toastr.error(response["description"]);
-            } else if(response["code"] == 100){
-                toastr.warning(response["description"]);
-            } else if(response["code"] == 200){
-                toastr.success("Connection successful.");
-            }
+            if(response["response"] == "true"){
+                toastr.success(response["message"]);
+            } else{
+                toastr.error(response["message"])
+            };
+
 
         $this.addClass("fa-plug");
         $this.removeClass("fa-circle faa-burst animated");
@@ -181,6 +185,16 @@ $(document).ready(function () {
 
 
     /* Downloader */
+
+    // hide disabled download types
+    $("div.downloader h2 i").click(function(){
+        tag = $(this).attr('tag');
+        if($(this).attr('value') == 'true'){
+            $('ul#' + tag).slideUp();
+        } else{
+            $('ul#' + tag).slideDown();
+        }
+    });
 
     // set default state for radios and downloader options
     $("div.downloader i.radio").each(function(){
@@ -195,6 +209,9 @@ $(document).ready(function () {
     // toggle downloader slide-downs
     $("div.downloader i.radio").click(function(){
         $this = $(this);
+        var name = $this.attr('name');
+
+        $downloaders = $this.parent().siblings()
         // turn on
         if( $this.attr("value") == "false" ){
             $this.attr("value", "true");
@@ -203,8 +220,8 @@ $(document).ready(function () {
         // and turn off the other ones
             var tog = $this.attr("tog");
             $("ul#"+tog).stop().slideDown();
-            $("ul#downloader ul").not($("#"+tog)).stop().slideUp()
-            $("i.radio[tog!="+tog+"]").attr("value", "false").removeClass("fa-circle").addClass("fa-circle-o");
+            $downloaders.filter("ul").not("#"+tog).stop().slideUp()
+            $("i.radio[name='" + name + "']").not($this).attr("value", "false").removeClass("fa-circle").addClass("fa-circle-o");
         }
     });
 
@@ -218,11 +235,16 @@ $(document).ready(function () {
 
         var mode = $this.attr("mode");
         var inputs = "ul#" + mode + " li input";
+        var checkboxes = "ul#" + mode + " li i.checkbox";
 
         // Gets entered info, even if not saved
         var data = {}
         $(inputs).each(function(){
             data[$(this).attr("id")] = $(this).val()
+        });
+
+        $(checkboxes).each(function(){
+            data[$(this).attr("id")] = $(this).attr('value')
         });
 
         data = JSON.stringify(data);

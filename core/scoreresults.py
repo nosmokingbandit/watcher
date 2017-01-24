@@ -48,6 +48,7 @@ class ScoreResults():
             filters = core.CONFIG['Filters']
 
         retention = int(core.CONFIG['Search']['retention'])
+        seeds = int(core.CONFIG['Search']['mintorrentseeds'])
         required = filters['requiredwords'].lower().split(u',')
         preferred = filters['preferredwords'].lower().split(u',')
         ignored = filters['ignoredwords'].lower().split(u',')
@@ -59,6 +60,7 @@ class ScoreResults():
         self.remove_ignored(ignored)
         self.keep_required(required)
         self.retention_check(retention, today)
+        self.seed_check(seeds)
         self.score_quality(qualities)
         if core.CONFIG['Search']['score_title'] == 'true':
             self.fuzzy_title(title)
@@ -76,6 +78,11 @@ class ScoreResults():
         Pulls active indexers from config, then removes any
             result that isn't from an active indexer.
 
+        Does not filter Torrent results.
+            Since torrent names don't always match their domain
+            ie demonoid == dnoid.me, we can't filter out disabled torrent
+            indexers since all would be removed
+
         Does not return, modifies self.results
         '''
 
@@ -85,8 +92,10 @@ class ScoreResults():
                 active.append(i[0])
 
         keep = []
-        for indexer in active:
-            for result in self.results:
+        for result in self.results:
+            if result['type'] in ['torrent', 'magnet']:
+                keep.append(result)
+            for indexer in active:
                 if indexer in result['guid']:
                     keep.append(result)
 
@@ -155,6 +164,24 @@ class ScoreResults():
                 pubdate = datetime.strptime(result['pubdate'], '%d %b %Y')
                 age = (today - pubdate).days
                 if age < retention:
+                    lst.append(result)
+        self.results = lst
+
+    def seed_check(self, seeds):
+        ''' Remove any torrents with fewer than 'seeds' seeders
+        seeds: int # of seeds required
+
+        Does not return
+        '''
+
+        if seeds == 0:
+            return
+        lst = []
+        for result in self.results:
+            if result['type'] not in ['torrent', 'magnet']:
+                lst.append(result)
+            else:
+                if int(result['seeders']) >= seeds:
                     lst.append(result)
         self.results = lst
 

@@ -7,9 +7,9 @@ import threading
 
 import cherrypy
 import core
-from core import config, newznab, poster, searcher, snatcher, sqldb, updatestatus, version
+from core import config, newznab, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.helpers import Conversions, Comparisons
-from core.downloaders import nzbget, sabnzbd
+from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
 from core.rss import predb
@@ -31,7 +31,6 @@ class Ajax(object):
         self.omdb = OMDB()
         self.tmdb = TMDB()
         self.config = config.Config()
-        self.nn = newznab.NewzNab()
         self.predb = predb.PreDB()
         self.searcher = searcher.Searcher()
         self.sql = sqldb.SQL()
@@ -289,12 +288,22 @@ class Ajax(object):
         return 'done'
 
     @cherrypy.expose
-    def manual_download(self, guid):
+    def manual_download(self, guid, kind):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
+        :param kind: str type of download (torrent, magnet, nzb)
 
         Returns str json.dumps(dict) success/fail message
         '''
+
+        torrent_enabled = core.CONFIG['Sources']['torrentenabled'] == u'true'
+
+        usenet_enabled = core.CONFIG['Sources']['usenetenabled'] == u'true'
+
+        if kind == 'nzb' and not usenet_enabled:
+            return json.dumps({'response': 'false', 'error': 'Link is NZB but no Usent downloader is enabled.'})
+        if kind in ['torrent', 'magnet'] and not torrent_enabled:
+            return json.dumps({'response': 'false', 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
@@ -389,6 +398,42 @@ class Ajax(object):
                 response['message'] = test
         if mode == u'nzbget':
             test = nzbget.Nzbget.test_connection(data)
+            if test is True:
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = u'false'
+                response['message'] = test
+
+        if mode == u'transmission':
+            test = transmission.Transmission.test_connection(data)
+            if test is True:
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = u'false'
+                response['message'] = test
+
+        if mode == u'delugerpc':
+            test = deluge.DelugeRPC.test_connection(data)
+            if test is True:
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = u'false'
+                response['message'] = test
+
+        if mode == u'delugeweb':
+            test = deluge.DelugeWeb.test_connection(data)
+            if test is True:
+                response['status'] = u'true'
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = u'false'
+                response['message'] = test
+
+        if mode == u'qbittorrent':
+            test = qbittorrent.QBittorrent.test_connection(data)
             if test is True:
                 response['status'] = u'true'
                 response['message'] = u'Connection successful.'
@@ -576,5 +621,10 @@ class Ajax(object):
         return log_text
 
     @cherrypy.expose
-    def newznab_test(self, indexer, apikey):
-        return json.dumps(self.nn.test_connection(indexer, apikey))
+    def indexer_test(self, indexer, apikey, mode):
+        if mode == 'newznab':
+            return json.dumps(newznab.NewzNab.test_connection(indexer, apikey))
+        elif mode == 'potato':
+            return json.dumps(torrent.Torrent.test_potato_connection(indexer, apikey))
+        else:
+            return None

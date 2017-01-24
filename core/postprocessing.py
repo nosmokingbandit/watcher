@@ -300,6 +300,8 @@ class Postprocessing(object):
         Returns dict of any gathered information
         '''
 
+        config = core.CONFIG['Postprocessing']
+
         # try to get searchresult using guid first then downloadid
         logging.info(u'Searching local database for guid.')
         result = self.sql.get_single_search_result('guid', data['guid'])
@@ -361,7 +363,7 @@ class Postprocessing(object):
             del data['quality']
             del data['plot']
 
-            repl = core.CONFIG['Postprocessing']['replaceillegal']
+            repl = config['replaceillegal']
 
             for (k, v) in data.iteritems():
                 if type(v) == str:
@@ -385,6 +387,8 @@ class Postprocessing(object):
 
         Returns dict of post-processing results
         '''
+
+        config = core.CONFIG['Postprocessing']
 
         # dict we will json.dump and send back to downloader
         result = {}
@@ -436,7 +440,7 @@ class Postprocessing(object):
         result['tasks']['update_movie_status'] = r
 
         # delete failed files
-        if core.CONFIG['Postprocessing']['cleanupfailed'] == u'true':
+        if config['cleanupfailed'] == u'true':
             result['tasks']['cleanup'] = {'enabled': 'true', 'path': data['path']}
 
             logging.info(u'Deleting leftover files from failed download.')
@@ -488,6 +492,8 @@ class Postprocessing(object):
 
         Returns dict of post-processing results
         '''
+
+        config = core.CONFIG['Postprocessing']
 
         # dict we will json.dump and send back to downloader
         result = {}
@@ -545,7 +551,7 @@ class Postprocessing(object):
         result['tasks']['update_movie_status'] = r
 
         # renamer
-        if core.CONFIG['Postprocessing']['renamerenabled'] == u'true':
+        if config['renamerenabled'] == u'true':
             result['tasks']['renamer'] = {'enabled': 'true'}
             result['data']['orig_filename'] = result['data']['filename']
             response = self.renamer(data)
@@ -560,7 +566,7 @@ class Postprocessing(object):
             result['tasks']['mover'] = {'enabled': 'false'}
 
         # mover
-        if core.CONFIG['Postprocessing']['moverenabled'] == u'true':
+        if config['moverenabled'] == u'true':
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
             if response is False:
@@ -572,12 +578,19 @@ class Postprocessing(object):
             logging.info(u'Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
 
-        # delete leftover dir, only if mover was enabled & successful
-        if core.CONFIG['Postprocessing']['cleanupenabled'] == u'true':
+        # Delete leftover dir. Skip if createhardlinks enabled or if mover disabled/failed
+        if config['cleanupenabled'] == u'true':
             result['tasks']['cleanup'] = {'enabled': 'true'}
+
+            if config['createhardlink'] == u'true':
+                logging.info('Hardlink creation enabled. Skipping Cleanup.')
+                result['tasks']['cleanup']['response'] = 'skipped'
+                return result
+
             # fail if mover disabled or failed
-            if core.CONFIG['Postprocessing']['moverenabled'] == u'false' or \
+            if config['moverenabled'] == u'false' or \
                     result['tasks']['mover']['response'] == u'false':
+                logging.info('Mover either disabled or failed. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = u'false'
             else:
                 if self.cleanup(data['path']):
@@ -606,6 +619,8 @@ class Postprocessing(object):
         Returns str new path
         '''
 
+        config = core.CONFIG['Postprocessing']
+
         for k, v in data.iteritems():
             k = "{"+k+"}"
             if k in string:
@@ -617,7 +632,7 @@ class Postprocessing(object):
         while len(string) > 1 and string[-1] == u' ':
             string = string[:-1]
 
-        repl = core.CONFIG['Postprocessing']['replaceillegal']
+        repl = config['replaceillegal']
         string = re.sub(r'["*?<>|]+', repl, string)
 
         drive, path = os.path.splitdrive(string)
@@ -634,7 +649,9 @@ class Postprocessing(object):
         Returns str new file name or None on failure
         '''
 
-        renamer_string = core.CONFIG['Postprocessing']['renamerstring']
+        config = core.CONFIG['Postprocessing']
+
+        renamer_string = config['renamerstring']
 
         # check to see if we have a valid renamerstring
         if re.match(r'{(.*?)}', renamer_string) is None:
@@ -678,18 +695,22 @@ class Postprocessing(object):
 
         Moves file to location specified in core.CONFIG
 
+        Copies and renames additional files
+
         Returns str new file location or False on failure
         '''
 
+        config = core.CONFIG['Postprocessing']
+
         # get target dir, remove illegal chars, and normalize
-        mover_path = core.CONFIG['Postprocessing']['moverpath']
+        mover_path = config['moverpath']
 
         target_folder = os.path.normpath(self.compile_path(mover_path, data))
 
         # if the new folder doesn't exist, make it
         try:
             if not os.path.exists(target_folder):
-                os.mkdir(target_folder)
+                os.makedirs(target_folder)
         except Exception, e:
             logging.error(u'Mover failed: Could not create missing directory {}.'.format(target_folder), exc_info=True)
             return False
@@ -703,12 +724,24 @@ class Postprocessing(object):
             logging.error(u'Mover failed: Could not move file.', exc_info=True)
             return False
 
-        logging.info(u'Moving and renaming any extra files.')
+        new_file_location = os.path.join(target_folder, os.path.basename(data['filename']))
 
-        moveextensions = core.CONFIG['Postprocessing']['moveextensions']
+        # Create hardlink
+
+        if config['createhardlink'] == u'true':
+            logging.info('Creating hardlink from {} to {}.'.format(new_file_location, data['orig_filename']))
+            if os.name == 'nt':
+                import ctypes
+                ctypes.windll.kernel32.CreateHardLinkA(data['orig_filename'], new_file_location, 0)
+            else:
+                os.link(new_file_location, data['orig_filename'])
+
+        logging.info(u'Copying and renaming any extra files.')
+
+        moveextensions = config['moveextensions']
         keep_extentions = [i for i in moveextensions.split(u',') if i != u'']
 
-        renamer_string = core.CONFIG['Postprocessing']['renamerstring']
+        renamer_string = config['renamerstring']
         new_name = self.compile_path(renamer_string, data)
 
         for root, dirs, filenames in os.walk(data['path']):
@@ -726,12 +759,11 @@ class Postprocessing(object):
                         target_file = u'{}{}'.format(os.path.join(target_folder, new_filename), ext)
                     try:
                         logging.info(u'Moving {} to {}'.format(old_abs_path, target_file))
-                        shutil.copystat = self.null
-                        shutil.move(old_abs_path, target_file)
+                        shutil.copyfile(old_abs_path, target_file)
                     except Exception, e: # noqa
-                        logging.error(u'Mover failed: Could not move {}.'.format(old_abs_path), exc_info=True)
+                        logging.error(u'Mover failed: Could not copy {}.'.format(old_abs_path), exc_info=True)
 
-        return os.path.join(target_folder, os.path.basename(data['filename']))
+        return new_file_location
 
     def cleanup(self, path):
         ''' Deletes specified path

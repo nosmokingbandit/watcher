@@ -202,31 +202,68 @@ $(document).ready(function () {
         // The order of these tend to get jumbled. I think it sorts alphabetically, but
         // I haven't put much effort into it yet because it really doesn't affect usage.
         var data = {};
-        var indexers = {};
         var ind = 1;
         var cancel = false;
 
+        newznab_indexers = {};
         $("#newznab_list li").each(function(){
-            if ($(this).attr("class") == "newznab_indexer"){
-                var check = $(this).children("i.newznab_check").attr('value');
-                var url = $(this).children("input.newznab_url").val();
-                var api = $(this).children("input.newznab_api").val();
+            $this = $(this);
+            if ($this.attr("class") == "newznab_indexer"){
+                var check = $this.children("i.newznab_check").attr('value');
+                var url = $this.children("input.newznab_url").val();
+                var api = $this.children("input.newznab_api").val();
 
                 // check if one field is blank and both are not blank
                 if ( (url == "" || api == "") && (url + api !=="") ){
                     toastr.warning("Please complete or clear out incomplete providers.");
-                    indexers = {}
+                    newznab_indexers = {}
                     cancel = true;
                 }
 
                 // but ignore it if both are blank
                 else if (url + api !=="") {
-                    indexers[ind] = [url, api, check].toString().toLowerCase();
+                    newznab_indexers[ind] = [url, api, check].toString().toLowerCase();
                     ind++;
                 }
             }
         });
-        data["Indexers"] = indexers;
+        data["Indexers"] = newznab_indexers;
+
+        potato_indexers = {};
+        ind = 1;
+        $("#potato_list li").each(function(){
+            $this = $(this);
+            if ($this.attr("class") == "potato_indexer"){
+                var check = $this.children("i.potato_check").attr('value');
+                var url = $this.children("input.potato_url").val();
+                var api = $this.children("input.potato_api").val();
+
+                // check if one field is blank and both are not blank
+                if ( (url == "" || api == "") && (url + api !=="") ){
+                    toastr.warning("Please complete or clear out incomplete providers.");
+                    potato_indexers = {}
+                    cancel = true;
+                }
+
+                // but ignore it if both are blank
+                else if (url + api !=="") {
+                    potato_indexers[ind] = [url, api, check].toString().toLowerCase();
+                    ind++;
+                }
+            }
+        });
+        data["PotatoIndexers"] = potato_indexers;
+
+        torrent_indexers = {}
+        $("#torrentindexer_list li").each(function(){
+            $this = $(this);
+            if ($this.attr("class") == "torrent_indexer"){
+                name = $this.attr('id');
+                check = $this.children("i.torrent_check").attr('value')
+                torrent_indexers[name] = check;
+            }
+        });
+        data['TorrentIndexers'] = torrent_indexers;
 
         if(cancel == true){
             return false;
@@ -236,14 +273,20 @@ $(document).ready(function () {
     }
 
     function downloader(){
-        var data = {}
+        var data = {};
+
+        var sources = {};
+        sources["usenetenabled"] = $("i#usenetenabled").attr("value");
+        sources["torrentenabled"] = $("i#torrentenabled").attr("value");
+        data['Sources'] = sources;
+
         var sabnzbd = {};
         sabnzbd["sabenabled"] = $("i#sabenabled").attr("value");
         $("ul#sabnzbd li input").each(function(){
-            sabnzbd[$(this).attr("id")] = $(this).val()
+            sabnzbd[$(this).attr("id")] = $(this).val();
         });
         $("ul#sabnzbd li select").each(function(){
-            sabnzbd[$(this).attr("id")] = $(this).val()
+            sabnzbd[$(this).attr("id")] = $(this).val();
         });
         data["Sabnzbd"] = sabnzbd;
 
@@ -259,6 +302,58 @@ $(document).ready(function () {
             nzbget[$(this).attr("id")] = $(this).val()
         });
         data["NzbGet"] = nzbget;
+
+        var transmission = {};
+        transmission["transmissionenabled"] = $("i#transmissionenabled").attr("value");
+        $("ul#transmission li i.checkbox").each(function(){
+            transmission[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("ul#transmission li input").not("[type=button]").each(function(){
+            transmission[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#transmission li select").each(function(){
+            transmission[$(this).attr("id")] = $(this).val()
+        });
+        data["Transmission"] = transmission;
+
+        var delugerpc = {};
+        delugerpc["delugerpcenabled"] = $("i#delugerpcenabled").attr("value");
+        $("ul#delugerpc li i.checkbox").each(function(){
+            delugerpc[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("ul#delugerpc li input").not("[type=button]").each(function(){
+            delugerpc[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#delugerpc li select").each(function(){
+            delugerpc[$(this).attr("id")] = $(this).val()
+        });
+        data["DelugeRPC"] = delugerpc;
+
+        var delugeweb = {};
+        delugeweb["delugewebenabled"] = $("i#delugewebenabled").attr("value");
+        $("ul#delugeweb li i.checkbox").each(function(){
+            delugeweb[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("ul#delugeweb li input").not("[type=button]").each(function(){
+            delugeweb[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#delugeweb li select").each(function(){
+            delugeweb[$(this).attr("id")] = $(this).val()
+        });
+        data["DelugeWeb"] = delugeweb;
+
+        var qbittorrent = {};
+        qbittorrent["qbittorrentenabled"] = $("i#qbittorrentenabled").attr("value");
+        $("ul#qbittorrent li i.checkbox").each(function(){
+            qbittorrent[$(this).attr("id")] = $(this).attr("value");
+        });
+        $("ul#qbittorrent li input").not("[type=button]").each(function(){
+            qbittorrent[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#qbittorrent li select").each(function(){
+            qbittorrent[$(this).attr("id")] = $(this).val()
+        });
+        data["QBittorrent"] = qbittorrent;
 
         return data
     }

@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import core
-from core import newznab, scoreresults, snatcher, sqldb, updatestatus
+from core import newznab, scoreresults, snatcher, sqldb, updatestatus, torrent
 from core.rss import predb
 
 logging = logging.getLogger(__name__)
@@ -16,6 +16,7 @@ class Searcher():
         self.sql = sqldb.SQL()
         self.predb = predb.PreDB()
         self.snatcher = snatcher.Snatcher()
+        self.torrent = torrent.Torrent()
         self.update = updatestatus.Status()
 
     # this only runs when scheduled. Only started by the user when changing search settings.
@@ -139,6 +140,8 @@ class Searcher():
         Returns Bool if movie is found.
         '''
 
+        results = []
+
         # First check predb
         movie = self.sql.get_movie_details('imdbid', imdbid)
         if movie['predb'] != u'found':
@@ -147,18 +150,23 @@ class Searcher():
         if movie['predb'] != u'found':
             return False
 
-        newznab_results = self.nn.search_all(imdbid)
+        if core.CONFIG['Sources']['usenetenabled'] == 'true':
+            for i in self.nn.search_all(imdbid):
+                results.append(i)
+        if core.CONFIG['Sources']['torrentenabled'] == 'true':
+            for i in self.torrent.search_all(imdbid):
+                results.append(i)
+
         old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
 
         # update results with old info if guids match
-        for idx, result in enumerate(newznab_results):
+        for idx, result in enumerate(results):
             for old in old_results:
                 if old['guid'] == result['guid']:
                     result.update(old)
-                    newznab_results[idx] = result
+                    results[idx] = result
 
-        scored_results = self.score.score(newznab_results, imdbid, 'nzb')
-        # TODO eventually add search for torrents
+        scored_results = self.score.score(results, imdbid, 'nzb')
 
         # sets result status based off marked results table
         marked_results = self.sql.get_marked_results(imdbid)

@@ -3,12 +3,19 @@ from datetime import datetime
 
 import core
 from core import sqldb, updatestatus
-from core.downloaders import nzbget, sabnzbd
+from core.downloaders import deluge, qbittorrent, nzbget, sabnzbd, transmission
 
 logging = logging.getLogger(__name__)
 
 
 class Snatcher():
+    ''' Clarification notes:
+
+    When snatching a torrent, the downloadid should *always* be the torrent hash.
+    When snatching NZBs use the client-supplied download id if possible. If the client
+        does not return a download-id, use None.
+
+    '''
 
     def __init__(self):
         self.sql = sqldb.SQL()
@@ -66,9 +73,19 @@ class Snatcher():
         Returns dict {'response': 'true', 'message': 'lorem impsum'}
         '''
 
-        data = dict(data)
+        if data['type'] == 'nzb':
+            if core.CONFIG['Sources']['usenetenabled'] == 'true':
+                return self.snatch_nzb(data)
+            else:
+                return {'response': 'false', 'message': 'NZB submitted but nzb snatching is disabled.'}
 
-        # Send to active downloaders
+        if data['type'] in ['torrent', 'magnet']:
+            if core.CONFIG['Sources']['torrentenabled'] == 'true':
+                return self.snatch_torrent(data)
+            else:
+                return {'response': 'false', 'message': 'Torrent submitted but torrent snatching is disabled.'}
+
+    def snatch_nzb(self, data):
         guid = data['guid']
         imdbid = data['imdbid']
         title = data['title']
@@ -76,7 +93,7 @@ class Snatcher():
 
         # If sending to SAB
         sab_conf = core.CONFIG['Sabnzbd']
-        if sab_conf['sabenabled'] == u'true' and data['type'] == u'nzb':
+        if sab_conf['sabenabled'] == u'true':
             logging.info(u'Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
@@ -96,7 +113,7 @@ class Snatcher():
 
         # If sending to NZBGET
         nzbg_conf = core.CONFIG['NzbGet']
-        if nzbg_conf['nzbgenabled'] == u'true' and data['type'] == u'nzb':
+        if nzbg_conf['nzbgenabled'] == u'true':
             logging.info(u'Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
@@ -108,6 +125,93 @@ class Snatcher():
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
                     return {'response': 'true', 'message': 'Sent to NZBGet.'}
+                else:
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+    def snatch_torrent(self, data):
+        guid = data['guid']
+        imdbid = data['imdbid']
+        title = data['title']
+        data['title'] = u'{}.Watcher'.format(data['title'])
+        kind = data['type']
+
+        # If sending to Transmission
+        transmission_conf = core.CONFIG['Transmission']
+        if transmission_conf['transmissionenabled'] == u'true':
+            logging.info(u'Sending {} to Transmission'.format(kind))
+            response = transmission.Transmission.add_torrent(data)
+
+            if response['response'] is 'true':
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to NZBGet.'.format(title))
+                    return {'response': 'true', 'message': 'Sent to Tranmission.'}
+                else:
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+        # If sending to QBittorrent
+        qbit_conf = core.CONFIG['QBittorrent']
+        if qbit_conf['qbittorrentenabled'] == u'true':
+            logging.info(u'Sending {} to QBittorrent'.format(kind))
+            response = qbittorrent.QBittorrent.add_torrent(data)
+
+            if response['response'] is 'true':
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to QBittorrent.'.format(title))
+                    return {'response': 'true', 'message': 'Sent to QBittorrent.'}
+                else:
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+        # If sending to DelugeRPC
+        delugerpc_conf = core.CONFIG['DelugeRPC']
+        if delugerpc_conf['delugerpcenabled'] == u'true':
+            logging.info(u'Sending {} to DelugeRPC'.format(kind))
+            response = deluge.DelugeRPC.add_torrent(data)
+
+            if response['response'] is 'true':
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to DelugeRPC.'.format(title))
+                    return {'response': 'true', 'message': 'Sent to Deluge.'}
+                else:
+                    return {'response': 'false', 'error': 'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+        # If sending to DelugeWeb
+        delugeweb_conf = core.CONFIG['DelugeWeb']
+        if delugeweb_conf['delugewebenabled'] == u'true':
+            logging.info(u'Sending {} to DelugeWeb'.format(kind))
+            response = deluge.DelugeWeb.add_torrent(data)
+
+            if response['response'] is 'true':
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to DelugeWeb.'.format(title))
+                    return {'response': 'true', 'message': 'Sent to Deluge.'}
                 else:
                     return {'response': 'false', 'error': 'Could not mark '
                             'search result as Snatched.'}

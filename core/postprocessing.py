@@ -685,11 +685,11 @@ class Postprocessing(object):
         mover_path = core.CONFIG['Postprocessing']['moverpath']
 
         target_folder = os.path.normpath(self.compile_path(mover_path, data))
-        target_folder = os.path.join(target_folder, '')
+
         # if the new folder doesn't exist, make it
         try:
             if not os.path.exists(target_folder):
-                os.mkdirs(target_folder)
+                os.mkdir(target_folder)
         except Exception, e:
             logging.error(u'Mover failed: Could not create missing directory {}.'.format(target_folder), exc_info=True)
             return False

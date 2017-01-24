@@ -153,18 +153,23 @@ class NewzNab():
         ''' Tests connection to NewzNab API
 
         '''
-        response = {'code': '10061', 'description': 'No connection could be made because the target machine actively refused it.'}
 
         url = u'{}/api?apikey={}&t=user'.format(indexer, apikey)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
-            xml = urllib2.urlopen(request).read()
-            response = ET.fromstring(xml).attrib
+            response = urllib2.urlopen(request).read()
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'NewzNab connection check.', exc_info=True)
-            return response
+            return 'No connection could be made because the target machine actively refused it.'
 
-        return response
+        if '<error code="' in response:
+            error = ET.fromstring(response)
+            if error.attrib['description'] == 'Missing parameter':
+                return "Connection successful."
+            else:
+                return error.attrib['description']
+        else:
+            return "Connection successful."

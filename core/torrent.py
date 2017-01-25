@@ -200,7 +200,8 @@ class Rarbg(object):
 
         Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(0, 2)
         try:
-            response = json.loads(urllib2.urlopen(request, timeout=60).read())['torrent_results']
+            response = urllib2.urlopen(request, timeout=60).read()
+            response = json.loads(response)['torrent_results']
             results = Rarbg.parse_rarbg(response)
 
             return results

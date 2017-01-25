@@ -51,6 +51,7 @@ class Snatcher():
         # through in order until we find the first Available result
         # and grab it.
         for result in search_results:
+            result = dict(result)
             status = result['status']
 
             if result['status'] == u'Available' and result['score'] > minscore:

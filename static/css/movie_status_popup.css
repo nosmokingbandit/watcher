@@ -259,6 +259,14 @@ div#additional_info{
     height: 2em;
 }
 
+div#additional_info i{
+    padding: 0;
+    margin: 0;
+    float: right;
+    font-size: 1.25em;
+    line-height: 1.5em;
+}
+
 div#additional_info span{
     padding: 0;
     margin: 0 1em 0em 0;
@@ -266,9 +274,6 @@ div#additional_info span{
     float: left;
 }
 
-div#additional_info button{
-
-}
 
 div#hidden_data{
     display: none;

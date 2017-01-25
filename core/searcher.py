@@ -19,7 +19,6 @@ class Searcher():
         self.torrent = torrent.Torrent()
         self.update = updatestatus.Status()
 
-    # this only runs when scheduled. Only started by the user when changing search settings.
     def auto_search_and_grab(self):
         ''' Scheduled searcher and grabber.
 
@@ -67,6 +66,14 @@ class Searcher():
             title = movie['title']
             status = movie['status']
             finisheddate = movie['finished_date']
+
+            # First check predb
+            movie = self.sql.get_movie_details('imdbid', imdbid)
+            if movie['predb'] != u'found':
+                self.predb.check_one(movie)
+            movie = self.sql.get_movie_details('imdbid', imdbid)
+            if movie['predb'] != u'found':
+                return False
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))
@@ -141,14 +148,6 @@ class Searcher():
         '''
 
         results = []
-
-        # First check predb
-        movie = self.sql.get_movie_details('imdbid', imdbid)
-        if movie['predb'] != u'found':
-            self.predb.check_one(movie)
-        movie = self.sql.get_movie_details('imdbid', imdbid)
-        if movie['predb'] != u'found':
-            return False
 
         if core.CONFIG['Sources']['usenetenabled'] == 'true':
             for i in self.nn.search_all(imdbid):

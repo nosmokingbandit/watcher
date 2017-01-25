@@ -154,9 +154,14 @@ class NewzNab():
 
         '''
 
+        while indexer[-1] == '/':
+            indexer = indexer[:-1]
+
         response = {}
 
-        url = u'{}/api?apikey={}&t=user'.format(indexer, apikey)
+        logging.info('Testing connection to {}'.format(indexer))
+
+        url = u'{}/api?apikey={}&t=search&id=tt0063350'.format(indexer, apikey)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -173,5 +178,7 @@ class NewzNab():
                 return {'response': 'true', 'message': 'Connection successful.'}
             else:
                 return {'response': 'false', 'message': error.attrib['description']}
+        elif 'unauthorized' in response.lower():
+            return {'response': 'false', 'message': 'Incorrect API key.'}
         else:
             return {'response': 'true', 'message': 'Connection successful.'}

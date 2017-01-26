@@ -543,7 +543,7 @@ class Postprocessing(object):
             r = str(self.update.movie_status(data['imdbid'])).lower()
             self.sql.update('MOVIES', 'finished_date', result['data']['finished_date'],
                             imdbid=data['imdbid'])
-            self.sql.update('MOVIES', 'finished_score', result['data']['finished_score'],
+            self.sql.update('MOVIES', 'finished_score', result['data'].get('finished_score'),
                             imdbid=data['imdbid'])
         else:
             logging.info(u'Imdbid not supplied or found, unable to update Movie status.')
@@ -616,10 +616,10 @@ class Postprocessing(object):
 
         Can return blank string ''
 
+        Sends string to self.sanitize() to remove illegal characters
+
         Returns str new path
         '''
-
-        config = core.CONFIG['Postprocessing']
 
         for k, v in data.iteritems():
             k = "{"+k+"}"
@@ -632,13 +632,7 @@ class Postprocessing(object):
         while len(string) > 1 and string[-1] == u' ':
             string = string[:-1]
 
-        repl = config['replaceillegal']
-        string = re.sub(r'["*?<>|]+', repl, string)
-
-        drive, path = os.path.splitdrive(string)
-        path.replace(':', repl)
-
-        return ''.join([drive, path])
+        return self.sanitize(string)
 
     def renamer(self, data):
         ''' Renames movie file based on renamerstring.
@@ -793,3 +787,13 @@ class Postprocessing(object):
         else:
             # if it is somehow neither
             return False
+
+    def sanitize(self, string):
+        config = core.CONFIG['Postprocessing']
+        repl = config['replaceillegal']
+
+        string = re.sub(r'["*?<>|]+', repl, string)
+
+        drive, path = os.path.splitdrive(string)
+        path = path.replace(':', repl)
+        return ''.join([drive, path])

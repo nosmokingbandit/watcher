@@ -67,13 +67,8 @@ class Searcher():
             status = movie['status']
             finisheddate = movie['finished_date']
 
-            # First check predb
-            movie = self.sql.get_movie_details('imdbid', imdbid)
             if movie['predb'] != u'found':
-                self.predb.check_one(movie)
-            movie = self.sql.get_movie_details('imdbid', imdbid)
-            if movie['predb'] != u'found':
-                return False
+                continue
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))

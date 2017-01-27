@@ -133,9 +133,16 @@ class Config():
         if repl in ['"', '*', '?', '<', '>', '|', ':']:
             d['Postprocessing']['replaceillegal'] = ''
 
-        # load quality json into dict
+       # load quality json into dict
+        r = []
         for k, v in d['Quality'].iteritems():
-            d['Quality'][k] = json.loads(v)
+            try:
+                d['Quality'][k] = json.loads(v)
+            except Exception:
+                r.append(k)
+                continue
+        for i in r:
+            del d['Quality'][i]
 
         # split Indexers values into lists
         for k, v in d['Indexers'].iteritems():

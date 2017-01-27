@@ -120,7 +120,7 @@ class Torrent(object):
 
         Returns list of dicts of results
         '''
-        item_keep = ('size', 'category', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
+        item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
         for result in results:
             result['size'] = result['size'] * 1024 * 1024

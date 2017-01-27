@@ -114,6 +114,9 @@ class API(object):
         elif params['mode'] == u'version':
             return self.version()
 
+        elif params['mode'] == u'get_config':
+            return json.dumps(core.CONFIG)
+
         else:
             return json.dumps({'response': 'false',
                                'error': 'invalid mode'})

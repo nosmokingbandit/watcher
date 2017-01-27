@@ -14,6 +14,7 @@ input#search_input{
     border-color:  #212121;
     background-color: #ffffff;
     border-width: 1px 0px 1px 1px;
+    border-radius: 4px 0 0 4px;
     font-family: Raleway, sans-serif;
 }
 
@@ -26,6 +27,7 @@ button#search_button{
     border-color:  #212121;
     border-width: 1px 1px 1px 0px;
     outline: none;
+    border-radius: 0 4px 4px 0;
 }
 
 button#search_button:hover{

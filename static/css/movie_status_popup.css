@@ -162,12 +162,11 @@ div#additional_info{
     height: 2em;
 }
 
-div#additional_info i{
-    padding: 0;
-    margin: 0;
-    float: right;
-    font-size: 1.25em;
-    line-height: 1.5em;
+div#additional_info i#predb{
+    float: left;
+    font-size: 1em;
+    margin-right: 0.5em;
+    line-height: 2em;
 }
 
 div#additional_info span{
@@ -177,5 +176,14 @@ div#additional_info span{
     float: left;
 }
 
+div#additional_info span#quality{
+    padding: 0;
+    margin: 0 1em 0em 0;
+    line-height: 2em;
+    float: right;
+}
 
+div#additional_info span#quality i{
+    font-size: 1.25em;
+    margin-left: 0.5em;
 }

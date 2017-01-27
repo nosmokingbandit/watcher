@@ -21,11 +21,9 @@ class MovieStatusPopup():
 
             url = data['url']
 
-        quality_settings = json.loads(data['quality'])
-
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.24')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.26')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -36,8 +34,6 @@ class MovieStatusPopup():
                         span(year, id='title_year')
                     i(cls='fa fa-times', id='close')
                     i(cls='fa fa-trash', id='remove')
-                    i(cls='fa fa-cog', id='change_quality')
-                    i(cls='fa fa-save', id='save_quality')
                     i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title=data['title'])
             with div(id='media'):
                 img(id='poster', src=poster_path)
@@ -45,43 +41,6 @@ class MovieStatusPopup():
 
                     self.result_list(imdbid)
                     div(id='results_thinker')
-
-                    # Panel that swaps in with quality adjustments
-                    resolutions = ['4K', '1080P', '720P', 'SD']
-                    with ul(id='quality', cls='wide'):
-                        # Resolution Block
-                        with ul(id='resolution', cls='sortable'):
-                            span(u'Resolutions', cls='sub_cat not_sortable')
-
-                            for res in resolutions:
-                                prior = u'{}priority'.format(res)
-                                with li(cls='rbord', id=prior, sort=quality_settings['Quality'][res][1]):
-                                    i(cls='fa fa-bars')
-                                    i(id=res, cls='fa fa-square-o checkbox', value=quality_settings['Quality'][res][0])
-                                    span(res)
-
-                        # Size restriction block
-                        with ul(id='resolution_size'):
-                            with li(u'Size Restrictions (MB)', cls='sub_cat'):
-
-                                for res in resolutions:
-                                    min = '{}min'.format(res)
-                                    max = '{}max'.format(res)
-                                    with li():
-                                        span(res)
-                                        input(type='number', id=min, value=quality_settings['Quality'][res][2], min='0', style='width: 7.5em')
-                                        input(type='number', id=max, value=quality_settings['Quality'][res][3], min='0', style='width: 7.5em')
-
-                        with ul(id='filters', cls='wide'):
-                            with li(cls='bbord flexbox'):
-                                span(u'Required words:')
-                                input(type='text', id='requiredwords', value=quality_settings['Filters']['requiredwords'], style='width: 16em')
-                            with li(cls='bbord flexbox'):
-                                span(u'Preferred words:')
-                                input(type='text', id='preferredwords', value=quality_settings['Filters']['preferredwords'], style='width: 16em')
-                            with li(cls='flexbox'):
-                                span(u'Ignored words:')
-                                input(type='text', id='ignoredwords', value=quality_settings['Filters']['ignoredwords'], style='width: 16em')
 
             with div(id='plot'):
                 p(data['plot'])
@@ -95,6 +54,16 @@ class MovieStatusPopup():
                     span(u'Score: {}'.format(data['score']))
                 span('Rated: {}'.format(data['rated']))
 
+                with span('Quality profile: ', id='quality'):
+                    with select(id='quality_profile', value=data['quality']):
+                        options = core.CONFIG['Quality'].keys()
+                        for opt in options:
+                            item = option(opt, value=opt)
+                            if opt == data['quality']:
+                                item['selected'] = 'selected'
+
+                    i(cls='fa fa-save', id='change_quality')
+
         return unicode(container)
 
     def result_list(self, imdbid):
@@ -105,7 +74,7 @@ class MovieStatusPopup():
 
             if not results:
                 li(u'Nothing found yet.', cls='title bold')
-                li(u'Next automatic search scheduled for: {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
+                li(u'Next automatic search scheduled for {}'.format(Conversions.human_datetime(core.NEXT_SEARCH)), cls='title')
             else:
                 for idx, res in enumerate(results):
                     kind = res['type']

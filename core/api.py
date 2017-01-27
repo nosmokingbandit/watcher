@@ -100,7 +100,8 @@ class API(object):
                                    'error': 'no imdbid supplied'})
             else:
                 imdbid = params['imdbid']
-            return self.addmovie(imdbid)
+                quality = params.get('quality')
+            return self.addmovie(imdbid, quality)
 
         elif params['mode'] == u'removemovie':
             if 'imdbid' not in params:
@@ -141,16 +142,19 @@ class API(object):
             response = {'response': 'true', 'movies': movies}
             return json.dumps(response, indent=1)
 
-    def addmovie(self, imdbid):
+    def addmovie(self, imdbid, quality):
         ''' Add movie with default quality settings
         :param imdbid: imdb id number of movie
 
         Returns str json.dumps(dict) {"status": "success", "message": "X added to wanted list."}
         '''
 
+        if quality is None:
+            quality = 'Default'
+
         logging.info(u'API request add movie {}'.format(imdbid))
 
-        return self.ajax.add_wanted_imdbid(imdbid)
+        return self.ajax.add_wanted_imdbid(imdbid, quality)
 
     def removemovie(self, imdbid):
         ''' Remove movie from wanted list

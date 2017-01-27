@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 
@@ -34,24 +33,23 @@ class ScoreResults():
 
         self.results = results
 
-        tableresults = self.sql.get_movie_details('imdbid', imdbid)
+        movie_details = self.sql.get_movie_details('imdbid', imdbid)
 
-        title = tableresults['title']
+        title = movie_details['title']
 
+        quality_profile = movie_details['quality']
         # get quality settings from database, or config if not found
-        if tableresults['quality']:
-            quality_dict = json.loads(tableresults['quality'])
-            qualities = quality_dict['Quality']
-            filters = quality_dict['Filters']
+        if quality_profile in core.CONFIG['Quality']:
+            quality = core.CONFIG['Quality'][quality_profile]
         else:
-            qualities = core.CONFIG['Quality']
-            filters = core.CONFIG['Filters']
+            quality = core.CONFIG['Quality']['Default']
 
+        resolution = {k: v for k, v in quality.iteritems() if k in ['4K', '1080P', '720P', 'SD']}
         retention = int(core.CONFIG['Search']['retention'])
         seeds = int(core.CONFIG['Search']['mintorrentseeds'])
-        required = filters['requiredwords'].lower().split(u',')
-        preferred = filters['preferredwords'].lower().split(u',')
-        ignored = filters['ignoredwords'].lower().split(u',')
+        required = quality['requiredwords'].lower().split(u',')
+        preferred = quality['preferredwords'].lower().split(u',')
+        ignored = quality['ignoredwords'].lower().split(u',')
         today = datetime.today()
 
         # These all just modify self.results
@@ -61,7 +59,7 @@ class ScoreResults():
         self.keep_required(required)
         self.retention_check(retention, today)
         self.seed_check(seeds)
-        self.score_quality(qualities)
+        self.score_resolution(resolution)
         if core.CONFIG['Search']['score_title'] == 'true':
             self.fuzzy_title(title)
         self.score_preferred(preferred)
@@ -226,7 +224,7 @@ class ScoreResults():
                 lst.append(result)
         self.results = lst
 
-    def score_quality(self, qualities):
+    def score_resolution(self, qualities):
         ''' Score releases based on quality preferences
         :param qualities: dict of quality preferences from MOVIES table
 

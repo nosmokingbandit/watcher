@@ -25,7 +25,7 @@ class Login(object):
             link(rel='stylesheet', href=core.URL_BASE + '/auth/static/font-awesome/css/font-awesome.css')
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
             script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
-            script(type='text/javascript', src=core.URL_BASE + '/auth/static/js/login/main.js?v=01.01')
+            script(type='text/javascript', src=core.URL_BASE + '/auth/static/js/login/main.js?v=01.26')
 
         with doc:
             with div(id='content'):

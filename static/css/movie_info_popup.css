@@ -8,12 +8,12 @@ div#container{
     margin: 0 auto;
 }
 
-div#title p{
-    padding: 0;
+div#title{
     margin: 0 0 1em 0;
-    height: 2em;
     line-height: 2em;
-    vertical-align: middle;
+    height: 2em;
+    width: 100%;
+    overflow: hidden;
 }
 
 div#title span#title{
@@ -24,28 +24,20 @@ div#title span#title{
     text-overflow: ellipsis;
 }
 
-div#title p i{
+div#title i{
     float: right;
 }
 
-button{
+div#title div#quality{
+    float: right;
+    overflow: hidden;
     height: 2em;
-    line-height: 2em;
-    margin: 0 0 0 1em;
-    background-color: white;
-    border: 1px solid #212121;
-    outline: none;
-    font-size: 1.0em;
-    cursor: pointer;
+    font-size: 1.25em;
 }
 
-button:hover{
-    background-color: #212121;
-    color: #fff;
-}
-
-i#button_submit{
-    display: none;
+div#title div#quality select{
+    font-size: 1em;
+    margin-right: 0.5em;
 }
 
 div#media{
@@ -60,6 +52,7 @@ div#media img#poster{
 }
 
 iframe#trailer{
+    float: right;
     top: 0px;
     right: 0px;
     background: url('../../images/logo_bg.png') no-repeat 50% 50% #eeeeee;

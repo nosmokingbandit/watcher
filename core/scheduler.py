@@ -155,7 +155,7 @@ class ImdbRssSync(object):
 
     @staticmethod
     def create():
-        interval = core.CONFIG['Search']['imdbfrequency'] * 60
+        interval = int(core.CONFIG['Search']['imdbfrequency']) * 60
         now = datetime.datetime.now()
 
         hr = now.hour
@@ -185,7 +185,7 @@ class PopularMoviesSync(object):
 
     @staticmethod
     def create():
-        interval = core.CONFIG['Search']['popularmoviesfrequency'] * 60
+        interval = int(core.CONFIG['Search']['popularmoviesfrequency']) * 60
         now = datetime.datetime.now()
 
         hr = now.hour

@@ -77,9 +77,12 @@ class Torrent(object):
 
         '''
 
+        while indexer[-1] == u'/':
+            indexer = indexer[:-1]
+
         response = {}
 
-        url = u'{}/api?passkey={}'.format(indexer, apikey)
+        url = u'{}?passkey={}'.format(indexer, apikey)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:

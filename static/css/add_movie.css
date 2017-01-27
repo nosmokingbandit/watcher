@@ -3,7 +3,6 @@
     margin: 0 auto;
     width: 60%;
     max-width: 1024px;
-    clear: both;
 }
 
 input#search_input{
@@ -12,11 +11,9 @@ input#search_input{
     font-size: 2em;
     padding: 8px;
     margin: 32px 0;
-    border-style: solid;
     border-color:  #212121;
     background-color: #ffffff;
     border-width: 1px 0px 1px 1px;
-    outline: none;
     font-family: Raleway, sans-serif;
 }
 
@@ -24,25 +21,16 @@ button#search_button{
     float: right;
     width: 48px;
     height: 50px;
-    padding: 0;
     margin: 32px 0;
-    background-color: white;
     border-style: solid;
     border-color:  #212121;
     border-width: 1px 1px 1px 0px;
     outline: none;
-    border-radius: 0px;
-    vertical-align: inherit;
-    line-height: 50px;
 }
 
 button#search_button:hover{
     background-color: #212121;
     color: #fff;
-}
-
-button#search_button i{
-    vertical-align: inherit;
 }
 
 /* results fade-in */
@@ -63,7 +51,6 @@ ul#movie_list{
 
 ul#movie_list li{
     width: 200px;
-    float: left;
     margin: 0 1.5em 1.5em 1.5em;
     text-align: center;
     position: relative;

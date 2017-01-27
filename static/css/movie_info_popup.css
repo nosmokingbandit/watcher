@@ -2,20 +2,6 @@ i{
     font-size: 1.5em;
 }
 
-input[type="number"], input[type="text"]{
-    border: 1px solid #212121;
-    outline: none;
-    background-color: #eeeeee;
-    height: 1.5em;
-    padding: 0 0.5em;
-}
-
-input[type='text']{
-    font-family: "Lucida Console", Monaco, monospace;
-    font-size: 0.75em;
-    height: 2.0em;
-}
-
 div#container{
     padding: 1em;
     max-width: 912px;
@@ -73,96 +59,10 @@ div#media img#poster{
     max-width: 255px;
 }
 
-div#trailer_container{
-    float: right;
-    position: relative;
-
-}
-
 iframe#trailer{
-    position: absolute;
     top: 0px;
     right: 0px;
     background: url('../../images/logo_bg.png') no-repeat 50% 50% #eeeeee;
-}
-
-/* Quality slide in panel */
-ul{
-    clear: none;
-}
-
-ul#quality{
-    position: absolute;
-    width: 640px;
-    height: 360px;
-    top: 0px;
-    right: 0px;
-    display: none;
-}
-
-ul#quality li{
-    height: 2.5em;
-    line-height: 2.5em;
-}
-
-ul#quality li.rbord{
-    border-right: 1px solid #bdbdbd;
-}
-
-ul#quality .sub_cat{
-    line-height: 2.5em;
-}
-
-ul#resolution{
-    width: 30%;
-    margin: 0 5% 0 0;
-    float: left;
-}
-
-ul#resolution_size li{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-ul#resolution_size li span{
-    width: 6em;
-}
-
-ul#resolution_size li input{
-    order: 0;
-    flex: 1 0 auto;
-    margin: 0 1em;
-}
-
-ul#filters{
-    clear: both;
-    padding: 1em 0 0 0;
-}
-
-ul#filters li{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-ul#filters li span{
-    order: 0;
-    flex: 0 1 auto;
-}
-
-ul#filters li input{
-    order: 0;
-    flex: 1 0 auto;
-    margin: 0 1em;
-
-}
-
-
-div.hidden_data{
-    display: none;
 }
 
 /* Bottom row info */
@@ -174,13 +74,6 @@ div#plot p{
 }
 
 div#additional_info p{
-    padding: 0;
     margin: 0 1em 1em 0;
     float: left;
-}
-
-div#hidden_data{
-    display: none;
-    width: 0;
-    height: 0;
 }

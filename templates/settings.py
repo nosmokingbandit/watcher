@@ -3,7 +3,6 @@ import os
 import cherrypy
 import core
 import dominate
-
 from cherrypy import expose
 from dominate.tags import *
 from header import Header
@@ -24,10 +23,10 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.23')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.23'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.23')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.23')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.26')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.26'.format(core.CONFIG['Server']['theme']))
 
         with doc:
             Header.insert_header(current="settings")

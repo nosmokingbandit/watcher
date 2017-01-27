@@ -30,7 +30,6 @@ h1{
     font-size: 2em;
     font-weight: 700;
     margin: 0.5em 0 0.5em 0;
-    padding: 0;
     display: inline-block;
 }
 
@@ -40,8 +39,6 @@ h2{
     margin: .75em 0 .25em 0;
 }
 
-.hidden{
-    display: none;
 }
 
 ul{
@@ -62,7 +59,6 @@ div#content a{
 div#content ul.wide{
     max-width: 1024px;
     min-width: 640px;
-    margin: 0 0 2.5em 0;
 }
 
 div#content ul li{
@@ -70,12 +66,8 @@ div#content ul li{
     line-height: 2.5em;
 }
 
-div#content ul li.hidden{
-    display:none;
 }
 
-div#content ul li.bbord{
-    border-bottom: 1px solid #bdbdbd;
 }
 
 div#content ul li.rbord{
@@ -226,8 +218,6 @@ ul#usenet, ul#torrent{
 ul#sabnzbd, ul#nzbget, ul#transmission, ul#delugerpc, ul#delugeweb, ul#qbittorrent{
     margin: 0 0 1em 2em;
     display: none;
-    width: 100%;
-
 }
 
 span.test_connection{
@@ -241,7 +231,6 @@ ul#postprocessing{
 
 ul#renamer, ul#mover{
     margin: 0 0 1em 2em;
-    width: 100%;
 }
 
 ul#postprocessing li span.taglist{

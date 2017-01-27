@@ -47,6 +47,10 @@ button{
     cursor: pointer;
 }
 
+.hidden{
+    display: none;
+}
+
 
 ::selection {
   background: #f4693b; /* WebKit/Blink Browsers */

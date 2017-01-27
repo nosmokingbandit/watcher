@@ -7,11 +7,58 @@ from core import ajax, sqldb, poster
 
 logging = logging.getLogger(__name__)
 
+api_version = 1.1
+
+''' API
+
+All methods output a json object:
+{'response': 'true'}
+
+A 'true' response indicates that the request was valid and returs useful data.
+A 'false' response indicates that the request was invalid. This will always include an
+    'error' key that describes the reason for the failure.
+
+All successul method calls then append addition key:value pairs to the output json.
+
+
+# METHODS
+
+mode=liststatus:
+    input: imdbid=tt1234567     <optional>
+    if imdbid supplied:
+        output: {'movie': {'key': 'value', 'key2', 'value2'} }
+    if no imdbid supplied:
+        output: {'movies': [{'key': 'value', 'key2', 'value2'}, {'key': 'value', 'key2', 'value2'}] }
+
+mode=addmovie
+    input: imdbid=tt1234567
+    input: quality=Default      <optional>
+    output: {'message': 'MOVIE TITLE YEAR added to wanted list.'}
+
+    If quality is not supplied, uses 'Default' profile.
+
+mode=removemovie
+    input: imdbid=tt1234567
+    output: {'removed': 'tt1234567'}
+
+mode=version
+    output: {'version': '4fcdda1df1a4ff327c3219311578d703a288e598', 'api_version': 1.0}
+
+
+# API Version
+Methods added to the api will increase the version by X.1
+Version 1.11 is greater than 1.9
+It is safe to assume that these version increases will not break any api interactions
+
+Changes to the output responses will increase the version to the next whole number 2.0
+Major version changes can be expected to break api interactions
+
+'''
+
 
 class API(object):
     '''
     A simple GET/POST api. Used for basic remote interactions.
-    This still needs work.
     '''
     exposed = True
 
@@ -135,4 +182,4 @@ class API(object):
 
         Returns str json.dumps(dict)
         '''
-        return json.dumps({'response': 'true', 'version': core.CURRENT_HASH})
+        return json.dumps({'response': 'true', 'version': core.CURRENT_HASH, 'api_version': api_version})

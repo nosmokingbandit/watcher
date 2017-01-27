@@ -43,42 +43,6 @@ $(document).ready(function () {
             response = JSON.parse(r);
             if(response['response'] == 'fail'){
                 toastr.error("Unable to save settings. Check log for more information.");
-            }
-            else if(response['response'] == 'change' && change_check == true){
-                toastr.success("Settings Saved");
-                diff = response['changes']
-
-                diff_string = ""
-                for(k in diff){
-                    s = JSON.stringify(diff[k])
-                    s = s.replace(/","/g, '<br/>').replace(/"/g, '').replace(/{/g, '').replace(/}/g, '<br/>').replace(/:/g, ': ')
-                    diff_string = diff_string + s
-                }
-
-                swal({
-                    title: "Apply to all movies?",
-                    text: "Would you like to apply these changes to all movies?<br/><br/>" + diff_string + "<br/> Changes will not affect results until next search.",
-                    html: true,
-                    type: "",
-                    showCancelButton: true,
-                    cancelButtonText: "No",
-                    confirmButtonColor: "#03A9F4",
-                    confirmButtonText: "Apply to all",
-                    closeOnConfirm: true
-                }, function(){
-                    $.post(url_base + "/ajax/update_all_quality", {
-                        "quality": JSON.stringify(diff)
-                    })
-                    .done(function(r){
-                        response = JSON.parse(r);
-
-                        if(response['response'] == 'success'){
-                            toastr.success("All movies updated.");
-                        } else {
-                            toastr.error("Unable to update movies. Check log for more information.");
-                        }
-                    })
-                });
             } else {
                 toastr.success("Settings Saved");
             }
@@ -143,59 +107,79 @@ $(document).ready(function () {
 
     function quality(){
         var data = {};
-        var quality = {};
-        var tmp = {};
+        var profiles = {};
         var blanks = false;
+        var names = [];
 
-        var q_list = [];
-        $("ul#resolution i.checkbox").each(function(){
-            q_list.push( $(this).attr("id") );
-        });
+        $("ul.quality_profile").each(function(){
+            var $this = $(this);
+            var tmp = {};
+            var name = $this.find("li.name input.name").val();
 
-        // enabled resolutions
-        $("ul#resolution i.checkbox").each(function(){
-            tmp[$(this).attr("id")] = $(this).attr("value");
-        });
-
-        // order of resolutions
-        var arr = $("ul#resolution").sortable("toArray");
-        arr.shift();
-        $.each(arr, function(i, v){
-            tmp[v] = i;
-        });
-        // min/max sizes
-        $("#resolution_size :input").each(function(){
-            if($(this).val() == ''){
-                blanks = true;
-                highlight($(this));
+            if(name === undefined){
+                name = 'Default'
             }
-            tmp[$(this).attr("id")] = $(this).val();
-        });
+
+            if(name == '' || name === undefined){
+                blanks = true;
+                toastr.warning("Please enter a name for each profile.");
+                return false;
+            }
+
+            if(names.includes(name)){
+                blanks = true;
+                toastr.warning("Please enter a unique name for each profile.");
+                return false;
+            }
+
+            names.push(name);
+
+            profiles[name] = {};
+
+            var q_list = [];
+            $this.find("ul#resolution i.checkbox").each(function(){
+                $_this = $(this);
+                res = $_this.attr('id');
+                enabled = $_this.attr('value');
+                profiles[name][res] = [enabled];
+            });
+
+            // order of resolutions
+            var arr = $this.find("ul#resolution").sortable("toArray");
+            arr.shift();
+            $.each(arr, function(value, res){
+                profiles[name][res].push(value)
+            });
+
+            // min/max sizes
+            $this.find("#resolution_size :input").each(function(){
+                $_this = $(this);
+                if($_this.val() == ''){
+                    blanks = true;
+                    highlight($_this);
+                }
+                res = $_this.attr('id');
+                size = $_this.val();
+                profiles[name][res].push(size);
+            })
+
+            // word lists
+            $this.find("ul#filters li input").each(function(){
+                $_this = $(this);
+                id = $_this.attr('id');
+                value = $_this.val();
+                profiles[name][id] = value;
+            })
+
+            profiles[name] = JSON.stringify(profiles[name]);
+
+        })
 
         if(blanks == true){
             return false;
         };
-
-        $.each(q_list, function(i, res){
-            var enabled = res,
-                priority = res + "priority",
-                min = res + "min",
-                max = res + "max";
-            var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
-            quality[res] = [tmp[enabled], tmp[priority], tmp[min], tmp[max]].join(',');
-        });
-
-        data["Quality"] = quality;
-
-        // FILTERS options.
-        var filters = {};
-        $("ul#filters li input").each(function(){
-            var val = $(this).val().split(", ").join(",");
-            filters[$(this).attr("id")] = val;
-        });
-        data["Filters"] = filters;
-
-        return data
+        data['Quality'] = profiles
+        return data;
     }
 
     function providers(){
@@ -264,7 +248,6 @@ $(document).ready(function () {
             }
         });
         data['TorrentIndexers'] = torrent_indexers;
-
         if(cancel == true){
             return false;
         } else {

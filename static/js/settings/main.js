@@ -128,13 +128,29 @@ $(document).ready(function () {
 
     // Add new rows
     $("div.providers i#add_newznab_row").click(function (){
-        var row = "<li class='newznab_indexer'>\n<i class='fa fa-square-o newznab_check checkbox' value='false'></i>\n<input class='newznab_url' placeholder=' http://indexer.url' type='text'>\n<input class='newznab_api' placeholder=' Api Key' type='text'><i class='newznab_clear fa fa-trash-o'></i><i class='newznab_test fa fa-plug'/>\n</li>"
+        var row = `
+        <li class='newznab_indexer'>
+            <i class='fa fa-square-o newznab_check checkbox' value='false'/>
+            <input class='newznab_url' placeholder=' http://indexer.url' type='text'/>
+            <input class='newznab_api' placeholder=' Api Key' type='text'/>
+            <i class='newznab_clear fa fa-trash-o'/>
+            <i class='newznab_test fa fa-plug'/>
+        </li>
+        `
 
         $("ul#newznab_list li:nth-last-child(2)").after(row);
     });
 
     $("div.providers i#add_potato_row").click(function (){
-        var row = "<li class='potato_indexer'>\n<i class='fa fa-square-o potato_check checkbox' value='false'></i>\n<input class='potato_url' placeholder=' http://indexer.url' type='text'>\n<input class='potato_api' placeholder=' Api Key' type='text'><i class='potato_clear fa fa-trash-o'></i><i class='potato_test fa fa-plug'/>\n</li>"
+        var row = `
+        <li class='potato_indexer'>
+            <i class='fa fa-square-o potato_check checkbox' value='false'/>
+            <input class='potato_url' placeholder=' http://indexer.url' type='text'>
+            <input class='potato_api' placeholder=' Api Key' type='text'>
+            <i class='potato_clear fa fa-trash-o'>
+            <i class='potato_test fa fa-plug'/>
+        </li>
+        `
 
         $("div.providers ul#potato_list li:nth-last-child(2)").after(row);
     });
@@ -269,22 +285,122 @@ $(document).ready(function () {
     /* Quality */
 
     // set up sortable
-    $(function () {
-        $("ul.sortable").sortable();
-        $("ul.sortable").disableSelection();
-    });
+    init_sortables()
+
 
     $("div.quality ul.sortable").sortable({
         cancel: "span.not_sortable"
     });
 
     // set order for sortable items
-    $("div.quality ul#resolution li").each(function () {
+    $("div.quality ul#resolution li").each(function(){
         $(this).siblings().eq($(this).attr("sort")).after($(this));
     });
-    $("div.quality ul#sources li").each(function () {
+    $("div.quality ul#sources li").each(function(){
         $(this).siblings().eq($(this).attr("sort")).after($(this));
     });
+
+    // add new profile
+    $("div.quality div#add_new_profile").click(function(){
+
+        html = `
+        <ul class="quality_profile wide">
+                  <li class="name bold">Name:
+                    <input class="name" type="text" value="New Profile">
+                    <div class="delete_profile" name="New Profile">
+                        <i class="fa fa-trash-o"></i>
+                        <span>Delete profile.</span>
+                    </div>
+                  </li>
+                  <ul class="sortable ui-sortable" id="resolution">
+                    <li class="sub_cat ui-sortable-handle">Resolution Priority</li><li class="rbord ui-sortable-handle" id="4K" sort="0">
+                      <i class="fa fa-bars"></i>
+                      <i class="fa fa-square-o checkbox" id="4K" value="false"></i>
+                      <span>4K</span>
+                    </li><li class="rbord ui-sortable-handle" id="1080P" sort="1">
+                      <i class="fa fa-bars"></i>
+                      <i class="fa checkbox fa-check-square-o" id="1080P" value="true"></i>
+                      <span>1080P</span>
+                    </li><li class="rbord ui-sortable-handle" id="720P" sort="2">
+                      <i class="fa fa-bars"></i>
+                      <i class="fa checkbox fa-check-square-o" id="720P" value="true"></i>
+                      <span>720P</span>
+                    </li><li class="rbord ui-sortable-handle" id="SD" sort="3">
+                      <i class="fa fa-bars"></i>
+                      <i class="fa fa-square-o checkbox" id="SD" value="false"></i>
+                      <span>SD</span>
+                    </li>
+                  </ul>
+                  <ul id="resolution_size">
+                    <li class="sub_cat">Size Restrictions (MB)</li>
+                    <li>
+                      <span>4K</span>
+                      <input class="min" id="4K" min="0" type="number" value="10000">
+                      <span>-</span>
+                      <input class="max" id="4K" min="0" type="number" value="50000">
+                    </li>
+                    <li>
+                      <span>1080P</span>
+                      <input class="min" id="1080P" min="0" type="number" value="2000">
+                      <span>-</span>
+                      <input class="max" id="1080P" min="0" type="number" value="10000">
+                    </li>
+                    <li>
+                      <span>720P</span>
+                      <input class="min" id="720P" min="0" type="number" value="500">
+                      <span>-</span>
+                      <input class="max" id="720P" min="0" type="number" value="10000">
+                    </li>
+                    <li>
+                      <span>SD</span>
+                      <input class="min" id="SD" min="0" type="number" value="200">
+                      <span>-</span>
+                      <input class="max" id="SD" min="0" type="number" value="1000">
+                    </li>
+                  </ul>
+                  <ul class="wide" id="filters">
+                    <li class="bbord">
+                      <span class="bold">Required words:</span>
+                      <input id="requiredwords" type="text" value="">
+                      <span class="tip">Releases must contain one of these words.</span>
+                    </li>
+                    <li class="bbord">
+                      <span class="bold">Preferred words:</span>
+                      <input id="preferredwords" type="text" value="">
+                      <span class="tip">Releases with these words score higher.</span>
+                    </li>
+                    <li>
+                      <span class="bold">Ignored words:</span>
+                      <input id="ignoredwords" type="text" value="subs,german,dutch,french,truefrench,danish,swedish,spanish,italian,korean,dubbed,swesub,korsub,dksubs,vain,HC,blurred">
+                      <span class="tip">Releases with these words are ignored.</span>
+                    </li>
+                  </ul>
+                </ul>
+        `
+
+
+        $("div#qualities").append(html);
+        init_sortables();
+    })
+
+
+    // remove profile
+    $("div.quality div.delete_profile").click(function(){
+        $this = $(this);
+
+        swal({
+            title: "Delete quality profile?",
+            text: "Any movies assigned to this profile will instead use Default until changed.",
+            type: "",
+            showCancelButton: true,
+            confirmButtonColor: "#4CAF50",
+            confirmButtonText: "Delete profile",
+            closeOnConfirm: true
+        }, function(){
+            $profile = $this.parents("ul.quality_profile");
+            $profile.slideUp(500, function(){$(this).remove()})
+        });
+    })
 
     /* Logs */
 
@@ -309,3 +425,8 @@ $(document).ready(function () {
     });
 
 });
+
+function init_sortables(){
+    $("ul.sortable").sortable();
+    $("ul.sortable").disableSelection();
+}

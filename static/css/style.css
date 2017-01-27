@@ -35,6 +35,10 @@ ul{
     margin: 0;
 }
 
+input{
+    outline: none;
+}
+
 button{
     height: 2em;
     line-height: 2em;
@@ -45,6 +49,14 @@ button{
     outline: none;
     font-size: 1.0em;
     cursor: pointer;
+}
+
+select{
+    border-radius: 4px;
+}
+
+.hidden{
+    display: none;
 }
 
 
@@ -83,6 +95,7 @@ a:visisted {
   background: #212121;
 }
 ::-webkit-scrollbar-track {
+  border-radius: 4px;
   background: transparent;
   border: none;
 }

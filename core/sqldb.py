@@ -206,9 +206,7 @@ class SQL(object):
         if result:
             lst = []
             for i in result:
-                i = dict(i)
-                i['quality'] = json.loads(i['quality'])
-                lst.append(i)
+                lst.append(dict(i))
             return lst
         else:
             logging.error(u'EXECUTE SQL.GET_USER_MOVIES FAILED.')

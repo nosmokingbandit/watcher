@@ -30,7 +30,6 @@ h1{
     font-size: 2em;
     font-weight: 700;
     margin: 0.5em 0 0.5em 0;
-    padding: 0;
     display: inline-block;
 }
 
@@ -40,12 +39,13 @@ h2{
     margin: .75em 0 .25em 0;
 }
 
-.hidden{
-    display: none;
+.bold{
+    font-weight: bold;
 }
 
 ul{
     clear: none;
+    list-style: none;
 }
 
 div#content{
@@ -62,7 +62,6 @@ div#content a{
 div#content ul.wide{
     max-width: 1024px;
     min-width: 640px;
-    margin: 0 0 2.5em 0;
 }
 
 div#content ul li{
@@ -70,12 +69,14 @@ div#content ul li{
     line-height: 2.5em;
 }
 
-div#content ul li.hidden{
-    display:none;
+.bbord{
+    border-bottom: 1px solid #bdbdbd;
+    display: block;
 }
 
-div#content ul li.bbord{
-    border-bottom: 1px solid #bdbdbd;
+span.bbord{
+    margin: 0;
+    padding: 0;
 }
 
 div#content ul li.rbord{
@@ -94,12 +95,12 @@ div#content ul li.lbord{
 }
 
 /* server */
-span#restart, span#shutdown{
+div.server span#restart, span#shutdown{
     margin: 0 1em 0 0;
     cursor: pointer;
 }
 
-span#update_check{
+div.server span#update_check{
     cursor: pointer;
 }
 
@@ -108,20 +109,118 @@ input#retention{
     width: 4em;
 }
 
-/* Providers */
+/* Quality */
 
-div#content ul#providers{
+div.quality ul.quality_profile{
+    margin-bottom: 2em;
+    padding: 0 1em 1em 1em;
+}
+
+div.quality li.name{
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+div.quality li.name input{
+    font-size: 0.65em;
+    height: 1.75em;
+    vertical-align: middle;
+}
+
+div.quality ul#quality{
     overflow: hidden;
 }
 
-div#content ul#newznab_list,
-div#content ul#potato_list,{
+div.quality ul.quality_profile{
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+div.quality ul.quality_profile input{
+    background-color: #fff;
+}
+
+div.quality div.delete_profile{
+    float: right;
+    font-size: 1rem;
+}
+
+div.quality ul#resolution{
+    width: 30%;
+
+    float: left;
+}
+
+div.quality ul#resolution li{
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+div.quality ul#resolution_size li{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+div.quality ul#resolution_size li span{
+    min-width: 1em;
+    text-align: center;
+    flex: 0 1 auto;
+    align-self: auto;
+}
+
+div.quality ul#resolution_size li span:nth-child(1){
+    min-width: 5em;
+}
+
+div.quality ul#resolution_size li input{
+    flex: 1 0 auto;
+    align-self: auto;
+}
+
+div.quality ul#filters{
+    margin: 1em 0 0 0;
+}
+
+div.quality ul#filters li{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+div.quality ul#filters li span{
+    order: 0;
+    flex: 0 1 auto;
+}
+
+div.quality ul#filters li span:nth-child(1){
+    width: 8em;
+}
+
+div.quality ul#filters li input{
+    order: 0;
+    flex: 1 0 auto;
+    margin: 0 1em;
+    max-width: 24em;
+}
+
+
+/* Providers */
+
+div.providers ul#providers{
+    overflow: hidden;
+}
+
+div.providers ul#newznab_list,
+div.providers ul#potato_list,{
     float: left;
     width: 100%;
 }
 
-ul#newznab_list li,
-ul#potato_list li{
+div.providers ul#newznab_list li,
+div.providers ul#potato_list li{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -129,88 +228,32 @@ ul#potato_list li{
 }
 
 
-i.newznab_check,
-i.potato_check,
-i.torrent_check{
+div.providers i.newznab_check,
+div.providers i.potato_check,
+div.providers i.torrent_check{
     width: 1.2em;
     text-align: left;
     flex: 0 1 auto;
 }
 
-i.newznab_clear, i.newznab_test,
-i.potato_clear, i.potato_test{
+div.providers i.newznab_clear, div.providers i.newznab_test,
+div.providers i.potato_clear, div.providers i.potato_test{
     width: 1.5em;
     text-align: center;
     flex: 0 1 auto;
 }
 
-input.newznab_url, input.newznab_api,
-input.potato_url, input.potato_api{
+div.providers input.newznab_url, div.providers input.newznab_api,
+div.providers input.potato_url, div.providers input.potato_api{
     flex: 1 0 auto;
     margin: 0 0.5em;
 }
 
-li.add_newznab_row,
-li.add_potato_row{
+div.providers li.add_newznab_row,
+div.providers li.add_potato_row{
     margin: 0 0 2em 0;
 }
 
-
-/* Quality */
-
-ul#quality{
-    overflow: hidden;
-}
-
-ul#resolution{
-    width: 30%;
-    margin: 0 5% 0 0;
-    float: left;
-}
-
-ul#resolution li{
-    height: 2.5em;
-    line-height: 2.5em;
-}
-
-ul#resolution_size li{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-ul#resolution_size li span{
-    width: 6em;
-}
-
-ul#resolution_size li input{
-    order: 0;
-    flex: 1 0 auto;
-    margin: 0 1em;
-}
-
-ul#filters li{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-ul#filters li span{
-    order: 0;
-    flex: 0 1 auto;
-}
-
-ul#filters li input{
-    order: 0;
-    flex: 1 0 auto;
-    margin: 0 1em;
-}
-
-div.hidden_data{
-    display: none;
-}
 
 /* downloader */
 
@@ -220,14 +263,12 @@ ul#enabled_source span{
 }
 
 ul#usenet, ul#torrent{
-    margin: 0 0 4em 0;
+    margin: 0 0 2em 0;
 }
 
 ul#sabnzbd, ul#nzbget, ul#transmission, ul#delugerpc, ul#delugeweb, ul#qbittorrent{
     margin: 0 0 1em 2em;
     display: none;
-    width: 100%;
-
 }
 
 span.test_connection{
@@ -241,12 +282,15 @@ ul#postprocessing{
 
 ul#renamer, ul#mover{
     margin: 0 0 1em 2em;
-    width: 100%;
 }
 
 ul#postprocessing li span.taglist{
     font-family: "Lucida Console", Monaco, monospace;
     font-size: .75em;
+}
+
+span.charlist{
+    font-family: "Lucida Console", Monaco, monospace;
 }
 
 /* logs */
@@ -308,7 +352,7 @@ ul#libraries li{
 
 /**/
 span.tip{
-    font-size: 0.75em;
+    font-size: 0.75rem;
     margin: 0 0.25em 0 2em;
     height: 2.5em;
     text-align: right;

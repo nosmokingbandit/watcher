@@ -129,6 +129,10 @@ class Config():
             if '__name__' in d[i]:
                 del d[i]['__name__']
 
+        repl = d['Postprocessing']['replaceillegal']
+        if repl in ['"', '*', '?', '<', '>', '|', ':']:
+            d['Postprocessing']['replaceillegal'] = ''
+
         # split Indexers values into lists
         for k, v in d['Indexers'].iteritems():
             d['Indexers'][k] = v.split(',')

@@ -145,9 +145,9 @@ $(document).ready(function () {
         var row = `
         <li class='potato_indexer'>
             <i class='fa fa-square-o potato_check checkbox' value='false'/>
-            <input class='potato_url' placeholder=' http://indexer.url' type='text'>
-            <input class='potato_api' placeholder=' Api Key' type='text'>
-            <i class='potato_clear fa fa-trash-o'>
+            <input class='potato_url' placeholder=' http://indexer.url' type='text'/>
+            <input class='potato_api' placeholder=' Api Key' type='text'/>
+            <i class='potato_clear fa fa-trash-o'/>
             <i class='potato_test fa fa-plug'/>
         </li>
         `

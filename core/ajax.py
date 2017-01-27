@@ -115,14 +115,14 @@ class Ajax(object):
 
         if not data['imdbid']:
             response['response'] = u'false'
-            response['message'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
+            response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
             return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
             response['response'] = u'false'
-            response['message'] = u'{} {} is already wanted, cannot add.'.format(title, year)
+            response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
         else:
@@ -158,7 +158,7 @@ class Ajax(object):
                 return json.dumps(response)
             else:
                 response['response'] = u'false'
-                response['message'] = u'Could not write to database. ' \
+                response['error'] = u'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
 
@@ -181,7 +181,7 @@ class Ajax(object):
         data = self.tmdb.find_imdbid(imdbid)[0]
 
         if not data:
-            response['status'] = u'failed'
+            response['status'] = u'false'
             response['message'] = u'{} not found on TMDB.'.format(imdbid)
             return response
 

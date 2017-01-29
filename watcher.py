@@ -14,7 +14,7 @@ from core.app import App
 from core.log import log
 
 if os.name == 'nt':
-    from core.plugins import systray
+    from core.cp_plugins import systray
 
 MIN_PYTHON = (2, 7, 9)
 if sys.version_info < MIN_PYTHON:

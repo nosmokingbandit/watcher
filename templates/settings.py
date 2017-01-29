@@ -223,7 +223,7 @@ class Settings():
                     input(value=name, type='text', cls='name')
                     with div(cls='delete_profile', name=name):
                         i(cls='fa fa-trash-o')
-                        span('Delete profile.')
+                        span('Delete profile')
 
             # Resolution Block
             with ul(id='resolution', cls='sortable'):
@@ -361,7 +361,7 @@ class Settings():
             c_s = 'Sabnzbd'
             with li(cls='bbord'):
                 i(id='sabenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='sabnzbd', value=c[c_s]['sabenabled'])
-                span(u'Sabnzbd', cls='sub_cat')
+                span(u'SABnzbd', cls='sub_cat')
             # I'm not 100% sure it is valid to do a ul>ul, but it only work this way so deal with it.
             with ul(id='sabnzbd', cls='nzb'):
                 with li(u'Host & Port: ', cls='bbord'):
@@ -683,7 +683,5 @@ class Settings():
             logfiles.append(i)
 
         return logfiles
-
-
 
 # pylama:ignore=W0401

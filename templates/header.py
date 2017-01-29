@@ -52,7 +52,6 @@ class Header():
                                         i(cls='fa fa-info-circle')
                                         span(u'About')
 
-
                     with a(href=core.URL_BASE + '/add_movie/'):
                         if current == 'add_movie':
                             cls = 'add_movie current'

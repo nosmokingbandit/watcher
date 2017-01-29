@@ -8,7 +8,6 @@ import threading
 import cherrypy
 import core
 from core import config, newznab, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
-from core.helpers import Conversions, Comparisons
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification

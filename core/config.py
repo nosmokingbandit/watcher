@@ -144,6 +144,9 @@ class Config():
         for i in r:
             del d['Quality'][i]
 
+        for k, v in d['Plugins'].iteritems():
+            d['Plugins'][k] = json.loads(v)
+
         # split Indexers values into lists
         for k, v in d['Indexers'].iteritems():
             d['Indexers'][k] = v.split(',')

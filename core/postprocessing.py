@@ -9,7 +9,7 @@ import urllib2
 import cherrypy
 import core
 import PTN
-from core import snatcher, sqldb, updatestatus
+from core import plugins, snatcher, sqldb, updatestatus
 
 logging = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ class Postprocessing(object):
     exposed = True
 
     def __init__(self):
+        self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()
         self.update = updatestatus.Status()
@@ -85,23 +86,37 @@ class Postprocessing(object):
         if data['mode'] == u'failed':
             logging.info(u'Post-processing as Failed.')
             # returns to url:
-            response = json.dumps(self.failed(data), indent=2, sort_keys=True)
+            response = self.failed(data)
             logging.info(response)
         elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
-            # returns to url:
-            response = json.dumps(self.complete(data), indent=2, sort_keys=True)
+
+            response = self.complete(data)
+
+            title = response['title']
+            year = response['year']
+            imdbid = response['imdbid']
+            resolution = response['resolution']
+            rated = response['rated']
+            original_file = response.get('orig_filename')
+            new_file_location = response.get('new_file_location')
+            downloadid = response['downloadid']
+            finished_date = response['finished_date']
+
+            self.plugins.finished(title, year, imdbid, resolution, rated, original_file,
+                                  new_file_location, downloadid, finished_date)
+
             logging.info(response)
         else:
             logging.info(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
-                               'error': 'invalid mode value'})
+                               'error': 'invalid mode value'}, indent=2, sort_keys=True)
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
         logging.info(u'#################################')
 
-        return response
+        return json.dumps(response, indent=2, sort_keys=True)
 
     @cherrypy.expose
     def GET(self, **data):
@@ -369,6 +384,9 @@ class Postprocessing(object):
                 if type(v) == str:
                     data[k] = re.sub(r'[:"*?<>|]+', repl, v)
 
+            # get rating from omdb
+            if data['imdbid']:
+                data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
             return data
         else:
             return {}

@@ -27,6 +27,9 @@ $(document).ready(function () {
         }
     });
 
+    // set up sortable
+    init_sortables()
+
     /* Server */
 
     // Generate new api key
@@ -284,27 +287,11 @@ $(document).ready(function () {
 
     /* Quality */
 
-    // set up sortable
-    init_sortables()
-
-
-    $("div.quality ul.sortable").sortable({
-        cancel: "span.not_sortable"
-    });
-
-    // set order for sortable items
-    $("div.quality ul#resolution li").each(function(){
-        $(this).siblings().eq($(this).attr("sort")).after($(this));
-    });
-    $("div.quality ul#sources li").each(function(){
-        $(this).siblings().eq($(this).attr("sort")).after($(this));
-    });
-
     // add new profile
     $("div.quality div#add_new_profile").click(function(){
 
         html = `
-        <ul class="quality_profile wide">
+        <ul class="quality_profile wide hidden">
                   <li class="name bold">Name:
                     <input class="name" type="text" value="New Profile">
                     <div class="delete_profile" name="New Profile">
@@ -378,14 +365,20 @@ $(document).ready(function () {
                 </ul>
         `
 
-
         $("div#qualities").append(html);
-        init_sortables();
+
+        $new_ul = $("div#qualities ul.quality_profile").last();
+
+        $new_sortable = $new_ul.find("ul.sortable")
+
+        init_sortables($sortables=$new_sortable);
+
+        $new_ul.slideDown();
     })
 
 
     // remove profile
-    $("div.quality div.delete_profile").click(function(){
+    $("div.quality").on("click", "div.delete_profile", function(){
         $this = $(this);
 
         swal({
@@ -426,7 +419,28 @@ $(document).ready(function () {
 
 });
 
-function init_sortables(){
-    $("ul.sortable").sortable();
-    $("ul.sortable").disableSelection();
+function init_sortables($sortables=false){
+    if($sortables == false){
+        var $sortables = $("ul.sortable")
+    }
+
+    $sortables.sortable({cancel: "span.not_sortable"});
+    $sortables.disableSelection();
+
+    $sortables.each(function(){
+        $this = $(this);
+        console.log($this)
+
+        $lis = $this.children("li").get();
+
+        $lis.sort(function(a, b){
+            var compa = parseInt($(a).attr("sort"));
+            var compb = parseInt($(b).attr("sort"));
+            return (compa < compb) ? -1 : (compa > compb) ? 1 : 0;
+        })
+
+        $.each($lis, function(idx, itm) {
+                $this.append(itm);
+            });
+    })
 }

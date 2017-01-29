@@ -29,6 +29,10 @@ div.quality ul.quality_profile input{
     background-color: #080f18;
 }
 
+div.plugins ul{
+    background-color: #151c25;
+}
+
 /* For log file viewing */
 pre#log_display {
     border: 1px solid #ccc;

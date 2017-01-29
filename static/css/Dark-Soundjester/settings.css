@@ -6,6 +6,10 @@ div.quality ul.quality_profile{
     background-color: #000;
 }
 
+div.plugins ul{
+    background-color: #000;
+}
+
 /* For log file viewing */
 pre#log_display {
     border: 1px solid #bdbdbd;

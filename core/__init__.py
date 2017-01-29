@@ -2,6 +2,7 @@
 PROG_PATH = None
 CONF_FILE = u'config.cfg'
 LOG_DIR = u'logs'
+PLUGIN_DIR = u'plugins'
 DB_FILE = u'watcher.sqlite'
 THEME = u'Default'
 

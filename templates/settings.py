@@ -23,15 +23,21 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.28')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.28'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.28')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.29')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.29'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=01.26')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=01.26'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.29')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.28')
 
         with doc:
             Header.insert_header(current="settings")
             with div(id="content", cls=page.__name__):
                 page(self, config)
+
+            div(id='overlay')
+
+            div(id='plugin_conf_popup')
 
         return doc.render()
 
@@ -592,7 +598,6 @@ class Settings():
 
         for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, 'plugins')):
             folder = os.path.split(root)[1]
-            filenames = [fname for fname in filenames if fname.startswith('.') is False]
             if folder == 'added':
                 added = filenames
             elif folder == 'snatched':
@@ -604,55 +609,15 @@ class Settings():
 
         with div(cls='plugins'):
             h1(u'Plugins')
-            c_s = 'Plugins'
 
             with ul('Added Movie', id='added', cls='sortable'):
-                fid = 0
-                for plugin in added:
-                    name = plugin.split('.')[-2]
-                    plug_conf = c[c_s]['added'].get(plugin)
-                    if plug_conf is not None:
-                        enabled, sort = plug_conf
-                    else:
-                        sort = 900 + fid
-                        enabled = 'false'
-                    with li(id='added{}'.format(fid), plugin=plugin, sort=sort):
-                        i(cls='fa fa-bars')
-                        i(cls='fa fa-square-o checkbox', value=enabled)
-                        span(name)
-                    fid += 1
+                self.render_plugins(added, 'added')
 
             with ul('Snatched Release', id='snatched', cls='sortable'):
-                fid = 0
-                for plugin in snatched:
-                    name = plugin.split('.')[-2]
-                    plug_conf = c[c_s]['snatched'].get(plugin)
-                    if plug_conf is not None:
-                        enabled, sort = plug_conf
-                    else:
-                        sort = 900 + fid
-                        enabled = 'false'
-                    with li(id='snatched{}'.format(fid), plugin=plugin, sort=sort):
-                        i(cls='fa fa-bars')
-                        i(cls='fa fa-square-o checkbox', value=enabled)
-                        span(name)
-                    fid += 1
+                self.render_plugins(snatched, 'snatched')
 
             with ul('Postprocessing Finished', id='finished', cls='sortable'):
-                fid = 0
-                for plugin in finished:
-                    name = plugin.split('.')[-2]
-                    plug_conf = c[c_s]['finished'].get(plugin)
-                    if plug_conf is not None:
-                        enabled, sort = plug_conf
-                    else:
-                        sort = 900 + fid
-                        enabled = 'false'
-                    with li(id='finished{}'.format(fid), plugin=plugin, sort=sort):
-                        i(cls='fa fa-bars')
-                        i(cls='fa fa-square-o checkbox', value=enabled)
-                        span(name)
-                    fid += 1
+                self.render_plugins(finished, 'finished')
 
             with span('See the '):
                 a('wiki', href='https://github.com/nosmokingbandit/watcher/wiki', target='_blank')
@@ -661,6 +626,45 @@ class Settings():
         with div(id='save', cat='plugins'):
             i(cls='fa fa-save')
             span(u'Save Settings')
+
+    def render_plugins(self, plugins, folder):
+        ''' Renders <li>s for plugins list
+        plugins: list of plugin files. Absolute paths.
+        folder: name of folder holding plugin files.
+
+        'folder' is used to find data in config and set element ids and classes
+
+        Returns str html list items
+        '''
+
+        c = core.CONFIG
+        c_s = 'Plugins'
+
+        fid = 0
+        for plugin in plugins:
+            if plugin.endswith('.py') is False or plugin.startswith('.') is True:
+                continue
+            name = plugin[:-3]
+
+            if '{}.conf'.format(name) in plugins:
+                conf = '{}.conf'.format(name)
+            else:
+                conf = None
+
+            plug_conf = c[c_s][folder].get(plugin)
+            if plug_conf is not None:
+                enabled, sort = plug_conf
+            else:
+                sort = 900 + fid
+                enabled = 'false'
+            with li(id='{}{}'.format(folder, fid), plugin=plugin, sort=sort):
+                i(cls='fa fa-bars')
+                i(cls='fa fa-square-o checkbox', value=enabled)
+                span(name)
+                if conf:
+                    i(cls='fa fa-cog edit_conf', conf=conf)
+            fid += 1
+        return
 
     @expose
     @settings_page

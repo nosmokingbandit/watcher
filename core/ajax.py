@@ -12,7 +12,7 @@ from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
 from core.rss import predb
-from templates import movie_info_popup, movie_status_popup, status
+from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status
 
 logging = logging.getLogger(__name__)
 
@@ -555,3 +555,38 @@ class Ajax(object):
             return json.dumps(torrent.Torrent.test_potato_connection(indexer, apikey))
         else:
             return None
+
+    @cherrypy.expose
+    def get_plugin_conf(self, folder, conf):
+        ''' Calls plugin_conf_popup to render html
+        folder: str folder to read config file from
+        conf: str filename of config file (ie 'my_plugin.conf')
+
+        Returns str html content.
+        '''
+
+        return plugin_conf_popup.PluginConfPopup.html(folder, conf)
+
+    @cherrypy.expose
+    def save_plugin_conf(self, folder, conf, data):
+        ''' Calls plugin_conf_popup to render html
+        folder: str folder to store config file
+        conf: str filename of config file (ie 'my_plugin.conf')
+        data: str json data to store in conf file
+
+        Returns str json dumps dict of success/fail message
+        '''
+
+        data = json.loads(data)
+
+        conf_file = conf_file = os.path.join(core.PROG_PATH, core.PLUGIN_DIR, folder, conf)
+
+        response = {'response': 'true', 'message': 'Plugin settings saved'}
+
+        try:
+            with open(conf_file, 'w') as output:
+                json.dump(data, output, indent=2)
+        except Exception, e: #noqa
+            response = {'response': 'false', 'error': str(e)}
+
+        return json.dumps(response)

@@ -3,7 +3,6 @@ import os
 import cherrypy
 import core
 import dominate
-import json
 from cherrypy import expose
 from dominate.tags import *
 from header import Header
@@ -593,6 +592,7 @@ class Settings():
 
         for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, 'plugins')):
             folder = os.path.split(root)[1]
+            filenames = [fname for fname in filenames if fname.startswith('.') is False]
             if folder == 'added':
                 added = filenames
             elif folder == 'snatched':

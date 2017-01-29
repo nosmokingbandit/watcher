@@ -178,6 +178,13 @@ class Settings():
                 input(type='number', min='15', id='imdbfrequency', value=c[c_s]['imdbfrequency'], style='width: 3.0em')
                 span(' minutes.')
                 span('*Requires restart.', cls='tip')
+            with li():
+                i(id='popularmoviessync', cls='fa fa-square-o checkbox', value=c[c_s]['popularmoviessync'])
+                span(u'Sync Popular Movie list ')
+                span(' every ')
+                input(type='number', min='15', id='popularmoviesfrequency', value=c[c_s]['popularmoviesfrequency'], style='width: 3.0em')
+                span(' minutes.')
+                span('*Requires restart.', cls='tip')
 
         with div(id='save', cat='search'):
             i(cls='fa fa-save')

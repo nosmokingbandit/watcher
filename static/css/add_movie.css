@@ -125,19 +125,6 @@ i.button_add{
             }
 }
 
-/* specific movie details */
-#overlay {
-    display: none;
-    position: fixed;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 100%;
-    background-color: #212121;
-    z-index:1001;
-    opacity: 0.95;
-}
-
 #info_pop_up {
     background: white;
     border-top: 1px solid #bdbdbd;

@@ -202,7 +202,6 @@ div.quality ul#filters li{
 }
 
 div.quality ul#filters li span{
-    order: 0;
     flex: 0 1 auto;
 }
 
@@ -211,7 +210,6 @@ div.quality ul#filters li span:nth-child(1){
 }
 
 div.quality ul#filters li input{
-    order: 0;
     flex: 1 0 auto;
     margin: 0 1em;
     max-width: 24em;
@@ -341,6 +339,20 @@ div.plugins ul li i{
 
 div.plugins ul li span{
     font-size: 1.25rem;
+}
+
+div.plugins ul li i.edit_conf{
+    float: right;
+}
+
+#plugin_conf_popup {
+    background: white;
+    border-top: 1px solid #bdbdbd;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: none;
+    z-index:1002;
 }
 
 /* logs */

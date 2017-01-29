@@ -2,7 +2,7 @@ $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
     var git_url = $("meta[name='git_url']").attr("content");
 
-    /* Shared */
+/* Shared */
 
     // set default state for pseudo checkboxes
     $("i.checkbox").each(function(){
@@ -30,7 +30,7 @@ $(document).ready(function () {
     // set up sortable
     init_sortables()
 
-    /* Server */
+/* Server */
 
     // Generate new api key
     $("div.server i#generate_new_key").click(function(){
@@ -127,7 +127,7 @@ $(document).ready(function () {
         });
     };
 
-    /* Providers */
+/* Providers */
 
     // Add new rows
     $("div.providers i#add_newznab_row").click(function (){
@@ -203,7 +203,7 @@ $(document).ready(function () {
     });
 
 
-    /* Downloader */
+/* Downloader */
 
     // hide disabled download types
     $("div.downloader h2 i").click(function(){
@@ -285,7 +285,7 @@ $(document).ready(function () {
         })
     });
 
-    /* Quality */
+/* Quality */
 
     // add new profile
     $("div.quality div#add_new_profile").click(function(){
@@ -395,7 +395,28 @@ $(document).ready(function () {
         });
     })
 
-    /* Logs */
+/* Plugins */
+
+    // apply plugin_conf overlay
+    $("i.edit_conf").click(function(){
+        $('div#overlay').fadeIn();
+        $this = $(this);
+        folder = $this.parents("ul").attr("id")
+        conf = $this.attr("conf");
+        $.post(url_base + "/ajax/get_plugin_conf", {"folder": folder, "conf": conf})
+        .done(function(html){
+            $("div#plugin_conf_popup").html(html).slideDown();
+        });
+    })
+
+    $('body').on('click' ,'div#overlay', function(){
+        $(this).fadeOut();
+        $('div#plugin_conf_popup').slideUp();
+        $("div#info_pop_up").empty();
+    });
+
+
+/* Logs */
 
     // Open log file
     $("span#view_log").click(function(){
@@ -429,7 +450,6 @@ function init_sortables($sortables=false){
 
     $sortables.each(function(){
         $this = $(this);
-        console.log($this)
 
         $lis = $this.children("li").get();
 

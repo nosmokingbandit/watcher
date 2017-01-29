@@ -98,7 +98,6 @@ $(document).ready(function() {
     });
 
 // applies add movie overlay
-
     $('div#database_results').on('click', 'img', function(){
         $('div#overlay').fadeIn();
 
@@ -106,8 +105,7 @@ $(document).ready(function() {
 
         $.post(url_base + "/ajax/movie_info_popup", {"data": data})
             .done(function(html){
-                $('div#info_pop_up').html(html);
-                $('div#info_pop_up').slideDown();
+                $('div#info_pop_up').html(html).slideDown();
             });
     });
 
@@ -115,7 +113,5 @@ $(document).ready(function() {
         $(this).fadeOut();
         $('div#info_pop_up').slideUp();
         $("div#info_pop_up").empty();
-        /* Don't ask me why slide Up slides it down. I give up. It works. That is all we need to know */
-
     });
 });

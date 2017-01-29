@@ -24,11 +24,6 @@ span.quickadd{
     background-color: #ccc;
 }
 
-/* specific movie details */
-#overlay {
-    background-color: #000;
-}
-
 #info_pop_up {
     background: #080f18;
     border-top: 1px solid #ccc;

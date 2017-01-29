@@ -1,4 +1,5 @@
 import core
+import json
 import os
 import sys
 import operator
@@ -62,8 +63,20 @@ class Plugins(object):
         Does not return
         '''
 
+        args = list(args)
+
         for plugin in plugins:
-            command = [sys.executable, plugin] + list(args)
+            conf_file = '{}.conf'.format(os.path.splitext(plugin)[0])
+
+            try:
+                if os.path.isfile(conf_file):
+                    with open(conf_file) as f:
+                        args.append(json.dumps(json.load(f)))
+            except Exception, e: #noqa
+                logging.error('Loading config {} failed.'.format(conf_file), exc_info=True)
+                continue
+
+            command = [sys.executable, plugin] + args
             if os.name == 'nt':
                 cmd = ['cmd', '/c']
                 command = cmd + command
@@ -90,7 +103,8 @@ class Plugins(object):
                 else:
                     logging.info('{} - Execution failed. Exit code {}.'.format(name, exit_code))
 
-            except Exception, e:
-                logging.info('Executing plugin {} failed.'.format(plugin), exc_info=True)
+            except Exception, e: #noqa
+                logging.error('Executing plugin {} failed.'.format(plugin), exc_info=True)
+                continue
 
         return

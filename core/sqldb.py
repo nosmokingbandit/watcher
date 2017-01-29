@@ -1,3 +1,4 @@
+import os
 import core
 import datetime
 import logging
@@ -19,7 +20,7 @@ class SQL(object):
     '''
 
     def __init__(self):
-        DB_NAME = u'sqlite:///{}'.format(core.DB_FILE)
+        DB_NAME = u'sqlite:////{}'.format(os.path.join(core.PROG_PATH, core.DB_FILE))
         try:
             self.engine = create_engine(DB_NAME, echo=False, connect_args={'timeout': 30})
             self.metadata = MetaData()

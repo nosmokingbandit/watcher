@@ -18,6 +18,10 @@ input{
     color: #ccc;
 }
 
+div#overlay {
+    background-color: #000;
+}
+
 ::selection {
     background: #ccc; /* WebKit/Blink Browsers */
     color: #080f18;

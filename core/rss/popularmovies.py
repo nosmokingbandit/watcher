@@ -77,7 +77,6 @@ class PopularMoviesFeed(object):
         # do quick-add procedure
         quality = {}
         quality['Quality'] = core.CONFIG['Quality']
-        quality['Filters'] = core.CONFIG['Filters']
         for imdbid in movies_to_add:
             movie_info = self.tmdb.find_imdbid(imdbid)[0]
             if not movie_info:

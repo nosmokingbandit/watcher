@@ -24,10 +24,10 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.26')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.26'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.27')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.26')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.28')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.28'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.28')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.28')
 
         with doc:
             Header.insert_header(current="settings")
@@ -198,11 +198,17 @@ class Settings():
             self.render_profile('Default', c['Quality']['Default'])
 
             for name, profile in user_profiles.iteritems():
-                self.render_profile(name, profile)
+                if type(profile) == dict:
+                    self.render_profile(name, profile)
 
         with div(id='add_new_profile'):
             i(cls='fa fa-plus-square')
             span('Add Profile')
+
+        with ul(id='quality'):
+            with li():
+                i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(c[c_s]['prefersmaller']).lower())  # TODO can remove string/lower when removing try/except block in config.stash
+                span(u'Prefer smaller file sizes for identically-scored releases.')
 
         div(u','.join(self.resolutions), cls='hidden')
         with div(id='save', cat='quality'):
@@ -223,7 +229,7 @@ class Settings():
                     input(value=name, type='text', cls='name')
                     with div(cls='delete_profile', name=name):
                         i(cls='fa fa-trash-o')
-                        span('Delete profile.')
+                        span('Delete profile')
 
             # Resolution Block
             with ul(id='resolution', cls='sortable'):
@@ -361,7 +367,7 @@ class Settings():
             c_s = 'Sabnzbd'
             with li(cls='bbord'):
                 i(id='sabenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='sabnzbd', value=c[c_s]['sabenabled'])
-                span(u'Sabnzbd', cls='sub_cat')
+                span(u'SABnzbd', cls='sub_cat')
             # I'm not 100% sure it is valid to do a ul>ul, but it only work this way so deal with it.
             with ul(id='sabnzbd', cls='nzb'):
                 with li(u'Host & Port: ', cls='bbord'):
@@ -582,6 +588,104 @@ class Settings():
 
     @expose
     @settings_page
+    def plugins(self, c):
+        added = snatched = finished = []
+
+        for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, 'plugins')):
+            folder = os.path.split(root)[1]
+            if folder == 'added':
+                added = filenames
+            elif folder == 'snatched':
+                snatched = filenames
+            elif folder == 'finished':
+                finished = filenames
+            else:
+                continue
+
+        with div(cls='plugins'):
+            h1(u'Plugins')
+            c_s = 'Plugins'
+
+            with ul('Added Movie', id='added', cls='sortable'):
+                fid = 0
+                for plugin in added:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['added'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='added{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with ul('Snatched Release', id='snatched', cls='sortable'):
+                fid = 0
+                for plugin in snatched:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['snatched'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='snatched{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with ul('Postprocessing Finished', id='finished', cls='sortable'):
+                fid = 0
+                for plugin in finished:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['finished'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='finished{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with span('See the '):
+                a('wiki', href='https://github.com/nosmokingbandit/watcher/wiki', target='_blank')
+                span(' for plugin instructions.')
+
+        with div(id='save', cat='plugins'):
+            i(cls='fa fa-save')
+            span(u'Save Settings')
+
+    @expose
+    @settings_page
+    def logs(self, c):
+        options = self.get_logfiles()
+        with div(cls='logs'):
+            h1(u'Log File')
+            with p():
+                span('Log directory: ', cls='bold')
+                span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
+            with div(id='log_actions'):
+                with select(id='log_file'):
+                    for opt in options:
+                        option(opt, value=opt)
+                with span(id='view_log'):
+                    i(cls='fa fa-file-text-o')
+                    span('View log')
+                with span(id='download_log'):
+                    i(cls='fa fa-download')
+                    span('Download log')
+
+            pre(id='log_display')
+
+    @expose
+    @settings_page
     def about(self, c):
         with div(cls='about'):
             h1(u'About Watcher')
@@ -631,28 +735,6 @@ class Settings():
                 with li():
                     a(u'Parse Torrent Name', href='https://pypi.python.org/pypi/parse-torrent-name')
 
-    @expose
-    @settings_page
-    def logs(self, c):
-        options = self.get_logfiles()
-        with div(cls='logs'):
-            h1(u'Log File')
-            with p():
-                span('Log directory: ', cls='bold')
-                span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
-            with div(id='log_actions'):
-                with select(id='log_file'):
-                    for opt in options:
-                        option(opt, value=opt)
-                with span(id='view_log'):
-                    i(cls='fa fa-file-text-o')
-                    span('View log')
-                with span(id='download_log'):
-                    i(cls='fa fa-download')
-                    span('Download log')
-
-            pre(id='log_display')
-
     def get_themes(self):
         ''' Returns list of folders in static/css/
         '''
@@ -683,7 +765,5 @@ class Settings():
             logfiles.append(i)
 
         return logfiles
-
-
 
 # pylama:ignore=W0401

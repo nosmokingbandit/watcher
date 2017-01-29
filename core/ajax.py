@@ -7,8 +7,7 @@ import threading
 
 import cherrypy
 import core
-from core import config, newznab, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
-from core.helpers import Conversions, Comparisons
+from core import config, newznab, plugins, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
@@ -32,6 +31,7 @@ class Ajax(object):
         self.tmdb = TMDB()
         self.config = config.Config()
         self.predb = predb.PreDB()
+        self.plugins = plugins.Plugins()
         self.searcher = searcher.Searcher()
         self.sql = sqldb.SQL()
         self.poster = poster.Poster()
@@ -155,6 +155,9 @@ class Ajax(object):
                 response['response'] = u'true'
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
+
+                self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
+
                 return json.dumps(response)
             else:
                 response['response'] = u'false'

@@ -66,7 +66,6 @@ div#content ul.wide{
 
 div#content ul li{
     padding: 0;
-    line-height: 2.5em;
 }
 
 .bbord{
@@ -95,6 +94,10 @@ div#content ul li.lbord{
 }
 
 /* server */
+div.server li{
+    line-height: 2.5em;
+}
+
 div.server span#restart, span#shutdown{
     margin: 0 1em 0 0;
     cursor: pointer;
@@ -105,11 +108,19 @@ div.server span#update_check{
 }
 
 /* Search */
+div.search li{
+    line-height: 2.5em;
+}
+
 input#retention{
     width: 4em;
 }
 
 /* Quality */
+
+div.quality li{
+    line-height: 2.5em;
+}
 
 div.quality ul.quality_profile{
     margin-bottom: 2em;
@@ -206,8 +217,15 @@ div.quality ul#filters li input{
     max-width: 24em;
 }
 
+div.quality div#add_new_profile{
+    margin: 0 0 2.5em 0;
+}
 
 /* Providers */
+
+div.providers li{
+    line-height: 2.5em;
+}
 
 div.providers ul#providers{
     overflow: hidden;
@@ -257,6 +275,10 @@ div.providers li.add_potato_row{
 
 /* downloader */
 
+div.downloader li{
+    line-height: 2.5em;
+}
+
 ul#enabled_source span{
     margin: 0 2em 0 0;
 
@@ -276,6 +298,10 @@ span.test_connection{
 }
 
 /* post processing */
+div.postprocessing li{
+    line-height: 2.5em;
+}
+
 ul#postprocessing{
     margin-bottom: 2.5em;
 }
@@ -291,6 +317,30 @@ ul#postprocessing li span.taglist{
 
 span.charlist{
     font-family: "Lucida Console", Monaco, monospace;
+}
+
+/* plugins */
+
+div.plugins ul{
+    font-size: 1.5em;
+    padding: 1em;
+    margin-bottom: 2em;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+div.plugins ul li{
+    padding: 0;
+    margin: 0;
+    line-height: 1.75em;
+}
+
+div.plugins ul li i{
+    font-size: 1.25rem;
+}
+
+div.plugins ul li span{
+    font-size: 1.25rem;
 }
 
 /* logs */

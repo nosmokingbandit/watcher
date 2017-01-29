@@ -232,6 +232,7 @@ class Rarbg(object):
 
     @staticmethod
     def parse_rarbg(results):
+        logging.info('Parsing Rarbg results.')
         item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
         for result in results:
@@ -251,6 +252,7 @@ class Rarbg(object):
             result['status'] = u'Available'
             result['score'] = 0
             result['downloadid'] = None
+        logging.info('Found {} results from Rarbg.'.format(len(results)))
         return results
 
 

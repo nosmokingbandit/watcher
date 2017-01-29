@@ -133,7 +133,7 @@ class Config():
         if repl in ['"', '*', '?', '<', '>', '|', ':']:
             d['Postprocessing']['replaceillegal'] = ''
 
-       # load quality json into dict
+        # load quality json into dict # TODO can eventually remove try/except block
         r = []
         for k, v in d['Quality'].iteritems():
             try:
@@ -143,6 +143,9 @@ class Config():
                 continue
         for i in r:
             del d['Quality'][i]
+
+        for k, v in d['Plugins'].iteritems():
+            d['Plugins'][k] = json.loads(v)
 
         # split Indexers values into lists
         for k, v in d['Indexers'].iteritems():

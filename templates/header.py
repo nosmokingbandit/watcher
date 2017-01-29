@@ -43,6 +43,10 @@ class Header():
                                     with li():
                                         i(cls='fa fa-film')
                                         span(u'Post Processing')
+                                with a(href=core.URL_BASE + '/settings/plugins/'):
+                                    with li():
+                                        i(cls='fa fa-puzzle-piece')
+                                        span(u'Plugins')
                                 with a(href=core.URL_BASE + '/settings/logs/'):
                                     with li():
                                         i(cls='fa fa-file-text')
@@ -51,7 +55,6 @@ class Header():
                                     with li():
                                         i(cls='fa fa-info-circle')
                                         span(u'About')
-
 
                     with a(href=core.URL_BASE + '/add_movie/'):
                         if current == 'add_movie':

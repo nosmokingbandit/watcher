@@ -7,7 +7,7 @@ from core.notification import Notification
 
 from core import searcher, version
 from core.rss import imdb, popularmovies
-from core.plugins import taskscheduler
+from core.cp_plugins import taskscheduler
 
 logging = logging.getLogger(__name__)
 

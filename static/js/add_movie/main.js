@@ -80,6 +80,7 @@ $(document).ready(function() {
         $icon.addClass('fa-circle faa-burst animated');
 
         data = $this.parent().attr('data')
+        data['quality'] = 'Default'
 
         $.post(url_base + "/ajax/add_wanted_movie", {"data":data})
         .done(function(r){
@@ -91,7 +92,7 @@ $(document).ready(function() {
             if(response['response'] == 'true'){
                 toastr.success(response['message']);
             } else {
-                toastr.error(response['message']);
+                toastr.error(response['error']);
             };
         })
     });

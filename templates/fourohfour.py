@@ -16,8 +16,8 @@ class FourOhFour():
         with doc.head:
             meta(name='enable_notifs', content='false')
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css?v=01.16')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css?v=01.16'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/fourohfour.css?v=01.26')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/fourohfour.css?v=01.26'.format(core.CONFIG['Server']['theme']))
 
         with doc:
             with div(id='content'):

@@ -129,15 +129,29 @@ class Config():
             if '__name__' in d[i]:
                 del d[i]['__name__']
 
+        repl = d['Postprocessing']['replaceillegal']
+        if repl in ['"', '*', '?', '<', '>', '|', ':']:
+            d['Postprocessing']['replaceillegal'] = ''
+
+        # load quality json into dict # TODO can eventually remove try/except block
+        r = []
+        for k, v in d['Quality'].iteritems():
+            try:
+                d['Quality'][k] = json.loads(v)
+            except Exception:
+                r.append(k)
+                continue
+        for i in r:
+            del d['Quality'][i]
+
+        for k, v in d['Plugins'].iteritems():
+            d['Plugins'][k] = json.loads(v)
+
         # split Indexers values into lists
         for k, v in d['Indexers'].iteritems():
             d['Indexers'][k] = v.split(',')
         for k, v in d['PotatoIndexers'].iteritems():
             d['PotatoIndexers'][k] = v.split(',')
-
-        # split Quality values into lists
-        for k, v in d['Quality'].iteritems():
-            d['Quality'][k] = v.split(',')
 
         core.CONFIG = d
 

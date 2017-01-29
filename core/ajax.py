@@ -7,8 +7,7 @@ import threading
 
 import cherrypy
 import core
-from core import config, newznab, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
-from core.helpers import Conversions, Comparisons
+from core import config, newznab, plugins, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
@@ -32,6 +31,7 @@ class Ajax(object):
         self.tmdb = TMDB()
         self.config = config.Config()
         self.predb = predb.PreDB()
+        self.plugins = plugins.Plugins()
         self.searcher = searcher.Searcher()
         self.sql = sqldb.SQL()
         self.poster = poster.Poster()
@@ -115,14 +115,14 @@ class Ajax(object):
 
         if not data['imdbid']:
             response['response'] = u'false'
-            response['message'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
+            response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
             return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
             response['response'] = u'false'
-            response['message'] = u'{} {} is already wanted, cannot add.'.format(title, year)
+            response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
         else:
@@ -142,7 +142,7 @@ class Ajax(object):
                     del data[i]
 
             if data.get('quality') is None:
-                data['quality'] = self._default_quality()
+                data['quality'] = 'Default'
 
             if self.sql.write(TABLE, data):
                 t2 = threading.Thread(target=self.poster.save_poster,
@@ -155,15 +155,18 @@ class Ajax(object):
                 response['response'] = u'true'
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
+
+                self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
+
                 return json.dumps(response)
             else:
                 response['response'] = u'false'
-                response['message'] = u'Could not write to database. ' \
+                response['error'] = u'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
 
     @cherrypy.expose
-    def add_wanted_imdbid(self, imdbid):
+    def add_wanted_imdbid(self, imdbid, quality='Default'):
         ''' Method to quckly add movie with just imdbid
         :param imdbid: str imdb id #
 
@@ -181,19 +184,13 @@ class Ajax(object):
         data = self.tmdb.find_imdbid(imdbid)[0]
 
         if not data:
-            response['status'] = u'failed'
+            response['status'] = u'false'
             response['message'] = u'{} not found on TMDB.'.format(imdbid)
             return response
 
-        data['quality'] = self._default_quality()
+        data['quality'] = quality
 
         return self.add_wanted_movie(json.dumps(data))
-
-    def _default_quality(self):
-        quality = {}
-        quality['Quality'] = core.CONFIG['Quality']
-        quality['Filters'] = core.CONFIG['Filters']
-        return json.dumps(quality)
 
     @cherrypy.expose
     def save_settings(self, data):
@@ -206,7 +203,6 @@ class Ajax(object):
 
         logging.info(u'Saving settings.')
         data = json.loads(data)
-        diff = None
 
         existing_data = {}
         for i in data.keys():
@@ -217,15 +213,10 @@ class Ajax(object):
 
         if data == existing_data:
             return json.dumps({'response': 'success'})
-        else:
-            diff = Comparisons.compare_dict(data, existing_data)
 
         try:
             self.config.write_dict(data)
-            if diff:
-                return json.dumps({'response': 'change', 'changes': diff})
-            else:
-                return json.dumps({'response': 'success'})
+            return json.dumps({'response': 'success'})
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
@@ -533,84 +524,20 @@ class Ajax(object):
             return
 
     @cherrypy.expose
-    def update_quality_settings(self, quality, imdbid=None):
+    def update_quality_profile(self, quality, imdbid):
         ''' Updates quality settings for individual title
-        :param quality: str json-formatted dict of quality
-                        settings as described below.
-        :param imdbid: str imdb identification number <optional>
+        :param quality: str name of new quality
+        :param imdbid: str imdb identification number
 
-        Takes entered information from /movie_status_popup and
-            updates database table if it has changed.
-
-        quality must be formatted as:
-            json.dumps({'Quality': {'key': 'val'}, 'Filters': {'key': 'val'}})
-
-        Returns str 'same', error message, or change alert message (human datetime conversion).
+        Returns str 'true' or 'false'
         '''
 
-        tabledata = self.sql.get_movie_details('imdbid', imdbid)
+        logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))
 
-        if tabledata is False:
-            return 'Could not get existing information from sql table. ' \
-                'Check logs for more information.'
+        if self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
+            return 'true'
         else:
-            existing_quality = tabledata['quality']
-
-        # check if we need to purge old results and alert the user.
-        if json.dumps(existing_quality) == json.dumps(quality):
-            return 'same'
-
-        else:
-            logging.info(u'Updating quality for {}.'.format(imdbid))
-            if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
-                return 'Could not save quality to database. ' \
-                    'Check logs for more information.'
-            else:
-                if not self.sql.update('MOVIES', 'status', 'Wanted', imdbid=imdbid):
-                    return 'Search criteria has changed, old search results ' \
-                        'have been purged, but the movie status could not be set. Check logs for more information.'
-                else:
-                    return Conversions.human_datetime(core.NEXT_SEARCH)
-
-    @cherrypy.expose
-    def update_all_quality(self, quality):
-        ''' Updates individual keys in every movie's quality settings
-        :param quality: str json.dumps(dict) of quality changes.
-
-        'quality' comes from POST request, therefore must be parsed before use.
-
-        Pulls every movie's quality setting and merges 'quality' into it. Then Writes
-            back to database.
-
-        Returns str json.dumps(dict)
-        '''
-
-        errors = False
-
-        quality = json.loads(quality)
-
-        if 'Quality' in quality.keys():
-            for k, v in quality['Quality'].iteritems():
-                quality['Quality'][k] = v.split(',')
-
-        movies = self.sql.get_user_movies()
-
-        for movie in movies:
-            imdbid = movie['imdbid']
-            table_quality = movie['quality']
-
-            for k in quality.keys():
-                table_quality[k].update(quality[k])
-
-            quality_string = json.dumps(table_quality)
-
-            if not self.sql.update('MOVIES', 'quality', quality_string, imdbid=imdbid):
-                errors = True
-
-        if errors:
-            return json.dumps({'response': 'fail'})
-        else:
-            return json.dumps({'response': 'success'})
+            return 'false'
 
     @cherrypy.expose
     def get_log_text(self, logfile):

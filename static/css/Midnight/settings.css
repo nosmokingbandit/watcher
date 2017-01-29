@@ -21,6 +21,18 @@ div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
 }
 
+div.quality ul.quality_profile{
+    background-color: #151c25;
+}
+
+div.quality ul.quality_profile input{
+    background-color: #080f18;
+}
+
+div.plugins ul{
+    background-color: #151c25;
+}
+
 /* For log file viewing */
 pre#log_display {
     border: 1px solid #ccc;

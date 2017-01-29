@@ -77,9 +77,12 @@ class Torrent(object):
 
         '''
 
+        while indexer[-1] == u'/':
+            indexer = indexer[:-1]
+
         response = {}
 
-        url = u'{}/api?passkey={}'.format(indexer, apikey)
+        url = u'{}?passkey={}'.format(indexer, apikey)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -117,7 +120,7 @@ class Torrent(object):
 
         Returns list of dicts of results
         '''
-        item_keep = ('size', 'category', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
+        item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
         for result in results:
             result['size'] = result['size'] * 1024 * 1024
@@ -229,6 +232,7 @@ class Rarbg(object):
 
     @staticmethod
     def parse_rarbg(results):
+        logging.info('Parsing Rarbg results.')
         item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
         for result in results:
@@ -248,6 +252,7 @@ class Rarbg(object):
             result['status'] = u'Available'
             result['score'] = 0
             result['downloadid'] = None
+        logging.info('Found {} results from Rarbg.'.format(len(results)))
         return results
 
 

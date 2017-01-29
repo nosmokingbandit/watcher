@@ -206,9 +206,7 @@ class SQL(object):
         if result:
             lst = []
             for i in result:
-                i = dict(i)
-                i['quality'] = json.loads(i['quality'])
-                lst.append(i)
+                lst.append(dict(i))
             return lst
         else:
             logging.error(u'EXECUTE SQL.GET_USER_MOVIES FAILED.')
@@ -243,10 +241,12 @@ class SQL(object):
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
 
+        sort = 'ASC' if str(core.CONFIG['Quality']['prefersmaller']).lower() == 'true' else 'DESC'  # TODO can remove string/lower when removing try/except block in config.stash
+
         logging.info(u'Retreving Search Results for {}.'.format(imdbid))
         TABLE = u'SEARCHRESULTS'
 
-        command = u'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size DESC'.format(TABLE, imdbid)
+        command = u'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size {}'.format(TABLE, imdbid, sort)
 
         results = self.execute(command)
 

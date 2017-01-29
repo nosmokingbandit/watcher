@@ -8,22 +8,24 @@ $(document).ready(function () {
         }
 
         $this = $(this);
-        $thisi = $this.children(':first');
+        $thisi = $this.children(":first");
 
-        cat = $this.attr('cat');
-        if(cat == 'server'){
+        cat = $this.attr("cat");
+        if(cat == "server"){
             data = server();
-        } else if(cat == 'search'){
+        } else if(cat == "search"){
             data = search();
-        } else if(cat == 'quality'){
+        } else if(cat == "quality"){
             change_check = true;
             data = quality();
-        } else if(cat == 'providers'){
+        } else if(cat == "providers"){
             data = providers();
-        } else if(cat == 'downloader'){
+        } else if(cat == "downloader"){
             data = downloader();
-        }else if(cat == 'postprocessing') {
+        }else if(cat == "postprocessing"){
             data = postprocessing();
+        }else if(cat == "plugins"){
+            data = plugins();
         }
 
         if(data == false){
@@ -32,8 +34,8 @@ $(document).ready(function () {
 
         post_data = JSON.stringify(data);
 
-        $thisi.removeClass('fa-save')
-        $thisi.addClass('fa-circle faa-burst animated');
+        $thisi.removeClass("fa-save")
+        $thisi.addClass("fa-circle faa-burst animated");
 
         $.post(url_base + "/ajax/save_settings", {
             "data": post_data
@@ -41,50 +43,14 @@ $(document).ready(function () {
 
         .done(function(r) {
             response = JSON.parse(r);
-            if(response['response'] == 'fail'){
+            if(response["response"] == "fail"){
                 toastr.error("Unable to save settings. Check log for more information.");
-            }
-            else if(response['response'] == 'change' && change_check == true){
-                toastr.success("Settings Saved");
-                diff = response['changes']
-
-                diff_string = ""
-                for(k in diff){
-                    s = JSON.stringify(diff[k])
-                    s = s.replace(/","/g, '<br/>').replace(/"/g, '').replace(/{/g, '').replace(/}/g, '<br/>').replace(/:/g, ': ')
-                    diff_string = diff_string + s
-                }
-
-                swal({
-                    title: "Apply to all movies?",
-                    text: "Would you like to apply these changes to all movies?<br/><br/>" + diff_string + "<br/> Changes will not affect results until next search.",
-                    html: true,
-                    type: "",
-                    showCancelButton: true,
-                    cancelButtonText: "No",
-                    confirmButtonColor: "#03A9F4",
-                    confirmButtonText: "Apply to all",
-                    closeOnConfirm: true
-                }, function(){
-                    $.post(url_base + "/ajax/update_all_quality", {
-                        "quality": JSON.stringify(diff)
-                    })
-                    .done(function(r){
-                        response = JSON.parse(r);
-
-                        if(response['response'] == 'success'){
-                            toastr.success("All movies updated.");
-                        } else {
-                            toastr.error("Unable to update movies. Check log for more information.");
-                        }
-                    })
-                });
             } else {
                 toastr.success("Settings Saved");
             }
 
-            $thisi.removeClass('fa-circle faa-burst animated');
-            $thisi.addClass('fa-save');
+            $thisi.removeClass("fa-circle faa-burst animated");
+            $thisi.addClass("fa-save");
         });
 
         e.preventDefault();
@@ -98,10 +64,10 @@ $(document).ready(function () {
             server[$(this).attr("id")] = $(this).attr("value");
         });
         $("#server :input").each(function(){
-            if($(this).attr('id') == 'theme'){
+            if($(this).attr("id") == "theme"){
 
             }
-            else if($(this).val() == ''){
+            else if($(this).val() == ""){
                 blanks = true;
                 highlight($(this));
             }
@@ -112,7 +78,7 @@ $(document).ready(function () {
             return false;
         };
 
-        data['Server'] = server
+        data["Server"] = server
 
         return data
     }
@@ -127,7 +93,7 @@ $(document).ready(function () {
         $("ul#search :input").each(function(){
             $this = $(this);
 
-            if($this.val() == '' && $this.attr('id') != 'imdbrss'){
+            if($this.val() == "" && $this.attr("id") != "imdbrss"){
                 blanks = true;
                 highlight($this);
             }
@@ -144,58 +110,85 @@ $(document).ready(function () {
     function quality(){
         var data = {};
         var quality = {};
-        var tmp = {};
         var blanks = false;
+        var names = [];
 
-        var q_list = [];
-        $("ul#resolution i.checkbox").each(function(){
-            q_list.push( $(this).attr("id") );
-        });
+        $("ul.quality_profile").each(function(){
+            var $this = $(this);
+            var tmp = {};
+            var name = $this.find("li.name input.name").val();
 
-        // enabled resolutions
-        $("ul#resolution i.checkbox").each(function(){
-            tmp[$(this).attr("id")] = $(this).attr("value");
-        });
-
-        // order of resolutions
-        var arr = $("ul#resolution").sortable("toArray");
-        arr.shift();
-        $.each(arr, function(i, v){
-            tmp[v] = i;
-        });
-        // min/max sizes
-        $("#resolution_size :input").each(function(){
-            if($(this).val() == ''){
-                blanks = true;
-                highlight($(this));
+            if(name === undefined){
+                name = "Default"
             }
-            tmp[$(this).attr("id")] = $(this).val();
-        });
+
+            if(name == "" || name === undefined){
+                blanks = true;
+                toastr.warning("Please enter a name for each profile.");
+                return false;
+            }
+
+            if(names.includes(name)){
+                blanks = true;
+                toastr.warning("Please enter a unique name for each profile.");
+                return false;
+            }
+
+            names.push(name);
+
+            quality[name] = {};
+
+            var q_list = [];
+            $this.find("ul#resolution i.checkbox").each(function(){
+                $_this = $(this);
+                res = $_this.attr("id");
+                enabled = $_this.attr("value");
+                quality[name][res] = [enabled];
+            });
+
+            // order of resolutions
+            var arr = $this.find("ul#resolution").sortable("toArray");
+            arr.shift();
+            $.each(arr, function(value, res){
+                quality[name][res].push(value)
+            });
+
+            // min/max sizes
+            $this.find("#resolution_size :input").each(function(){
+                $_this = $(this);
+                if($_this.val() == ""){
+                    blanks = true;
+                    highlight($_this);
+                }
+                res = $_this.attr("id");
+                size = $_this.val();
+                quality[name][res].push(size);
+            })
+
+            // word lists
+            $this.find("ul#filters li input").each(function(){
+                $_this = $(this);
+                id = $_this.attr("id");
+                value = $_this.val();
+                quality[name][id] = value;
+            })
+
+            quality[name] = JSON.stringify(quality[name]);
+
+        })
 
         if(blanks == true){
             return false;
         };
 
-        $.each(q_list, function(i, res){
-            var enabled = res,
-                priority = res + "priority",
-                min = res + "min",
-                max = res + "max";
-            var dt = [tmp[enabled], tmp[priority], tmp[min], tmp[max]]
-            quality[res] = [tmp[enabled], tmp[priority], tmp[min], tmp[max]].join(',');
-        });
+        $("ul#quality i.checkbox").each(function(){
+            $this = $(this)
+            quality[$this.attr("id")] = $this.attr("value");
+        })
 
-        data["Quality"] = quality;
 
-        // FILTERS options.
-        var filters = {};
-        $("ul#filters li input").each(function(){
-            var val = $(this).val().split(", ").join(",");
-            filters[$(this).attr("id")] = val;
-        });
-        data["Filters"] = filters;
-
-        return data
+        data["Quality"] = quality
+        return data;
     }
 
     function providers(){
@@ -209,7 +202,7 @@ $(document).ready(function () {
         $("#newznab_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "newznab_indexer"){
-                var check = $this.children("i.newznab_check").attr('value');
+                var check = $this.children("i.newznab_check").attr("value");
                 var url = $this.children("input.newznab_url").val();
                 var api = $this.children("input.newznab_api").val();
 
@@ -234,7 +227,7 @@ $(document).ready(function () {
         $("#potato_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "potato_indexer"){
-                var check = $this.children("i.potato_check").attr('value');
+                var check = $this.children("i.potato_check").attr("value");
                 var url = $this.children("input.potato_url").val();
                 var api = $this.children("input.potato_api").val();
 
@@ -258,13 +251,12 @@ $(document).ready(function () {
         $("#torrentindexer_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "torrent_indexer"){
-                name = $this.attr('id');
-                check = $this.children("i.torrent_check").attr('value')
+                name = $this.attr("id");
+                check = $this.children("i.torrent_check").attr("value")
                 torrent_indexers[name] = check;
             }
         });
-        data['TorrentIndexers'] = torrent_indexers;
-
+        data["TorrentIndexers"] = torrent_indexers;
         if(cancel == true){
             return false;
         } else {
@@ -278,7 +270,7 @@ $(document).ready(function () {
         var sources = {};
         sources["usenetenabled"] = $("i#usenetenabled").attr("value");
         sources["torrentenabled"] = $("i#torrentenabled").attr("value");
-        data['Sources'] = sources;
+        data["Sources"] = sources;
 
         var sabnzbd = {};
         sabnzbd["sabenabled"] = $("i#sabenabled").attr("value");
@@ -359,15 +351,15 @@ $(document).ready(function () {
     }
 
     function postprocessing(){
-        var data = {}
-        var postprocessing = {}
+        var data = {};
+        var postprocessing = {};
         $("ul#postprocessing li i.checkbox").each(function(){
             postprocessing[$(this).attr("id")] = $(this).attr("value");
         });
         $("ul#postprocessing li input").not("[type=button]").each(function(){
             $this = $(this);
-            if($this.attr('id') == 'moveextensions'){
-                postprocessing['moveextensions'] = $this.val().split(", ").join(",");
+            if($this.attr("id") == "moveextensions"){
+                postprocessing["moveextensions"] = $this.val().split(", ").join(",");
             } else {
             postprocessing[$this.attr("id")] = $this.val();
             }
@@ -378,12 +370,64 @@ $(document).ready(function () {
         return data
     }
 
+    function plugins(){
+        var data = {};
+        var plugins = {};
+
+        var added = {};
+        var arr = $("ul#added").sortable("toArray");
+        var order = 0
+        $.each(arr, function(index, value){
+            $li = $("li#" + value);
+            plugin = $li.attr("plugin");
+            enabled = $li.find("i.checkbox").attr("value");
+            if(enabled == 'true'){
+                added[plugin] = [enabled, order];
+                order++;
+            }
+        })
+        plugins["added"] = JSON.stringify(added)
+
+        var snatched = {};
+        var arr = $("ul#snatched").sortable("toArray");
+        var order = 0
+        $.each(arr, function(index, value){
+            console.log(order)
+            $li = $("li#" + value);
+            plugin = $li.attr("plugin");
+            enabled = $li.find("i.checkbox").attr("value");
+            if(enabled == 'true'){
+                snatched[plugin] = [enabled, order];
+                order++;
+            }
+        })
+        plugins["snatched"] = JSON.stringify(snatched)
+
+        var finished = {};
+        var arr = $("ul#finished").sortable("toArray");
+        var order = 0;
+        $.each(arr, function(index, value){
+            $li = $("li#" + value);
+            plugin = $li.attr("plugin");
+            enabled = $li.find("i.checkbox").attr("value");
+            if(enabled == 'true'){
+                finished[plugin] = [enabled, order];
+                order++;
+            }
+        })
+        plugins["finished"] = JSON.stringify(finished)
+
+        data["Plugins"] = plugins;
+
+        return data
+    }
+
     function verify_data(){
 
         //check if only one downloader is active:
         var enabled = 0
-        $('ul#downloader > li > i.checkbox').each(function(){
-            if($(this).attr('value') == 'true'){
+        $("ul#downloader > li > i.checkbox").each(function(){
+            if($(this).attr("value") == "true"){
                 enabled++;
             }
         });
@@ -396,9 +440,9 @@ $(document).ready(function () {
     }
 
     function highlight(element){
-        orig_bg = element.css('background-color');
-        element.css('background-color', '#f4693b');
-        element.delay(500).animate({'background-color': orig_bg}, 1000);
+        orig_bg = element.css("background-color");
+        element.css("background-color", "#f4693b");
+        element.delay(500).animate({"background-color": orig_bg}, 1000);
     }
 
 });

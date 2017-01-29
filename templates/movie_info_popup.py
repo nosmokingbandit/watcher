@@ -34,61 +34,30 @@ class MovieInfoPopup():
 
         container = div(id='container')
         with container:
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=01.03')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=01.26')
             with div(id='title'):
-                with p():
-                    span(title_date, id='title')
-                    i(cls='fa fa-plus', id='button_add')
-                    i(cls='fa fa-floppy-o', id='button_submit')
+                span(title_date, id='title')
+                i(cls='fa fa-plus', id='button_add')
+                with div('Quality profile: ', cls='hidden', id='quality'):
+                    with select(id='quality_profile', value='Default'):
+                        options = core.CONFIG['Quality'].keys()
+                        for opt in options:
+                            if opt == 'Default':
+                                option(opt, value='Default')
+                            else:
+                                option(opt, value=opt)
+                    i(id='button_save', cls='fa fa-save')
             with div(id='media'):
                 img(id='poster', src=data['poster_path'])
-                with div(id='trailer_container'):
-                    iframe(id='trailer', width="640", height="360", src=trailer_embed, frameborder="0")
-
-                    # Panel that swaps in with quality adjustments
-                    resolutions = ['4K', '1080P', '720P', 'SD']
-                    with ul(id='quality', cls='wide'):
-                        # Resolution Block
-                        with ul(id='resolution', cls='sortable'):
-                            span(u'Resolutions', cls='sub_cat not_sortable')
-
-                            for res in resolutions:
-                                prior = '{}priority'.format(res)
-                                with li(cls='rbord', id=prior, sort=core.CONFIG['Quality'][res][1]):
-                                    i(cls='fa fa-bars')
-                                    i(id=res, cls='fa fa-square-o checkbox', value=core.CONFIG['Quality'][res][0])
-                                    span(res)
-
-                        # Size restriction block
-                        with ul(id='resolution_size'):
-                            with li(u'Size Restrictions (MB)', cls='sub_cat'):
-
-                                for res in resolutions:
-                                    min = '{}min'.format(res)
-                                    max = '{}max'.format(res)
-                                    with li():
-                                        span(res)
-                                        input(type='number', id=min, value=core.CONFIG['Quality'][res][2], min='0', style='width: 7.5em')
-                                        input(type='number', id=max, value=core.CONFIG['Quality'][res][3], min='0', style='width: 7.5em')
-
-                        with ul(id='filters', cls='wide'):
-                            with li(cls='bbord'):
-                                span(u'Required words:')
-                                input(type='text', id='requiredwords', value=core.CONFIG['Filters']['requiredwords'])
-                            with li(cls='bbord'):
-                                span(u'Preferred words:')
-                                input(type='text', id='preferredwords', value=core.CONFIG['Filters']['preferredwords'])
-                            with li():
-                                span(u'Ignored words:')
-                                input(type='text', id='ignoredwords', value=core.CONFIG['Filters']['ignoredwords'])
+                iframe(id='trailer', width="640", height="360", src=trailer_embed, frameborder="0")
 
             with div(id='plot'):
                 p(data['overview'])
             with div(id='additional_info'):
                 with a(href=tmdb_url, target='_blank'):
-                    p(u'TMDB Rating: {}'.format(data['vote_average']))
-                p(u'Theatrical Release Date: {}'.format(data['release_date']))
-            div(data_json, id='hidden_data')
+                    p(u'TMDB Score: {}'.format(data['vote_average']))
+                span(u'Theatrical Release Date: {}'.format(data['release_date']))
+            div(data_json, id='hidden_data', cls='hidden')
 
         return unicode(container)
 

@@ -3,7 +3,6 @@ import os
 import cherrypy
 import core
 import dominate
-
 from cherrypy import expose
 from dominate.tags import *
 from header import Header
@@ -24,10 +23,10 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.23')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.23'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.23')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.23')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=01.28')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=01.28'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=01.28')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=01.28')
 
         with doc:
             Header.insert_header(current="settings")
@@ -194,58 +193,85 @@ class Settings():
     @expose
     @settings_page
     def quality(self, c):
-        span(u'Quality and Filters may be set separately for each movie, this is the '
-             'default setting that will be used to \'Quick-Add\' movies.')
-        br()
-        h1(u'Quality')
+
         c_s = 'Quality'
-        resolutions = ['4K', '1080P', '720P', 'SD']
-        with ul(id='quality', cls='wide'):
+        user_profiles = {k: v for k, v in c[c_s].iteritems() if k != 'Default'}
+
+        self.resolutions = ['4K', '1080P', '720P', 'SD']
+
+        h1(u'Quality Profiles')
+        with div(id='qualities'):
+            self.render_profile('Default', c['Quality']['Default'])
+
+            for name, profile in user_profiles.iteritems():
+                if type(profile) == dict:
+                    self.render_profile(name, profile)
+
+        with div(id='add_new_profile'):
+            i(cls='fa fa-plus-square')
+            span('Add Profile')
+
+        with ul(id='quality'):
+            with li():
+                i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(c[c_s]['prefersmaller']).lower())  # TODO can remove string/lower when removing try/except block in config.stash
+                span(u'Prefer smaller file sizes for identically-scored releases.')
+
+        div(u','.join(self.resolutions), cls='hidden')
+        with div(id='save', cat='quality'):
+            i(cls='fa fa-save')
+            span(u'Save Settings')
+
+    def render_profile(self, name, profile):
+        '''
+        name: str name of profile
+        profile: dict of profile Settings
+        '''
+        with ul(id=name, cls='quality_profile wide') as profile_list:
+            with li('Name: ', cls='name bold'):
+                if name == 'Default':
+                    span('Default')
+                    span('Used for Quick-Add and default API quality.', cls='tip')
+                else:
+                    input(value=name, type='text', cls='name')
+                    with div(cls='delete_profile', name=name):
+                        i(cls='fa fa-trash-o')
+                        span('Delete profile')
+
             # Resolution Block
             with ul(id='resolution', cls='sortable'):
-                span(u'Resolutions', cls='sub_cat not_sortable')
-
-                for res in resolutions:
-                    prior = '{}priority'.format(res)
-                    with li(cls='rbord', id=prior, sort=c[c_s][res][1]):
+                li(u'Resolution Priority', cls='sub_cat')
+                for res in self.resolutions:
+                    with li(cls='rbord', id=res, sort=profile[res][1]):
                         i(cls='fa fa-bars')
-                        i(id=res, cls='fa fa-square-o checkbox', value=c[c_s][res][0])
+                        i(id=res, cls='fa fa-square-o checkbox', value=profile[res][0])
                         span(res)
 
             # Size restriction block
             with ul(id='resolution_size'):
                 li(u'Size Restrictions (MB)', cls='sub_cat')
 
-                for res in resolutions:
-                    min = '{}min'.format(res)
-                    max = '{}max'.format(res)
+                for res in self.resolutions:
                     with li():
                         span(res)
-                        input(type='number', id=min, value=c[c_s][res][2], min='0')
-                        input(type='number', id=max, value=c[c_s][res][3], min='0')
+                        input(type='number', id=res, cls='min', value=profile[res][2], min='0', placeholder='min')
+                        span('-')
+                        input(type='number', id=res, cls='max', value=profile[res][3], min='0', placeholder='max')
 
-        div(u','.join(resolutions), cls='hidden_data')
+            with ul(id='filters', cls='wide'):
+                with li(cls='bbord'):
+                    span(u'Required words:', cls='bold')
+                    input(type='text', id='requiredwords', value=profile['requiredwords'])
+                    span(u'Releases must contain one of these words.', cls='tip')
+                with li(cls='bbord'):
+                    span(u'Preferred words:', cls='bold')
+                    input(type='text', id='preferredwords', value=profile['preferredwords'])
+                    span(u'Releases with these words score higher.', cls='tip')
+                with li():
+                    span(u'Ignored words:', cls='bold')
+                    input(type='text', id='ignoredwords', value=profile['ignoredwords'])
+                    span(u'Releases with these words are ignored.', cls='tip')
 
-        h1(u'Filters', id='filter_form')
-        # set the config section at each new section. Just makes everything a little shorter and easier to write.
-        c_s = 'Filters'
-        with ul(id='filters', cls='wide'):
-            with li(cls='bbord'):
-                span(u'Required words:')
-                input(type='text', id='requiredwords', value=c[c_s]['requiredwords'])
-                span(u'Releases must contain one of these words.', cls='tip')
-            with li(cls='bbord'):
-                span(u'Preferred words:')
-                input(type='text', id='preferredwords', value=c[c_s]['preferredwords'])
-                span(u'Releases with these words score higher.', cls='tip')
-            with li():
-                span(u'Ignored words:')
-                input(type='text', id='ignoredwords', value=c[c_s]['ignoredwords'])
-                span(u'Releases with these words are ignored.', cls='tip')
-
-        with div(id='save', cat='quality'):
-            i(cls='fa fa-save')
-            span(u'Save Settings')
+        return unicode(profile_list)
 
     @expose
     @settings_page
@@ -347,7 +373,7 @@ class Settings():
             c_s = 'Sabnzbd'
             with li(cls='bbord'):
                 i(id='sabenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='sabnzbd', value=c[c_s]['sabenabled'])
-                span(u'Sabnzbd', cls='sub_cat')
+                span(u'SABnzbd', cls='sub_cat')
             # I'm not 100% sure it is valid to do a ul>ul, but it only work this way so deal with it.
             with ul(id='sabnzbd', cls='nzb'):
                 with li(u'Host & Port: ', cls='bbord'):
@@ -545,27 +571,125 @@ class Settings():
                     br()
                     span(u'Example: ')
                     br()
-                    span(u'/home/user/movies/{title} {year} = /home/user/movies/Black Swan 2010/',  cls='taglist')
-                    br()
-                    span(u'Move additional files:')
-                    input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
-                    span(u'Files will be renamed with Renamer settings.', cls='tip')
-                    br()
-                    i(id='createhardlink', cls='fa fa-square-o checkbox', value=c[c_s]['createhardlink'])
-                    span(u'Create hardlink to enable seeding torrents.')
-                    span(u'Will disable clean up.', cls='tip')
-                    br()
+                    span(u'/home/user/movies/{title} {year} = /home/user/movies/Black Swan 2010/',  cls='taglist bbord')
+                    with span(u'Move additional files:', cls='bbord'):
+                        input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
+                        span(u'Files will be renamed with Renamer settings.', cls='tip')
+                    with span(cls='bbord'):
+                        i(id='createhardlink', cls='fa fa-square-o checkbox', value=c[c_s]['createhardlink'])
+                        span(u'Create hardlink to enable seeding torrents.')
+                        span(u'Will disable clean up.', cls='tip')
                     i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupenabled'])
                     span(u'Clean up after move.')
             with li(u'Replace illegal characters with: ', cls='bbord'):
                 input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
-                span(u'Leave blank to simply remove characters.', cls='tip')
+                with span(u'Cannot contain ', cls='tip'):
+                    span('* ? " < > |', cls='charlist')
             with li(u'Available tags:'):
                 span(u'{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
 
         with div(id='save', cat='postprocessing'):
             i(cls='fa fa-save')
             span(u'Save Settings')
+
+    @expose
+    @settings_page
+    def plugins(self, c):
+        added = snatched = finished = []
+
+        for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, 'plugins')):
+            folder = os.path.split(root)[1]
+            filenames = [fname for fname in filenames if fname.startswith('.') is False]
+            if folder == 'added':
+                added = filenames
+            elif folder == 'snatched':
+                snatched = filenames
+            elif folder == 'finished':
+                finished = filenames
+            else:
+                continue
+
+        with div(cls='plugins'):
+            h1(u'Plugins')
+            c_s = 'Plugins'
+
+            with ul('Added Movie', id='added', cls='sortable'):
+                fid = 0
+                for plugin in added:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['added'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='added{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with ul('Snatched Release', id='snatched', cls='sortable'):
+                fid = 0
+                for plugin in snatched:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['snatched'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='snatched{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with ul('Postprocessing Finished', id='finished', cls='sortable'):
+                fid = 0
+                for plugin in finished:
+                    name = plugin.split('.')[-2]
+                    plug_conf = c[c_s]['finished'].get(plugin)
+                    if plug_conf is not None:
+                        enabled, sort = plug_conf
+                    else:
+                        sort = 900 + fid
+                        enabled = 'false'
+                    with li(id='finished{}'.format(fid), plugin=plugin, sort=sort):
+                        i(cls='fa fa-bars')
+                        i(cls='fa fa-square-o checkbox', value=enabled)
+                        span(name)
+                    fid += 1
+
+            with span('See the '):
+                a('wiki', href='https://github.com/nosmokingbandit/watcher/wiki', target='_blank')
+                span(' for plugin instructions.')
+
+        with div(id='save', cat='plugins'):
+            i(cls='fa fa-save')
+            span(u'Save Settings')
+
+    @expose
+    @settings_page
+    def logs(self, c):
+        options = self.get_logfiles()
+        with div(cls='logs'):
+            h1(u'Log File')
+            with p():
+                span('Log directory: ', cls='bold')
+                span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
+            with div(id='log_actions'):
+                with select(id='log_file'):
+                    for opt in options:
+                        option(opt, value=opt)
+                with span(id='view_log'):
+                    i(cls='fa fa-file-text-o')
+                    span('View log')
+                with span(id='download_log'):
+                    i(cls='fa fa-download')
+                    span('Download log')
+
+            pre(id='log_display')
 
     @expose
     @settings_page
@@ -618,28 +742,6 @@ class Settings():
                 with li():
                     a(u'Parse Torrent Name', href='https://pypi.python.org/pypi/parse-torrent-name')
 
-    @expose
-    @settings_page
-    def logs(self, c):
-        options = self.get_logfiles()
-        with div(cls='logs'):
-            h1(u'Log File')
-            with p():
-                span('Log directory: ', cls='bold')
-                span(os.path.join(core.PROG_PATH, core.LOG_DIR), cls='log_dir')
-            with div(id='log_actions'):
-                with select(id='log_file'):
-                    for opt in options:
-                        option(opt, value=opt)
-                with span(id='view_log'):
-                    i(cls='fa fa-file-text-o')
-                    span('View log')
-                with span(id='download_log'):
-                    i(cls='fa fa-download')
-                    span('Download log')
-
-            pre(id='log_display')
-
     def get_themes(self):
         ''' Returns list of folders in static/css/
         '''
@@ -670,7 +772,5 @@ class Settings():
             logfiles.append(i)
 
         return logfiles
-
-
 
 # pylama:ignore=W0401

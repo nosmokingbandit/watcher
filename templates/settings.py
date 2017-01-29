@@ -198,11 +198,17 @@ class Settings():
             self.render_profile('Default', c['Quality']['Default'])
 
             for name, profile in user_profiles.iteritems():
-                self.render_profile(name, profile)
+                if type(profile) == dict:
+                    self.render_profile(name, profile)
 
         with div(id='add_new_profile'):
             i(cls='fa fa-plus-square')
             span('Add Profile')
+
+        with ul(id='quality'):
+            with li():
+                i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(c[c_s]['prefersmaller']).lower())  # TODO can remove string/lower when removing try/except block in config.stash
+                span(u'Prefer smaller file sizes for identically-scored releases.')
 
         div(u','.join(self.resolutions), cls='hidden')
         with div(id='save', cat='quality'):

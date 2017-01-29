@@ -133,7 +133,7 @@ class Config():
         if repl in ['"', '*', '?', '<', '>', '|', ':']:
             d['Postprocessing']['replaceillegal'] = ''
 
-       # load quality json into dict
+        # load quality json into dict # TODO can eventually remove try/except block
         r = []
         for k, v in d['Quality'].iteritems():
             try:

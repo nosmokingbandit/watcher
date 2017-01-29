@@ -206,6 +206,9 @@ div.quality ul#filters li input{
     max-width: 24em;
 }
 
+div.quality div#add_new_profile{
+    margin: 0 0 2.5em 0;
+}
 
 /* Providers */
 

@@ -90,7 +90,11 @@ class Ajax(object):
 
         data = json.loads(data)
         title = data['title']
-        data['year'] = data['release_date'][:4]
+
+        if data.get('release_date'):
+            data['year'] = data['release_date'][:4]
+        else:
+            data['year'] = 'N/A'
         year = data['year']
 
         response = {}

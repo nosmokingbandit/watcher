@@ -9,7 +9,7 @@ import urllib2
 import cherrypy
 import core
 import PTN
-from core import plugins, snatcher, sqldb, updatestatus
+from core import plugins, movieinfo, snatcher, sqldb, updatestatus
 
 logging = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ class Postprocessing(object):
     exposed = True
 
     def __init__(self):
+        self.omdb = movieinfo.Omdb()
         self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()

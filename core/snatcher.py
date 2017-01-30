@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 import urllib2
-from lib import PTN
 import core
 from core import plugins, sqldb, updatestatus
 from core.downloaders import deluge, qbittorrent, nzbget, sabnzbd, transmission
@@ -76,7 +75,6 @@ class Snatcher():
         Returns dict {u'response': 'true', 'message': 'lorem impsum'}
         '''
 
-        title = PTN.parse(data['title'])['title']
         imdbid = data['imdbid']
         resolution = data['resolution']
         kind = data['type']
@@ -98,8 +96,11 @@ class Snatcher():
 
         if response['response'] == 'true':
             downloader = response['downloader']
+            movie_info = self.sql.get_movie_details('imdbid', imdbid)
+            title = movie_info['title']
+            year = movie_info['year']
 
-            self.plugins.snatched(title, imdbid, resolution, kind, downloader, downloadid, indexer, info_link)
+            self.plugins.snatched(title, year, imdbid, resolution, kind, downloader, downloadid, indexer, info_link)
         return response
 
     def snatch_nzb(self, data):

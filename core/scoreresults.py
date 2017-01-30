@@ -118,27 +118,32 @@ class ScoreResults():
             else:
                 self.results = [r for r in self.results if word not in r['title'].lower()]
 
-    def keep_required(self, words):
-        ''' Remove results without required 'words'
-        :param words: list of required words
+    def keep_required(self, word_goups):
+        ''' Remove results without required groups of 'words'
+        :param words: list of required group of words
 
-        Iterates through self.results and removes any entry that does not
-            contain all 'words'
+        Iterates through self.results and removes every entry that does not
+            contain any group of 'words'
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
 
         Does not return
         '''
 
         keep = []
 
-        if not words or words == [u'']:
+        if not word_goups or word_goups == [u'']:
             return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                for r in self.results:
-                    if word in r['title'].lower() and r not in keep:
-                        keep.append(r)
+        for words in word_goups:
+            for r in self.results:
+                cond = True
+                for word in words.split(u'&'):
+                    if word == u'':
+                        continue
+                    else:
+                        if word not in r['title'].lower():
+                            cond = False
+                if cond is True and r not in keep:
+                    keep.append(r)
         self.results = keep
 
     def retention_check(self, retention, today):

@@ -23,15 +23,15 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.26')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.29')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
 
             with div(id='title'):
                 with p():
-                    with span(title, id='title', imdbid=imdbid):
-                        span(year, id='title_year')
+                    span(title, id='title', imdbid=imdbid)
+                    span(year, id='year')
                     i(cls='fa fa-times', id='close')
                     i(cls='fa fa-trash', id='remove')
                     i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title=data['title'])

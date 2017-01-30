@@ -99,18 +99,19 @@ class Searcher():
             for movie in movies:
                 imdbid = movie['imdbid']
                 title = movie['title']
+                year = movie['year']
                 status = movie['status']
 
                 if status == u'Found':
                     logging.info(u'{} status is Found. Running automatic snatcher.'.format(title))
-                    self.snatcher.auto_grab(imdbid)
+                    self.snatcher.auto_grab(title, year, imdbid)
                     continue
 
                 if status == u'Finished' and keepsearching == u'true':
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta <= today:
                         logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
-                        self.snatcher.auto_grab(imdbid)
+                        self.snatcher.auto_grab(title, year, imdbid)
                         continue
                     else:
                         logging.info(u'{} finished on {} and is not within the Keep Searching window.'.format(title, finisheddate))

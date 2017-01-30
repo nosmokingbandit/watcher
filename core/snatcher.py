@@ -23,7 +23,7 @@ class Snatcher():
         self.update = updatestatus.Status()
         return
 
-    def auto_grab(self, imdbid, minscore=0):
+    def auto_grab(self, title, year, imdbid, minscore=0):
         ''' Grabs the best scoring result that isn't 'Bad'
 
         This simply picks the best release, actual snatching is
@@ -80,7 +80,8 @@ class Snatcher():
         kind = data['type']
         info_link = urllib2.quote(data['info_link'], safe='')
         indexer = data['indexer']
-        downloadid = data['downloadid']
+        title = data['title']
+        year = data['year']
 
         if data['type'] == 'nzb':
             if core.CONFIG['Sources']['usenetenabled'] == 'true':
@@ -96,9 +97,7 @@ class Snatcher():
 
         if response['response'] == 'true':
             downloader = response['downloader']
-            movie_info = self.sql.get_movie_details('imdbid', imdbid)
-            title = movie_info['title']
-            year = movie_info['year']
+            downloadid = response['downloadid']
 
             self.plugins.snatched(title, year, imdbid, resolution, kind, downloader, downloadid, indexer, info_link)
         return response
@@ -122,7 +121,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to Sabnzbd.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb'}
+                    return {u'response': u'true', u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}
@@ -142,7 +141,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet'}
+                    return {u'response': u'true', u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}
@@ -169,7 +168,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Tranmission.', u'downloader': u'Transmission'}
+                    return {u'response': u'true', u'message': u'Sent to Tranmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}
@@ -189,7 +188,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to QBittorrent.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent'}
+                    return {u'response': u'true', u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}
@@ -209,7 +208,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeRPC.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge'}
+                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}
@@ -229,7 +228,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeWeb.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge'}
+                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': u'false', u'error': u'Could not mark '
                             'search result as Snatched.'}

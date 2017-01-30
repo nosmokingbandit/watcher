@@ -6,7 +6,8 @@ import json
 import urllib2
 from time import strftime
 
-script, title, year, imdbid, resolution, kind, downloader, indexer, info_link, conf_json = sys.argv
+script, title, year, imdbid, resolution, kind, downloader, downloadid, indexer, info_link, conf_json = sys.argv
+
 conf = json.loads(conf_json)
 apikey = conf['Api Key']
 
@@ -31,7 +32,6 @@ request = urllib2.Request(pushbullet_api, body, headers)
 
 try:
     response = urllib2.urlopen(request)
-    print response.read()
 except Exception, e:
     print str(e)
     sys.exit(1)

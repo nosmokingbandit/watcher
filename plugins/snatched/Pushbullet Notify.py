@@ -6,7 +6,7 @@ import json
 import urllib2
 from time import strftime
 
-script, title, imdbid, resolution, kind, downloader, indexer, info_link, conf_json = sys.argv
+script, title, year, imdbid, resolution, kind, downloader, indexer, info_link, conf_json = sys.argv
 conf = json.loads(conf_json)
 apikey = conf['Api Key']
 

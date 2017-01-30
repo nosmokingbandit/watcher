@@ -35,8 +35,11 @@ div#container ul li{
 
 div#container ul li span,
 div#container ul li input{
-    width: 50%;
+    display: inline-block;
+    margin: 0;
+    width: 48%;
 }
+
 div#container ul li input{
-    float: right;
+    padding: 0 1%;
 }

@@ -55,6 +55,9 @@ class Snatcher():
             result = dict(result)
             status = result['status']
 
+            result['title'] = title
+            result['year'] = year
+
             if result['status'] == u'Available' and result['score'] > minscore:
                 self.snatch(result)
                 return True

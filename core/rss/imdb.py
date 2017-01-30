@@ -29,6 +29,7 @@ class ImdbRss(object):
         '''
 
         if 'rss' in list_url:
+            list_id = filter(unicode.isdigit, list_url)
             logging.info(u'Syncing rss IMDB watchlist {}'.format(list_url))
             request = urllib2.Request(list_url, headers={'User-Agent': 'Mozilla/5.0'})
             try:
@@ -48,7 +49,7 @@ class ImdbRss(object):
 
         if movies:
             logging.info(u'Found {} movies in watchlist.'.format(len(movies)))
-            self.sync_new_movies(movies)
+            self.sync_new_movies(movies, list_id)
             logging.info(u'IMDB sync complete.')
             return True
         else:
@@ -88,9 +89,10 @@ class ImdbRss(object):
         for i in root.iter('lastBuildDate'):
             return i.text
 
-    def sync_new_movies(self, movies):
+    def sync_new_movies(self, movies, list_id):
         ''' Adds new movies from rss feed
         :params movies: list of dicts of movies
+        list_id: str id # of watch list
 
         Checks last sync time and pulls new imdbids from feed.
 
@@ -107,7 +109,7 @@ class ImdbRss(object):
 
         if os.path.isfile(data_file):
             with open(data_file, 'r') as f:
-                last_sync = f.read()
+                last_sync = json.load(f).get(list_id) or u'Sat, 01 Jan 2000 00:00:00 GMT'
         else:
             last_sync = u'Sat, 01 Jan 2000 00:00:00 GMT'
 
@@ -147,4 +149,4 @@ class ImdbRss(object):
 
         logging.info(u'Storing last synced date')
         with open(data_file, 'w') as f:
-            f.write(self.lastbuilddate)
+            json.dump({list_id: self.lastbuilddate}, f)

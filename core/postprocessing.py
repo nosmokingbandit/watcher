@@ -18,7 +18,7 @@ class Postprocessing(object):
     exposed = True
 
     def __init__(self):
-        self.omdb = movieinfo.Omdb()
+        self.omdb = movieinfo.OMDB()
         self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()

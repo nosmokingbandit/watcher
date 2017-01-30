@@ -98,13 +98,14 @@ class Ajax(object):
         def thread_search_grab(data):
             imdbid = data['imdbid']
             title = data['title']
+            year = data['year']
             self.predb.check_one(data)
             if core.CONFIG['Search']['searchafteradd'] == u'true':
                 if self.searcher.search(imdbid, title):
                     # if we don't need to wait to grab the movie do it now.
                     if core.CONFIG['Search']['autograb'] == u'true' and \
                             core.CONFIG['Search']['waitdays'] == u'0':
-                        self.snatcher.auto_grab(imdbid)
+                        self.snatcher.auto_grab(title, year, imdbid)
 
         TABLE = u'MOVIES'
 
@@ -279,7 +280,7 @@ class Ajax(object):
         return 'done'
 
     @cherrypy.expose
-    def manual_download(self, guid, kind):
+    def manual_download(self, title, year, guid, kind):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
         :param kind: str type of download (torrent, magnet, nzb)
@@ -298,6 +299,8 @@ class Ajax(object):
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
+            data['title'] = title
+            data['year'] = year
             return json.dumps(self.snatcher.snatch(data))
         else:
             return json.dumps({'response': 'false', 'error': 'Unable to get download '

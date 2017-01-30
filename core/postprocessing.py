@@ -473,7 +473,7 @@ class Postprocessing(object):
         if core.CONFIG['Search']['autograb'] == u'true':
             result['tasks']['autograb'] = {'enabled': 'true'}
             if data['imdbid']:
-                if self.snatcher.auto_grab(data['imdbid']):
+                if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid']):
                     r = u'true'
                 else:
                     r = u'false'

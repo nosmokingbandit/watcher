@@ -201,13 +201,15 @@ class Rarbg(object):
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
-        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(0, 2)
+        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(minutes=14)
         try:
             response = urllib2.urlopen(request, timeout=60).read()
-            response = json.loads(response)['torrent_results']
-            results = Rarbg.parse_rarbg(response)
-
-            return results
+            response = json.loads(response).get('torrent_results')
+            if response:
+                results = Rarbg.parse_rarbg(response)
+                return results
+            else:
+                return []
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa

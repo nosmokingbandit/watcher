@@ -201,7 +201,7 @@ class Rarbg(object):
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
-        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(minutes=14)
+        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
             response = urllib2.urlopen(request, timeout=60).read()
             response = json.loads(response).get('torrent_results')

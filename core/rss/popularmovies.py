@@ -75,13 +75,11 @@ class PopularMoviesFeed(object):
         movies_to_add = [i for i in new_sync_movies if i not in existing_movies]
 
         # do quick-add procedure
-        quality = {}
-        quality['Quality'] = core.CONFIG['Quality']
         for imdbid in movies_to_add:
             movie_info = self.tmdb.find_imdbid(imdbid)[0]
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
             # logging.info(u'Adding {}'.format(imdbid))
-            movie_info['quality'] = json.dumps(quality)
+            movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))

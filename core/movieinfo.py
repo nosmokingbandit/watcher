@@ -43,6 +43,7 @@ class OMDB(object):
         if imdbid:
             search_string = u'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
         elif title and year:
+            title = ''.join([i if ord(i) < 128 else '+' for i in title])
             search_string = u'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
         else:
             return self._null_tuple(length)

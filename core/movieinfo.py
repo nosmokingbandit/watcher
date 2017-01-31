@@ -123,7 +123,7 @@ class TMDB(object):
             return 'Search Error.'
 
     def find_imdbid(self, imdbid):
-        search_string = 'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
+        search_string = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
         try:

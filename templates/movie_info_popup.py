@@ -30,7 +30,7 @@ class MovieInfoPopup():
         if data['poster_path'] is None:
             data['poster_path'] = core.URL_BASE + '/static/images/missing_poster.jpg'
         else:
-            data['poster_path'] = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+            data['poster_path'] = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
         container = div(id='container')
         with container:

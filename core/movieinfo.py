@@ -41,9 +41,9 @@ class OMDB(object):
             length = len(tags)
 
         if imdbid:
-            search_string = 'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
+            search_string = u'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
         elif title and year:
-            search_string = 'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
+            search_string = u'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
         else:
             return self._null_tuple(length)
 

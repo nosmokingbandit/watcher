@@ -131,7 +131,7 @@ class Ajax(object):
             return json.dumps(response)
 
         else:
-            poster_url = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
             data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
             data['plot'] = data['overview']

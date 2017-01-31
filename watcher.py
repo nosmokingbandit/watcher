@@ -103,21 +103,21 @@ if __name__ == '__main__':
     if core.CONFIG['Proxy']['behindproxy'] == 'true':
         core.URL_BASE = core.CONFIG['Proxy']['webroot']
     root = cherrypy.tree.mount(App(),
-                               '{}/'.format(core.URL_BASE),
+                               u'{}/'.format(core.URL_BASE),
                                'core/conf_app.ini'
                                )
     cherrypy.tree.mount(api.API(),
-                        '{}/api'.format(core.URL_BASE),
+                        u'{}/api'.format(core.URL_BASE),
                         'core/conf_api.ini'
                         )
 
     cherrypy.tree.mount(postprocessing.Postprocessing(),
-                        '{}/postprocessing'.format(core.URL_BASE),
+                        u'{}/postprocessing'.format(core.URL_BASE),
                         'core/conf_postprocessing.ini'
                         )
 
     cherrypy.tree.mount(App.auth,
-                        '{}/auth'.format(core.URL_BASE),
+                        u'{}/auth'.format(core.URL_BASE),
                         'core/conf_auth.ini'
                         )
 

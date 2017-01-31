@@ -8,7 +8,7 @@ import core
 
 logging = logging.getLogger(__name__)
 
-test_url = 'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef9ceba603d2dd8ba1&t=movie&imdbid=tt3748528'
+test_url = u'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef9ceba603d2dd8ba1&t=movie&imdbid=tt3748528'
 
 
 class Torrent(object):
@@ -197,7 +197,7 @@ class Rarbg(object):
                 logging.error('Unable to get rarbg token.')
                 return []
 
-        url = 'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
+        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
@@ -218,7 +218,7 @@ class Rarbg(object):
 
     @staticmethod
     def get_token():
-        url = 'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
+        url = u'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 

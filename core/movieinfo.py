@@ -43,6 +43,7 @@ class OMDB(object):
         if imdbid:
             search_string = u'http://www.omdbapi.com/?i={}&r=json'.format(imdbid)
         elif title and year:
+            title = ''.join([i if ord(i) < 128 else '+' for i in title])
             search_string = u'http://www.omdbapi.com/?t={}&y={}&r=json'.format(title, year).replace(' ', '+')
         else:
             return self._null_tuple(length)
@@ -123,7 +124,7 @@ class TMDB(object):
             return 'Search Error.'
 
     def find_imdbid(self, imdbid):
-        search_string = 'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
+        search_string = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
         try:

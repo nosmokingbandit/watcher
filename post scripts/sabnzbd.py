@@ -8,7 +8,7 @@
 
 conf = {
     'watcherapi': 'WATCHERAPIKEY',
-    'watcheraddress': 'http://localhost:9090/',
+    'watcheraddress': u'http://localhost:9090/',
     'sabkey': 'SABAPIKEY',
     'sabhost': 'localhost',
     'sabport': '8080'
@@ -38,7 +38,7 @@ data = {'apikey': watcherapi, 'guid': ''}
 
 # get guid and nzo_id from sab history:
 name = urllib2.quote(sys.argv[3], safe='')
-url = 'http://{}:{}/sabnzbd/api?apikey={}&mode=history&output=json&search={}'.format(sabhost, sabport, sabkey, name)
+url = u'http://{}:{}/sabnzbd/api?apikey={}&mode=history&output=json&search={}'.format(sabhost, sabport, sabkey, name)
 
 request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 response = urllib2.urlopen(request, timeout=60).read()

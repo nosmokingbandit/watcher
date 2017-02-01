@@ -387,7 +387,7 @@ class Postprocessing(object):
 
             # get rating from omdb
             if data['imdbid']:
-                data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
+                data['rated'] = self.omdb.get_info(data.get('title'), data.get('year'), imdbid=data['imdbid'], tags=['Rated'])[0]
             return data
         else:
             return {}

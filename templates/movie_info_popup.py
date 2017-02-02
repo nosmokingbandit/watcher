@@ -34,7 +34,7 @@ class MovieInfoPopup():
 
         container = div(id='container')
         with container:
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=01.26')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=02.02')
             with div(id='title'):
                 span(title_date, id='title')
                 i(cls='fa fa-plus', id='button_add')

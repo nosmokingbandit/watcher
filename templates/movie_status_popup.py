@@ -1,5 +1,3 @@
-import json
-
 import core
 from core import sqldb
 from core.helpers import Conversions
@@ -23,7 +21,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.29')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.02')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()

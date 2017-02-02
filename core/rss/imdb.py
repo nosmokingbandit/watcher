@@ -1,5 +1,4 @@
-import core
-from core import ajax, config, sqldb
+from core import ajax, sqldb
 from core.movieinfo import TMDB
 from datetime import datetime
 import json
@@ -13,7 +12,6 @@ logging = logging.getLogger(__name__)
 
 class ImdbRss(object):
     def __init__(self):
-        self.config = config.Config()
         self.tmdb = TMDB()
         self.sql = sqldb.SQL()
         self.ajax = ajax.Ajax()

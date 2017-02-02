@@ -234,14 +234,19 @@ class SQL(object):
         else:
             return False
 
-    def get_search_results(self, imdbid):
+    def get_search_results(self, imdbid, quality):
         ''' Gets all search results for a given movie
         :param imdbid: str imdb id #
+        quality: str quality profile. Used to sort order
 
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
 
-        sort = 'ASC' if str(core.CONFIG['Quality']['prefersmaller']).lower() == 'true' else 'DESC'  # TODO can remove string/lower when removing try/except block in config.stash
+        if quality in core.CONFIG['Quality']['Profiles']:
+            if core.CONFIG['Quality']['Profiles'][quality]['prefersmaller']:
+                sort = 'ASC'
+        else:
+            sort = 'DESC'
 
         logging.info(u'Retreving Search Results for {}.'.format(imdbid))
         TABLE = u'SEARCHRESULTS'

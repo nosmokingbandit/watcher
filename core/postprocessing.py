@@ -471,10 +471,10 @@ class Postprocessing(object):
             result['tasks']['cleanup'] = {'enabled': 'false'}
 
         # grab the next best release
-        if core.CONFIG['Search']['autograb'] == u'true':
+        if core.CONFIG['Search']['autograb']:
             result['tasks']['autograb'] = {'enabled': 'true'}
-            if data['imdbid']:
-                if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid']):
+            if data['imdbid'] and data['quality']:
+                if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid'], data['quality']):
                     r = u'true'
                 else:
                     r = u'false'

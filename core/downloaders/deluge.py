@@ -23,10 +23,10 @@ class DelugeRPC(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['delugerpchost']
-        port = int(data['delugerpcport'])
-        user = data['delugerpcuser']
-        password = data['delugerpcpass']
+        host = data['host']
+        port = data['port']
+        user = data['user']
+        password = data['pass']
 
         client = DelugeRPCClient(host, port, user, password)
         try:
@@ -46,12 +46,12 @@ class DelugeRPC(object):
                      {'response': 'false', 'error': 'exception'}
 
         '''
-        conf = core.CONFIG['DelugeRPC']
+        conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
 
-        host = conf['delugerpchost']
-        port = int(conf['delugerpcport'])
-        user = conf['delugerpcuser']
-        password = conf['delugerpcpass']
+        host = conf['host']
+        port = conf['port']
+        user = conf['user']
+        password = conf['pass']
 
         client = DelugeRPCClient(host, port, user, password)
 
@@ -68,7 +68,7 @@ class DelugeRPC(object):
             logging.error('Unable to get download path.', exc_info=True)
             return {'response': 'false', 'error': 'Unable to get download path.'}
 
-        download_path = '{}/{}'.format(def_download_path, conf['delugerpccategory'])
+        download_path = '{}/{}'.format(def_download_path, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -77,9 +77,9 @@ class DelugeRPC(object):
         }
 
         options = {}
-        options['add_paused'] = conf['delugerpcaddpaused'] == u'true'
+        options['add_paused'] = conf['addpaused'] == u'true'
         options['download_location'] = download_path
-        options['priority'] = priority_keys[conf['delugerpcpriority']]
+        options['priority'] = priority_keys[conf['priority']]
 
         if data['type'] == u'magnet':
             try:
@@ -113,9 +113,9 @@ class DelugeWeb(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['delugewebhost']
-        port = int(data['delugewebport'])
-        password = data['delugewebpass']
+        host = data['host']
+        port = data['port']
+        password = data['pass']
 
         url = u'{}:{}/json'.format(host, port)
 
@@ -133,17 +133,17 @@ class DelugeWeb(object):
 
         '''
 
-        deluge_conf = core.CONFIG['DelugeWeb']
+        conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
 
-        host = deluge_conf['delugewebhost']
-        port = deluge_conf['delugewebport']
+        host = conf['host']
+        port = conf['port']
         url = '{}:{}/json'.format(host, port)
 
         # check cookie validity while getting default download dir
         download_dir = DelugeWeb._get_download_dir(url)
 
         if not download_dir:
-            password = deluge_conf['delugewebpass']
+            password = conf['pass']
             if DelugeWeb._login(url, password) is not True:
                 return {'response': 'false', 'error': 'Incorrect usename or password.'}
 
@@ -153,7 +153,7 @@ class DelugeWeb(object):
             return {'response': 'false', 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
-        download_dir = '{}/{}'.format(download_dir, deluge_conf['delugewebcategory'])
+        download_dir = '{}/{}'.format(download_dir, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -162,9 +162,9 @@ class DelugeWeb(object):
         }
 
         torrent = {'path': data['torrentfile'], 'options': {}}
-        torrent['options']['add_paused'] = deluge_conf['delugewebaddpaused'] == u'true'
+        torrent['options']['add_paused'] = conf['addpaused']
         torrent['options']['download_location'] = download_dir
-        torrent['options']['priority'] = priority_keys[deluge_conf['delugewebpriority']]
+        torrent['options']['priority'] = priority_keys[conf['priority']]
 
         command = {'method': 'web.add_torrents',
                    'params': [[torrent]],

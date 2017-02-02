@@ -12,7 +12,7 @@ class App(object):
 
     @cherrypy.expose
     def __init__(self):
-        if core.CONFIG['Server']['authrequired'] == u'true':
+        if core.CONFIG['Server']['authrequired']:
             self._cp_config = {
                 'auth.require': []
             }
@@ -30,7 +30,7 @@ class App(object):
             'error_page.404': self.error_page_404
         })
 
-        if core.CONFIG['Server']['checkupdates'] == u'true':
+        if core.CONFIG['Server']['checkupdates']:
             scheduler.AutoUpdateCheck.update_check()
 
         return

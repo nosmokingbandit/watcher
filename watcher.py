@@ -81,7 +81,7 @@ if __name__ == '__main__':
     if passed_args.port:
         core.SERVER_PORT = passed_args.port
     else:
-        core.SERVER_PORT = core.CONFIG['Server']['serverport']
+        core.SERVER_PORT = int(core.CONFIG['Server']['serverport'])
 
     # set up db on first launch, check for updates afterward
     if passed_args.db:
@@ -100,9 +100,8 @@ if __name__ == '__main__':
     del sql
 
     # mount and configure applications
-    if core.CONFIG['Server']['customwebroot']:
-        core.URL_BASE = core.CONFIG['Server']['customwebrootpath']
-
+    if core.CONFIG['Proxy']['behindproxy'] == 'true':
+        core.URL_BASE = core.CONFIG['Proxy']['webroot']
     root = cherrypy.tree.mount(App(),
                                u'{}/'.format(core.URL_BASE),
                                'core/conf_app.ini'
@@ -123,7 +122,7 @@ if __name__ == '__main__':
                         )
 
     # if everything goes well so far, open the browser
-    if passed_args.browser or core.CONFIG['Server']['launchbrowser']:
+    if passed_args.browser or core.CONFIG['Server']['launchbrowser'] == 'true':
         webbrowser.open("http://{}:{}{}".format(
             core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
         logging.info(u'Launching web browser.')

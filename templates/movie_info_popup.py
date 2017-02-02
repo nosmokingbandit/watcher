@@ -40,7 +40,7 @@ class MovieInfoPopup():
                 i(cls='fa fa-plus', id='button_add')
                 with div('Quality profile: ', cls='hidden', id='quality'):
                     with select(id='quality_profile', value='Default'):
-                        options = core.CONFIG['Quality']['Profiles'].keys()
+                        options = core.CONFIG['Quality'].keys()
                         for opt in options:
                             if opt == 'Default':
                                 option(opt, value='Default')

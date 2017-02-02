@@ -39,14 +39,14 @@ class ScoreResults():
 
         quality_profile = movie_details['quality']
         # get quality settings from database, or config if not found
-        if quality_profile in core.CONFIG['Quality']['Profiles']:
-            quality = core.CONFIG['Quality']['Profiles'][quality_profile]
+        if quality_profile in core.CONFIG['Quality']:
+            quality = core.CONFIG['Quality'][quality_profile]
         else:
-            quality = core.CONFIG['Quality']['Profiles']['Default']
+            quality = core.CONFIG['Quality']['Default']
 
         resolution = {k: v for k, v in quality.iteritems() if k in ['4K', '1080P', '720P', 'SD']}
-        retention = core.CONFIG['Search']['retention']
-        seeds = core.CONFIG['Search']['mintorrentseeds']
+        retention = int(core.CONFIG['Search']['retention'])
+        seeds = int(core.CONFIG['Search']['mintorrentseeds'])
         required = quality['requiredwords'].lower().split(u',')
         preferred = quality['preferredwords'].lower().split(u',')
         ignored = quality['ignoredwords'].lower().split(u',')
@@ -60,7 +60,7 @@ class ScoreResults():
         self.retention_check(retention, today)
         self.seed_check(seeds)
         self.score_resolution(resolution)
-        if quality['scoretitle']:
+        if core.CONFIG['Search']['score_title'] == 'true':
             self.fuzzy_title(title)
         self.score_preferred(preferred)
 
@@ -85,7 +85,7 @@ class ScoreResults():
         '''
 
         active = []
-        for i in core.CONFIG['Indexers']['NewzNab'].values():
+        for i in core.CONFIG['Indexers'].values():
             if i[2] == u'true':
                 active.append(i[0])
 
@@ -224,7 +224,7 @@ class ScoreResults():
                 lst.append(result)
         self.results = lst
 
-    def score_resolution(self, resolutions):
+    def score_resolution(self, qualities):
         ''' Score releases based on quality preferences
         :param qualities: dict of quality preferences from MOVIES table
 
@@ -237,16 +237,17 @@ class ScoreResults():
 
         lst = []
         for result in self.results:
-            result_res = result['resolution']
+            resolution = result['resolution']
             size = result['size'] / 1000000
-            for k, v in resolutions.iteritems():
-                if v[0] is False:
+            for quality in qualities:
+                qlist = qualities[quality]
+                if qlist[0] != u'true':
                     continue
-                priority = v[1]
-                min_size = v[2]
-                max_size = v[3]
+                priority = int(qlist[1])
+                min_size = int(qlist[2])
+                max_size = int(qlist[3])
 
-                if result_res == k:
+                if resolution == quality:
                     if min_size < size < max_size:
                         result['score'] += (8 - priority) * 100
                         lst.append(result)

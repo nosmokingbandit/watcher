@@ -17,14 +17,14 @@ class Torrent(object):
         return
 
     def search_all(self, imdbid):
-        torrent_indexers = core.CONFIG['Indexers']['Torrent']
+        torrent_indexers = core.CONFIG['TorrentIndexers']
 
         results = []
 
         potato_results = self.search_potato(imdbid)
         results = potato_results
 
-        if torrent_indexers['rarbg']:
+        if torrent_indexers['rarbg'] == 'true':
             rarbg_results = Rarbg.search(imdbid)
             for i in rarbg_results:
                 if i not in results:
@@ -39,11 +39,11 @@ class Torrent(object):
         Returns list of dicts with movie info
         '''
 
-        indexers = core.CONFIG['Indexers']['TorrentPotato'].values()
+        indexers = core.CONFIG['PotatoIndexers'].values()
         results = []
 
         for indexer in indexers:
-            if indexer[2] is False:
+            if indexer[2] == u'false':
                 continue
             url = indexer[0]
             if url[-1] == u'/':
@@ -83,8 +83,6 @@ class Torrent(object):
         response = {}
 
         url = u'{}?passkey={}'.format(indexer, apikey)
-
-        print url
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:

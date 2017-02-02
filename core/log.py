@@ -19,7 +19,7 @@ class log(object):
             os.makedirs(path)
 
         logfile = os.path.join(path, 'log.txt')
-        backup_days = core.CONFIG['Server']['keeplog']
+        backup_days = int(core.CONFIG['Server']['keeplog'])
         logging_level = logging.INFO
 
         formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s.%(funcName)s: %(message)s')

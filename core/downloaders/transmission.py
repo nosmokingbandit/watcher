@@ -17,10 +17,10 @@ class Transmission(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['host']
-        port = data['port']
-        user = data['user']
-        password = data['pass']
+        host = data['transmissionhost']
+        port = data['transmissionport']
+        user = data['transmissionuser']
+        password = data['transmissionpass']
 
         try:
             client = transmissionrpc.Client(host, port, user=user, password=password)
@@ -46,19 +46,19 @@ class Transmission(object):
 
         '''
 
-        conf = core.CONFIG['Downloader']['Torrent']['Transmission']
+        trans_conf = core.CONFIG['Transmission']
 
-        host = conf['host']
-        port = conf['port']
-        user = conf['user']
-        password = conf['pass']
+        host = trans_conf['transmissionhost']
+        port = trans_conf['transmissionport']
+        user = trans_conf['transmissionuser']
+        password = trans_conf['transmissionpass']
 
         client = transmissionrpc.Client(host, port, user=user, password=password)
 
         url = data['torrentfile']
-        paused = conf['addpaused']
-        bandwidthPriority = conf['priority']
-        category = conf['category']
+        paused = trans_conf['transmissionaddpaused'] == 'true'
+        bandwidthPriority = trans_conf['transmissionpriority']
+        category = trans_conf['transmissioncategory']
 
         priority_keys = {
             'Low': '-1',
@@ -66,7 +66,7 @@ class Transmission(object):
             'High': '1'
         }
 
-        bandwidthPriority = priority_keys[conf['priority']]
+        bandwidthPriority = priority_keys[trans_conf['transmissionpriority']]
 
         download_dir = None
         if category:

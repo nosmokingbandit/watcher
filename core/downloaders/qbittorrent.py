@@ -22,10 +22,10 @@ class QBittorrent(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['host']
-        port = data['port']
-        user = data['user']
-        password = data['pass']
+        host = data['qbittorrenthost']
+        port = data['qbittorrentport']
+        user = data['qbittorrentuser']
+        password = data['qbittorrentpass']
 
         url = u'{}:{}/'.format(host, port)
 
@@ -43,14 +43,14 @@ class QBittorrent(object):
 
         '''
 
-        conf = core.CONFIG['Downloader']['Torrent']['QBittorrent']
+        qbit_conf = core.CONFIG['QBittorrent']
 
-        host = conf['host']
-        port = conf['port']
+        host = qbit_conf['qbittorrenthost']
+        port = qbit_conf['qbittorrentport']
         base_url = '{}:{}/'.format(host, port)
 
-        user = conf['user']
-        password = conf['pass']
+        user = qbit_conf['qbittorrentuser']
+        password = qbit_conf['qbittorrentpass']
 
         # check cookie validity while getting default download dir
         download_dir = QBittorrent._get_download_dir(base_url)
@@ -69,9 +69,9 @@ class QBittorrent(object):
 
         post_data['urls'] = data['torrentfile']
 
-        post_data['savepath'] = '{}{}'.format(download_dir, conf['category'])
+        post_data['savepath'] = '{}{}'.format(download_dir, qbit_conf['qbittorrentcategory'])
 
-        post_data['category'] = conf['category']
+        post_data['category'] = qbit_conf['qbittorrentcategory']
 
         req_url = u'{}command/download'.format(base_url)
         post_data = urllib.urlencode(post_data)

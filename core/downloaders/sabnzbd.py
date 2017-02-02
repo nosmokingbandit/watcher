@@ -19,9 +19,9 @@ class Sabnzbd():
         Return True on success or str error message on failure
         '''
 
-        host = data['host']
-        port = data['port']
-        api = data['api']
+        host = data['sabhost']
+        port = data['sabport']
+        api = data['sabapi']
 
         url = u'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
 
@@ -49,18 +49,18 @@ class Sabnzbd():
 
         '''
 
-        conf = core.CONFIG['Downloader']['Torrent']['Sabnzbd']
+        sab_conf = core.CONFIG['Sabnzbd']
 
-        host = conf['host']
-        port = conf['port']
-        api = conf['api']
+        host = sab_conf['sabhost']
+        port = sab_conf['sabport']
+        api = sab_conf['sabapi']
 
         base_url = u'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
         mode = u'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))
         nzbname = urllib2.quote(data['title'].encode('ascii', 'ignore'))
-        cat = conf['category']
+        cat = sab_conf['sabcategory']
         priority_keys = {
             'Paused': '-2',
             'Low': '-1',
@@ -68,7 +68,7 @@ class Sabnzbd():
             'High': '1',
             'Forced': '2'
         }
-        priority = priority_keys[conf['priority']]
+        priority = priority_keys[sab_conf['sabpriority']]
 
         command_url = u'&mode={}&name={}&nzbname={}&cat={}&priority={}&output=json'.format(mode, name, nzbname, cat, priority)
 

@@ -103,14 +103,13 @@ class Ajax(object):
             imdbid = data['imdbid']
             title = data['title']
             year = data['year']
-            quality = data['quality']
             self.predb.check_one(data)
-            if core.CONFIG['Search']['searchafteradd']:
-                if self.searcher.search(imdbid, title, quality):
+            if core.CONFIG['Search']['searchafteradd'] == u'true':
+                if self.searcher.search(imdbid, title):
                     # if we don't need to wait to grab the movie do it now.
-                    if core.CONFIG['Search']['autograb'] and \
-                            core.CONFIG['Search']['waitdays'] == 0:
-                        self.snatcher.auto_grab(title, year, imdbid, quality)
+                    if core.CONFIG['Search']['autograb'] == u'true' and \
+                            core.CONFIG['Search']['waitdays'] == u'0':
+                        self.snatcher.auto_grab(title, year, imdbid)
 
         TABLE = u'MOVIES'
 
@@ -210,22 +209,45 @@ class Ajax(object):
         logging.info(u'Saving settings.')
         data = json.loads(data)
 
-        save_data = {}
-        for key in data:
-            if data[key] != core.CONFIG[key]:
-                save_data[key] = data[key]
+        existing_data = {}
+        for i in data.keys():
+            existing_data.update({i: core.CONFIG[i]})
+            for k, v in core.CONFIG[i].iteritems():
+                if type(v) == list:
+                    existing_data[i][k] = ','.join(v)
 
-        if not save_data:
+        if data == existing_data:
             return json.dumps({'response': 'success'})
 
         try:
-            self.config.write_dict(save_data)
+            self.config.write_dict(data)
             return json.dumps({'response': 'success'})
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Writing config.', exc_info=True)
             return json.dumps({'response': 'fail'})
+
+    @cherrypy.expose
+    def save_single(self, cat, key, val):
+        ''' Saves single setting to config
+        :param conf: str config category
+        :param key: str config key
+        :param val: str config values
+
+        Returns str 'failed' or 'success'
+        '''
+
+        logging.info('Saving {}:{}:{}'.format(cat, key, val))
+
+        try:
+            self.config.write_single(cat, key, val)
+            return 'success'
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Writing config.')
+            return 'failed'
 
     @cherrypy.expose
     def remove_movie(self, imdbid):
@@ -248,7 +270,7 @@ class Ajax(object):
         return json.dumps(response)
 
     @cherrypy.expose
-    def search(self, imdbid, title, quality):
+    def search(self, imdbid, title):
         ''' Search indexers for specific movie.
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year
@@ -258,7 +280,7 @@ class Ajax(object):
         Returns str 'done' when done.
         '''
 
-        self.searcher.search(imdbid, title, quality)
+        self.searcher.search(imdbid, title)
         return 'done'
 
     @cherrypy.expose
@@ -270,9 +292,9 @@ class Ajax(object):
         Returns str json.dumps(dict) success/fail message
         '''
 
-        torrent_enabled = core.CONFIG['Downloader']['Sources']['torrentenabled']
+        torrent_enabled = core.CONFIG['Sources']['torrentenabled'] == u'true'
 
-        usenet_enabled = core.CONFIG['Downloader']['Sources']['usenetenabled']
+        usenet_enabled = core.CONFIG['Sources']['usenetenabled'] == u'true'
 
         if kind == 'nzb' and not usenet_enabled:
             return json.dumps({'response': 'false', 'error': 'Link is NZB but no Usent downloader is enabled.'})
@@ -332,7 +354,7 @@ class Ajax(object):
         return json.dumps(response)
 
     @cherrypy.expose
-    def refresh_list(self, list, imdbid='', quality=''):
+    def refresh_list(self, list, imdbid=''):
         ''' Re-renders html for Movies/Results list
         :param list: str the html list id to be re-rendered
         :param imdbid: str imdb identification number (tt123456) <optional>
@@ -346,7 +368,7 @@ class Ajax(object):
         if list == u'#movie_list':
             return status.Status.movie_list()
         if list == u'#result_list':
-            return movie_status_popup.MovieStatusPopup().result_list(imdbid, quality)
+            return movie_status_popup.MovieStatusPopup().result_list(imdbid)
 
     @cherrypy.expose
     def test_downloader_connection(self, mode, data):

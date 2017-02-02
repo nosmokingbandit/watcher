@@ -21,23 +21,23 @@ $(document).ready(function() {
 
     /* set default state for pseudo checkboxes */
     $('i.checkbox').each(function(){
-       if ( $(this).attr("value") == "True" ){
+       if ( $(this).attr("value") == "true" ){
            $(this).removeClass('fa-square-o');
-           $(this).addClass('fa-check-square');
+           $(this).addClass('fa-check-square-o');
        }
     });
 
     /* toggle check box status */
     $('i.checkbox').click(function(){
         // turn on
-        if( $(this).attr("value") == "False"){
+        if( $(this).attr("value") == "false" ){
             $(this).attr("value", "true");
             $(this).removeClass('fa-square-o');
-            $(this).addClass('fa-check-square');
+            $(this).addClass('fa-check-square-o');
         // turn off
-        } else if ( $(this).attr("value") == "True"){
+        } else if ( $(this).attr("value") == "true" ){
             $(this).attr("value", "false");
-            $(this).removeClass('fa-check-square');
+            $(this).removeClass('fa-check-square-o');
             $(this).addClass('fa-square-o');
         }
     });

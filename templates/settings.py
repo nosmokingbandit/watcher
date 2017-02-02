@@ -56,16 +56,6 @@ class Settings():
         h1(u'Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
-            with li(u'Host: ', cls='bbord'):
-                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 17em')
-                span(u'Typically localhost or 127.0.0.1.', cls='tip')
-            with li(u'Port: ', cls='bbord'):
-                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 5em')
-            with li(u'API Key: ', cls='bbord'):
-                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 20em')
-                with span(cls='tip'):
-                    i(id='generate_new_key', cls='fa fa-refresh')
-                    span(u'Generate new key.')
             with li(u'Theme:', cls='bbord'):
                 with select(id='theme', value=c[c_s]['theme']) as theme_select:
                     tl = self.get_themes()
@@ -77,9 +67,24 @@ class Settings():
                         if item['value'] == c[c_s]['theme']:
                             item['selected'] = 'selected'
                             theme_select['value'] = opt
-
+            with li(u'Host: ', cls='bbord'):
+                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 17em')
+                span(u'Typically localhost or 127.0.0.1.', cls='tip')
+            with li(u'Port: ', cls='bbord'):
+                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 5em')
             with li():
-                i(id='authrequired', cls='fa fa-square-o checkbox', value=c[c_s]['authrequired'])
+                i(id='customwebroot', cls='fa fa-square-o checkbox', value=str(c[c_s]['customwebroot']))
+                span(u'Use custom webroot.')
+                span(u'For access behind reverse proxies.', cls='tip')
+            with li(u'Webroot path: ', cls='bbord'):
+                input(type='text', id='customwebrootpath', value=c[c_s]['customwebrootpath'])
+            with li(u'API Key: ', cls='bbord'):
+                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 20em')
+                with span(cls='tip'):
+                    i(id='generate_new_key', cls='fa fa-refresh')
+                    span(u'Generate new key.')
+            with li():
+                i(id='authrequired', cls='fa fa-square-o checkbox', value=str(c[c_s]['authrequired']))
                 span(u'Password-protect web-ui.')
                 span(u'*Requires restart.', cls='tip')
             with li(u'Name: '):
@@ -87,16 +92,16 @@ class Settings():
             with li(u'Password: ', cls='bbord'):
                 input(type='text', id='authpass', value=c[c_s]['authpass'], style='width: 20em')
             with li(cls='bbord'):
-                i(id='launchbrowser', cls='fa fa-square-o checkbox', value=c[c_s]['launchbrowser'])
+                i(id='launchbrowser', cls='fa fa-square-o checkbox', value=str(c[c_s]['launchbrowser']))
                 span(u'Open browser on launch.')
             with li(cls='bbord'):
-                i(id='checkupdates', cls='fa fa-square-o checkbox', value=c[c_s]['checkupdates'])
+                i(id='checkupdates', cls='fa fa-square-o checkbox', value=str(c[c_s]['checkupdates']))
                 span(u'Check for updates every ')
                 input(type='number', min='8', id='checkupdatefrequency', value=c[c_s]['checkupdatefrequency'], style='width: 2.25em')
                 span(u' hours.')
                 span(u'Checks at program start and every X hours afterward. *Requires restart.', cls='tip')
             with li(cls='bbord'):
-                i(id='installupdates', cls='fa fa-square-o checkbox', value=c[c_s]['installupdates'])
+                i(id='installupdates', cls='fa fa-square-o checkbox', value=str(c[c_s]['installupdates']))
                 span(u'Automatically install updates at ')
                 input(type='number', min='0', max='23', id='installupdatehr', value=c[c_s]['installupdatehr'], style='width: 2.25em')
                 span(u':')
@@ -130,16 +135,17 @@ class Settings():
     @expose
     @settings_page
     def search(self, c):
-        h1(u'Search', id='searchform')
-        # set the config section at each new section. Just makes everything a little shorter and easier to write.
         c_s = 'Search'
+
+        h1(u'Search')
+        # set the config section at each new section. Just makes everything a little shorter and easier to write.
         with ul(id='search', cls='wide'):
             with li(cls='bbord'):
-                i(id='searchafteradd', cls='fa fa-square-o checkbox', value=c[c_s]['searchafteradd'])
+                i(id='searchafteradd', cls='fa fa-square-o checkbox', value=str(c[c_s]['searchafteradd']))
                 span(u'Search immediately after adding movie.')
                 span(u'Skips wait until next scheduled search.', cls='tip')
             with li(cls='bbord'):
-                i(id='autograb', cls='fa fa-square-o checkbox', value=c[c_s]['autograb'])
+                i(id='autograb', cls='fa fa-square-o checkbox', value=str(c[c_s]['autograb']))
                 span(u'Automatically grab best result.')
                 span(u'Will still wait X days if set.', cls='tip')
             with li(cls='bbord'):
@@ -159,7 +165,7 @@ class Settings():
                 span(u' days for best release.')
                 span(u'After movie is found, wait to snatch in case better match is found.', cls='tip')
             with li(cls='bbord'):
-                i(id='keepsearching', cls='fa fa-square-o checkbox', value=c[c_s]['keepsearching'])
+                i(id='keepsearching', cls='fa fa-square-o checkbox', value=str(c[c_s]['keepsearching']))
                 span(u'Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(u' days for best release.')
@@ -168,20 +174,20 @@ class Settings():
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
                 span(' days.')
                 span('Use 0 for no limit.', cls='tip')
-            with li(cls='bbord'):
+            with li():
                 span(u'Torrents require a minimum of ')
                 input(type='number', min='0', id='mintorrentseeds', value=c[c_s]['mintorrentseeds'], style='width: 2.5em')
                 span(' seeds.')
-            with li(cls='bbord'):
-                i(id='score_title', cls='fa fa-square-o checkbox', value=c[c_s]['score_title'])
-                span('Score and filter release titles.')
-                span('May need to disable for non-English results. Disabling can cause incorrect downloads.', cls='tip')
+
+        h2(u'Watchlists')
+        with ul(id='watchlists'):
+
             with li():
-                i(id='imdbsync', cls='fa fa-square-o checkbox', value=c[c_s]['imdbsync'])
+                i(id='imdbsync', cls='fa fa-square-o checkbox', value=str(c[c_s]['Watchlists']['imdbsync']))
                 span(u'Sync imdb watch list ')
-                input(type='text', id='imdbrss', value=c[c_s]['imdbrss'], placeholder="http://rss.imdb.com/user/...", style="width:20em;")
+                input(type='text', id='imdbrss', value=c[c_s]['Watchlists']['imdbrss'], placeholder="http://rss.imdb.com/user/...", style="width:20em;")
                 span(' every ')
-                input(type='number', min='15', id='imdbfrequency', value=c[c_s]['imdbfrequency'], style='width: 3.0em')
+                input(type='number', min='15', id='imdbfrequency', value=c[c_s]['Watchlists']['imdbfrequency'], style='width: 3.0em')
                 span(' minutes.')
                 span('*Requires restart.', cls='tip')
 
@@ -194,26 +200,21 @@ class Settings():
     def quality(self, c):
 
         c_s = 'Quality'
-        user_profiles = {k: v for k, v in c[c_s].iteritems() if k != 'Default'}
+        user_profiles = {k: v for k, v in c[c_s]['Profiles'].iteritems() if k != 'Default'}
+        default_profile = c[c_s]['Profiles']['Default']
 
         self.resolutions = ['4K', '1080P', '720P', 'SD']
 
         h1(u'Quality Profiles')
         with div(id='qualities'):
-            self.render_profile('Default', c['Quality']['Default'])
+            self.render_profile('Default', default_profile)
 
             for name, profile in user_profiles.iteritems():
-                if type(profile) == dict:
-                    self.render_profile(name, profile)
+                self.render_profile(name, profile)
 
         with div(id='add_new_profile'):
             i(cls='fa fa-plus-square')
             span('Add Profile')
-
-        with ul(id='quality'):
-            with li():
-                i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(c[c_s]['prefersmaller']).lower())  # TODO can remove string/lower when removing try/except block in config.stash
-                span(u'Prefer smaller file sizes for identically-scored releases.')
 
         div(u','.join(self.resolutions), cls='hidden')
         with div(id='save', cat='quality'):
@@ -242,7 +243,7 @@ class Settings():
                 for res in self.resolutions:
                     with li(cls='rbord', id=res, sort=profile[res][1]):
                         i(cls='fa fa-bars')
-                        i(id=res, cls='fa fa-square-o checkbox', value=profile[res][0])
+                        i(id=res, cls='fa fa-square-o checkbox', value=str(profile[res][0]))
                         span(res)
 
             # Size restriction block
@@ -269,51 +270,56 @@ class Settings():
                     span(u'Ignored words:', cls='bold')
                     input(type='text', id='ignoredwords', value=profile['ignoredwords'])
                     span(u'Releases with these words are ignored.', cls='tip')
+            with ul(id='toggles'):
+                with li(cls='bbord'):
+                    i(id='scoretitle', cls='fa fa-square-o checkbox', value=str(profile['scoretitle']))
+                    span('Score and filter titles.')
+                    span('May need to disable for non-English results. Can cause incorrect downloads', cls='tip')
+                with li():
+                    i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(profile['prefersmaller']))
+                    span('Prefer smaller file sizes for identically-scored releases.')
 
         return unicode(profile_list)
 
     @expose
     @settings_page
     def providers(self, c):
-        h1(u'Indexers')
+        c_s = 'Indexers'
 
+        h1(u'Indexers')
         with ul(id='indexers', cls='wide'):
             with li():
-
-                c_s = 'Indexers'
                 with ul(id='newznab_list'):
                     with li(cls='sub_cat'):
                         span(u'NewzNab Indexers')
-                    for n in c[c_s]:
+                    for n in c[c_s]['NewzNab']:
                         with li(cls='newznab_indexer'):
-                            i(cls='newznab_check fa fa-square-o checkbox', value=c[c_s][n][2])
-                            input(type='text', cls='newznab_url', value=c[c_s][n][0], placeholder=" http://www.indexer-url.com/")
-                            input(type='text', cls='newznab_api', value=c[c_s][n][1], placeholder=" Api Key")
+                            i(cls='newznab_check fa fa-square-o checkbox', value=str(c[c_s]['NewzNab'][n][2]))
+                            input(type='text', cls='newznab_url', value=c[c_s]['NewzNab'][n][0], placeholder=" http://www.indexer-url.com/")
+                            input(type='text', cls='newznab_api', value=c[c_s]['NewzNab'][n][1], placeholder=" Api Key")
                             i(cls='newznab_clear fa fa-trash-o')
                             i(cls='indexer_test fa fa-plug', type='newznab')
                     with li(cls='add_newznab_row'):
                         i(cls='fa fa-plus-square', id='add_newznab_row')
 
-                c_s = 'PotatoIndexers'
                 with ul(id='potato_list'):
                     with li(cls='sub_cat'):
                         span(u'Torrent Potato Indexers')
-                    for n in c[c_s]:
+                    for n in c[c_s]['TorrentPotato']:
                         with li(cls='potato_indexer'):
-                            i(cls='potato_check fa fa-square-o checkbox', value=c[c_s][n][2])
-                            input(type='text', cls='potato_url', value=c[c_s][n][0], placeholder=" http://www.indexer-url.com/")
-                            input(type='text', cls='potato_api', value=c[c_s][n][1], placeholder=" Api Key")
+                            i(cls='potato_check fa fa-square-o checkbox', value=str(c[c_s]['TorrentPotato'][n][2]))
+                            input(type='text', cls='potato_url', value=c[c_s]['TorrentPotato'][n][0], placeholder=" http://www.indexer-url.com/")
+                            input(type='text', cls='potato_api', value=c[c_s]['TorrentPotato'][n][1], placeholder=" Api Key")
                             i(cls='potato_clear fa fa-trash-o')
                             i(cls='indexer_test fa fa-plug', type='potato')
                     with li(cls='add_potato_row'):
                         i(cls='fa fa-plus-square', id='add_potato_row')
 
-                c_s = 'TorrentIndexers'
                 with ul(id='torrentindexer_list'):
                     with li(cls='sub_cat'):
                         span(u'Torrent Indexers')
                     with li(cls='torrent_indexer', id='rarbg'):
-                        i(cls='torrent_check fa fa-square-o checkbox', value=c[c_s]['rarbg'])
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rarbg']))
                         span('Search Rarbg')
 
         with div(id='save', cat='providers'):
@@ -323,45 +329,45 @@ class Settings():
     @expose
     @settings_page
     def downloader(self, c):
+        c_s = 'Downloader'
+
         h1(u'Downloader')
         with h2():
-            i(id='usenetenabled', cls='fa fa-square-o checkbox', value=c['Sources']['usenetenabled'], tag='usenet')
+            i(id='usenetenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['Sources']['usenetenabled']), tag='usenet')
             span('Usenet Downloaders')
 
         usenet_hidden = None
-        if c['Sources']['usenetenabled'] == 'false':
+        if c[c_s]['Sources']['usenetenabled'] is False:
             usenet_hidden = 'hidden'
 
         with ul(id='usenet', cls=usenet_hidden):
-
-            c_s = 'NzbGet'
             with li():
-                i(id='nzbgenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='nzbget', value=c[c_s]['nzbgenabled'])
+                i(id='nzbgetenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='nzbget', value=str(c[c_s]['Usenet']['NzbGet']['enabled']))
                 span(u'NZBGet', cls='sub_cat')
             with ul(id='nzbget', cls='nzb'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='nzbghost', value=c[c_s]['nzbghost'], style='width: 25%')
+                    input(type='text', id='host', value=c[c_s]['Usenet']['NzbGet']['host'], style='width: 25%')
                     span(u' : ')
-                    input(type='text', id='nzbgport', value=c[c_s]['nzbgport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Usenet']['NzbGet']['port'], style='width: 25%')
                 with li(u'User Name: ', cls='bbord'):
-                    input(type='text', id='nzbguser', value=c[c_s]['nzbguser'], style='width: 50%')
+                    input(type='text', id='user', value=c[c_s]['Usenet']['NzbGet']['user'], style='width: 50%')
                     span(u'Default: nzbget.', cls='tip')
                 with li(u'Password: ', cls='bbord'):
-                    input(type='text', id='nzbgpass', value=c[c_s]['nzbgpass'], style='width: 50%')
+                    input(type='text', id='pass', value=c[c_s]['Usenet']['NzbGet']['pass'], style='width: 50%')
                     span(u'Default: tegbzn6789.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='nzbgcategory', value=c[c_s]['nzbgcategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Usenet']['NzbGet']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
                 with li(u'Priority: ', cls='bbord'):
-                    with select(id='nzbgpriority', style='width: 50%'):
+                    with select(id='priority', style='width: 50%'):
                         pl = ['Very Low', 'Low', 'Normal', 'High', 'Forced']
                         for o in pl:
-                            if o == c[c_s]['nzbgpriority']:
+                            if o == c[c_s]['Usenet']['NzbGet']['priority']:
                                 option(o, value=o, selected="selected")
                             else:
                                 option(o, value=o)
                 with li(cls='bbord'):
-                    i(id='nzbgaddpaused', cls='fa fa-square-o checkbox', value=c[c_s]['nzbgaddpaused'])
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Usenet']['NzbGet']['addpaused']))
                     span(u'Add Paused')
 
                 with li():
@@ -369,27 +375,26 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-            c_s = 'Sabnzbd'
-            with li(cls='bbord'):
-                i(id='sabenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='sabnzbd', value=c[c_s]['sabenabled'])
+            with li():
+                i(id='sabenabled', cls='fa fa-circle-o radio', name='usenetdownloader', tog='sabnzbd', value=str(c[c_s]['Usenet']['Sabnzbd']['enabled']))
                 span(u'SABnzbd', cls='sub_cat')
             # I'm not 100% sure it is valid to do a ul>ul, but it only work this way so deal with it.
             with ul(id='sabnzbd', cls='nzb'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='sabhost', value=c[c_s]['sabhost'], style='width: 25%')
+                    input(type='text', id='host', value=c[c_s]['Usenet']['Sabnzbd']['host'], style='width: 25%')
                     span(u' : ')
-                    input(type='text', id='sabport', value=c[c_s]['sabport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Usenet']['Sabnzbd']['port'], style='width: 25%')
                 with li(u'Api Key: ', cls='bbord'):
-                    input(type='text', id='sabapi', value=c[c_s]['sabapi'], style='width: 50%')
+                    input(type='text', id='api', value=c[c_s]['Usenet']['Sabnzbd']['api'], style='width: 50%')
                     span(u'Please use full api key.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='sabcategory', value=c[c_s]['sabcategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Usenet']['Sabnzbd']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
                 with li(u'Priority: ', cls='bbord'):
-                    with select(id='sabpriority', value=c[c_s]['sabpriority'], style='width: 50%'):
+                    with select(id='priority', value=c[c_s]['Usenet']['Sabnzbd']['priority'], style='width: 50%'):
                         pl = ['Paused', 'Low', 'Normal', 'High', 'Forced']
                         for o in pl:
-                            if o == c[c_s]['sabpriority']:
+                            if o == c[c_s]['Usenet']['Sabnzbd']['priority']:
                                 option(o, value=o, selected="selected")
                             else:
                                 option(o, value=o)
@@ -400,43 +405,41 @@ class Settings():
                         span(u'Test Connection')
 
         with h2():
-            i(id='torrentenabled', cls='fa fa-square-o checkbox', value=c['Sources']['torrentenabled'], tag='torrent')
+            i(id='torrentenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['Sources']['torrentenabled']), tag='torrent')
             span('Torrent Downloaders')
 
         torrent_hidden = None
-        if c['Sources']['torrentenabled'] == 'false':
+        if c[c_s]['Sources']['torrentenabled'] is False:
             torrent_hidden = 'hidden'
 
         with ul(id='torrent', cls=torrent_hidden):
-
-            c_s = 'DelugeRPC'
             with li():
-                i(id='delugerpcenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='delugerpc', value=c[c_s]['delugerpcenabled'])
+                i(id='delugerpcenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='delugerpc', value=str(c[c_s]['Torrent']['DelugeRPC']['enabled']))
                 span(u'Deluge Daemon', cls='sub_cat')
             with ul(id='delugerpc', cls='torrent'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='delugerpchost', value=c[c_s]['delugerpchost'], style='width: 25%', placeholder='http://localhost')
+                    input(type='text', id='host', value=c[c_s]['Torrent']['DelugeRPC']['host'], style='width: 25%', placeholder='http://localhost')
                     span(u' : ')
-                    input(type='text', id='delugerpcport', value=c[c_s]['delugerpcport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Torrent']['DelugeRPC']['port'], style='width: 25%')
                 with li(u'User Name: ', cls='bbord'):
-                    input(type='text', id='delugerpcuser', value=c[c_s]['delugerpcuser'], style='width: 50%')
+                    input(type='text', id='user', value=c[c_s]['Torrent']['DelugeRPC']['user'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Password: ', cls='bbord'):
-                    input(type='text', id='delugerpcpass', value=c[c_s]['delugerpcpass'], style='width: 50%')
+                    input(type='text', id='pass', value=c[c_s]['Torrent']['DelugeRPC']['pass'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='delugerpccategory', value=c[c_s]['delugerpccategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Torrent']['DelugeRPC']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
                 with li(u'Priority: ', cls='bbord'):
-                    with select(id='delugerpcpriority', style='width: 50%'):
+                    with select(id='priority', style='width: 50%'):
                         pl = ['Normal', 'High', 'Max']
                         for o in pl:
-                            if o == c[c_s]['delugerpcpriority']:
+                            if o == c[c_s]['Torrent']['DelugeRPC']['priority']:
                                 option(o, value=o, selected="selected")
                             else:
                                 option(o, value=o)
                 with li(cls='bbord'):
-                    i(id='delugerpcaddpaused', cls='fa fa-square-o checkbox', value=c[c_s]['delugerpcaddpaused'])
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['DelugeRPC']['addpaused']))
                     span(u'Add Paused')
 
                 with li():
@@ -444,31 +447,30 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-            c_s = 'DelugeWeb'
             with li():
-                i(id='delugewebenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='delugeweb', value=c[c_s]['delugewebenabled'])
+                i(id='delugewebenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='delugeweb', value=str(c[c_s]['Torrent']['DelugeWeb']['enabled']))
                 span(u'Deluge Web UI', cls='sub_cat')
             with ul(id='delugeweb', cls='torrent'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='delugewebhost', value=c[c_s]['delugewebhost'], style='width: 25%', placeholder='http://localhost')
+                    input(type='text', id='host', value=c[c_s]['Torrent']['DelugeWeb']['host'], style='width: 25%', placeholder='http://localhost')
                     span(u' : ')
-                    input(type='text', id='delugewebport', value=c[c_s]['delugewebport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Torrent']['DelugeWeb']['port'], style='width: 25%')
                 with li(u'Password: ', cls='bbord'):
-                    input(type='text', id='delugewebpass', value=c[c_s]['delugewebpass'], style='width: 50%')
+                    input(type='text', id='pass', value=c[c_s]['Torrent']['DelugeWeb']['pass'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='delugewebcategory', value=c[c_s]['delugewebcategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Torrent']['DelugeWeb']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
                 with li(u'Priority: ', cls='bbord'):
-                    with select(id='delugewebpriority', style='width: 50%'):
+                    with select(id='priority', style='width: 50%'):
                         pl = ['Normal', 'High', 'Max']
                         for o in pl:
-                            if o == c[c_s]['delugewebpriority']:
+                            if o == c[c_s]['Torrent']['DelugeWeb']['priority']:
                                 option(o, value=o, selected="selected")
                             else:
                                 option(o, value=o)
                 with li(cls='bbord'):
-                    i(id='delugewebaddpaused', cls='fa fa-square-o checkbox', value=c[c_s]['delugewebaddpaused'])
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['DelugeWeb']['addpaused']))
                     span(u'Add Paused')
 
                 with li():
@@ -476,34 +478,33 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-            c_s = 'Transmission'
             with li():
-                i(id='transmissionenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='transmission', value=c[c_s]['transmissionenabled'])
+                i(id='transmissionenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='transmission', value=str(c[c_s]['Torrent']['Transmission']['enabled']))
                 span(u'Transmission', cls='sub_cat')
             with ul(id='transmission', cls='torrent'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='transmissionhost', value=c[c_s]['transmissionhost'], style='width: 25%')
+                    input(type='text', id='host', value=c[c_s]['Torrent']['Transmission']['host'], style='width: 25%')
                     span(u' : ')
-                    input(type='text', id='transmissionport', value=c[c_s]['transmissionport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Torrent']['Transmission']['port'], style='width: 25%')
                 with li(u'User Name: ', cls='bbord'):
-                    input(type='text', id='transmissionuser', value=c[c_s]['transmissionuser'], style='width: 50%')
+                    input(type='text', id='user', value=c[c_s]['Torrent']['Transmission']['user'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Password: ', cls='bbord'):
-                    input(type='text', id='transmissionpass', value=c[c_s]['transmissionpass'], style='width: 50%')
+                    input(type='text', id='pass', value=c[c_s]['Torrent']['Transmission']['pass'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='transmissioncategory', value=c[c_s]['transmissioncategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Torrent']['Transmission']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
                 with li(u'Priority: ', cls='bbord'):
-                    with select(id='transmissionpriority', style='width: 50%'):
+                    with select(id='priority', style='width: 50%'):
                         pl = ['Low', 'Normal', 'High']
                         for o in pl:
-                            if o == c[c_s]['transmissionpriority']:
+                            if o == c[c_s]['Torrent']['Transmission']['priority']:
                                 option(o, value=o, selected="selected")
                             else:
                                 option(o, value=o)
                 with li(cls='bbord'):
-                    i(id='transmissionaddpaused', cls='fa fa-square-o checkbox', value=c[c_s]['transmissionaddpaused'])
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['Transmission']['addpaused']))
                     span(u'Add Paused')
 
                 with li():
@@ -511,23 +512,22 @@ class Settings():
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
 
-            c_s = 'QBittorrent'
             with li():
-                i(id='qbittorrentenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='qbittorrent', value=c[c_s]['qbittorrentenabled'])
+                i(id='qbittorrentenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='qbittorrent', value=str(c[c_s]['Torrent']['QBittorrent']['enabled']))
                 span(u'QBittorrent', cls='sub_cat')
             with ul(id='qbittorrent', cls='torrent'):
                 with li(u'Host & Port: ', cls='bbord'):
-                    input(type='text', id='qbittorrenthost', value=c[c_s]['qbittorrenthost'], style='width: 25%')
+                    input(type='text', id='host', value=c[c_s]['Torrent']['QBittorrent']['host'], style='width: 25%')
                     span(u' : ')
-                    input(type='text', id='qbittorrentport', value=c[c_s]['qbittorrentport'], style='width: 25%')
+                    input(type='number', id='port', value=c[c_s]['Torrent']['QBittorrent']['port'], style='width: 25%')
                 with li(u'User Name: ', cls='bbord'):
-                    input(type='text', id='qbittorrentuser', value=c[c_s]['qbittorrentuser'], style='width: 50%')
+                    input(type='text', id='user', value=c[c_s]['Torrent']['QBittorrent']['user'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Password: ', cls='bbord'):
-                    input(type='text', id='qbittorrentpass', value=c[c_s]['qbittorrentpass'], style='width: 50%')
+                    input(type='text', id='pass', value=c[c_s]['Torrent']['QBittorrent']['pass'], style='width: 50%')
                     span(u'Leave blank for none.', cls='tip')
                 with li(u'Category: ', cls='bbord'):
-                    input(type='text', id='qbittorrentcategory', value=c[c_s]['qbittorrentcategory'], style='width: 50%')
+                    input(type='text', id='category', value=c[c_s]['Torrent']['QBittorrent']['category'], style='width: 50%')
                     span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
 
                 with li():
@@ -546,21 +546,21 @@ class Settings():
         c_s = 'Postprocessing'
         with ul(id='postprocessing'):
             with li(cls='bbord'):
-                i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupfailed'])
+                i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupfailed']))
                 span(u'Delete leftover files after a failed download.')
             with li(cls='bbord'):
-                i(id='renamerenabled', cls='fa fa-square-o checkbox', value=c[c_s]['renamerenabled'])
+                i(id='renamerenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['renamerenabled']))
                 span(u'Enable Renamer')
             with ul(id='renamer'):
                 with li():
-                    input(id='renamerstring', type='text', style='width: 80%', value=c[c_s]['renamerstring'], placeholder='{title} ({year}) {resolution}')
+                    input(id='renamerstring', type='text', style='width: 80%', value=str(c[c_s]['renamerstring']), placeholder='{title} ({year}) {resolution}')
                     br()
                     span(u'Example: ')
                     br()
                     span(u'{title} {year} - {videocodec} = How to Train Your Dragon 2010 - x264.mkv',  cls='taglist')
 
             with li(cls='bbord'):
-                i(id='moverenabled', cls='fa fa-square-o checkbox', value=c[c_s]['moverenabled'])
+                i(id='moverenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['moverenabled']))
                 span(u'Enable Mover')
             with ul(id='mover'):
                 with li():
@@ -575,10 +575,10 @@ class Settings():
                         input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
                         span(u'Files will be renamed with Renamer settings.', cls='tip')
                     with span(cls='bbord'):
-                        i(id='createhardlink', cls='fa fa-square-o checkbox', value=c[c_s]['createhardlink'])
+                        i(id='createhardlink', cls='fa fa-square-o checkbox', value=str(c[c_s]['createhardlink']))
                         span(u'Create hardlink to enable seeding torrents.')
                         span(u'Will disable clean up.', cls='tip')
-                    i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=c[c_s]['cleanupenabled'])
+                    i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupenabled']))
                     span(u'Clean up after move.')
             with li(u'Replace illegal characters with: ', cls='bbord'):
                 input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
@@ -656,10 +656,10 @@ class Settings():
                 enabled, sort = plug_conf
             else:
                 sort = 900 + fid
-                enabled = 'false'
+                enabled = 'False'
             with li(id='{}{}'.format(folder, fid), plugin=plugin, sort=sort):
                 i(cls='fa fa-bars')
-                i(cls='fa fa-square-o checkbox', value=enabled)
+                i(cls='fa fa-square-o checkbox', value=str(enabled))
                 span(name)
                 if conf:
                     i(cls='fa fa-cog edit_conf', conf=conf)

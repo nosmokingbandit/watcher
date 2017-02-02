@@ -18,10 +18,10 @@ class Nzbget():
         Return True on success or str error message on failure
         '''
 
-        host = data['nzbghost']
-        port = data['nzbgport']
-        user = data['nzbguser']
-        passw = data['nzbgpass']
+        host = data['host']
+        port = data['port']
+        user = data['user']
+        passw = data['pass']
 
         https = False
         if https:
@@ -48,12 +48,12 @@ class Nzbget():
         Returns str response from server
         '''
 
-        nzbg_conf = core.CONFIG['NzbGet']
+        nzbg_conf = core.CONFIG['Downloader']['Usenet']['NzbGet']
 
-        host = nzbg_conf['nzbghost']
-        port = nzbg_conf['nzbgport']
-        user = nzbg_conf['nzbguser']
-        passw = nzbg_conf['nzbgpass']
+        host = conf['host']
+        port = conf['port']
+        user = conf['user']
+        passw = conf['pass']
 
         https = False
         if https:
@@ -65,7 +65,7 @@ class Nzbget():
 
         filename = u'{}.nzb'.format(data['title'])
         contenturl = data['guid']
-        category = nzbg_conf['nzbgcategory']
+        category = conf['category']
         priority_keys = {
             'Very Low': -100,
             'Low': -50,
@@ -74,8 +74,8 @@ class Nzbget():
             'Very High': 100,
             'Forced': 900
         }
-        priority = priority_keys[nzbg_conf['nzbgpriority']]
-        if nzbg_conf['nzbgaddpaused'] == u'true':
+        priority = priority_keys[conf['priority']]
+        if conf['addpaused']:
             paused = True
         else:
             paused = False

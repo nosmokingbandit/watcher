@@ -56,22 +56,31 @@ $(document).ready(function () {
         e.preventDefault();
     });
 
+
+
     function server(){
         var data = {};
         var server = {};
         var blanks = false;
         $("#server i.checkbox").each(function(){
-            server[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            server[$this.attr("id")] = is_checked($this);
         });
         $("#server :input").each(function(){
-            if($(this).attr("id") == "theme"){
-
+            $this = $(this);
+            if($this.attr("id") == "theme"){
             }
-            else if($(this).val() == ""){
+            else if($this.val() == ""){
                 blanks = true;
-                highlight($(this));
+                highlight($this);
             }
-            server[$(this).attr("id")] = $(this).val();
+
+            if($this.attr("type") == "number"){
+                server[$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                server[$this.attr("id")] = $this.val();
+            }
         });
 
         if(blanks == true){
@@ -86,9 +95,12 @@ $(document).ready(function () {
     function search(){
         var data = {};
         var search = {};
+        var watchlists = {};
         var blanks = false;
+
         $("ul#search i.checkbox").each(function(){
-            search[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            search[$this.attr("id")] = is_checked($this);
         })
         $("ul#search :input").each(function(){
             $this = $(this);
@@ -97,19 +109,42 @@ $(document).ready(function () {
                 blanks = true;
                 highlight($this);
             }
-            search[$this.attr("id")] = $this.val();
+            if($this.attr("type") == "number"){
+                search[$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                search[$this.attr("id")] = $this.val();
+            }
         });
+
+        data["Search"] = search;
+
         if(blanks == true){
             return false;
         };
 
-        data["Search"] = search;
+        $("ul#watchlists i.checkbox").each(function(){
+            $this = $(this);
+            watchlists[$this.attr("id")] = is_checked($this);
+        })
+        $("ul#watchlists :input").each(function(){
+            $this = $(this);
+            if($this.attr("type") == "number"){
+                watchlists[$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                watchlists[$this.attr("id")] = $this.val();
+            }
+        });
+
+        data["Search"]["Watchlists"] = watchlists
+
         return data
     }
 
     function quality(){
         var data = {};
-        var quality = {};
+        var profile = {};
         var blanks = false;
         var names = [];
 
@@ -136,21 +171,21 @@ $(document).ready(function () {
 
             names.push(name);
 
-            quality[name] = {};
+            profile[name] = {};
 
             var q_list = [];
             $this.find("ul#resolution i.checkbox").each(function(){
                 $_this = $(this);
                 res = $_this.attr("id");
-                enabled = $_this.attr("value");
-                quality[name][res] = [enabled];
+                enabled = is_checked($_this)
+                profile[name][res] = [enabled];
             });
 
             // order of resolutions
             var arr = $this.find("ul#resolution").sortable("toArray");
             arr.shift();
             $.each(arr, function(value, res){
-                quality[name][res].push(value)
+                profile[name][res].push(value)
             });
 
             // min/max sizes
@@ -161,19 +196,21 @@ $(document).ready(function () {
                     highlight($_this);
                 }
                 res = $_this.attr("id");
-                size = $_this.val();
-                quality[name][res].push(size);
-            })
+                size = parseInt($_this.val());
+                profile[name][res].push(size);
+            });
 
             // word lists
             $this.find("ul#filters li input").each(function(){
                 $_this = $(this);
                 id = $_this.attr("id");
                 value = $_this.val();
-                quality[name][id] = value;
-            })
+                profile[name][id] = value;
+            });
 
-            quality[name] = JSON.stringify(quality[name]);
+            $this.find("ul#toggles li i.checkbox").each(function(){
+                profile[name][$(this).attr("id")] = is_checked($(this));
+            });
 
         })
 
@@ -183,18 +220,20 @@ $(document).ready(function () {
 
         $("ul#quality i.checkbox").each(function(){
             $this = $(this)
-            quality[$this.attr("id")] = $this.attr("value");
+            profile[name][$this.attr("id")] = is_checked($this);
         })
 
 
-        data["Quality"] = quality
+        data["Quality"] = {}
+        data["Quality"]["Profiles"] = {}
+        data["Quality"]["Profiles"] = profile
+
         return data;
     }
 
     function providers(){
-        // The order of these tend to get jumbled. I think it sorts alphabetically, but
-        // I haven't put much effort into it yet because it really doesn't affect usage.
         var data = {};
+        data['Indexers'] = {};
         var ind = 1;
         var cancel = false;
 
@@ -202,7 +241,7 @@ $(document).ready(function () {
         $("#newznab_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "newznab_indexer"){
-                var check = $this.children("i.newznab_check").attr("value");
+                var check = is_checked($this.children("i.newznab_check"));
                 var url = $this.children("input.newznab_url").val();
                 var api = $this.children("input.newznab_api").val();
 
@@ -215,19 +254,19 @@ $(document).ready(function () {
 
                 // but ignore it if both are blank
                 else if (url + api !=="") {
-                    newznab_indexers[ind] = [url, api, check].toString().toLowerCase();
+                    newznab_indexers[ind] = [url, api, check];
                     ind++;
                 }
             }
         });
-        data["Indexers"] = newznab_indexers;
+        data["Indexers"]['NewzNab'] = newznab_indexers;
 
         potato_indexers = {};
         ind = 1;
         $("#potato_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "potato_indexer"){
-                var check = $this.children("i.potato_check").attr("value");
+                var check = is_checked($this.children("i.potato_check"));
                 var url = $this.children("input.potato_url").val();
                 var api = $this.children("input.potato_api").val();
 
@@ -240,23 +279,25 @@ $(document).ready(function () {
 
                 // but ignore it if both are blank
                 else if (url + api !=="") {
-                    potato_indexers[ind] = [url, api, check].toString().toLowerCase();
+                    potato_indexers[ind] = [url, api, check]
                     ind++;
                 }
             }
         });
-        data["PotatoIndexers"] = potato_indexers;
+
+        data["Indexers"]["TorrentPotato"] = potato_indexers;
 
         torrent_indexers = {}
         $("#torrentindexer_list li").each(function(){
             $this = $(this);
             if ($this.attr("class") == "torrent_indexer"){
                 name = $this.attr("id");
-                check = $this.children("i.torrent_check").attr("value")
+                check = is_checked($this.children("i.torrent_check"));
                 torrent_indexers[name] = check;
             }
         });
-        data["TorrentIndexers"] = torrent_indexers;
+        data["Indexers"]["Torrent"] = torrent_indexers;
+
         if(cancel == true){
             return false;
         } else {
@@ -266,26 +307,29 @@ $(document).ready(function () {
 
     function downloader(){
         var data = {};
+        data["Downloader"] = {"Torrent": {}, "Usenet": {}};
+
 
         var sources = {};
-        sources["usenetenabled"] = $("i#usenetenabled").attr("value");
-        sources["torrentenabled"] = $("i#torrentenabled").attr("value");
-        data["Sources"] = sources;
+        sources["usenetenabled"] = is_checked($("i#usenetenabled"));
+        sources["torrentenabled"] = is_checked($("i#torrentenabled"));
+        data["Downloader"]["Sources"] = sources;
 
         var sabnzbd = {};
-        sabnzbd["sabenabled"] = $("i#sabenabled").attr("value");
+        sabnzbd["enabled"] = is_checked($("i#sabenabled"));
         $("ul#sabnzbd li input").each(function(){
             sabnzbd[$(this).attr("id")] = $(this).val();
         });
         $("ul#sabnzbd li select").each(function(){
             sabnzbd[$(this).attr("id")] = $(this).val();
         });
-        data["Sabnzbd"] = sabnzbd;
+        data["Downloader"]["Usenet"]["Sabnzbd"] = sabnzbd;
 
         var nzbget = {};
-        nzbget["nzbgenabled"] = $("i#nzbgenabled").attr("value");
+        nzbget["enabled"] = is_checked($("i#nzbgenabled"));
         $("ul#nzbget li i.checkbox").each(function(){
-            nzbget[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this)
+            nzbget[$this.attr("id")] = is_checked($this);
         });
         $("ul#nzbget li input").not("[type=button]").each(function(){
             nzbget[$(this).attr("id")] = $(this).val();
@@ -293,12 +337,13 @@ $(document).ready(function () {
         $("ul#nzbget li select").each(function(){
             nzbget[$(this).attr("id")] = $(this).val()
         });
-        data["NzbGet"] = nzbget;
+        data["Downloader"]["Usenet"]["NzbGet"] = nzbget;
 
         var transmission = {};
-        transmission["transmissionenabled"] = $("i#transmissionenabled").attr("value");
+        transmission["enabled"] = is_checked($("i#transmissionenabled"));
         $("ul#transmission li i.checkbox").each(function(){
-            transmission[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this)
+            transmission[$this.attr("id")] = is_checked($this);
         });
         $("ul#transmission li input").not("[type=button]").each(function(){
             transmission[$(this).attr("id")] = $(this).val();
@@ -306,12 +351,13 @@ $(document).ready(function () {
         $("ul#transmission li select").each(function(){
             transmission[$(this).attr("id")] = $(this).val()
         });
-        data["Transmission"] = transmission;
+        data["Downloader"]["Torrent"]["Transmission"] = transmission;
 
         var delugerpc = {};
-        delugerpc["delugerpcenabled"] = $("i#delugerpcenabled").attr("value");
+        delugerpc["enabled"] = is_checked($("i#delugerpcenabled"));
         $("ul#delugerpc li i.checkbox").each(function(){
-            delugerpc[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            delugerpc[$this.attr("id")] = is_checked($this);
         });
         $("ul#delugerpc li input").not("[type=button]").each(function(){
             delugerpc[$(this).attr("id")] = $(this).val();
@@ -319,12 +365,13 @@ $(document).ready(function () {
         $("ul#delugerpc li select").each(function(){
             delugerpc[$(this).attr("id")] = $(this).val()
         });
-        data["DelugeRPC"] = delugerpc;
+        data["Downloader"]["Torrent"]["DelugeRPC"] = delugerpc;
 
         var delugeweb = {};
-        delugeweb["delugewebenabled"] = $("i#delugewebenabled").attr("value");
+        delugeweb["enabled"] = is_checked($("i#delugewebenabled"));
         $("ul#delugeweb li i.checkbox").each(function(){
-            delugeweb[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            delugeweb[$this.attr("id")] = is_checked($this);
         });
         $("ul#delugeweb li input").not("[type=button]").each(function(){
             delugeweb[$(this).attr("id")] = $(this).val();
@@ -332,12 +379,13 @@ $(document).ready(function () {
         $("ul#delugeweb li select").each(function(){
             delugeweb[$(this).attr("id")] = $(this).val()
         });
-        data["DelugeWeb"] = delugeweb;
+        data["Downloader"]["Torrent"]["DelugeWeb"] = delugeweb;
 
         var qbittorrent = {};
-        qbittorrent["qbittorrentenabled"] = $("i#qbittorrentenabled").attr("value");
+        qbittorrent["enabled"] = is_checked($("i#qbittorrentenabled"));
         $("ul#qbittorrent li i.checkbox").each(function(){
-            qbittorrent[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            qbittorrent[$this.attr("id")] = is_checked($this);
         });
         $("ul#qbittorrent li input").not("[type=button]").each(function(){
             qbittorrent[$(this).attr("id")] = $(this).val();
@@ -345,7 +393,7 @@ $(document).ready(function () {
         $("ul#qbittorrent li select").each(function(){
             qbittorrent[$(this).attr("id")] = $(this).val()
         });
-        data["QBittorrent"] = qbittorrent;
+        data["Downloader"]["Torrent"]["QBittorrent"] = qbittorrent;
 
         return data
     }
@@ -354,7 +402,8 @@ $(document).ready(function () {
         var data = {};
         var postprocessing = {};
         $("ul#postprocessing li i.checkbox").each(function(){
-            postprocessing[$(this).attr("id")] = $(this).attr("value");
+            $this = $(this);
+            postprocessing[$this.attr("id")] = is_checked($this);
         });
         $("ul#postprocessing li input").not("[type=button]").each(function(){
             $this = $(this);
@@ -380,13 +429,13 @@ $(document).ready(function () {
         $.each(arr, function(index, value){
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
-            enabled = $li.find("i.checkbox").attr("value");
+            enabled = is_checked($li.find("i.checkbox"));
             if(enabled == 'true'){
                 added[plugin] = [enabled, order];
                 order++;
             }
         })
-        plugins["added"] = JSON.stringify(added)
+        plugins["added"] = added
 
         var snatched = {};
         var arr = $("ul#snatched").sortable("toArray");
@@ -395,13 +444,12 @@ $(document).ready(function () {
             console.log(order)
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
-            enabled = $li.find("i.checkbox").attr("value");
-            if(enabled == 'true'){
-                snatched[plugin] = [enabled, order];
+            if(is_checked($li.find("i.checkbox"))){
+                snatched[plugin] = [true, order];
                 order++;
             }
         })
-        plugins["snatched"] = JSON.stringify(snatched)
+        plugins["snatched"] = snatched
 
         var finished = {};
         var arr = $("ul#finished").sortable("toArray");
@@ -409,25 +457,31 @@ $(document).ready(function () {
         $.each(arr, function(index, value){
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
-            enabled = $li.find("i.checkbox").attr("value");
+            enabled = is_checked($li.find("i.checkbox"));
             if(enabled == 'true'){
                 finished[plugin] = [enabled, order];
                 order++;
             }
         })
-        plugins["finished"] = JSON.stringify(finished)
+        plugins["finished"] = finished
 
         data["Plugins"] = plugins;
 
         return data
     }
 
-    function verify_data(){
+    function is_checked(checkbox){
+        // Turns value of checkbox "True"/"False" into js bool
+        // checkbox: object jquery object of checkbox <i>
+        return (checkbox.attr("value") == "True")
+    }
 
-        //check if only one downloader is active:
+    function verify_data(){
+        // checks if only one downloader is active
+        // Returns bool
         var enabled = 0
         $("ul#downloader > li > i.checkbox").each(function(){
-            if($(this).attr("value") == "true"){
+            if(is_checked($(this))){
                 enabled++;
             }
         });
@@ -440,6 +494,8 @@ $(document).ready(function () {
     }
 
     function highlight(element){
+        // Highlights empty or invalid inputs
+        // element: object JQ object of input to highlight
         orig_bg = element.css("background-color");
         element.css("background-color", "#f4693b");
         element.delay(500).animate({"background-color": orig_bg}, 1000);

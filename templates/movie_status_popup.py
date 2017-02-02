@@ -18,7 +18,7 @@ class MovieStatusPopup():
             poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
             title = data['title']
             year = str(data['year'])
-
+            quality = data['quality']
             url = data['url']
 
         container = div(id='container')
@@ -39,7 +39,7 @@ class MovieStatusPopup():
                 img(id='poster', src=poster_path)
                 with div(id='search_results'):
 
-                    self.result_list(imdbid)
+                    self.result_list(imdbid, quality)
                     div(id='results_thinker')
 
             with div(id='plot'):
@@ -56,7 +56,7 @@ class MovieStatusPopup():
 
                 with span('Quality profile: ', id='quality'):
                     with select(id='quality_profile', value=data['quality']):
-                        options = core.CONFIG['Quality'].keys()
+                        options = core.CONFIG['Quality']['Profiles'].keys()
                         for opt in options:
                             item = option(opt, value=opt)
                             if opt == data['quality']:
@@ -66,8 +66,8 @@ class MovieStatusPopup():
 
         return unicode(container)
 
-    def result_list(self, imdbid):
-        results = self.sql.get_search_results(imdbid)
+    def result_list(self, imdbid, quality):
+        results = self.sql.get_search_results(imdbid, quality)
 
         result_list = ul(id='result_list')
         with result_list:

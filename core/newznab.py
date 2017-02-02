@@ -21,7 +21,7 @@ class NewzNab():
         Returns list of dicts with sorted nzb information.
         '''
 
-        indexers = core.CONFIG['Indexers'].values()
+        indexers = core.CONFIG['Indexers']['NewzNab'].values()
 
         self.imdbid = imdbid
 
@@ -29,7 +29,7 @@ class NewzNab():
         imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
-            if indexer[2] == u'false':
+            if indexer[2] is False:
                 continue
             url = indexer[0]
             if url[-1] != u'/':
@@ -91,8 +91,7 @@ class NewzNab():
 
         Returns dict.
         '''
-        # TODO Should probably have a base dict then fill it in with d.update()
-
+        
         permalink = True
 
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')

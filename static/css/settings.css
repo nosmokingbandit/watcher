@@ -1,15 +1,11 @@
 input[type="number"], input[type="text"]{
+    font-family: "Lucida Console", Monaco, monospace;
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
     height: 1.5em;
-    padding: 0 0.5em;
-}
-
-input[type='text']{
-    font-family: "Lucida Console", Monaco, monospace;
-    font-size: 0.75em;
-    height: 2.0em;
+    padding: 0.1em 0.5em;
+    font-size: .85em;
 }
 
 select{
@@ -191,7 +187,7 @@ div.quality ul#resolution_size li input{
 }
 
 div.quality ul#filters{
-    margin: 1em 0 0 0;
+    margin: 1em 0 1em 0;
 }
 
 div.quality ul#filters li{

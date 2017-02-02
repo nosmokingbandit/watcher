@@ -22,36 +22,36 @@ $(document).ready(function() {
 
     /* set default state for pseudo checkboxes */
     $('i.checkbox').each(function(){
-       if ( $(this).attr("value") == "true" ){
+       if ( $(this).attr("value") == "True" ){
            $(this).removeClass('fa-square-o')
-           $(this).addClass('fa-check-square-o');
+           $(this).addClass('fa-check-square');
        }
     });
 
     /* toggle check box status */
     $('i.checkbox').click(function(){
         // turn on
-        if( $(this).attr("value") == "false" ){
-            $(this).attr("value", "true");
+        if( $(this).attr("value") == "False" ){
+            $(this).attr("value", "True");
             $(this).removeClass('fa-square-o');
-            $(this).addClass('fa-check-square-o');
+            $(this).addClass('fa-check-square');
         // turn off
-        } else if ( $(this).attr("value") == "true" ){
-            $(this).attr("value", "false");
-            $(this).removeClass('fa-check-square-o')
+        } else if ( $(this).attr("value") == "True" ){
+            $(this).attr("value", "False");
+            $(this).removeClass('fa-check-square')
             $(this).addClass('fa-square-o');
         }
     });
 
     /* Button actions */
-    function search_now(imdbid, title){
+    function search_now(imdbid, title, quality){
         $('ul#result_list').hide();
         $('div#results_thinker').show();
         $('i#search_now').addClass('fa-circle faa-burst animated');
 
-        $.post(url_base + "/ajax/search", {"imdbid":imdbid, "title":title})
+        $.post(url_base + "/ajax/search", {"imdbid":imdbid, "title":title, "quality":quality})
         .done(function(r){
-            refresh_list('#result_list', imdbid=imdbid)
+            refresh_list('#result_list', imdbid=imdbid, quality=quality)
             refresh_list('#movie_list')
 
             $('div#results_thinker').hide();
@@ -103,7 +103,8 @@ $(document).ready(function() {
         var $this = $(this);
         var imdbid = $this.attr('imdbid');
         var title = $this.attr('title');
-        search_now(imdbid, title);
+        var quality = $("select#quality_profile").val()
+        search_now(imdbid, title, quality);
     });
 
     $('i#change_quality').click(function(){
@@ -116,8 +117,6 @@ $(document).ready(function() {
 
         $.post(url_base + "/ajax/update_quality_profile", {"quality": quality, "imdbid": imdbid})
         .done(function(r){
-            console.log(r);
-
             $this.addClass('fa-save');
             $this.removeClass('fa-circle faa-burst animated');
         })
@@ -185,7 +184,7 @@ $(document).ready(function() {
         });
     });
 
-    function refresh_list(list, imdbid){
+    function refresh_list(list, imdbid, quality){
         scroll_position = $(list).scrollTop();
         if(imdbid === undefined) {
             imdbid = '';
@@ -201,7 +200,7 @@ $(document).ready(function() {
         })
 
 
-        $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid})
+        $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid, "quality":quality})
         .done(function(html){
             var $parent = $list.parent()
             $list.remove();

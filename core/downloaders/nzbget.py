@@ -48,7 +48,7 @@ class Nzbget():
         Returns str response from server
         '''
 
-        nzbg_conf = core.CONFIG['Downloader']['Usenet']['NzbGet']
+        conf = core.CONFIG['Downloader']['Usenet']['NzbGet']
 
         host = conf['host']
         port = conf['port']

@@ -126,7 +126,7 @@ class Settings():
                     span(u'Shutdown')
                 with span(u'Current version hash: ', cls='tip'):
                     if core.CURRENT_HASH is not None:
-                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
+                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
 
         with div(id='save', cat='server'):
             i(cls='fa fa-save')

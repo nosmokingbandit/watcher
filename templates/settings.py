@@ -183,9 +183,9 @@ class Settings():
                 i(id='popularmoviessync', cls='fa fa-square-o checkbox', value=c[c_s]['popularmoviessync'])
                 span(u'Sync Popular Movie list ')
                 span(' every ')
-                input(type='number', min='15', id='popularmoviesfrequency', value=c[c_s]['popularmoviesfrequency'], style='width: 3.0em')
-                span(' minutes.')
-                span('*Requires restart.', cls='tip')
+                input(type='number', min='8', id='popularmoviesfrequency', value=c[c_s]['popularmoviesfrequency'], style='width: 3.0em')
+                span(' hours.')
+                span('*Requires restart, minimum of 8 hours.', cls='tip')
 
         with div(id='save', cat='search'):
             i(cls='fa fa-save')

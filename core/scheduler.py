@@ -185,7 +185,8 @@ class PopularMoviesSync(object):
 
     @staticmethod
     def create():
-        interval = int(core.CONFIG['Search']['popularmoviesfrequency']) * 60
+        # Minimum of eight hours
+        interval = max(int(core.CONFIG['Search']['popularmoviesfrequency']), 8) * 60 * 60
         now = datetime.datetime.now()
 
         hr = now.hour

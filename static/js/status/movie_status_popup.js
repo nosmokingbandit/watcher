@@ -86,14 +86,14 @@ $(document).ready(function() {
             .done(function(r){
                 response = JSON.parse(r)
 
-                if(response["response"] == "false"){
-                    var message = title + ' could not be removed. Check logs for more information.';
-                    swal("Error", message, "error");
-                } else {
+                if(response["response"] == true){
                     swal.close();
                     refresh_list('#movie_list');
                     $('div#status_pop_up').slideUp();
                     $('div#overlay').fadeOut();
+                } else {
+                    var message = title + ' could not be removed. Check logs for more information.';
+                    swal("Error", message, "error");
                 }
             });
         });
@@ -117,6 +117,12 @@ $(document).ready(function() {
 
         $.post(url_base + "/ajax/update_quality_profile", {"quality": quality, "imdbid": imdbid})
         .done(function(r){
+            response = JSON.parse(r);
+
+            if(response["response"] == false){
+                toastr.error("Unable to update database");
+            }
+
             $this.addClass('fa-save');
             $this.removeClass('fa-circle faa-burst animated');
         })
@@ -148,7 +154,7 @@ $(document).ready(function() {
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid)
 
-            if(response['response'] == 'true'){
+            if(response['response'] == true){
                 toastr.success(response['message']);
             } else {
                 toastr.error(response['error']);
@@ -175,7 +181,7 @@ $(document).ready(function() {
 
             refresh_list('#movie_list');
             refresh_list('#result_list', imdbid=imdbid);
-            if (response['response'] == 'true'){
+            if (response['response'] == true){
                 toastr.success(response['message']);
             } else {
                 toastr.error(response['error']);

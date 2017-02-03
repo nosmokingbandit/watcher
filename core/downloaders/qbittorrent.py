@@ -38,8 +38,8 @@ class QBittorrent(object):
 
         Adds torrents to default/path/<category>
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
@@ -57,12 +57,12 @@ class QBittorrent(object):
 
         if not download_dir:
             if QBittorrent._login(base_url, user, password) is not True:
-                return {'response': 'false', 'error': 'Incorrect usename or password.'}
+                return {'response': False, 'error': 'Incorrect usename or password.'}
 
         download_dir = QBittorrent._get_download_dir(base_url)
 
         if not download_dir:
-            return {'response': 'false', 'error': 'Unable to get path information.'}
+            return {'response': False, 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
         post_data = {}
@@ -81,12 +81,12 @@ class QBittorrent(object):
         try:
             urllib2.urlopen(request)  # QBit returns an empty string
             downloadid = Torrent.get_hash(data['torrentfile'])
-            return {'response': 'true', 'downloadid': downloadid}
+            return {'response': True, 'downloadid': downloadid}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error(u'qbittorrent test_connection', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def _get_download_dir(base_url):
@@ -100,7 +100,7 @@ class QBittorrent(object):
             return False
         except Exception, e:
             logging.error(u'qbittorrent get_download_dir', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def get_torrents(base_url):

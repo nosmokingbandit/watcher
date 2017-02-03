@@ -22,7 +22,7 @@ $(document).ready(function() {
 
         $('#thinker').fadeIn();
 
-        $.post(url_base + "/ajax/search_omdb", {
+        $.post(url_base + "/ajax/search_tmdb", {
             "search_term": $("input[name='search_term']").val()
         })
 
@@ -89,7 +89,7 @@ $(document).ready(function() {
             $icon.removeClass('fa-circle faa-burst animated');
             $icon.addClass('fa-plus');
 
-            if(response['response'] == 'true'){
+            if(response['response'] == true){
                 toastr.success(response['message']);
             } else {
                 toastr.error(response['error']);

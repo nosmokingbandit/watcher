@@ -66,7 +66,7 @@ $(document).ready(function() {
         .done(function(r){
             response = JSON.parse(r)
 
-            if(response['response'] == 'true'){
+            if(response['response'] == true){
                 toastr.success(response['message']);
             } else {
                 toastr.error(response['error']);

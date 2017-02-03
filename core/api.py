@@ -7,12 +7,12 @@ from core import ajax, sqldb, poster
 
 logging = logging.getLogger(__name__)
 
-api_version = 1.1
+api_version = 2.0
 
 ''' API
 
 All methods output a json object:
-{'response': 'true'}
+{'response': true}
 
 A 'true' response indicates that the request was valid and returs useful data.
 A 'false' response indicates that the request was invalid. This will always include an
@@ -53,6 +53,12 @@ It is safe to assume that these version increases will not break any api interac
 Changes to the output responses will increase the version to the next whole number 2.0
 Major version changes can be expected to break api interactions
 
+# VERSION HISTORY
+1.0     First commit
+1.1     Consistency in responses
+
+2.0     Change to semantically correct json. Responses are now bools instead of str 'true'/'false'
+
 '''
 
 
@@ -73,18 +79,18 @@ class API(object):
 
         if 'apikey' not in params:
             logging.warning(u'API request failed, no key supplied.')
-            return json.dumps({'response': 'false',
+            return json.dumps({'response': False,
                                'error': 'no api key supplied'})
 
         # check for api key
         if serverkey != params['apikey']:
             logging.warning(u'Invalid API key in request: {}'.format(params['apikey']))
-            return json.dumps({'response': 'false',
+            return json.dumps({'response': False,
                                'error': 'incorrect api key'})
 
         # find what we are going to do
         if 'mode' not in params:
-            return json.dumps({'response': 'false',
+            return json.dumps({'response': False,
                                'error': 'no api mode specified'})
 
         if params['mode'] == u'liststatus':
@@ -96,7 +102,7 @@ class API(object):
 
         elif params['mode'] == u'addmovie':
             if 'imdbid' not in params:
-                return json.dumps({'response': 'false',
+                return json.dumps({'response': False,
                                    'error': 'no imdbid supplied'})
             else:
                 imdbid = params['imdbid']
@@ -105,7 +111,7 @@ class API(object):
 
         elif params['mode'] == u'removemovie':
             if 'imdbid' not in params:
-                return json.dumps({'response': 'false',
+                return json.dumps({'response': False,
                                    'error': 'no imdbid supplied'})
             else:
                 imdbid = params['imdbid']
@@ -118,7 +124,7 @@ class API(object):
             return json.dumps(core.CONFIG)
 
         else:
-            return json.dumps({'response': 'false',
+            return json.dumps({'response': False,
                                'error': 'invalid mode'})
 
     def liststatus(self, imdbid=None):
@@ -139,10 +145,10 @@ class API(object):
         if imdbid:
             for i in movies:
                 if i['imdbid'] == imdbid:
-                    response = {'response': 'true', 'movie': i}
+                    response = {'response': True, 'movie': i}
                     return json.dumps(response, indent=1)
         else:
-            response = {'response': 'true', 'movies': movies}
+            response = {'response': True, 'movies': movies}
             return json.dumps(response, indent=1)
 
     def addmovie(self, imdbid, quality):
@@ -174,11 +180,11 @@ class API(object):
         removed = self.sql.remove_movie(imdbid)
 
         if removed is True:
-            response = {'response': 'true', 'removed': imdbid}
+            response = {'response': True, 'removed': imdbid}
         elif removed is False:
-            response = {'response': 'false', 'error': 'unable to remove {}'.format(imdbid)}
+            response = {'response': False, 'error': 'unable to remove {}'.format(imdbid)}
         elif removed is None:
-            response = {'response': 'false', 'error': '{} does not exist'.format(imdbid)}
+            response = {'response': False, 'error': '{} does not exist'.format(imdbid)}
 
         return json.dumps(response, indent=1)
 
@@ -189,4 +195,4 @@ class API(object):
 
         Returns str json.dumps(dict)
         '''
-        return json.dumps({'response': 'true', 'version': core.CURRENT_HASH, 'api_version': api_version})
+        return json.dumps({'response': True, 'version': core.CURRENT_HASH, 'api_version': api_version})

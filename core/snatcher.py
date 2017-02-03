@@ -90,17 +90,15 @@ class Snatcher():
             if core.CONFIG['Downloader']['Sources']['usenetenabled']:
                 response = self.snatch_nzb(data)
             else:
-                return {u'response': u'false', u'message': u'NZB submitted but nzb snatching is disabled.'}
+                return {u'response': False, u'message': u'NZB submitted but nzb snatching is disabled.'}
 
         if data['type'] in ['torrent', 'magnet']:
             if core.CONFIG['Downloader']['Sources']['torrentenabled']:
                 response = self.snatch_torrent(data)
             else:
-                return {u'response': u'false', u'message': u'Torrent submitted but torrent snatching is disabled.'}
+                return {u'response': False, u'message': u'Torrent submitted but torrent snatching is disabled.'}
 
-        print response
-
-        if response['response'] == u'true':
+        if response['response'] is True:
             downloader = response['downloader']
             downloadid = response['downloadid']
 
@@ -121,16 +119,16 @@ class Snatcher():
             logging.info(u'Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to Sabnzbd.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -141,16 +139,16 @@ class Snatcher():
             logging.info(u'Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
-            if response['response'] is u'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -168,16 +166,16 @@ class Snatcher():
             logging.info(u'Sending {} to Transmission'.format(kind))
             response = transmission.Transmission.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Tranmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to Tranmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -188,16 +186,16 @@ class Snatcher():
             logging.info(u'Sending {} to QBittorrent'.format(kind))
             response = qbittorrent.QBittorrent.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to QBittorrent.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -208,16 +206,16 @@ class Snatcher():
             logging.info(u'Sending {} to DelugeRPC'.format(kind))
             response = deluge.DelugeRPC.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeRPC.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -228,22 +226,22 @@ class Snatcher():
             logging.info(u'Sending {} to DelugeWeb'.format(kind))
             response = deluge.DelugeWeb.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeWeb.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
 
         else:
-            return {u'response': u'false', u'error': u'No downloader enabled.'}
+            return {u'response': False, u'error': u'No downloader enabled.'}
 
     def update_status_snatched(self, guid, imdbid):
         '''

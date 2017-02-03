@@ -27,8 +27,8 @@ def settings_page(page):
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.02'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.029')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.02')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.02b9')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.02b')
 
         with doc:
             Header.insert_header(current="settings")
@@ -126,7 +126,7 @@ class Settings():
                     span(u'Shutdown')
                 with span(u'Current version hash: ', cls='tip'):
                     if core.CURRENT_HASH is not None:
-                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL))
+                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
 
         with div(id='save', cat='server'):
             i(cls='fa fa-save')

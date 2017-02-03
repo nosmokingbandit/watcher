@@ -41,8 +41,8 @@ class Transmission(object):
 
         Adds torrents to /default/path/<category>
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False', 'error': 'exception'}
 
         '''
 
@@ -79,9 +79,9 @@ class Transmission(object):
         try:
             download = client.add_torrent(url, paused=paused, bandwidthPriority=bandwidthPriority, download_dir=download_dir, timeout=30)
             download_id = download.hashString
-            return {'response': 'true', 'downloadid': download_id}
+            return {'response': True, 'downloadid': download_id}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error(u'Transmission add_torrent', exc_info=True)
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}

@@ -16,7 +16,7 @@ class PluginConfPopup(object):
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/settings/plugin_conf_popup.js?v=02.02')
+            script(src=core.URL_BASE + '/static/js/settings/plugin_conf_popup.js?v=02.02b')
             with div(cls='title'):
                 span(conf.split('.')[0], cls='name')
                 i(id='close', cls='fa fa-close')

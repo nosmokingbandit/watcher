@@ -42,8 +42,8 @@ class DelugeRPC(object):
         ''' Adds torrent or magnet to Deluge
         data: dict of torrrent/magnet information
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
         conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
@@ -58,15 +58,15 @@ class DelugeRPC(object):
         try:
             error = client.connect()
             if error:
-                return {'response': 'false', 'error': error}
+                return {'response': False, 'error': error}
         except Exception, e:
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}
 
         try:
             def_download_path = client.call('core.get_config')['download_location']
         except Exception, e:
             logging.error('Unable to get download path.', exc_info=True)
-            return {'response': 'false', 'error': 'Unable to get download path.'}
+            return {'response': False, 'error': 'Unable to get download path.'}
 
         download_path = '{}/{}'.format(def_download_path, conf['category'])
 
@@ -84,17 +84,17 @@ class DelugeRPC(object):
         if data['type'] == u'magnet':
             try:
                 download_id = client.call('core.add_torrent_magnet', data['torrentfile'], options)
-                return {'response': 'true', 'downloadid': download_id}
+                return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error('Unable to send magnet.', exc_info=True)
-                return {'response': 'false', 'error': str(e)}
+                return {'response': False, 'error': str(e)}
         elif data['type'] == u'torrent':
             try:
                 download_id = client.call('core.add_torrent_url', data['torrentfile'], options)
-                return {'response': 'true', 'downloadid': download_id}
+                return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error('Unable to send magnet.', exc_info=True)
-                return {'response': 'false', 'error': str(e)}
+                return {'response': False, 'error': str(e)}
         return
 
 
@@ -128,8 +128,8 @@ class DelugeWeb(object):
 
         Adds torrents to default/path/<category>
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
@@ -145,12 +145,12 @@ class DelugeWeb(object):
         if not download_dir:
             password = conf['pass']
             if DelugeWeb._login(url, password) is not True:
-                return {'response': 'false', 'error': 'Incorrect usename or password.'}
+                return {'response': False, 'error': 'Incorrect usename or password.'}
 
         download_dir = DelugeWeb._get_download_dir(url)
 
         if not download_dir:
-            return {'response': 'false', 'error': 'Unable to get path information.'}
+            return {'response': False, 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
         download_dir = '{}/{}'.format(download_dir, conf['category'])
@@ -180,14 +180,14 @@ class DelugeWeb(object):
             response = DelugeWeb._read(urllib2.urlopen(request))
             if response['result'] is True:
                 downloadid = Torrent.get_hash(data['torrentfile'])
-                return {'response': 'true', 'downloadid': downloadid}
+                return {'response': True, 'downloadid': downloadid}
             else:
-                return {'response': 'false', 'error': response['error']}
+                return {'response': False, 'error': response['error']}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error(u'Delugeweb add_torrent', exc_info=True)
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}
 
     @staticmethod
     def _get_download_dir(url):
@@ -210,7 +210,7 @@ class DelugeWeb(object):
             return False
         except Exception, e:
             logging.error(u'delugeweb get_download_dir', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def _read(response):

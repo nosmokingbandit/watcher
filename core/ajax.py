@@ -39,7 +39,7 @@ class Ajax(object):
         self.update = updatestatus.Status()
 
     @cherrypy.expose
-    def search_omdb(self, search_term):
+    def search_tmdb(self, search_term):
         ''' Search omdb for movies
         :param search_term: str title and year of movie (Movie Title 2016)
 
@@ -120,14 +120,14 @@ class Ajax(object):
             data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
 
         if not data['imdbid']:
-            response['response'] = u'false'
+            response['response'] = False
             response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
             return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
-            response['response'] = u'false'
+            response['response'] = False
             response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
@@ -158,7 +158,7 @@ class Ajax(object):
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
-                response['response'] = u'true'
+                response['response'] = True
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
 
@@ -166,7 +166,7 @@ class Ajax(object):
 
                 return json.dumps(response)
             else:
-                response['response'] = u'false'
+                response['response'] = False
                 response['error'] = u'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
@@ -216,16 +216,16 @@ class Ajax(object):
                 save_data[key] = data[key]
 
         if not save_data:
-            return json.dumps({'response': 'success'})
+            return json.dumps({'response': True})
 
         try:
             self.config.write_dict(save_data)
-            return json.dumps({'response': 'success'})
+            return json.dumps({'response': True})
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Writing config.', exc_info=True)
-            return json.dumps({'response': 'fail'})
+            return json.dumps({'response': False})
 
     @cherrypy.expose
     def remove_movie(self, imdbid):
@@ -242,9 +242,9 @@ class Ajax(object):
         t.start()
 
         if self.sql.remove_movie(imdbid):
-            response = {'response': 'true'}
+            response = {'response': True}
         else:
-            response = {'response': 'false'}
+            response = {'response': False}
         return json.dumps(response)
 
     @cherrypy.expose
@@ -255,11 +255,11 @@ class Ajax(object):
 
         Checks predb, then, if found, starts searching providers for movie.
 
-        Returns str 'done' when done.
+        Does not return
         '''
 
         self.searcher.search(imdbid, title, quality)
-        return 'done'
+        return
 
     @cherrypy.expose
     def manual_download(self, title, year, guid, kind):
@@ -275,9 +275,9 @@ class Ajax(object):
         usenet_enabled = core.CONFIG['Downloader']['Sources']['usenetenabled']
 
         if kind == 'nzb' and not usenet_enabled:
-            return json.dumps({'response': 'false', 'error': 'Link is NZB but no Usent downloader is enabled.'})
+            return json.dumps({'response': False, 'error': 'Link is NZB but no Usent downloader is enabled.'})
         if kind in ['torrent', 'magnet'] and not torrent_enabled:
-            return json.dumps({'response': 'false', 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
+            return json.dumps({'response': False, 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
@@ -285,7 +285,7 @@ class Ajax(object):
             data['year'] = year
             return json.dumps(self.snatcher.snatch(data))
         else:
-            return json.dumps({'response': 'false', 'error': 'Unable to get download '
+            return json.dumps({'response': False, 'error': 'Unable to get download '
                                'information from the database. Check logs for more information.'})
 
     @cherrypy.expose
@@ -297,9 +297,9 @@ class Ajax(object):
         '''
 
         if self.update.mark_bad(guid, imdbid=imdbid):
-            response = {'response': 'true', 'message': 'Marked as Bad.'}
+            response = {'response': True, 'message': 'Marked as Bad.'}
         else:
-            response = {'response': 'false', 'error': 'Could not mark release as bad. '
+            response = {'response': False, 'error': 'Could not mark release as bad. '
                         'Check logs for more information.'}
 
         return json.dumps(response)
@@ -367,55 +367,55 @@ class Ajax(object):
         if mode == u'sabnzbd':
             test = sabnzbd.Sabnzbd.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
         if mode == u'nzbget':
             test = nzbget.Nzbget.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'transmission':
             test = transmission.Transmission.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'delugerpc':
             test = deluge.DelugeRPC.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'delugeweb':
             test = deluge.DelugeWeb.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'qbittorrent':
             test = qbittorrent.QBittorrent.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         return json.dumps(response)
 
@@ -492,15 +492,15 @@ class Ajax(object):
 
         if mode == u'set_true':
             core.UPDATING = True
-            yield 'success'  # can be return?
+            yield json.dumps({'response': True})
         if mode == u'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
             if update_status is False:
                 logging.info(u'Update Failed.')
-                yield 'failed'
+                yield json.dumps({'response': False})
             elif update_status is True:
-                yield 'success'
+                yield json.dumps({'response': True})
                 logging.info(u'Respawning process...')
                 cherrypy.engine.stop()
                 python = sys.executable
@@ -520,9 +520,9 @@ class Ajax(object):
         logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))
 
         if self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
-            return 'true'
+            return json.dumps({'response': True})
         else:
-            return 'false'
+            return json.dumps({'response': False})
 
     @cherrypy.expose
     def get_log_text(self, logfile):
@@ -566,12 +566,12 @@ class Ajax(object):
 
         conf_file = conf_file = os.path.join(core.PROG_PATH, core.PLUGIN_DIR, folder, conf)
 
-        response = {'response': 'true', 'message': 'Plugin settings saved'}
+        response = {'response': True, 'message': 'Plugin settings saved'}
 
         try:
             with open(conf_file, 'w') as output:
                 json.dump(data, output, indent=2)
         except Exception, e: #noqa
-            response = {'response': 'false', 'error': str(e)}
+            response = {'response': False, 'error': str(e)}
 
         return json.dumps(response)

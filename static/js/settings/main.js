@@ -281,10 +281,10 @@ $(document).ready(function () {
             $thisi.addClass("fa-plug");
             $thisi.removeClass("fa-circle faa-burst animated");
 
-            if(response["status"] == "false"){
-                toastr.error(response["message"]);
-            } else {
+            if(response["status"] == true){
                 toastr.success(response["message"]);
+            } else {
+                toastr.error(response["message"]);
             }
         })
     });

@@ -85,7 +85,7 @@ class Nzbget():
 
         try:
             response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
-            return {'response': 'true', 'downloadid': response}
+            return {'response': True, 'downloadid': response}
 
         except Exception, e:
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}

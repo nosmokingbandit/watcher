@@ -25,7 +25,7 @@ class Head(object):
         script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js')
         script(type='text/javascript', src=core.URL_BASE + '/static/js/sweetalert-master/dist/sweetalert-dev.js')
         script(type='text/javascript', src=core.URL_BASE + '/static/js/toastr/toastr.min.js')
-        script(type='text/javascript', src=core.URL_BASE + '/static/js/notification/main.js?v=02.02')
+        script(type='text/javascript', src=core.URL_BASE + '/static/js/notification/main.js?v=02.02b')
         script("toastr.options.positionClass = 'toast-bottom-left'; toastr['update'] = toastr['info'];toastr.options.preventDuplicates = false;", type='text/javascript')
 
 # pylama:ignore=W0401

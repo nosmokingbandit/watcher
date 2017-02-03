@@ -44,8 +44,8 @@ class Sabnzbd():
         ''' Adds nzb file to sab to download
         :param data: dict of nzb information
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
@@ -81,9 +81,9 @@ class Sabnzbd():
 
             if response['status'] is True and len(response['nzo_ids']) > 0:
                 downloadid = response['nzo_ids'][0]
-                return {'response': 'true', 'downloadid': downloadid}
+                return {'response': True, 'downloadid': downloadid}
             else:
-                return {'response': 'false', 'error': 'Unable to add NZB.'}
+                return {'response': False, 'error': 'Unable to add NZB.'}
 
         except Exception as e:
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}

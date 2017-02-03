@@ -43,10 +43,10 @@ $(document).ready(function () {
 
         .done(function(r) {
             response = JSON.parse(r);
-            if(response["response"] == "fail"){
-                toastr.error("Unable to save settings. Check log for more information.");
-            } else {
+            if(response["response"] == true){
                 toastr.success("Settings Saved");
+            } else {
+                toastr.error("Unable to save settings. Check log for more information.");
             }
 
             $thisi.removeClass("fa-circle faa-burst animated");

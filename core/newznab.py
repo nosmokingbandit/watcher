@@ -91,7 +91,7 @@ class NewzNab():
 
         Returns dict.
         '''
-        
+
         permalink = True
 
         item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
@@ -169,15 +169,15 @@ class NewzNab():
             raise
         except Exception, e: # noqa
             logging.error(u'NewzNab connection check.', exc_info=True)
-            return {'response': 'false', 'message': 'No connection could be made because the target machine actively refused it.'}
+            return {'response': False, 'message': 'No connection could be made because the target machine actively refused it.'}
 
         if '<error code="' in response:
             error = ET.fromstring(response)
             if error.attrib['description'] == 'Missing parameter':
-                return {'response': 'true', 'message': 'Connection successful.'}
+                return {'response': True, 'message': 'Connection successful.'}
             else:
-                return {'response': 'false', 'message': error.attrib['description']}
+                return {'response': False, 'message': error.attrib['description']}
         elif 'unauthorized' in response.lower():
-            return {'response': 'false', 'message': 'Incorrect API key.'}
+            return {'response': False, 'message': 'Incorrect API key.'}
         else:
-            return {'response': 'true', 'message': 'Connection successful.'}
+            return {'response': True, 'message': 'Connection successful.'}

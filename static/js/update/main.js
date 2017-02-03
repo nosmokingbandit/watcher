@@ -19,11 +19,12 @@ $(document).ready(function () {
         "mode": "update_now"
     })
     .done(function(r){
-        if(r == "failed"){
+        response = JSON.parse(r);
+        if(response["response"] == false){
             $("#thinker").fadeOut();
             $("span.msg").text("Update failed. Check logs for more information.");
 
-        }else if(r == "success"){
+        }else if(response["response"] == true){
             // if the update succeeds we"ll start checking for the server to come back online
             var check = setInterval(function(){
                 $.post(url_base + "/ajax/server_status", {

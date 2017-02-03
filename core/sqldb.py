@@ -242,9 +242,8 @@ class SQL(object):
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''
 
-        if quality in core.CONFIG['Quality']['Profiles']:
-            if core.CONFIG['Quality']['Profiles'][quality]['prefersmaller']:
-                sort = 'ASC'
+        if quality in core.CONFIG['Quality']['Profiles'] and core.CONFIG['Quality']['Profiles'][quality]['prefersmaller']:
+            sort = 'ASC'
         else:
             sort = 'DESC'
 

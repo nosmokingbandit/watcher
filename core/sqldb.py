@@ -243,6 +243,7 @@ class SQL(object):
         '''
 
         if quality in core.CONFIG['Quality']['Profiles']:
+            sort = 'DESC'
             if core.CONFIG['Quality']['Profiles'][quality]['prefersmaller']:
                 sort = 'ASC'
         else:

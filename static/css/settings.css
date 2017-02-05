@@ -1,24 +1,16 @@
 input[type="number"], input[type="text"]{
+    font-family: "Lucida Console", Monaco, monospace;
     border: 1px solid #212121;
     outline: none;
     background-color: #eeeeee;
     height: 1.5em;
-    padding: 0 0.5em;
-}
-
-input[type='text']{
-    font-family: "Lucida Console", Monaco, monospace;
-    font-size: 0.75em;
-    height: 2.0em;
+    padding: 0.1em 0.5em;
+    font-size: .85em;
 }
 
 select{
-    border: 1px solid #212121;
-    outline: none;
-    background-color: #eeeeee;
     height: 2em;
     font-size: 0.85em;
-    font-family: "Lucida Console", Monaco, monospace;
 }
 
 i{
@@ -36,7 +28,7 @@ h1{
 h2{
     font-size: 1.35em;
     padding: 0;
-    margin: .75em 0 .25em 0;
+    margin: 1.5em 0 .25em 0;
 }
 
 .bold{
@@ -84,6 +76,10 @@ div#content ul li.rbord{
 
 div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
+}
+
+div#content ul li.indent{
+    margin-left: 2em;
 }
 
 .sub_cat{
@@ -191,7 +187,7 @@ div.quality ul#resolution_size li input{
 }
 
 div.quality ul#filters{
-    margin: 1em 0 0 0;
+    margin: 1em 0 1em 0;
 }
 
 div.quality ul#filters li{
@@ -202,7 +198,6 @@ div.quality ul#filters li{
 }
 
 div.quality ul#filters li span{
-    order: 0;
     flex: 0 1 auto;
 }
 
@@ -211,7 +206,6 @@ div.quality ul#filters li span:nth-child(1){
 }
 
 div.quality ul#filters li input{
-    order: 0;
     flex: 1 0 auto;
     margin: 0 1em;
     max-width: 24em;
@@ -341,6 +335,20 @@ div.plugins ul li i{
 
 div.plugins ul li span{
     font-size: 1.25rem;
+}
+
+div.plugins ul li i.edit_conf{
+    float: right;
+}
+
+#plugin_conf_popup {
+    background: white;
+    border-top: 1px solid #bdbdbd;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: none;
+    z-index:1002;
 }
 
 /* logs */

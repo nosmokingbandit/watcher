@@ -3,14 +3,8 @@ input[type="number"], input[type="text"]{
     background-color: #151c25;
 }
 
-select{
-    border: 1px solid #ccc;
-    background-color: #151c25;
-    color: #ccc;
-}
-
 div#content ul li.bbord{
-    border-bottom: 1px solid #bdbdbd;
+    border-bottom: 1px solid #252c35;
 }
 
 div#content ul li.rbord{

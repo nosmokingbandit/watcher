@@ -24,10 +24,10 @@ class AutoSearch(object):
     @staticmethod
     def create():
         search = searcher.Searcher()
-        interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
+        interval = core.CONFIG['Search']['searchfrequency'] * 3600
 
-        hr = int(core.CONFIG['Search']['searchtimehr'])
-        min = int(core.CONFIG['Search']['searchtimemin'])
+        hr = core.CONFIG['Search']['searchtimehr']
+        min = core.CONFIG['Search']['searchtimemin']
 
         task_search = taskscheduler.ScheduledTask(hr, min, interval,
                                                   search.auto_search_and_grab,
@@ -44,7 +44,7 @@ class AutoUpdateCheck(object):
     @staticmethod
     def create():
 
-        interval = int(core.CONFIG['Server']['checkupdatefrequency']) * 3600
+        interval = core.CONFIG['Server']['checkupdatefrequency'] * 3600
 
         now = datetime.datetime.today()
         hr = now.hour
@@ -52,7 +52,7 @@ class AutoUpdateCheck(object):
         if now.second > 30:
             min += 1
 
-        if core.CONFIG['Server']['checkupdates'] == u'true':
+        if core.CONFIG['Server']['checkupdates']:
             auto_start = True
         else:
             auto_start = False
@@ -113,10 +113,10 @@ class AutoUpdateInstall(object):
     def create():
         interval = 24 * 3600
 
-        hr = int(core.CONFIG['Server']['installupdatehr'])
-        min = int(core.CONFIG['Server']['installupdatemin'])
+        hr = core.CONFIG['Server']['installupdatehr']
+        min = core.CONFIG['Server']['installupdatemin']
 
-        if core.CONFIG['Server']['installupdates'] == u'true':
+        if core.CONFIG['Server']['installupdates']:
             auto_start = True
         else:
             auto_start = False
@@ -155,13 +155,14 @@ class ImdbRssSync(object):
 
     @staticmethod
     def create():
-        interval = int(core.CONFIG['Search']['imdbfrequency']) * 60
+        interval = core.CONFIG['Search']['Watchlists']['imdbfrequency']
+        interval = 6 * 3600
         now = datetime.datetime.now()
 
         hr = now.hour
         min = now.minute + 5
 
-        if core.CONFIG['Search']['imdbsync'] == u'true':
+        if core.CONFIG['Search']['Watchlists']['imdbsync']:
             auto_start = True
         else:
             auto_start = False
@@ -173,7 +174,7 @@ class ImdbRssSync(object):
     @staticmethod
     def sync_rss():
         logging.info(u'Running automatic IMDB rss sync.')
-        rss_url = core.CONFIG['Search']['imdbrss']
+        rss_url = core.CONFIG['Search']['Watchlists']['imdbrss']
 
         imdb_rss = imdb.ImdbRss()
 

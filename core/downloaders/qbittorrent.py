@@ -22,10 +22,10 @@ class QBittorrent(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['qbittorrenthost']
-        port = data['qbittorrentport']
-        user = data['qbittorrentuser']
-        password = data['qbittorrentpass']
+        host = data['host']
+        port = data['port']
+        user = data['user']
+        password = data['pass']
 
         url = u'{}:{}/'.format(host, port)
 
@@ -38,40 +38,40 @@ class QBittorrent(object):
 
         Adds torrents to default/path/<category>
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
-        qbit_conf = core.CONFIG['QBittorrent']
+        conf = core.CONFIG['Downloader']['Torrent']['QBittorrent']
 
-        host = qbit_conf['qbittorrenthost']
-        port = qbit_conf['qbittorrentport']
+        host = conf['host']
+        port = conf['port']
         base_url = '{}:{}/'.format(host, port)
 
-        user = qbit_conf['qbittorrentuser']
-        password = qbit_conf['qbittorrentpass']
+        user = conf['user']
+        password = conf['pass']
 
         # check cookie validity while getting default download dir
         download_dir = QBittorrent._get_download_dir(base_url)
 
         if not download_dir:
             if QBittorrent._login(base_url, user, password) is not True:
-                return {'response': 'false', 'error': 'Incorrect usename or password.'}
+                return {'response': False, 'error': 'Incorrect usename or password.'}
 
         download_dir = QBittorrent._get_download_dir(base_url)
 
         if not download_dir:
-            return {'response': 'false', 'error': 'Unable to get path information.'}
+            return {'response': False, 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
         post_data = {}
 
         post_data['urls'] = data['torrentfile']
 
-        post_data['savepath'] = '{}{}'.format(download_dir, qbit_conf['qbittorrentcategory'])
+        post_data['savepath'] = '{}{}'.format(download_dir, conf['category'])
 
-        post_data['category'] = qbit_conf['qbittorrentcategory']
+        post_data['category'] = conf['category']
 
         req_url = u'{}command/download'.format(base_url)
         post_data = urllib.urlencode(post_data)
@@ -81,12 +81,12 @@ class QBittorrent(object):
         try:
             urllib2.urlopen(request)  # QBit returns an empty string
             downloadid = Torrent.get_hash(data['torrentfile'])
-            return {'response': 'true', 'downloadid': downloadid}
+            return {'response': True, 'downloadid': downloadid}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error(u'qbittorrent test_connection', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def _get_download_dir(base_url):
@@ -100,7 +100,7 @@ class QBittorrent(object):
             return False
         except Exception, e:
             logging.error(u'qbittorrent get_download_dir', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def get_torrents(base_url):

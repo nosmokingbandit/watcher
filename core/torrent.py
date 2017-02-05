@@ -5,10 +5,12 @@ import time
 import urllib2
 import xml.etree.cElementTree as ET
 import core
+from core.proxy import Proxy
+
 
 logging = logging.getLogger(__name__)
 
-test_url = 'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef9ceba603d2dd8ba1&t=movie&imdbid=tt3748528'
+test_url = u'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef9ceba603d2dd8ba1&t=movie&imdbid=tt3748528'
 
 
 class Torrent(object):
@@ -17,14 +19,14 @@ class Torrent(object):
         return
 
     def search_all(self, imdbid):
-        torrent_indexers = core.CONFIG['TorrentIndexers']
+        torrent_indexers = core.CONFIG['Indexers']['Torrent']
 
         results = []
 
         potato_results = self.search_potato(imdbid)
         results = potato_results
 
-        if torrent_indexers['rarbg'] == 'true':
+        if torrent_indexers['rarbg']:
             rarbg_results = Rarbg.search(imdbid)
             for i in rarbg_results:
                 if i not in results:
@@ -38,12 +40,13 @@ class Torrent(object):
 
         Returns list of dicts with movie info
         '''
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        indexers = core.CONFIG['PotatoIndexers'].values()
+        indexers = core.CONFIG['Indexers']['TorrentPotato'].values()
         results = []
 
         for indexer in indexers:
-            if indexer[2] == u'false':
+            if indexer[2] is False:
                 continue
             url = indexer[0]
             if url[-1] == u'/':
@@ -57,9 +60,18 @@ class Torrent(object):
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
-                torrent_results = json.loads(urllib2.urlopen(request, timeout=60).read())['results']
-                for i in torrent_results:
-                    results.append(i)
+                if proxy_enabled and Proxy.whitelist(url) is True:
+                    response = Proxy.bypass(request)
+                else:
+                    response = urllib2.urlopen(request)
+
+                torrent_results = json.loads(response.read()).get('results')
+
+                if torrent_results:
+                    for i in torrent_results:
+                        results.append(i)
+                else:
+                    continue
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
@@ -84,6 +96,8 @@ class Torrent(object):
 
         url = u'{}?passkey={}'.format(indexer, apikey)
 
+        print url
+
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             response = urllib2.urlopen(request).read()
@@ -96,17 +110,17 @@ class Torrent(object):
         try:
             results = json.loads(response)
             if 'results' in results.keys():
-                return {'response': 'true', 'message': 'Connection successful.'}
+                return {'response': True, 'message': 'Connection successful.'}
             else:
-                return {'response': 'false', 'message': 'Malformed json response.'}
+                return {'response': False, 'message': 'Malformed json response.'}
         except (SystemExit, KeyboardInterrupt):
             raise
         except ValueError:
             try:
                 tree = ET.fromstring(response)
-                return {'response': 'false', 'message': tree.text}
+                return {'response': False, 'message': tree.text}
             except Exception, e:
-                return {'response': 'false', 'message': 'Unknown response format.'}
+                return {'response': False, 'message': 'Unknown response format.'}
         except Exception, e: # noqa
             logging.error(u'Torrent Potato connection check.', exc_info=True)
             return {'response': 'false', 'message': 'Unknown response format.'}
@@ -184,6 +198,8 @@ class Rarbg(object):
 
     @staticmethod
     def search(imdbid):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
         logging.info('Searching Rarbg for {}'.format(imdbid))
         if Rarbg.timeout:
             now = datetime.datetime.now()
@@ -197,17 +213,24 @@ class Rarbg(object):
                 logging.error('Unable to get rarbg token.')
                 return []
 
-        url = 'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
+        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
-        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(0, 2)
+        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
-            response = urllib2.urlopen(request, timeout=60).read()
-            response = json.loads(response)['torrent_results']
-            results = Rarbg.parse_rarbg(response)
+            if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
 
-            return results
+            response = urllib2.urlopen(request, timeout=60).read()
+            response = json.loads(response).get('torrent_results')
+            if response:
+                results = Rarbg.parse_rarbg(response)
+                return results
+            else:
+                return []
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
@@ -216,7 +239,7 @@ class Rarbg(object):
 
     @staticmethod
     def get_token():
-        url = 'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
+        url = u'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 

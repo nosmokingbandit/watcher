@@ -18,6 +18,17 @@ input{
     color: #ccc;
 }
 
+div#overlay {
+    background-color: #000;
+}
+
+select{
+    border: 1px solid #ccc;
+    background-color: #151c25;
+    color: #ccc;
+    padding-top: .1em;
+}
+
 ::selection {
     background: #ccc; /* WebKit/Blink Browsers */
     color: #080f18;

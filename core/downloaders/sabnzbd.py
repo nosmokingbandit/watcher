@@ -19,9 +19,9 @@ class Sabnzbd():
         Return True on success or str error message on failure
         '''
 
-        host = data['sabhost']
-        port = data['sabport']
-        api = data['sabapi']
+        host = data['host']
+        port = data['port']
+        api = data['api']
 
         url = u'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
 
@@ -44,23 +44,23 @@ class Sabnzbd():
         ''' Adds nzb file to sab to download
         :param data: dict of nzb information
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
-        sab_conf = core.CONFIG['Sabnzbd']
+        conf = core.CONFIG['Downloader']['Torrent']['Sabnzbd']
 
-        host = sab_conf['sabhost']
-        port = sab_conf['sabport']
-        api = sab_conf['sabapi']
+        host = conf['host']
+        port = conf['port']
+        api = conf['api']
 
         base_url = u'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
         mode = u'addurl'
         name = urllib2.quote(data['guid'].encode('utf-8'))
         nzbname = urllib2.quote(data['title'].encode('ascii', 'ignore'))
-        cat = sab_conf['sabcategory']
+        cat = conf['category']
         priority_keys = {
             'Paused': '-2',
             'Low': '-1',
@@ -68,7 +68,7 @@ class Sabnzbd():
             'High': '1',
             'Forced': '2'
         }
-        priority = priority_keys[sab_conf['sabpriority']]
+        priority = priority_keys[conf['priority']]
 
         command_url = u'&mode={}&name={}&nzbname={}&cat={}&priority={}&output=json'.format(mode, name, nzbname, cat, priority)
 
@@ -81,9 +81,9 @@ class Sabnzbd():
 
             if response['status'] is True and len(response['nzo_ids']) > 0:
                 downloadid = response['nzo_ids'][0]
-                return {'response': 'true', 'downloadid': downloadid}
+                return {'response': True, 'downloadid': downloadid}
             else:
-                return {'response': 'false', 'error': 'Unable to add NZB.'}
+                return {'response': False, 'error': 'Unable to add NZB.'}
 
         except Exception as e:
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}

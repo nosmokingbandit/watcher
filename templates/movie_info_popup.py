@@ -30,17 +30,17 @@ class MovieInfoPopup():
         if data['poster_path'] is None:
             data['poster_path'] = core.URL_BASE + '/static/images/missing_poster.jpg'
         else:
-            data['poster_path'] = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+            data['poster_path'] = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
         container = div(id='container')
         with container:
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=01.26')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/add_movie/movie_info_popup.js?v=02.02b')
             with div(id='title'):
                 span(title_date, id='title')
                 i(cls='fa fa-plus', id='button_add')
                 with div('Quality profile: ', cls='hidden', id='quality'):
                     with select(id='quality_profile', value='Default'):
-                        options = core.CONFIG['Quality'].keys()
+                        options = core.CONFIG['Quality']['Profiles'].keys()
                         for opt in options:
                             if opt == 'Default':
                                 option(opt, value='Default')

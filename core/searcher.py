@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import core
-from core import newznab, scoreresults, snatcher, sqldb, updatestatus, torrent
+from core import newznab, scoreresults, snatcher, sqldb, updatestatus, torrent, proxy
 from core.rss import predb
 
 logging = logging.getLogger(__name__)
@@ -40,13 +40,13 @@ class Searcher():
         Does not return
         '''
 
-        interval = int(core.CONFIG['Search']['searchfrequency']) * 3600
+        interval = core.CONFIG['Search']['searchfrequency'] * 3600
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, interval)
 
         today = datetime.date.today()
         keepsearching = core.CONFIG['Search']['keepsearching']
-        keepsearchingdays = int(core.CONFIG['Search']['keepsearchingdays'])
+        keepsearchingdays = core.CONFIG['Search']['keepsearchingdays']
         keepsearchingdelta = datetime.timedelta(days=keepsearchingdays)
         auto_grab = core.CONFIG['Search']['autograb']
 
@@ -66,13 +66,14 @@ class Searcher():
             title = movie['title']
             status = movie['status']
             finisheddate = movie['finished_date']
+            quality = movie['quality']
 
             if movie['predb'] != u'found':
                 continue
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))
-                    self.search(imdbid, title)
+                    self.search(imdbid, title, quality)
                     continue
 
             if status == u'Finished' and keepsearching == u'true':
@@ -80,7 +81,7 @@ class Searcher():
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
                     logging.info(u'{} finished on {}, searching again.'.format(title, finisheddate))
-                    self.search(imdbid, title)
+                    self.search(imdbid, title, quality)
                     continue
                 else:
                     logging.info(u'{} finished on {} and is not within the search window.'.format(title, finisheddate))
@@ -99,18 +100,20 @@ class Searcher():
             for movie in movies:
                 imdbid = movie['imdbid']
                 title = movie['title']
+                year = movie['year']
                 status = movie['status']
+                quality = movie['quality']
 
                 if status == u'Found':
                     logging.info(u'{} status is Found. Running automatic snatcher.'.format(title))
-                    self.snatcher.auto_grab(imdbid)
+                    self.snatcher.auto_grab(title, year, imdbid, quality)
                     continue
 
                 if status == u'Finished' and keepsearching == u'true':
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta <= today:
                         logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
-                        self.snatcher.auto_grab(imdbid)
+                        self.snatcher.auto_grab(title, year, imdbid, quality)
                         continue
                     else:
                         logging.info(u'{} finished on {} and is not within the Keep Searching window.'.format(title, finisheddate))
@@ -121,10 +124,11 @@ class Searcher():
         logging.info(u'Autosearch complete.')
         return
 
-    def search(self, imdbid, title):
+    def search(self, imdbid, title, quality):
         ''' Search indexers for releases
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year (Movie Title 2016)
+        sort: str ASC or DESC, order to sort sizes
 
         Checks predb value in MOVIES table. If not == u'found', does nothing.
 
@@ -142,16 +146,20 @@ class Searcher():
         Returns Bool if movie is found.
         '''
 
+        proxy.Proxy.create()
+
         results = []
 
-        if core.CONFIG['Sources']['usenetenabled'] == 'true':
+        if core.CONFIG['Downloader']['Sources']['usenetenabled']:
             for i in self.nn.search_all(imdbid):
                 results.append(i)
-        if core.CONFIG['Sources']['torrentenabled'] == 'true':
+        if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             for i in self.torrent.search_all(imdbid):
                 results.append(i)
 
-        old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
+        proxy.Proxy.destroy()
+
+        old_results = [dict(r) for r in self.sql.get_search_results(imdbid, quality)]
 
         # update results with old info if guids match
         for idx, result in enumerate(results):
@@ -193,7 +201,6 @@ class Searcher():
 
         # This iterates through the new search results and submits only results we haven't already stored. This keeps it from overwriting the FoundDate
         BATCH_DB_STRING = []
-
 
         for result in results:
             DB_STRING = result

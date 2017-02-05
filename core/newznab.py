@@ -3,6 +3,7 @@ import urllib2
 import xml.etree.cElementTree as ET
 
 import core
+from core.proxy import Proxy
 
 logging = logging.getLogger(__name__)
 
@@ -20,8 +21,9 @@ class NewzNab():
 
         Returns list of dicts with sorted nzb information.
         '''
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        indexers = core.CONFIG['Indexers'].values()
+        indexers = core.CONFIG['Indexers']['NewzNab'].values()
 
         self.imdbid = imdbid
 
@@ -29,7 +31,7 @@ class NewzNab():
         imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
-            if indexer[2] == u'false':
+            if indexer[2] is False:
                 continue
             url = indexer[0]
             if url[-1] != u'/':
@@ -43,7 +45,12 @@ class NewzNab():
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
-                results_xml = urllib2.urlopen(request).read()
+                if proxy_enabled and Proxy.whitelist(url) is True:
+                    response = Proxy.bypass(request)
+                else:
+                    response = urllib2.urlopen(request)
+
+                results_xml = response.read()
                 nn_results = self.parse_newznab_xml(results_xml)
                 for result in nn_results:
                     results.append(result)
@@ -51,6 +58,7 @@ class NewzNab():
                 raise
             except Exception, e: # noqa
                 logging.error(u'NewzNab search_all get xml', exc_info=True)
+
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
@@ -91,7 +99,6 @@ class NewzNab():
 
         Returns dict.
         '''
-        # TODO Should probably have a base dict then fill it in with d.update()
 
         permalink = True
 
@@ -170,15 +177,15 @@ class NewzNab():
             raise
         except Exception, e: # noqa
             logging.error(u'NewzNab connection check.', exc_info=True)
-            return {'response': 'false', 'message': 'No connection could be made because the target machine actively refused it.'}
+            return {'response': False, 'message': 'No connection could be made because the target machine actively refused it.'}
 
         if '<error code="' in response:
             error = ET.fromstring(response)
             if error.attrib['description'] == 'Missing parameter':
-                return {'response': 'true', 'message': 'Connection successful.'}
+                return {'response': True, 'message': 'Connection successful.'}
             else:
-                return {'response': 'false', 'message': error.attrib['description']}
+                return {'response': False, 'message': error.attrib['description']}
         elif 'unauthorized' in response.lower():
-            return {'response': 'false', 'message': 'Incorrect API key.'}
+            return {'response': False, 'message': 'Incorrect API key.'}
         else:
-            return {'response': 'true', 'message': 'Connection successful.'}
+            return {'response': True, 'message': 'Connection successful.'}

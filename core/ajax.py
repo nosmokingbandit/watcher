@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import urllib2
 import threading
 
 import cherrypy
@@ -12,7 +13,7 @@ from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import OMDB, TMDB
 from core.notification import Notification
 from core.rss import predb
-from templates import movie_info_popup, movie_status_popup, status
+from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status
 
 logging = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class Ajax(object):
         self.update = updatestatus.Status()
 
     @cherrypy.expose
-    def search_omdb(self, search_term):
+    def search_tmdb(self, search_term):
         ''' Search omdb for movies
         :param search_term: str title and year of movie (Movie Title 2016)
 
@@ -90,7 +91,11 @@ class Ajax(object):
 
         data = json.loads(data)
         title = data['title']
-        data['year'] = data['release_date'][:4]
+
+        if data.get('release_date'):
+            data['year'] = data['release_date'][:4]
+        else:
+            data['year'] = 'N/A'
         year = data['year']
 
         response = {}
@@ -98,13 +103,15 @@ class Ajax(object):
         def thread_search_grab(data):
             imdbid = data['imdbid']
             title = data['title']
+            year = data['year']
+            quality = data['quality']
             self.predb.check_one(data)
-            if core.CONFIG['Search']['searchafteradd'] == u'true':
-                if self.searcher.search(imdbid, title):
+            if core.CONFIG['Search']['searchafteradd']:
+                if self.searcher.search(imdbid, title, quality):
                     # if we don't need to wait to grab the movie do it now.
-                    if core.CONFIG['Search']['autograb'] == u'true' and \
-                            core.CONFIG['Search']['waitdays'] == u'0':
-                        self.snatcher.auto_grab(imdbid)
+                    if core.CONFIG['Search']['autograb'] and \
+                            core.CONFIG['Search']['waitdays'] == 0:
+                        self.snatcher.auto_grab(title, year, imdbid, quality)
 
         TABLE = u'MOVIES'
 
@@ -114,19 +121,19 @@ class Ajax(object):
             data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
 
         if not data['imdbid']:
-            response['response'] = u'false'
+            response['response'] = False
             response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
             return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
-            response['response'] = u'false'
+            response['response'] = False
             response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
         else:
-            poster_url = 'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
             data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
             data['plot'] = data['overview']
@@ -152,7 +159,7 @@ class Ajax(object):
                 t = threading.Thread(target=thread_search_grab, args=(data,))
                 t.start()
 
-                response['response'] = u'true'
+                response['response'] = True
                 response['message'] = u'{} {} added to wanted list.' \
                     .format(title, year)
 
@@ -160,7 +167,7 @@ class Ajax(object):
 
                 return json.dumps(response)
             else:
-                response['response'] = u'false'
+                response['response'] = False
                 response['error'] = u'Could not write to database. ' \
                     'Check logs for more information.'
                 return json.dumps(response)
@@ -198,51 +205,35 @@ class Ajax(object):
         :param data: dict of Section with nested dict of keys and values:
         {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
 
+        All dicts must contain the full tree or data will be lost.
+
+        Fires off additional methods if neccesary.
+
         Returns json.dumps(dict)
         '''
+
+        orig_config = dict(core.CONFIG)
 
         logging.info(u'Saving settings.')
         data = json.loads(data)
 
-        existing_data = {}
-        for i in data.keys():
-            existing_data.update({i: core.CONFIG[i]})
-            for k, v in core.CONFIG[i].iteritems():
-                if type(v) == list:
-                    existing_data[i][k] = ','.join(v)
+        save_data = {}
+        for key in data:
+            if data[key] != core.CONFIG[key]:
+                save_data[key] = data[key]
 
-        if data == existing_data:
-            return json.dumps({'response': 'success'})
+        if not save_data:
+            return json.dumps({'response': True})
 
         try:
-            self.config.write_dict(data)
-            return json.dumps({'response': 'success'})
+            self.config.write_dict(save_data)
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Writing config.', exc_info=True)
-            return json.dumps({'response': 'fail'})
+            return json.dumps({'response': False, 'error': 'Unable to write to config file.'})
 
-    @cherrypy.expose
-    def save_single(self, cat, key, val):
-        ''' Saves single setting to config
-        :param conf: str config category
-        :param key: str config key
-        :param val: str config values
-
-        Returns str 'failed' or 'success'
-        '''
-
-        logging.info('Saving {}:{}:{}'.format(cat, key, val))
-
-        try:
-            self.config.write_single(cat, key, val)
-            return 'success'
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e: # noqa
-            logging.error(u'Writing config.')
-            return 'failed'
+        return json.dumps({'response': True})
 
     @cherrypy.expose
     def remove_movie(self, imdbid):
@@ -259,27 +250,27 @@ class Ajax(object):
         t.start()
 
         if self.sql.remove_movie(imdbid):
-            response = {'response': 'true'}
+            response = {'response': True}
         else:
-            response = {'response': 'false'}
+            response = {'response': False}
         return json.dumps(response)
 
     @cherrypy.expose
-    def search(self, imdbid, title):
+    def search(self, imdbid, title, quality):
         ''' Search indexers for specific movie.
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year
 
         Checks predb, then, if found, starts searching providers for movie.
 
-        Returns str 'done' when done.
+        Does not return
         '''
 
-        self.searcher.search(imdbid, title)
-        return 'done'
+        self.searcher.search(imdbid, title, quality)
+        return
 
     @cherrypy.expose
-    def manual_download(self, guid, kind):
+    def manual_download(self, title, year, guid, kind):
         ''' Sends search result to downloader manually
         :param guid: str download link for nzb/magnet/torrent file.
         :param kind: str type of download (torrent, magnet, nzb)
@@ -287,20 +278,22 @@ class Ajax(object):
         Returns str json.dumps(dict) success/fail message
         '''
 
-        torrent_enabled = core.CONFIG['Sources']['torrentenabled'] == u'true'
+        torrent_enabled = core.CONFIG['Downloader']['Sources']['torrentenabled']
 
-        usenet_enabled = core.CONFIG['Sources']['usenetenabled'] == u'true'
+        usenet_enabled = core.CONFIG['Downloader']['Sources']['usenetenabled']
 
         if kind == 'nzb' and not usenet_enabled:
-            return json.dumps({'response': 'false', 'error': 'Link is NZB but no Usent downloader is enabled.'})
+            return json.dumps({'response': False, 'error': 'Link is NZB but no Usent downloader is enabled.'})
         if kind in ['torrent', 'magnet'] and not torrent_enabled:
-            return json.dumps({'response': 'false', 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
+            return json.dumps({'response': False, 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
+            data['title'] = title
+            data['year'] = year
             return json.dumps(self.snatcher.snatch(data))
         else:
-            return json.dumps({'response': 'false', 'error': 'Unable to get download '
+            return json.dumps({'response': False, 'error': 'Unable to get download '
                                'information from the database. Check logs for more information.'})
 
     @cherrypy.expose
@@ -312,9 +305,9 @@ class Ajax(object):
         '''
 
         if self.update.mark_bad(guid, imdbid=imdbid):
-            response = {'response': 'true', 'message': 'Marked as Bad.'}
+            response = {'response': True, 'message': 'Marked as Bad.'}
         else:
-            response = {'response': 'false', 'error': 'Could not mark release as bad. '
+            response = {'response': False, 'error': 'Could not mark release as bad. '
                         'Check logs for more information.'}
 
         return json.dumps(response)
@@ -347,7 +340,7 @@ class Ajax(object):
         return json.dumps(response)
 
     @cherrypy.expose
-    def refresh_list(self, list, imdbid=''):
+    def refresh_list(self, list, imdbid='', quality=''):
         ''' Re-renders html for Movies/Results list
         :param list: str the html list id to be re-rendered
         :param imdbid: str imdb identification number (tt123456) <optional>
@@ -361,7 +354,7 @@ class Ajax(object):
         if list == u'#movie_list':
             return status.Status.movie_list()
         if list == u'#result_list':
-            return movie_status_popup.MovieStatusPopup().result_list(imdbid)
+            return movie_status_popup.MovieStatusPopup().result_list(imdbid, quality)
 
     @cherrypy.expose
     def test_downloader_connection(self, mode, data):
@@ -382,55 +375,55 @@ class Ajax(object):
         if mode == u'sabnzbd':
             test = sabnzbd.Sabnzbd.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
         if mode == u'nzbget':
             test = nzbget.Nzbget.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'transmission':
             test = transmission.Transmission.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'delugerpc':
             test = deluge.DelugeRPC.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'delugeweb':
             test = deluge.DelugeWeb.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         if mode == u'qbittorrent':
             test = qbittorrent.QBittorrent.test_connection(data)
             if test is True:
-                response['status'] = u'true'
+                response['status'] = True
                 response['message'] = u'Connection successful.'
             else:
-                response['status'] = u'false'
-                response['message'] = test
+                response['status'] = False
+                response['error'] = test
 
         return json.dumps(response)
 
@@ -507,15 +500,15 @@ class Ajax(object):
 
         if mode == u'set_true':
             core.UPDATING = True
-            yield 'success'  # can be return?
+            yield json.dumps({'response': True})
         if mode == u'update_now':
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
             if update_status is False:
                 logging.info(u'Update Failed.')
-                yield 'failed'
+                yield json.dumps({'response': False})
             elif update_status is True:
-                yield 'success'
+                yield json.dumps({'response': True})
                 logging.info(u'Respawning process...')
                 cherrypy.engine.stop()
                 python = sys.executable
@@ -529,15 +522,14 @@ class Ajax(object):
         :param quality: str name of new quality
         :param imdbid: str imdb identification number
 
-        Returns str 'true' or 'false'
         '''
 
         logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))
 
         if self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
-            return 'true'
+            return json.dumps({'response': True})
         else:
-            return 'false'
+            return json.dumps({'response': False})
 
     @cherrypy.expose
     def get_log_text(self, logfile):
@@ -555,3 +547,38 @@ class Ajax(object):
             return json.dumps(torrent.Torrent.test_potato_connection(indexer, apikey))
         else:
             return None
+
+    @cherrypy.expose
+    def get_plugin_conf(self, folder, conf):
+        ''' Calls plugin_conf_popup to render html
+        folder: str folder to read config file from
+        conf: str filename of config file (ie 'my_plugin.conf')
+
+        Returns str html content.
+        '''
+
+        return plugin_conf_popup.PluginConfPopup.html(folder, conf)
+
+    @cherrypy.expose
+    def save_plugin_conf(self, folder, conf, data):
+        ''' Calls plugin_conf_popup to render html
+        folder: str folder to store config file
+        conf: str filename of config file (ie 'my_plugin.conf')
+        data: str json data to store in conf file
+
+        Returns str json dumps dict of success/fail message
+        '''
+
+        data = json.loads(data)
+
+        conf_file = conf_file = os.path.join(core.PROG_PATH, core.PLUGIN_DIR, folder, conf)
+
+        response = {'response': True, 'message': 'Plugin settings saved'}
+
+        try:
+            with open(conf_file, 'w') as output:
+                json.dump(data, output, indent=2)
+        except Exception, e: #noqa
+            response = {'response': False, 'error': str(e)}
+
+        return json.dumps(response)

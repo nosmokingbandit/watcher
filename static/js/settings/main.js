@@ -2,35 +2,37 @@ $(document).ready(function () {
     var url_base = $("meta[name='url_base']").attr("content");
     var git_url = $("meta[name='git_url']").attr("content");
 
-    /* Shared */
+/* Shared */
 
     // set default state for pseudo checkboxes
     $("i.checkbox").each(function(){
-       if ( $(this).attr("value") == "true" ){
-           $(this).removeClass("fa-square-o")
-           $(this).addClass("fa-check-square-o");
-       }
+        $this = $(this);
+        if ($this.attr("value") == "True" ){
+            $this.removeClass("fa-square-o")
+            $this.addClass("fa-check-square");
+        }
     });
 
     // toggle checkbox status
     $("div#content").on("click", "i.checkbox", function(){
+        $this = $(this);
         // turn on
-        if( $(this).attr("value") == "false" ){
-            $(this).attr("value", "true");
-            $(this).removeClass("fa-square-o")
-            $(this).addClass("fa-check-square-o");
+        if( $this.attr("value") == "False" ){
+            $this.attr("value", "True");
+            $this.removeClass("fa-square-o")
+            $this.addClass("fa-check-square");
         // turn off
-        } else if ( $(this).attr("value") == "true" ){
-            $(this).attr("value", "false");
-            $(this).removeClass("fa-check-square-o");
-            $(this).addClass("fa-square-o")
+        } else if ($this.attr("value") == "True" ){
+            $this.attr("value", "False");
+            $this.removeClass("fa-check-square");
+            $this.addClass("fa-square-o")
         }
     });
 
     // set up sortable
     init_sortables()
 
-    /* Server */
+/* Server */
 
     // Generate new api key
     $("div.server i#generate_new_key").click(function(){
@@ -54,7 +56,7 @@ $(document).ready(function () {
             text: "",
             type: "",
             showCancelButton: true,
-            imageUrl: '',
+            imageUrl: "",
             confirmButtonColor: "#4CAF50",
             confirmButtonText: "Restart",
             closeOnConfirm: true
@@ -89,10 +91,10 @@ $(document).ready(function () {
         .done(function(r){
 
             response = JSON.parse(r);
-            if(response['status'] == 'current'){
+            if(response["status"] == "current"){
                 toastr.info("No updates available.");
-            } else if(response['status'] == 'error'){
-                toastr.warning(response['error']);
+            } else if(response["status"] == "error"){
+                toastr.warning(response["error"]);
             } else if(response["status"] == "behind"){
 
                 if(response["behind_count"] == 1){
@@ -127,13 +129,13 @@ $(document).ready(function () {
         });
     };
 
-    /* Providers */
+/* Providers */
 
     // Add new rows
     $("div.providers i#add_newznab_row").click(function (){
         var row = `
         <li class='newznab_indexer'>
-            <i class='fa fa-square-o newznab_check checkbox' value='false'/>
+            <i class='fa fa-square-o newznab_check checkbox' value='False'/>
             <input class='newznab_url' placeholder=' http://indexer.url' type='text'/>
             <input class='newznab_api' placeholder=' Api Key' type='text'/>
             <i class='newznab_clear fa fa-trash-o'/>
@@ -147,7 +149,7 @@ $(document).ready(function () {
     $("div.providers i#add_potato_row").click(function (){
         var row = `
         <li class='potato_indexer'>
-            <i class='fa fa-square-o potato_check checkbox' value='false'/>
+            <i class='fa fa-square-o potato_check checkbox' value='False'/>
             <input class='potato_url' placeholder=' http://indexer.url' type='text'/>
             <input class='potato_api' placeholder=' Api Key' type='text'/>
             <i class='potato_clear fa fa-trash-o'/>
@@ -161,7 +163,7 @@ $(document).ready(function () {
     // clear row
     $("div.providers ul#newznab_list").on("click", "i.newznab_clear", function(){
         $li = $(this).parent();
-        $li.find('input').each(function(){
+        $li.find("input").each(function(){
             $(this).val("");
         });
     });
@@ -172,16 +174,16 @@ $(document).ready(function () {
 
         $this.removeClass("fa-plug");
         $this.addClass("fa-circle faa-burst animated");
-        var mode = $this.attr('type');
+        var mode = $this.attr("type");
         var url = "";
         var api = "";
 
-        $li = $(this).parent();
-        $li.find('input:eq(0)').each(function(){
+        $li = $this.parent();
+        $li.find("input:eq(0)").each(function(){
             url = $(this).val();
         });
 
-        $li.find('input:eq(1)').each(function(){
+        $li.find("input:eq(1)").each(function(){
             api = $(this).val();
         });
 
@@ -203,44 +205,46 @@ $(document).ready(function () {
     });
 
 
-    /* Downloader */
+/* Downloader */
 
     // hide disabled download types
     $("div.downloader h2 i").click(function(){
-        tag = $(this).attr('tag');
-        if($(this).attr('value') == 'true'){
-            $('ul#' + tag).slideUp();
+        $this = $(this);
+        tag = $this.attr("tag");
+        if($this.attr("value") == "True"){
+            $("ul#" + tag).slideUp();
         } else{
-            $('ul#' + tag).slideDown();
+            $("ul#" + tag).slideDown();
         }
     });
 
     // set default state for radios and downloader options
     $("div.downloader i.radio").each(function(){
-       if ( $(this).attr("value") == "true" ){
-           u = ("ul#" + $(this).attr("tog"));
-           $(u).show()
-           $(this).removeClass("fa-circle-o")
-           $(this).addClass("fa-circle");
-       }
+        $this = $(this);
+        if ( $this.attr("value") == "True" ){
+            u = ("ul#" + $this.attr("tog"));
+            $(u).show()
+            $this.removeClass("fa-circle-o")
+            $this.addClass("fa-circle");
+        }
     });
 
     // toggle downloader slide-downs
     $("div.downloader i.radio").click(function(){
         $this = $(this);
-        var name = $this.attr('name');
+        var name = $this.attr("name");
 
         $downloaders = $this.parent().siblings()
         // turn on
-        if( $this.attr("value") == "false" ){
-            $this.attr("value", "true");
+        if( $this.attr("value") == "False" ){
+            $this.attr("value", "True");
             $this.removeClass("fa-circle-o")
             $this.addClass("fa-circle");
         // and turn off the other ones
             var tog = $this.attr("tog");
             $("ul#"+tog).stop().slideDown();
             $downloaders.filter("ul").not("#"+tog).stop().slideUp()
-            $("i.radio[name='" + name + "']").not($this).attr("value", "false").removeClass("fa-circle").addClass("fa-circle-o");
+            $("i.radio[name='" + name + "']").not($this).attr("value", "False").removeClass("fa-circle").addClass("fa-circle-o");
         }
     });
 
@@ -263,7 +267,7 @@ $(document).ready(function () {
         });
 
         $(checkboxes).each(function(){
-            data[$(this).attr("id")] = $(this).attr('value')
+            data[$(this).attr("id")] = $(this).attr("value")
         });
 
         data = JSON.stringify(data);
@@ -277,92 +281,104 @@ $(document).ready(function () {
             $thisi.addClass("fa-plug");
             $thisi.removeClass("fa-circle faa-burst animated");
 
-            if(response["status"] == "false"){
-                toastr.error(response["message"]);
-            } else {
+            if(response["status"] == true){
                 toastr.success(response["message"]);
+            } else {
+                toastr.error(response["message"]);
             }
         })
     });
 
-    /* Quality */
+/* Quality */
 
     // add new profile
     $("div.quality div#add_new_profile").click(function(){
 
         html = `
         <ul class="quality_profile wide hidden">
-                  <li class="name bold">Name:
-                    <input class="name" type="text" value="New Profile">
-                    <div class="delete_profile" name="New Profile">
-                        <i class="fa fa-trash-o"></i>
-                        <span>Delete profile.</span>
-                    </div>
-                  </li>
-                  <ul class="sortable ui-sortable" id="resolution">
-                    <li class="sub_cat ui-sortable-handle">Resolution Priority</li><li class="rbord ui-sortable-handle" id="4K" sort="0">
-                      <i class="fa fa-bars"></i>
-                      <i class="fa fa-square-o checkbox" id="4K" value="false"></i>
-                      <span>4K</span>
-                    </li><li class="rbord ui-sortable-handle" id="1080P" sort="1">
-                      <i class="fa fa-bars"></i>
-                      <i class="fa checkbox fa-check-square-o" id="1080P" value="true"></i>
-                      <span>1080P</span>
-                    </li><li class="rbord ui-sortable-handle" id="720P" sort="2">
-                      <i class="fa fa-bars"></i>
-                      <i class="fa checkbox fa-check-square-o" id="720P" value="true"></i>
-                      <span>720P</span>
-                    </li><li class="rbord ui-sortable-handle" id="SD" sort="3">
-                      <i class="fa fa-bars"></i>
-                      <i class="fa fa-square-o checkbox" id="SD" value="false"></i>
-                      <span>SD</span>
-                    </li>
-                  </ul>
-                  <ul id="resolution_size">
-                    <li class="sub_cat">Size Restrictions (MB)</li>
-                    <li>
-                      <span>4K</span>
-                      <input class="min" id="4K" min="0" type="number" value="10000">
-                      <span>-</span>
-                      <input class="max" id="4K" min="0" type="number" value="50000">
-                    </li>
-                    <li>
-                      <span>1080P</span>
-                      <input class="min" id="1080P" min="0" type="number" value="2000">
-                      <span>-</span>
-                      <input class="max" id="1080P" min="0" type="number" value="10000">
-                    </li>
-                    <li>
-                      <span>720P</span>
-                      <input class="min" id="720P" min="0" type="number" value="500">
-                      <span>-</span>
-                      <input class="max" id="720P" min="0" type="number" value="10000">
-                    </li>
-                    <li>
-                      <span>SD</span>
-                      <input class="min" id="SD" min="0" type="number" value="200">
-                      <span>-</span>
-                      <input class="max" id="SD" min="0" type="number" value="1000">
-                    </li>
-                  </ul>
-                  <ul class="wide" id="filters">
-                    <li class="bbord">
-                      <span class="bold">Required words:</span>
-                      <input id="requiredwords" type="text" value="">
-                      <span class="tip">Releases must contain one of these words.</span>
-                    </li>
-                    <li class="bbord">
-                      <span class="bold">Preferred words:</span>
-                      <input id="preferredwords" type="text" value="">
-                      <span class="tip">Releases with these words score higher.</span>
-                    </li>
-                    <li>
-                      <span class="bold">Ignored words:</span>
-                      <input id="ignoredwords" type="text" value="subs,german,dutch,french,truefrench,danish,swedish,spanish,italian,korean,dubbed,swesub,korsub,dksubs,vain,HC,blurred">
-                      <span class="tip">Releases with these words are ignored.</span>
-                    </li>
-                  </ul>
-                </ul>
+            <li class="name bold">Name:
+                <input class="name" type="text" value="New Profile">
+                <div class="delete_profile" name="New Profile">
+                    <i class="fa fa-trash-o"></i>
+                    <span>Delete profile.</span>
+                </div>
+            </li>
+            <ul class="sortable ui-sortable" id="resolution">
+                <li class="sub_cat ui-sortable-handle">Resolution Priority</li>
+                <li class="rbord ui-sortable-handle" id="4K" sort="0">
+                    <i class="fa fa-bars"></i>
+                    <i class="fa fa-square-o checkbox" id="4K" value="False"></i>
+                    <span>4K</span>
+                </li><li class="rbord ui-sortable-handle" id="1080P" sort="1">
+                    <i class="fa fa-bars"></i>
+                    <i class="fa checkbox fa-check-square" id="1080P" value="True"></i>
+                    <span>1080P</span>
+                </li><li class="rbord ui-sortable-handle" id="720P" sort="2">
+                    <i class="fa fa-bars"></i>
+                    <i class="fa checkbox fa-check-square" id="720P" value="True"></i>
+                    <span>720P</span>
+                </li><li class="rbord ui-sortable-handle" id="SD" sort="3">
+                    <i class="fa fa-bars"></i>
+                    <i class="fa fa-square-o checkbox" id="SD" value="False"></i>
+                    <span>SD</span>
+                </li>
+            </ul>
+            <ul id="resolution_size">
+                <li class="sub_cat">Size Restrictions (MB)</li>
+                <li>
+                    <span>4K</span>
+                    <input class="min" id="4K" min="0" type="number" value="10000">
+                    <span>-</span>
+                    <input class="max" id="4K" min="0" type="number" value="50000">
+                </li>
+                <li>
+                    <span>1080P</span>
+                    <input class="min" id="1080P" min="0" type="number" value="2000">
+                    <span>-</span>
+                    <input class="max" id="1080P" min="0" type="number" value="10000">
+                </li>
+                <li>
+                    <span>720P</span>
+                    <input class="min" id="720P" min="0" type="number" value="500">
+                     <span>-</span>
+                    <input class="max" id="720P" min="0" type="number" value="10000">
+                </li>
+                <li>
+                    <span>SD</span>
+                    <input class="min" id="SD" min="0" type="number" value="200">
+                    <span>-</span>
+                    <input class="max" id="SD" min="0" type="number" value="1000">
+                </li>
+            </ul>
+            <ul class="wide" id="filters">
+                <li class="bbord">
+                    <span class="bold">Required words:</span>
+                    <input id="requiredwords" type="text" value="">
+                    <span class="tip">Releases must contain one of these words.</span>
+                </li>
+                <li class="bbord">
+                    <span class="bold">Preferred words:</span>
+                    <input id="preferredwords" type="text" value="">
+                    <span class="tip">Releases with these words score higher.</span>
+                </li>
+                <li>
+                    <span class="bold">Ignored words:</span>
+                    <input id="ignoredwords" type="text" value="subs,german,dutch,french,truefrench,danish,swedish,spanish,italian,korean,dubbed,swesub,korsub,dksubs,vain,HC,blurred">
+                    <span class="tip">Releases with these words are ignored.</span>
+                </li>
+            </ul>
+            <ul id="toggles">
+                <li class="bbord">
+                    <i class="fa fa-check-square checkbox" id="scoretitle" value="True"></i>
+                    <span>Score and filter titles.</span>
+                    <span class="tip">May need to disable for non-English results. Can cause incorrect downloads</span>
+                </li>
+                <li>
+                    <i class="fa fa-square-o checkbox" id="prefersmaller" value="False"></i>
+                    <span>Prefer smaller file sizes for identically-scored releases.</span>
+                </li>
+            </ul>
+        </ul>
         `
 
         $("div#qualities").append(html);
@@ -395,7 +411,28 @@ $(document).ready(function () {
         });
     })
 
-    /* Logs */
+/* Plugins */
+
+    // apply plugin_conf overlay
+    $("i.edit_conf").click(function(){
+        $("div#overlay").fadeIn();
+        $this = $(this);
+        folder = $this.parents("ul").attr("id")
+        conf = $this.attr("conf");
+        $.post(url_base + "/ajax/get_plugin_conf", {"folder": folder, "conf": conf})
+        .done(function(html){
+            $("div#plugin_conf_popup").html(html).slideDown();
+        });
+    })
+
+    $("body").on("click" ,"div#overlay", function(){
+        $(this).fadeOut();
+        $("div#plugin_conf_popup").slideUp();
+        $("div#info_pop_up").empty();
+    });
+
+
+/* Logs */
 
     // Open log file
     $("span#view_log").click(function(){
@@ -403,7 +440,7 @@ $(document).ready(function () {
         $log_display.hide();
         logfile = $("select#log_file").val();
 
-        $.post(url_base + "/ajax/get_log_text", {'logfile': logfile})
+        $.post(url_base + "/ajax/get_log_text", {"logfile": logfile})
         .done(function(r){
             $log_display.text(r);
             $log_display.show();
@@ -414,7 +451,7 @@ $(document).ready(function () {
     // Download log file
     $("span#download_log").click(function(){
         logfile = $("select#log_file").val();
-        window.open(url_base + '/logs/' + logfile)
+        window.open(url_base + "/logs/" + logfile)
     });
 
 });
@@ -429,7 +466,6 @@ function init_sortables($sortables=false){
 
     $sortables.each(function(){
         $this = $(this);
-        console.log($this)
 
         $lis = $this.children("li").get();
 

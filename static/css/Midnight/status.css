@@ -58,11 +58,6 @@ ul#movie_list li div img{
     border-color: #ffffff;
 }
 
-/* specific movie details */
-#overlay {
-    background-color: #000;
-}
-
 #status_pop_up {
     background: #080f18;
     border-top: 1px solid #ccc;

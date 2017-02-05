@@ -1,5 +1,3 @@
-import json
-
 import core
 from core import sqldb
 from core.helpers import Conversions
@@ -18,20 +16,20 @@ class MovieStatusPopup():
             poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
             title = data['title']
             year = str(data['year'])
-
+            quality = data['quality']
             url = data['url']
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=01.26')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.02b')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
 
             with div(id='title'):
                 with p():
-                    with span(title, id='title', imdbid=imdbid):
-                        span(year, id='title_year')
+                    span(title, id='title', imdbid=imdbid)
+                    span(year, id='year')
                     i(cls='fa fa-times', id='close')
                     i(cls='fa fa-trash', id='remove')
                     i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title=data['title'])
@@ -39,7 +37,7 @@ class MovieStatusPopup():
                 img(id='poster', src=poster_path)
                 with div(id='search_results'):
 
-                    self.result_list(imdbid)
+                    self.result_list(imdbid, quality)
                     div(id='results_thinker')
 
             with div(id='plot'):
@@ -56,7 +54,7 @@ class MovieStatusPopup():
 
                 with span('Quality profile: ', id='quality'):
                     with select(id='quality_profile', value=data['quality']):
-                        options = core.CONFIG['Quality'].keys()
+                        options = core.CONFIG['Quality']['Profiles'].keys()
                         for opt in options:
                             item = option(opt, value=opt)
                             if opt == data['quality']:
@@ -66,8 +64,8 @@ class MovieStatusPopup():
 
         return unicode(container)
 
-    def result_list(self, imdbid):
-        results = self.sql.get_search_results(imdbid)
+    def result_list(self, imdbid, quality):
+        results = self.sql.get_search_results(imdbid, quality)
 
         result_list = ul(id='result_list')
         with result_list:

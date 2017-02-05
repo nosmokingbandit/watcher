@@ -23,7 +23,7 @@ class Snatcher():
         self.update = updatestatus.Status()
         return
 
-    def auto_grab(self, imdbid, minscore=0):
+    def auto_grab(self, title, year, imdbid, quality, minscore=0):
         ''' Grabs the best scoring result that isn't 'Bad'
 
         This simply picks the best release, actual snatching is
@@ -33,13 +33,13 @@ class Snatcher():
         '''
 
         logging.info(u'Selecting best result for {}'.format(imdbid))
-        search_results = self.sql.get_search_results(imdbid)
+        search_results = self.sql.get_search_results(imdbid, quality)
         if not search_results:
             logging.info(u'Unable to automatically grab {}, no results.'.format(imdbid))
             return False
 
         # Check if we are past the 'waitdays'
-        wait_days = int(core.CONFIG['Search']['waitdays'])
+        wait_days = core.CONFIG['Search']['waitdays']
 
         earliest_found = min([x['date_found'] for x in search_results])
         date_found = datetime.strptime(earliest_found, '%Y-%m-%d')
@@ -54,6 +54,9 @@ class Snatcher():
         for result in search_results:
             result = dict(result)
             status = result['status']
+
+            result['title'] = title
+            result['year'] = year
 
             if result['status'] == u'Available' and result['score'] > minscore:
                 self.snatch(result)
@@ -72,34 +75,37 @@ class Snatcher():
         Returns response from download.
         Marks release and movie as 'Snatched'
 
-        Returns dict {u'response': 'true', 'message': 'lorem impsum'}
+        Returns dict {u'response': True, 'message': 'lorem impsum'}
         '''
 
-        title = data['title']
         imdbid = data['imdbid']
         resolution = data['resolution']
         kind = data['type']
         info_link = urllib2.quote(data['info_link'], safe='')
         indexer = data['indexer']
-        downloadid = data['downloadid']
+        title = data['title']
+        year = data['year']
 
         if data['type'] == 'nzb':
-            if core.CONFIG['Sources']['usenetenabled'] == 'true':
+            if core.CONFIG['Downloader']['Sources']['usenetenabled']:
                 response = self.snatch_nzb(data)
             else:
-                return {u'response': u'false', u'message': u'NZB submitted but nzb snatching is disabled.'}
+                return {u'response': False, u'message': u'NZB submitted but nzb snatching is disabled.'}
 
         if data['type'] in ['torrent', 'magnet']:
-            if core.CONFIG['Sources']['torrentenabled'] == 'true':
+            if core.CONFIG['Downloader']['Sources']['torrentenabled']:
                 response = self.snatch_torrent(data)
             else:
-                return {u'response': u'false', u'message': u'Torrent submitted but torrent snatching is disabled.'}
+                return {u'response': False, u'message': u'Torrent submitted but torrent snatching is disabled.'}
 
-        if response['response'] == 'true':
+        if response['response'] is True:
             downloader = response['downloader']
+            downloadid = response['downloadid']
 
-            self.plugins.snatched(title, imdbid, resolution, kind, downloader, downloadid, indexer, info_link)
-        return response
+            self.plugins.snatched(title, year, imdbid, resolution, kind, downloader, downloadid, indexer, info_link)
+            return response
+        else:
+            return response
 
     def snatch_nzb(self, data):
         guid = data['guid']
@@ -108,41 +114,41 @@ class Snatcher():
         data['title'] = u'{}.Watcher'.format(data['title'])
 
         # If sending to SAB
-        sab_conf = core.CONFIG['Sabnzbd']
-        if sab_conf['sabenabled'] == u'true':
+        sab_conf = core.CONFIG['Downloader']['Usenet']['Sabnzbd']
+        if sab_conf['enabled'] is True:
             logging.info(u'Sending nzb to Sabnzbd.')
             response = sabnzbd.Sabnzbd.add_nzb(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to Sabnzbd.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb'}
+                    return {u'response': True, u'message': u'Sent to SABnzbd.', u'downloader': u'SABnzb', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
 
         # If sending to NZBGET
-        nzbg_conf = core.CONFIG['NzbGet']
-        if nzbg_conf['nzbgenabled'] == u'true':
+        nzbg_conf = core.CONFIG['Downloader']['Usenet']['NzbGet']
+        if nzbg_conf['enabled'] is True:
             logging.info(u'Sending nzb to NzbGet.')
             response = nzbget.Nzbget.add_nzb(data)
 
-            if response['response'] is u'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet'}
+                    return {u'response': True, u'message': u'Sent to NZBGet.', u'downloader': u'NZBGet', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
@@ -155,84 +161,87 @@ class Snatcher():
         kind = data['type']
 
         # If sending to Transmission
-        transmission_conf = core.CONFIG['Transmission']
-        if transmission_conf['transmissionenabled'] == u'true':
+        transmission_conf = core.CONFIG['Downloader']['Torrent']['Transmission']
+        if transmission_conf['enabled'] is True:
             logging.info(u'Sending {} to Transmission'.format(kind))
             response = transmission.Transmission.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Tranmission.', u'downloader': u'Transmission'}
+                    return {u'response': True, u'message': u'Sent to Tranmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
 
         # If sending to QBittorrent
-        qbit_conf = core.CONFIG['QBittorrent']
-        if qbit_conf['qbittorrentenabled'] == u'true':
+        qbit_conf = core.CONFIG['Downloader']['Torrent']['QBittorrent']
+        if qbit_conf['enabled'] is True:
             logging.info(u'Sending {} to QBittorrent'.format(kind))
             response = qbittorrent.QBittorrent.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to QBittorrent.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent'}
+                    return {u'response': True, u'message': u'Sent to QBittorrent.', u'downloader': u'QBitorrent', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
 
         # If sending to DelugeRPC
-        delugerpc_conf = core.CONFIG['DelugeRPC']
-        if delugerpc_conf['delugerpcenabled'] == u'true':
+        delugerpc_conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
+        if delugerpc_conf['enabled'] is True:
             logging.info(u'Sending {} to DelugeRPC'.format(kind))
             response = deluge.DelugeRPC.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeRPC.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge'}
+                    return {u'response': True, u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
 
         # If sending to DelugeWeb
-        delugeweb_conf = core.CONFIG['DelugeWeb']
-        if delugeweb_conf['delugewebenabled'] == u'true':
+        delugeweb_conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
+        if delugeweb_conf['enabled'] is True:
             logging.info(u'Sending {} to DelugeWeb'.format(kind))
             response = deluge.DelugeWeb.add_torrent(data)
 
-            if response['response'] is 'true':
+            if response['response'] is True:
 
                 # store downloadid in database
                 self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeWeb.'.format(title))
-                    return {u'response': u'true', u'message': u'Sent to Deluge.', u'downloader': u'Deluge'}
+                    return {u'response': True, u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
                 else:
-                    return {u'response': u'false', u'error': u'Could not mark '
+                    return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}
             else:
                 return response
+
+        else:
+            return {u'response': False, u'error': u'No downloader enabled.'}
 
     def update_status_snatched(self, guid, imdbid):
         '''

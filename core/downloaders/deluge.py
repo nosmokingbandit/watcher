@@ -23,10 +23,10 @@ class DelugeRPC(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['delugerpchost']
-        port = int(data['delugerpcport'])
-        user = data['delugerpcuser']
-        password = data['delugerpcpass']
+        host = data['host']
+        port = data['port']
+        user = data['user']
+        password = data['pass']
 
         client = DelugeRPCClient(host, port, user, password)
         try:
@@ -42,33 +42,33 @@ class DelugeRPC(object):
         ''' Adds torrent or magnet to Deluge
         data: dict of torrrent/magnet information
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
-        conf = core.CONFIG['DelugeRPC']
+        conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
 
-        host = conf['delugerpchost']
-        port = int(conf['delugerpcport'])
-        user = conf['delugerpcuser']
-        password = conf['delugerpcpass']
+        host = conf['host']
+        port = conf['port']
+        user = conf['user']
+        password = conf['pass']
 
         client = DelugeRPCClient(host, port, user, password)
 
         try:
             error = client.connect()
             if error:
-                return {'response': 'false', 'error': error}
+                return {'response': False, 'error': error}
         except Exception, e:
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}
 
         try:
             def_download_path = client.call('core.get_config')['download_location']
         except Exception, e:
             logging.error('Unable to get download path.', exc_info=True)
-            return {'response': 'false', 'error': 'Unable to get download path.'}
+            return {'response': False, 'error': 'Unable to get download path.'}
 
-        download_path = '{}/{}'.format(def_download_path, conf['delugerpccategory'])
+        download_path = '{}/{}'.format(def_download_path, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -77,24 +77,24 @@ class DelugeRPC(object):
         }
 
         options = {}
-        options['add_paused'] = conf['delugerpcaddpaused'] == u'true'
+        options['add_paused'] = conf['addpaused']
         options['download_location'] = download_path
-        options['priority'] = priority_keys[conf['delugerpcpriority']]
+        options['priority'] = priority_keys[conf['priority']]
 
         if data['type'] == u'magnet':
             try:
                 download_id = client.call('core.add_torrent_magnet', data['torrentfile'], options)
-                return {'response': 'true', 'downloadid': download_id}
+                return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error('Unable to send magnet.', exc_info=True)
-                return {'response': 'false', 'error': str(e)}
+                return {'response': False, 'error': str(e)}
         elif data['type'] == u'torrent':
             try:
                 download_id = client.call('core.add_torrent_url', data['torrentfile'], options)
-                return {'response': 'true', 'downloadid': download_id}
+                return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error('Unable to send magnet.', exc_info=True)
-                return {'response': 'false', 'error': str(e)}
+                return {'response': False, 'error': str(e)}
         return
 
 
@@ -113,9 +113,9 @@ class DelugeWeb(object):
         Return True on success or str error message on failure
         '''
 
-        host = data['delugewebhost']
-        port = int(data['delugewebport'])
-        password = data['delugewebpass']
+        host = data['host']
+        port = data['port']
+        password = data['pass']
 
         url = u'{}:{}/json'.format(host, port)
 
@@ -128,32 +128,32 @@ class DelugeWeb(object):
 
         Adds torrents to default/path/<category>
 
-        Returns dict {'response': 'true', 'download_id': 'id'}
-                     {'response': 'false', 'error': 'exception'}
+        Returns dict {'response': True, 'download_id': 'id'}
+                     {'response': False, 'error': 'exception'}
 
         '''
 
-        deluge_conf = core.CONFIG['DelugeWeb']
+        conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
 
-        host = deluge_conf['delugewebhost']
-        port = deluge_conf['delugewebport']
+        host = conf['host']
+        port = conf['port']
         url = '{}:{}/json'.format(host, port)
 
         # check cookie validity while getting default download dir
         download_dir = DelugeWeb._get_download_dir(url)
 
         if not download_dir:
-            password = deluge_conf['delugewebpass']
+            password = conf['pass']
             if DelugeWeb._login(url, password) is not True:
-                return {'response': 'false', 'error': 'Incorrect usename or password.'}
+                return {'response': False, 'error': 'Incorrect usename or password.'}
 
         download_dir = DelugeWeb._get_download_dir(url)
 
         if not download_dir:
-            return {'response': 'false', 'error': 'Unable to get path information.'}
+            return {'response': False, 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
-        download_dir = '{}/{}'.format(download_dir, deluge_conf['delugewebcategory'])
+        download_dir = '{}/{}'.format(download_dir, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -162,9 +162,9 @@ class DelugeWeb(object):
         }
 
         torrent = {'path': data['torrentfile'], 'options': {}}
-        torrent['options']['add_paused'] = deluge_conf['delugewebaddpaused'] == u'true'
+        torrent['options']['add_paused'] = conf['addpaused']
         torrent['options']['download_location'] = download_dir
-        torrent['options']['priority'] = priority_keys[deluge_conf['delugewebpriority']]
+        torrent['options']['priority'] = priority_keys[conf['priority']]
 
         command = {'method': 'web.add_torrents',
                    'params': [[torrent]],
@@ -180,14 +180,14 @@ class DelugeWeb(object):
             response = DelugeWeb._read(urllib2.urlopen(request))
             if response['result'] is True:
                 downloadid = Torrent.get_hash(data['torrentfile'])
-                return {'response': 'true', 'downloadid': downloadid}
+                return {'response': True, 'downloadid': downloadid}
             else:
-                return {'response': 'false', 'error': response['error']}
+                return {'response': False, 'error': response['error']}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
             logging.error(u'Delugeweb add_torrent', exc_info=True)
-            return {'response': 'false', 'error': str(e)}
+            return {'response': False, 'error': str(e)}
 
     @staticmethod
     def _get_download_dir(url):
@@ -210,7 +210,7 @@ class DelugeWeb(object):
             return False
         except Exception, e:
             logging.error(u'delugeweb get_download_dir', exc_info=True)
-            return {'response': 'false', 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
     def _read(response):

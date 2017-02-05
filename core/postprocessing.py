@@ -9,7 +9,7 @@ import urllib2
 import cherrypy
 import core
 import PTN
-from core import plugins, snatcher, sqldb, updatestatus
+from core import plugins, movieinfo, snatcher, sqldb, updatestatus
 
 logging = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ class Postprocessing(object):
     exposed = True
 
     def __init__(self):
+        self.omdb = movieinfo.OMDB()
         self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()
@@ -69,8 +70,9 @@ class Postprocessing(object):
         # get the actual movie file name
         data['filename'] = self.get_filename(data['path'])
 
-        logging.info(u'Parsing release name for information.')
-        data.update(self.parse_filename(data['filename']))
+        if data['filename']:
+            logging.info(u'Parsing release name for information.')
+            data.update(self.parse_filename(data['filename']))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -93,15 +95,15 @@ class Postprocessing(object):
 
             response = self.complete(data)
 
-            title = response['title']
-            year = response['year']
-            imdbid = response['imdbid']
-            resolution = response['resolution']
-            rated = response['rated']
+            title = response.get('title')
+            year = response.get('year')
+            imdbid = response.get('imdbid')
+            resolution = response.get('resolution')
+            rated = response.get('rated')
             original_file = response.get('orig_filename')
             new_file_location = response.get('new_file_location')
-            downloadid = response['downloadid']
-            finished_date = response['finished_date']
+            downloadid = response.get('downloadid')
+            finished_date = response.get('finished_date')
 
             self.plugins.finished(title, year, imdbid, resolution, rated, original_file,
                                   new_file_location, downloadid, finished_date)
@@ -218,7 +220,7 @@ class Postprocessing(object):
             try:
                 files = os.listdir(path)
             except Exception, e: # noqa
-                logging.error(u'Path not found in filesystem.',
+                logging.error(u'Path not found in filesystem. Will be unable to move or rename.',
                               exc_info=True)
                 return ''
 
@@ -242,7 +244,7 @@ class Postprocessing(object):
 
             return biggestfile
 
-    def parse_filename(self, filepath):
+    def parse_filename(self, data):
         ''' Parses filename for release information
         :param filename: str name of movie file
 
@@ -256,8 +258,11 @@ class Postprocessing(object):
         Returns dict of parsed data
         '''
 
+        filepath = data['filepath']
+        path = data['path']
+
         # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
-        data = {
+        metadata = {
             'title': '',
             'year': '',
             'resolution': '',
@@ -275,13 +280,9 @@ class Postprocessing(object):
 
         if len(titledata) <= 2:
             logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name.')
-            path_list = filepath.split(os.sep)
-            if len(path_list) >= 2:
-                titledata = PTN.parse(path_list[-2])
-                logging.info(u'Found {} in parent folder.'.format(titledata))
-            else:
-                logging.info(u'Unable to parse file name or folder.')
-                return data
+            path_list = path.split(os.sep)
+            titledata = PTN.parse(path_list[-1])
+            logging.info(u'Found {} in parent folder.'.format(titledata))
         else:
             logging.info(u'Found {} in filname.'.format(titledata))
 
@@ -298,9 +299,9 @@ class Postprocessing(object):
             titledata['source'] = titledata.pop('quality')
         if 'group' in titledata:
             titledata['releasegroup'] = titledata.pop('group')
-        data.update(titledata)
+        metadata.update(titledata)
 
-        return data
+        return metadata
 
     def get_movie_info(self, data):
         ''' Gets score, imdbid, and other information to help process
@@ -386,7 +387,7 @@ class Postprocessing(object):
 
             # get rating from omdb
             if data['imdbid']:
-                data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
+                data['rated'] = self.omdb.get_info(data.get('title'), data.get('year'), imdbid=data['imdbid'], tags=['Rated'])[0]
             return data
         else:
             return {}
@@ -470,10 +471,10 @@ class Postprocessing(object):
             result['tasks']['cleanup'] = {'enabled': 'false'}
 
         # grab the next best release
-        if core.CONFIG['Search']['autograb'] == u'true':
+        if core.CONFIG['Search']['autograb']:
             result['tasks']['autograb'] = {'enabled': 'true'}
-            if data['imdbid']:
-                if self.snatcher.auto_grab(data['imdbid']):
+            if data['imdbid'] and data['quality']:
+                if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid'], data['quality']):
                     r = u'true'
                 else:
                     r = u'false'

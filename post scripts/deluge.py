@@ -7,7 +7,7 @@
 # Add api information to conf:
 
 watcherapi = 'APIKEY'
-watcheraddress = 'http://localhost:9090/'
+watcheraddress = u'http://localhost:9090/'
 category = 'Watcher'
 
 #  DO NOT TOUCH ANYTHING BELOW THIS LINE!  #

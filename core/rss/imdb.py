@@ -1,5 +1,4 @@
-import core
-from core import ajax, config, sqldb
+from core import ajax, sqldb
 from core.movieinfo import TMDB
 from datetime import datetime
 import json
@@ -13,7 +12,6 @@ logging = logging.getLogger(__name__)
 
 class ImdbRss(object):
     def __init__(self):
-        self.config = config.Config()
         self.tmdb = TMDB()
         self.sql = sqldb.SQL()
         self.ajax = ajax.Ajax()
@@ -29,6 +27,7 @@ class ImdbRss(object):
         '''
 
         if 'rss' in list_url:
+            list_id = filter(unicode.isdigit, list_url)
             logging.info(u'Syncing rss IMDB watchlist {}'.format(list_url))
             request = urllib2.Request(list_url, headers={'User-Agent': 'Mozilla/5.0'})
             try:
@@ -48,7 +47,7 @@ class ImdbRss(object):
 
         if movies:
             logging.info(u'Found {} movies in watchlist.'.format(len(movies)))
-            self.sync_new_movies(movies)
+            self.sync_new_movies(movies, list_id)
             logging.info(u'IMDB sync complete.')
             return True
         else:
@@ -88,9 +87,10 @@ class ImdbRss(object):
         for i in root.iter('lastBuildDate'):
             return i.text
 
-    def sync_new_movies(self, movies):
+    def sync_new_movies(self, movies, list_id):
         ''' Adds new movies from rss feed
         :params movies: list of dicts of movies
+        list_id: str id # of watch list
 
         Checks last sync time and pulls new imdbids from feed.
 
@@ -107,7 +107,7 @@ class ImdbRss(object):
 
         if os.path.isfile(data_file):
             with open(data_file, 'r') as f:
-                last_sync = f.read()
+                last_sync = json.load(f).get(list_id) or u'Sat, 01 Jan 2000 00:00:00 GMT'
         else:
             last_sync = u'Sat, 01 Jan 2000 00:00:00 GMT'
 
@@ -136,18 +136,15 @@ class ImdbRss(object):
         movies_to_add = [i for i in new_rss_movies if i not in existing_movies]
 
         # do quick-add procedure
-        quality = {}
-        quality['Quality'] = core.CONFIG['Quality']
-        quality['Filters'] = core.CONFIG['Filters']
         for imdbid in movies_to_add:
             movie_info = self.tmdb.find_imdbid(imdbid)[0]
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
-            # logging.info(u'Adding {}'.format(imdbid))
-            movie_info['quality'] = json.dumps(quality)
+            logging.info('Adding movie {} {} from imdb watchlist.'.format(title, imdbid))
+            movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
 
         logging.info(u'Storing last synced date')
         with open(data_file, 'w') as f:
-            f.write(self.lastbuilddate)
+            json.dump({list_id: self.lastbuilddate}, f)

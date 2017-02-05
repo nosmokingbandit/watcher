@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import core
-from core import newznab, scoreresults, snatcher, sqldb, updatestatus, torrent
+from core import newznab, scoreresults, snatcher, sqldb, updatestatus, torrent, proxy
 from core.rss import predb
 
 logging = logging.getLogger(__name__)
@@ -146,6 +146,8 @@ class Searcher():
         Returns Bool if movie is found.
         '''
 
+        proxy.Proxy.create()
+
         results = []
 
         if core.CONFIG['Downloader']['Sources']['usenetenabled']:
@@ -154,6 +156,8 @@ class Searcher():
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             for i in self.torrent.search_all(imdbid):
                 results.append(i)
+
+        proxy.Proxy.destroy()
 
         old_results = [dict(r) for r in self.sql.get_search_results(imdbid, quality)]
 

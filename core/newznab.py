@@ -3,6 +3,7 @@ import urllib2
 import xml.etree.cElementTree as ET
 
 import core
+from core.proxy import Proxy
 
 logging = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class NewzNab():
 
         Returns list of dicts with sorted nzb information.
         '''
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
         indexers = core.CONFIG['Indexers']['NewzNab'].values()
 
@@ -43,7 +45,12 @@ class NewzNab():
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
-                results_xml = urllib2.urlopen(request).read()
+                if proxy_enabled and Proxy.whitelist(url) is True:
+                    response = Proxy.bypass(request)
+                else:
+                    response = urllib2.urlopen(request)
+
+                results_xml = response.read()
                 nn_results = self.parse_newznab_xml(results_xml)
                 for result in nn_results:
                     results.append(result)
@@ -51,6 +58,7 @@ class NewzNab():
                 raise
             except Exception, e: # noqa
                 logging.error(u'NewzNab search_all get xml', exc_info=True)
+
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>

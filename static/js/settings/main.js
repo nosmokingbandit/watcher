@@ -135,7 +135,7 @@ $(document).ready(function () {
     $("div.providers i#add_newznab_row").click(function (){
         var row = `
         <li class='newznab_indexer'>
-            <i class='fa fa-square-o newznab_check checkbox' value='false'/>
+            <i class='fa fa-square-o newznab_check checkbox' value='False'/>
             <input class='newznab_url' placeholder=' http://indexer.url' type='text'/>
             <input class='newznab_api' placeholder=' Api Key' type='text'/>
             <i class='newznab_clear fa fa-trash-o'/>
@@ -149,7 +149,7 @@ $(document).ready(function () {
     $("div.providers i#add_potato_row").click(function (){
         var row = `
         <li class='potato_indexer'>
-            <i class='fa fa-square-o potato_check checkbox' value='false'/>
+            <i class='fa fa-square-o potato_check checkbox' value='False'/>
             <input class='potato_url' placeholder=' http://indexer.url' type='text'/>
             <input class='potato_api' placeholder=' Api Key' type='text'/>
             <i class='potato_clear fa fa-trash-o'/>

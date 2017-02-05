@@ -77,7 +77,7 @@ class DelugeRPC(object):
         }
 
         options = {}
-        options['add_paused'] = conf['addpaused'] == u'true'
+        options['add_paused'] = conf['addpaused']
         options['download_location'] = download_path
         options['priority'] = priority_keys[conf['priority']]
 

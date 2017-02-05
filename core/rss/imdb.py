@@ -6,6 +6,7 @@ import logging
 import os
 import urllib2
 import xml.etree.cElementTree as ET
+import time
 
 logging = logging.getLogger(__name__)
 
@@ -144,6 +145,7 @@ class ImdbRss(object):
             logging.info('Adding movie {} {} from imdb watchlist.'.format(title, imdbid))
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
+            time.sleep(2)  # We need to limit requests to OMDB
 
         logging.info(u'Storing last synced date')
         with open(data_file, 'w') as f:

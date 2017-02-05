@@ -225,13 +225,14 @@ class Settings():
                 span('*Requires restart.', cls='tip')
             with li():
                 i(id='popularmoviessync', cls='fa fa-square-o checkbox', value=str(c[c_s]['Watchlists']['popularmoviessync']))
-                span(u'Sync Popular Movie list.')
-
+                span(u'Sync Popular Movies list at ')
+                input(type='number', min='0', max='23', id='popularmovieshour', value=c[c_s]['Watchlists']['popularmovieshour'], style='width: 3.0em')
+                span(':')
+                input(type='number', min='0', max='59', id='popularmoviesmin', value=c[c_s]['Watchlists']['popularmoviesmin'], style='width: 3.0em')
                 with span(cls='tip'):
                     with a(href='https://github.com/sjlu/popular-movies', target='_blank'):
                         i(cls='fa fa-question-circle')
                     span('Updates every 24hr. *Requires restart.')
-
         with div(id='save', cat='search'):
             i(cls='fa fa-save')
             span(u'Save Settings')

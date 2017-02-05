@@ -55,6 +55,9 @@ class Config():
         config['Server']['installupdatehr'] = random.randint(0, 23)
         config['Server']['installupdatemin'] = random.randint(0, 59)
 
+        config['Search']['popularmovieshour'] = random.randint(0, 23)
+        config['Search']['popularmoviesmin'] = random.randint(0, 59)
+
         apikey = "%06x" % random.randint(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         config['Server']['apikey'] = apikey
 

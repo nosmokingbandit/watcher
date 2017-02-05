@@ -75,7 +75,7 @@ class Snatcher():
         Returns response from download.
         Marks release and movie as 'Snatched'
 
-        Returns dict {u'response': 'true', 'message': 'lorem impsum'}
+        Returns dict {u'response': True, 'message': 'lorem impsum'}
         '''
 
         imdbid = data['imdbid']

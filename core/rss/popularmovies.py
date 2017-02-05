@@ -1,16 +1,15 @@
-import core
-from core import ajax, config, sqldb
+from core import ajax, sqldb
 from core.movieinfo import TMDB
 import json
 import logging
 import urllib2
+import time
 
 logging = logging.getLogger(__name__)
 
 
 class PopularMoviesFeed(object):
     def __init__(self):
-        self.config = config.Config()
         self.tmdb = TMDB()
         self.sql = sqldb.SQL()
         self.ajax = ajax.Ajax()
@@ -24,18 +23,18 @@ class PopularMoviesFeed(object):
         Returns True or None on success or failure (due to exception or empty movie list)
         '''
 
+        movies = None
+
         logging.info(u'Syncing popular movie feed')
         request = urllib2.Request('https://s3.amazonaws.com/popular-movies/movies.json',
                                   headers={'User-Agent': 'Mozilla/5.0'})
         try:
-            response = urllib2.urlopen(request).read()
+            movies = json.load(urllib2.urlopen(request))
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Popular feed request.', exc_info=True)
             return None
-
-        movies = json.loads(response)
 
         if movies:
             logging.info(u'Found {} movies in popular movies.'.format(len(movies)))
@@ -80,6 +79,6 @@ class PopularMoviesFeed(object):
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
-            # logging.info(u'Adding {}'.format(imdbid))
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
+            time.sleep(2)  # We need to limit requests to OMDB

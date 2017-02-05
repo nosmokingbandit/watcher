@@ -160,7 +160,7 @@ class ImdbRssSync(object):
         now = datetime.datetime.now()
 
         hr = now.hour
-        min = now.minute + 5
+        min = now.minute + 3
 
         if core.CONFIG['Search']['Watchlists']['imdbsync']:
             auto_start = True
@@ -186,13 +186,13 @@ class PopularMoviesSync(object):
 
     @staticmethod
     def create():
-        interval = int(core.CONFIG['Search']['popularmoviesfrequency']) * 60
+        interval = 86400
         now = datetime.datetime.now()
 
         hr = now.hour
-        min = now.minute + 5
+        min = now.minute + 7
 
-        if core.CONFIG['Search']['popularmoviessync'] == u'true':
+        if core.CONFIG['Search']['Watchlists']['popularmoviessync']:
             auto_start = True
         else:
             auto_start = False

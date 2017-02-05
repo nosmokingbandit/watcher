@@ -186,11 +186,10 @@ class PopularMoviesSync(object):
 
     @staticmethod
     def create():
-        interval = 86400
-        now = datetime.datetime.now()
+        interval = 24 * 3600
 
-        hr = now.hour
-        min = now.minute + 7
+        hr = core.CONFIG['Search']['Watchlists']['popularmovieshour']
+        min = core.CONFIG['Search']['Watchlists']['popularmoviesmin']
 
         if core.CONFIG['Search']['Watchlists']['popularmoviessync']:
             auto_start = True

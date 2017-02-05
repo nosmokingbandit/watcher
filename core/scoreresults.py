@@ -86,7 +86,7 @@ class ScoreResults():
 
         active = []
         for i in core.CONFIG['Indexers']['NewzNab'].values():
-            if i[2] == u'true':
+            if i[2] is True:
                 active.append(i[0])
 
         keep = []

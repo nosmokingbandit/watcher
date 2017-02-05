@@ -53,6 +53,10 @@ button{
 
 select{
     border-radius: 4px;
+    font-family: "Lucida Console", Monaco, monospace;
+    border: 1px solid #212121;
+    outline: none;
+    background-color: #eeeeee;
 }
 
 .hidden{
@@ -85,6 +89,24 @@ a {
 a:visisted {
     color: #212121;
 }
+
+::-webkit-input-placeholder {
+    font-style: italic;
+    opacity: 0.5;
+}
+::-moz-placeholder {
+    font-style: italic;
+    opacity: 0.5;
+}
+:-ms-input-placeholder {
+    font-style: italic;
+    opacity: 0.5;
+}
+:-moz-placeholder {
+    font-style: italic;
+    opacity: 0.5;
+}
+
 
 ::-webkit-scrollbar {
   width: 8px;

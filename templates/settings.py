@@ -23,12 +23,12 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.02')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.02'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.04')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.04'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.02b9')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.02b')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.04')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.04')
 
         with doc:
             Header.insert_header(current="settings")
@@ -48,7 +48,7 @@ class Settings():
 
     @expose
     def default(self):
-        raise cherrypy.InternalRedirect(core.URL_BASE + 'settings/server')
+        raise cherrypy.InternalRedirect('/settings/server')
 
     @expose
     @settings_page
@@ -56,6 +56,28 @@ class Settings():
         h1(u'Server')
         c_s = 'Server'
         with ul(id='server', cls='wide'):
+            with li(u'Host: ', cls='bbord'):
+                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 17em')
+                span(u'Typically localhost or 127.0.0.1.', cls='tip')
+            with li(u'Port: ', cls='bbord'):
+                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 5em')
+            with li(cls='bbord'):
+                i(id='customwebroot', cls='fa fa-square-o checkbox', value=str(c[c_s]['customwebroot']))
+                span(u'Use custom webroot: ')
+                input(type='text', id='customwebrootpath', value=c[c_s]['customwebrootpath'], placeholder='/watcher')
+                span(u'For access behind reverse proxies.', cls='tip')
+            with li(u'API Key: ', cls='bbord'):
+                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 20em')
+                with span(cls='tip'):
+                    i(id='generate_new_key', cls='fa fa-refresh')
+                    span(u'Generate new key.')
+            with li():
+                span(u'Keep ')
+                input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')
+                span(u' days of logs.')
+
+        h2('Interface')
+        with ul(id='interface', cls='wide'):
             with li(u'Theme:', cls='bbord'):
                 with select(id='theme', value=c[c_s]['theme']) as theme_select:
                     tl = self.get_themes()
@@ -67,33 +89,20 @@ class Settings():
                         if item['value'] == c[c_s]['theme']:
                             item['selected'] = 'selected'
                             theme_select['value'] = opt
-            with li(u'Host: ', cls='bbord'):
-                input(type='text', id='serverhost', value=c[c_s]['serverhost'], style='width: 17em')
-                span(u'Typically localhost or 127.0.0.1.', cls='tip')
-            with li(u'Port: ', cls='bbord'):
-                input(type='number', id='serverport', value=c[c_s]['serverport'], style='width: 5em')
-            with li():
-                i(id='customwebroot', cls='fa fa-square-o checkbox', value=str(c[c_s]['customwebroot']))
-                span(u'Use custom webroot.')
-                span(u'For access behind reverse proxies.', cls='tip')
-            with li(u'Webroot path: ', cls='bbord'):
-                input(type='text', id='customwebrootpath', value=c[c_s]['customwebrootpath'])
-            with li(u'API Key: ', cls='bbord'):
-                input(type='text', id='apikey', value=c[c_s]['apikey'], style='width: 20em')
-                with span(cls='tip'):
-                    i(id='generate_new_key', cls='fa fa-refresh')
-                    span(u'Generate new key.')
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=str(c[c_s]['authrequired']))
                 span(u'Password-protect web-ui.')
                 span(u'*Requires restart.', cls='tip')
-            with li(u'Name: '):
+            with li(u'Name: ', cls='indent bbord'):
                 input(type='text', id='authuser', value=c[c_s]['authuser'], style='width: 20em')
-            with li(u'Password: ', cls='bbord'):
+            with li(u'Password: ', cls='bbord indent'):
                 input(type='text', id='authpass', value=c[c_s]['authpass'], style='width: 20em')
-            with li(cls='bbord'):
+            with li():
                 i(id='launchbrowser', cls='fa fa-square-o checkbox', value=str(c[c_s]['launchbrowser']))
                 span(u'Open browser on launch.')
+
+        h2('Updates')
+        with ul(id='updates', cls='wide'):
             with li(cls='bbord'):
                 i(id='checkupdates', cls='fa fa-square-o checkbox', value=str(c[c_s]['checkupdates']))
                 span(u'Check for updates every ')
@@ -109,14 +118,42 @@ class Settings():
                 span(u'24hr time. *Requires restart.', cls='tip')
             with li(cls='hidden'):
                 input(type='text', id='gitbranch', value=c[c_s]['gitbranch'])
-            with li(cls='bbord'):
+            with li():
                 with span(id='update_check'):
                     i(cls='fa fa-arrow-circle-up')
                     span(u'Check for updates now.')
-            with li(cls='bbord'):
-                span(u'Keep ')
-                input(type='number', id='keeplog', value=c[c_s]['keeplog'], style='width: 3em')
-                span(u' days of logs.')
+                    with span(u'Current version hash: ', cls='tip'):
+                        if core.CURRENT_HASH is not None:
+                            a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
+        h2('Proxy')
+        with ul(id='proxy', cls='wide'):
+            with li():
+                i(id='enabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['Proxy']['enabled']))
+                span('Enable proxy')
+                span('Used when connecting to search providers.', cls='tip')
+            with li('Address: ', cls='indent bbord'):
+                input(type='text', id='host', value=c[c_s]['Proxy']['host'], style="width:16em")
+                span('Include "http://" or "https://" for http(s) proxy.', cls='tip')
+            with li('Port: ', cls='indent bbord'):
+                input(type='number', min='0', max='65535', id='port', value=c[c_s]['Proxy']['port'], style='width: 6em')
+            with li('User name: ', cls='indent bbord'):
+                input(type='text', id='user', value=c[c_s]['Proxy']['user'])
+                span('Leave blank for none.', cls='tip')
+            with li('Password: ', cls='indent bbord'):
+                input(type='text', id='pass', value=c[c_s]['Proxy']['pass'])
+                span('Leave blank for none.', cls='tip')
+            with li('Type: ', cls='indent bbord'):
+                with select(id='type'):
+                    opts = ['http(s)', 'socks4', 'socks5']
+                    for opt in opts:
+                        if opt == c[c_s]['Proxy']['type']:
+                            option(opt, value=opt, selected="selected")
+                        else:
+                            option(opt, value=opt)
+            with li('Whitelist', cls='indent'):
+                input(type='text', id='whitelist', value=c[c_s]['Proxy']['whitelist'], placeholder='http://localhost:5075, http://localhost:5060', style='width:24em')
+        h2()
+        with ul():
             with li():
                 with span(id='restart'):
                     i(cls='fa fa-refresh')
@@ -124,10 +161,6 @@ class Settings():
                 with span(id='shutdown'):
                     i(cls='fa fa-power-off')
                     span(u'Shutdown')
-                with span(u'Current version hash: ', cls='tip'):
-                    if core.CURRENT_HASH is not None:
-                        a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
-
         with div(id='save', cat='server'):
             i(cls='fa fa-save')
             span(u'Save Settings')

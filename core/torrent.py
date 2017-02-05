@@ -5,6 +5,8 @@ import time
 import urllib2
 import xml.etree.cElementTree as ET
 import core
+from core.proxy import Proxy
+
 
 logging = logging.getLogger(__name__)
 
@@ -38,6 +40,7 @@ class Torrent(object):
 
         Returns list of dicts with movie info
         '''
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
         indexers = core.CONFIG['Indexers']['TorrentPotato'].values()
         results = []
@@ -57,9 +60,18 @@ class Torrent(object):
             request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
             try:
-                torrent_results = json.loads(urllib2.urlopen(request, timeout=60).read())['results']
-                for i in torrent_results:
-                    results.append(i)
+                if proxy_enabled and Proxy.whitelist(url) is True:
+                    response = Proxy.bypass(request)
+                else:
+                    response = urllib2.urlopen(request)
+
+                torrent_results = json.loads(response.read()).get('results')
+
+                if torrent_results:
+                    for i in torrent_results:
+                        results.append(i)
+                else:
+                    continue
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
@@ -98,17 +110,17 @@ class Torrent(object):
         try:
             results = json.loads(response)
             if 'results' in results.keys():
-                return {'response': 'true', 'message': 'Connection successful.'}
+                return {'response': True, 'message': 'Connection successful.'}
             else:
-                return {'response': 'false', 'message': 'Malformed json response.'}
+                return {'response': False, 'message': 'Malformed json response.'}
         except (SystemExit, KeyboardInterrupt):
             raise
         except ValueError:
             try:
                 tree = ET.fromstring(response)
-                return {'response': 'false', 'message': tree.text}
+                return {'response': False, 'message': tree.text}
             except Exception, e:
-                return {'response': 'false', 'message': 'Unknown response format.'}
+                return {'response': False, 'message': 'Unknown response format.'}
         except Exception, e: # noqa
             logging.error(u'Torrent Potato connection check.', exc_info=True)
             return {'response': 'false', 'message': 'Unknown response format.'}
@@ -186,6 +198,8 @@ class Rarbg(object):
 
     @staticmethod
     def search(imdbid):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
         logging.info('Searching Rarbg for {}'.format(imdbid))
         if Rarbg.timeout:
             now = datetime.datetime.now()
@@ -205,6 +219,11 @@ class Rarbg(object):
 
         Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
+            if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
             response = urllib2.urlopen(request, timeout=60).read()
             response = json.loads(response).get('torrent_results')
             if response:

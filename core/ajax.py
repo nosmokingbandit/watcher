@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import urllib2
 import threading
 
 import cherrypy
@@ -204,8 +205,14 @@ class Ajax(object):
         :param data: dict of Section with nested dict of keys and values:
         {'Section': {'key': 'val', 'key2': 'val2'}, 'Section2': {'key': 'val'}}
 
+        All dicts must contain the full tree or data will be lost.
+
+        Fires off additional methods if neccesary.
+
         Returns json.dumps(dict)
         '''
+
+        orig_config = dict(core.CONFIG)
 
         logging.info(u'Saving settings.')
         data = json.loads(data)
@@ -220,12 +227,13 @@ class Ajax(object):
 
         try:
             self.config.write_dict(save_data)
-            return json.dumps({'response': True})
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Writing config.', exc_info=True)
-            return json.dumps({'response': False})
+            return json.dumps({'response': False, 'error': 'Unable to write to config file.'})
+
+        return json.dumps({'response': True})
 
     @cherrypy.expose
     def remove_movie(self, imdbid):
@@ -514,7 +522,6 @@ class Ajax(object):
         :param quality: str name of new quality
         :param imdbid: str imdb identification number
 
-        Returns str 'true' or 'false'
         '''
 
         logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))

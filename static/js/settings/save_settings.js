@@ -46,7 +46,7 @@ $(document).ready(function () {
             if(response["response"] == true){
                 toastr.success("Settings Saved");
             } else {
-                toastr.error("Unable to save settings. Check log for more information.");
+                toastr.error(response["error"]);
             }
 
             $thisi.removeClass("fa-circle faa-burst animated");
@@ -61,12 +61,13 @@ $(document).ready(function () {
     function server(){
         var data = {};
         var server = {};
+        server["Proxy"] = {};
         var blanks = false;
-        $("#server i.checkbox").each(function(){
+        $("ul#server i.checkbox").each(function(){
             $this = $(this);
             server[$this.attr("id")] = is_checked($this);
         });
-        $("#server :input").each(function(){
+        $("ul#server :input").each(function(){
             $this = $(this);
             if($this.attr("id") == "theme"){
             }
@@ -82,6 +83,66 @@ $(document).ready(function () {
                 server[$this.attr("id")] = $this.val();
             }
         });
+
+        $("ul#interface i.checkbox").each(function(){
+            $this = $(this);
+            server[$this.attr("id")] = is_checked($this);
+        });
+        $("ul#interface :input").each(function(){
+            $this = $(this);
+            if($this.attr("id") == "theme"){
+            }
+            else if($this.val() == ""){
+                blanks = true;
+                highlight($this);
+            }
+
+            if($this.attr("type") == "number"){
+                server[$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                server[$this.attr("id")] = $this.val();
+            }
+        });
+
+        $("ul#updates i.checkbox").each(function(){
+            $this = $(this);
+            server[$this.attr("id")] = is_checked($this);
+        });
+        $("ul#updates :input").each(function(){
+            $this = $(this);
+            if($this.attr("id") == "theme"){
+            }
+            else if($this.val() == ""){
+                blanks = true;
+                highlight($this);
+            }
+
+            if($this.attr("type") == "number"){
+                server[$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                server[$this.attr("id")] = $this.val();
+            }
+        });
+
+        $("ul#proxy i.checkbox").each(function(){
+            $this = $(this);
+            server["Proxy"][$this.attr("id")] = is_checked($this);
+        });
+        $("ul#proxy :input").each(function(){
+            $this = $(this);
+            if($this.attr("id") == "type"){
+                server["Proxy"]["type"] = $(this).val();
+            }
+            else if($this.attr("type") == "number"){
+                server["Proxy"][$this.attr("id")] = parseInt($this.val());
+            }
+            else{
+                server["Proxy"][$this.attr("id")] = $this.val();
+            }
+        });
+
 
         if(blanks == true){
             return false;
@@ -233,7 +294,7 @@ $(document).ready(function () {
 
     function providers(){
         var data = {};
-        data['Indexers'] = {};
+        data["Indexers"] = {};
         var ind = 1;
         var cancel = false;
 
@@ -259,7 +320,7 @@ $(document).ready(function () {
                 }
             }
         });
-        data["Indexers"]['NewzNab'] = newznab_indexers;
+        data["Indexers"]["NewzNab"] = newznab_indexers;
 
         potato_indexers = {};
         ind = 1;
@@ -430,7 +491,7 @@ $(document).ready(function () {
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
             enabled = is_checked($li.find("i.checkbox"));
-            if(enabled == 'true'){
+            if(enabled == "true"){
                 added[plugin] = [enabled, order];
                 order++;
             }
@@ -458,7 +519,7 @@ $(document).ready(function () {
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
             enabled = is_checked($li.find("i.checkbox"));
-            if(enabled == 'true'){
+            if(enabled == "true"){
                 finished[plugin] = [enabled, order];
                 order++;
             }

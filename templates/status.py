@@ -101,8 +101,8 @@ class Status():
                                         i(cls='fa fa-star-half-o')
                                     for nostar in range(5 - count):
                                         i(cls='fa fa-star-o')
-
-                            span(data['rated'], cls='rated')
+                            if data['rated']:
+                                span(data['rated'], cls='rated')
 
         return unicode(movie_list)
 

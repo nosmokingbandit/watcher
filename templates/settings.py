@@ -218,11 +218,19 @@ class Settings():
             with li():
                 i(id='imdbsync', cls='fa fa-square-o checkbox', value=str(c[c_s]['Watchlists']['imdbsync']))
                 span(u'Sync imdb watch list ')
-                input(type='text', id='imdbrss', value=c[c_s]['Watchlists']['imdbrss'], placeholder="http://rss.imdb.com/user/...", style="width:20em;")
+                input(type='text', id='imdbrss', value=c[c_s]['Watchlists']['imdbrss'], placeholder="http://rss.imdb.com/user/...", style="width:18em;")
                 span(' every ')
                 input(type='number', min='15', id='imdbfrequency', value=c[c_s]['Watchlists']['imdbfrequency'], style='width: 3.0em')
                 span(' minutes.')
                 span('*Requires restart.', cls='tip')
+            with li():
+                i(id='popularmoviessync', cls='fa fa-square-o checkbox', value=str(c[c_s]['Watchlists']['popularmoviessync']))
+                span(u'Sync Popular Movie list.')
+
+                with span(cls='tip'):
+                    with a(href='https://github.com/sjlu/popular-movies', target='_blank'):
+                        i(cls='fa fa-question-circle')
+                    span('Updates every 24hr. *Requires restart.')
 
         with div(id='save', cat='search'):
             i(cls='fa fa-save')

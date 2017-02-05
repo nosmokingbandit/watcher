@@ -6,7 +6,7 @@ import core
 from core.notification import Notification
 
 from core import searcher, version
-from core.rss import imdb
+from core.rss import imdb, popularmovies
 from core.cp_plugins import taskscheduler
 
 logging = logging.getLogger(__name__)
@@ -160,7 +160,7 @@ class ImdbRssSync(object):
         now = datetime.datetime.now()
 
         hr = now.hour
-        min = now.minute + 5
+        min = now.minute + 3
 
         if core.CONFIG['Search']['Watchlists']['imdbsync']:
             auto_start = True
@@ -179,4 +179,33 @@ class ImdbRssSync(object):
         imdb_rss = imdb.ImdbRss()
 
         imdb_rss.get_rss(rss_url)
+        return
+
+
+class PopularMoviesSync(object):
+
+    @staticmethod
+    def create():
+        interval = 86400
+        now = datetime.datetime.now()
+
+        hr = now.hour
+        min = now.minute + 7
+
+        if core.CONFIG['Search']['Watchlists']['popularmoviessync']:
+            auto_start = True
+        else:
+            auto_start = False
+
+        taskscheduler.ScheduledTask(hr, min, interval, PopularMoviesSync.sync_feed,
+                                    auto_start=auto_start)
+        return
+
+    @staticmethod
+    def sync_feed():
+        logging.info(u'Running automatic popular movies sync.')
+
+        popular_feed = popularmovies.PopularMoviesFeed()
+
+        popular_feed.get_feed()
         return

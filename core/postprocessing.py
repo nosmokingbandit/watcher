@@ -258,7 +258,7 @@ class Postprocessing(object):
         Returns dict of parsed data
         '''
 
-        filepath = data['filepath']
+        filename = data['filename']
         path = data['path']
 
         # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
@@ -273,7 +273,7 @@ class Postprocessing(object):
             'imdbid': ''
             }
 
-        titledata = PTN.parse(os.path.basename(filepath))
+        titledata = PTN.parse(os.path.basename(filename))
         # this key is useless
         if 'excess' in titledata:
             titledata.pop('excess')

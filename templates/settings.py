@@ -23,11 +23,11 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.04')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.04'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.06')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.06'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.04')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.06')
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.04')
 
         with doc:
@@ -300,6 +300,9 @@ class Settings():
                         input(type='number', id=res, cls='max', value=profile[res][3], min='0', placeholder='max')
 
             with ul(id='filters', cls='wide'):
+                with li(cls='sub_cat'):
+                    span(u'Filter words')
+                    span(u'Group words with ampersands ( & ) and separate groups with commas ( , )', cls='tip')
                 with li(cls='bbord'):
                     span(u'Required words:', cls='bold')
                     input(type='text', id='requiredwords', value=profile['requiredwords'])

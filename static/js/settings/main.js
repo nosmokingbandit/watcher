@@ -190,7 +190,7 @@ $(document).ready(function () {
         $.post(url_base + "/ajax/indexer_test", {"indexer": url, "apikey": api, "mode": mode})
         .done(function(r){
             response = JSON.parse(r);
-            if(response["response"] == "true"){
+            if(response["response"] == true){
                 toastr.success(response["message"]);
             } else{
                 toastr.error(response["message"])

@@ -265,6 +265,7 @@ class Rarbg(object):
             result['guid'] = result['download'].split('&')[0].split(':')[-1]
             result['type'] = 'magnet'
             result['pubdate'] = None
+            result['category'] = None
 
             result['resolution'] = Torrent.get_resolution(result)
 

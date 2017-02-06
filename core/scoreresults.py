@@ -25,8 +25,8 @@ class ScoreResults():
         Scores movie based on reslution priority, title match, and
             preferred words,
 
-        Orders the list by Score, then by Size. So a 5gb release will have
-            a lower index than a 2gb release of the same score.
+        Word groups are split in to a list of lists:
+        [['word'], ['word2', 'word3'], 'word4']
 
         Returns list of dicts.
         '''
@@ -47,9 +47,11 @@ class ScoreResults():
         resolution = {k: v for k, v in quality.iteritems() if k in ['4K', '1080P', '720P', 'SD']}
         retention = core.CONFIG['Search']['retention']
         seeds = core.CONFIG['Search']['mintorrentseeds']
-        required = quality['requiredwords'].lower().split(u',')
-        preferred = quality['preferredwords'].lower().split(u',')
-        ignored = quality['ignoredwords'].lower().split(u',')
+
+        required = [i.split('&') for i in quality['requiredwords'].lower().replace(' ', '').split(',') if i != '']
+        preferred = [i.split('&') for i in quality['preferredwords'].lower().replace(' ', '').split(',') if i != '']
+        ignored = [i.split('&') for i in quality['ignoredwords'].lower().replace(' ', '').split(',') if i != '']
+
         today = datetime.today()
 
         # These all just modify self.results
@@ -100,45 +102,57 @@ class ScoreResults():
         self.results = keep
         return
 
-    def remove_ignored(self, words):
-        ''' Remove results with ignored 'words'
-        :param words: list of forbidden words
+    def remove_ignored(self, group_list):
+        ''' Remove results with ignored groups of 'words'
+        :param group_list: list of forbidden groups of words
 
-        Iterates through self.results and removes any entry that contains
-            any 'words'
+        word_groups is a list of lists.
 
-        Does not return
-        '''
-
-        if not words:
-            return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                self.results = [r for r in self.results if word not in r['title'].lower()]
-
-    def keep_required(self, words):
-        ''' Remove results without required 'words'
-        :param words: list of required words
-
-        Iterates through self.results and removes any entry that does not
-            contain all 'words'
+        Iterates through self.results and removes every entry that contains
+            any group of 'words'
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
 
         Does not return
         '''
 
         keep = []
 
-        if not words or words == [u'']:
+        if not group_list or group_list == [u'']:
             return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                for r in self.results:
-                    if word in r['title'].lower() and r not in keep:
-                        keep.append(r)
+
+        for r in self.results:
+            cond = False
+            for word_group in group_list:
+                if all(word in r['title'].lower() for word in word_group):
+                    cond = True
+                    break
+            if cond is False and r not in keep:
+                keep.append(r)
+        self.results = keep
+
+    def keep_required(self, group_list):
+        ''' Remove results without required groups of 'words'
+        :param word_goups: list of required groups of words
+
+        Iterates through self.results and removes every entry that does not
+            contain any group of 'words'
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
+
+        Does not return
+        '''
+
+        keep = []
+
+        if not group_list or group_list == [u'']:
+            return
+
+        for r in self.results:
+            for word_group in group_list:
+                if all(word in r['title'].lower() for word in word_group) and r not in keep:
+                    keep.append(r)
+                    break
+                else:
+                    continue
         self.results = keep
 
     def retention_check(self, retention, today):
@@ -183,25 +197,27 @@ class ScoreResults():
                     lst.append(result)
         self.results = lst
 
-    def score_preferred(self, words):
-        ''' Increase score for each 'words' match
-        :param words: list of preferred words
+    def score_preferred(self, group_list):
+        ''' Increase score for each group of 'words' match
+        :param word_goups: list of preferred groups of words
 
         Iterates through self.results and increases ['score'] each time a
-            preferred 'words' is found
+            preferred group of 'words' is found
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
 
         Does not return
         '''
 
-        if not words:
+        if not group_list or group_list == [u'']:
             return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                for result in self.results:
-                    if word in result['title'].lower():
-                        result['score'] += 10
+
+        for r in self.results:
+            for word_group in group_list:
+                if all(word in r['title'].lower() for word in word_group):
+                    r['score'] += 10
+                    break
+                else:
+                    continue
 
     def fuzzy_title(self, title):
         ''' Score and remove results based on title match

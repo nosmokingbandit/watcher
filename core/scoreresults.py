@@ -100,45 +100,60 @@ class ScoreResults():
         self.results = keep
         return
 
-    def remove_ignored(self, words):
-        ''' Remove results with ignored 'words'
-        :param words: list of forbidden words
+    def remove_ignored(self, word_goups):
+        ''' Remove results with ignored groups of 'words'
+        :param word_goups: list of forbidden groups of words
 
-        Iterates through self.results and removes any entry that contains
-            any 'words'
-
-        Does not return
-        '''
-
-        if not words:
-            return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                self.results = [r for r in self.results if word not in r['title'].lower()]
-
-    def keep_required(self, words):
-        ''' Remove results without required 'words'
-        :param words: list of required words
-
-        Iterates through self.results and removes any entry that does not
-            contain all 'words'
+        Iterates through self.results and removes every entry that contains
+            any group of 'words'
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
 
         Does not return
         '''
 
         keep = []
 
-        if not words or words == [u'']:
+        if not word_goups or word_goups == [u'']:
             return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                for r in self.results:
-                    if word in r['title'].lower() and r not in keep:
-                        keep.append(r)
+        for words in word_goups:
+            for r in self.results:
+                cond = True
+                for word in words.split(u'&'):
+                    if word == u'':
+                        continue
+                    else:
+                        if word not in r['title'].lower():
+                            cond = False
+                if cond is False and r not in keep:
+                    keep.append(r)
+        self.results = keep
+
+    def keep_required(self, word_goups):
+        ''' Remove results without required groups of 'words'
+        :param word_goups: list of required groups of words
+
+        Iterates through self.results and removes every entry that does not
+            contain any group of 'words'
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
+
+        Does not return
+        '''
+
+        keep = []
+
+        if not word_goups or word_goups == [u'']:
+            return
+        for words in word_goups:
+            for r in self.results:
+                cond = True
+                for word in words.split(u'&'):
+                    if word == u'':
+                        continue
+                    else:
+                        if word not in r['title'].lower():
+                            cond = False
+                if cond is True and r not in keep:
+                    keep.append(r)
         self.results = keep
 
     def retention_check(self, retention, today):
@@ -183,25 +198,30 @@ class ScoreResults():
                     lst.append(result)
         self.results = lst
 
-    def score_preferred(self, words):
-        ''' Increase score for each 'words' match
-        :param words: list of preferred words
+    def score_preferred(self, word_goups):
+        ''' Increase score for each group of 'words' match
+        :param word_goups: list of preferred groups of words
 
         Iterates through self.results and increases ['score'] each time a
-            preferred 'words' is found
+            preferred group of 'words' is found
+        A group of 'words' is multiple 'words' concatenated with an ampersand '&'
 
         Does not return
         '''
 
-        if not words:
+        if not word_goups or word_goups == [u'']:
             return
-        for word in words:
-            if word == u'':
-                continue
-            else:
-                for result in self.results:
-                    if word in result['title'].lower():
-                        result['score'] += 10
+        for words in word_goups:
+            for r in self.results:
+                cond = True
+                for word in words.split(u'&'):
+                    if word == u'':
+                        continue
+                    else:
+                        if word not in r['title'].lower():
+                            cond = False
+                if cond is True:
+                    r['score'] += 10
 
     def fuzzy_title(self, title):
         ''' Score and remove results based on title match

@@ -72,7 +72,7 @@ class Postprocessing(object):
 
         if data['filename']:
             logging.info(u'Parsing release name for information.')
-            data.update(self.parse_filename(data['filename']))
+            data.update(self.parse_filename(data))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -167,7 +167,7 @@ class Postprocessing(object):
         data['filename'] = self.get_filename(data['path'])
 
         logging.info(u'Parsing release name for information.')
-        data.update(self.parse_filename(data['filename']))
+        data.update(self.parse_filename(data))
 
         # Get possible local data or get OMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -246,7 +246,7 @@ class Postprocessing(object):
 
     def parse_filename(self, data):
         ''' Parses filename for release information
-        :param filename: str name of movie file
+        :param data: dict movie info
 
         PTN only returns information it finds, so we start with a blank dict
             of keys that we NEED to have, then update it with PTN's data. This

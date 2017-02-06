@@ -300,6 +300,9 @@ class Settings():
                         input(type='number', id=res, cls='max', value=profile[res][3], min='0', placeholder='max')
 
             with ul(id='filters', cls='wide'):
+                with li(cls='sub_cat'):
+                    span(u'Filter words')
+                    span(u'Split words with \',\' group words with \'&\'', cls='tip')
                 with li(cls='bbord'):
                     span(u'Required words:', cls='bold')
                     input(type='text', id='requiredwords', value=profile['requiredwords'])

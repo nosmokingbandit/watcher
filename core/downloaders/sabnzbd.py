@@ -49,7 +49,7 @@ class Sabnzbd():
 
         '''
 
-        conf = core.CONFIG['Downloader']['Torrent']['Sabnzbd']
+        conf = core.CONFIG['Downloader']['Usenet']['Sabnzbd']
 
         host = conf['host']
         port = conf['port']

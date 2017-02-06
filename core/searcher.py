@@ -52,7 +52,7 @@ class Searcher():
 
         self.predb.check_all()
         logging.info(u'Running automatic search.')
-        if keepsearching == u'true':
+        if keepsearching is True:
             logging.info(u'Search for finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
         movies = self.sql.get_user_movies()
         if not movies:
@@ -76,7 +76,7 @@ class Searcher():
                     self.search(imdbid, title, quality)
                     continue
 
-            if status == u'Finished' and keepsearching == u'true':
+            if status == u'Finished' and keepsearching is True:
                 logging.info(u'{} is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
@@ -91,7 +91,7 @@ class Searcher():
         '''
         If autograb is enabled, loops through movies and grabs any appropriate releases.
         '''
-        if auto_grab == u'true':
+        if auto_grab is True:
             logging.info(u'Running automatic snatcher.')
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
@@ -109,7 +109,7 @@ class Searcher():
                     self.snatcher.auto_grab(title, year, imdbid, quality)
                     continue
 
-                if status == u'Finished' and keepsearching == u'true':
+                if status == u'Finished' and keepsearching is True:
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta <= today:
                         logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))

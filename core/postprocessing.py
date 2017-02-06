@@ -459,7 +459,7 @@ class Postprocessing(object):
         result['tasks']['update_movie_status'] = r
 
         # delete failed files
-        if config['cleanupfailed'] == u'true':
+        if config['cleanupfailed']:
             result['tasks']['cleanup'] = {'enabled': 'true', 'path': data['path']}
 
             logging.info(u'Deleting leftover files from failed download.')
@@ -570,7 +570,7 @@ class Postprocessing(object):
         result['tasks']['update_movie_status'] = r
 
         # renamer
-        if config['renamerenabled'] == u'true':
+        if config['renamerenabled']:
             result['tasks']['renamer'] = {'enabled': 'true'}
             result['data']['orig_filename'] = result['data']['filename']
             response = self.renamer(data)
@@ -585,7 +585,7 @@ class Postprocessing(object):
             result['tasks']['mover'] = {'enabled': 'false'}
 
         # mover
-        if config['moverenabled'] == u'true':
+        if config['moverenabled']:
             result['tasks']['mover'] = {'enabled': 'true'}
             response = self.mover(data)
             if response is False:
@@ -598,16 +598,16 @@ class Postprocessing(object):
             result['tasks']['mover'] = {'enabled': 'false'}
 
         # Delete leftover dir. Skip if createhardlinks enabled or if mover disabled/failed
-        if config['cleanupenabled'] == u'true':
+        if config['cleanupenabled']:
             result['tasks']['cleanup'] = {'enabled': 'true'}
 
-            if config['createhardlink'] == u'true':
+            if config['createhardlink']:
                 logging.info('Hardlink creation enabled. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = 'skipped'
                 return result
 
             # fail if mover disabled or failed
-            if config['moverenabled'] == u'false' or \
+            if config['moverenabled'] is False or \
                     result['tasks']['mover']['response'] == u'false':
                 logging.info('Mover either disabled or failed. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = u'false'
@@ -741,7 +741,7 @@ class Postprocessing(object):
 
         # Create hardlink
 
-        if config['createhardlink'] == u'true':
+        if config['createhardlink']:
             logging.info('Creating hardlink from {} to {}.'.format(new_file_location, data['orig_filename']))
             if os.name == 'nt':
                 import ctypes

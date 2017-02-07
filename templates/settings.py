@@ -363,6 +363,9 @@ class Settings():
                 with ul(id='torrentindexer_list'):
                     with li(cls='sub_cat'):
                         span(u'Torrent Indexers')
+                    with li(cls='torrent_indexer', id='extratorrent'):
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['extratorrent']))
+                        span('Search ExtraTorrent')
                     with li(cls='torrent_indexer', id='rarbg'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rarbg']))
                         span('Search Rarbg')

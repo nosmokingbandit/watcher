@@ -18,7 +18,7 @@ class Torrent(object):
     def __init__(self):
         return
 
-    def search_all(self, imdbid):
+    def search_all(self, imdbid, title, year):
         torrent_indexers = core.CONFIG['Indexers']['Torrent']
 
         results = []
@@ -29,6 +29,11 @@ class Torrent(object):
         if torrent_indexers['rarbg']:
             rarbg_results = Rarbg.search(imdbid)
             for i in rarbg_results:
+                if i not in results:
+                    results.append(i)
+        if torrent_indexers['extratorrent']:
+            extra_results = ExtraTorrent.search(imdbid, title, year)
+            for i in extra_results:
                 if i not in results:
                     results.append(i)
 
@@ -333,3 +338,69 @@ u'size': 601}
 }
 
 '''
+class ExtraTorrent(object):
+
+    @staticmethod
+    def search(imdbid, title, year):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info('Searching ExtraTorrent for {}'.format(title))
+
+        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year).replace(' ', '+')
+
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = ExtraTorrent.parse_extra(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'ExtraTorrent search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse_extra(xml, imdbid):
+        logging.info('Parsing ExtraTorrent results.')
+
+        tree = ET.fromstring(xml)
+
+        items = tree[0].findall('item')
+
+        results = []
+        for i in items:
+            result = {}
+            try:
+                result['score'] = 0
+                result['size'] = int(i.find('size').text)
+                result['category'] = i.find('category').text
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i.find('title').text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.extratorrent.cc'
+                result['info_link'] = i.find('link').text
+                result['torrentfile'] = i.find('magnetURI').text
+                result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
+                result['resolution'] = Torrent.get_resolution(result)
+                result['type'] = 'magnet'
+                result['downloadid'] = None
+
+                seeders = i.find('seeders').text
+                result['seeders'] = 0 if seeders == '---' else seeders
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error('Error parsing ExtraTorrent XML.', exc_info=True)
+                continue
+
+        logging.info('Found {} results from ExtraTorrent.'.format(len(results)))
+        return results

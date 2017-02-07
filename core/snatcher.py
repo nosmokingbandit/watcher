@@ -54,8 +54,6 @@ class Snatcher():
         for result in search_results:
             result = dict(result)
             status = result['status']
-
-            result['title'] = title
             result['year'] = year
 
             if result['status'] == u'Available' and result['score'] > minscore:

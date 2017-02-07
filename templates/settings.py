@@ -366,6 +366,9 @@ class Settings():
                     with li(cls='torrent_indexer', id='extratorrent'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['extratorrent']))
                         span('Search ExtraTorrent')
+                    with li(cls='torrent_indexer', id='limetorrents'):
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['limetorrents']))
+                        span('Search LimeTorrents')
                     with li(cls='torrent_indexer', id='rarbg'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rarbg']))
                         span('Search Rarbg')

@@ -31,6 +31,11 @@ class Torrent(object):
             for i in rarbg_results:
                 if i not in results:
                     results.append(i)
+        if torrent_indexers['limetorrents']:
+            lime_results = LimeTorrents.search(imdbid, title, year)
+            for i in lime_results:
+                if i not in results:
+                    results.append(i)
         if torrent_indexers['extratorrent']:
             extra_results = ExtraTorrent.search(imdbid, title, year)
             for i in extra_results:
@@ -285,59 +290,72 @@ class Rarbg(object):
         return results
 
 
-'''
-Required Key:
-size, category, pubdate, title, indexer, info_link, guid, torrentfile, resolution, type(magnet, torrent)
+class LimeTorrents(object):
 
-'''
+    @staticmethod
+    def search(imdbid, title, year):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info('Searching LimeTorrents for {}'.format(title))
+        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year).replace(' ', '+')
+
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = LimeTorrents.parse_lime(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'LimeTorrent search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse_lime(xml, imdbid):
+        logging.info('Parsing LimeTorrents results.')
+
+        tree = ET.fromstring(xml)
+
+        items = tree[0].findall('item')
+
+        results = []
+        for i in items:
+            result = {}
+            try:
+                result['score'] = 0
+                result['size'] = int(i.find('size').text)
+                result['category'] = i.find('category').text
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i.find('title').text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.limetorrents.cc'
+                result['info_link'] = i.find('comments').text
+                result['torrentfile'] = i.find('enclosure').attrib['url']
+                result['guid'] = result['torrentfile'].split('.')[1].split('/')[-1].lower()
+                result['resolution'] = Torrent.get_resolution(result)
+                result['type'] = 'torrent'
+                result['downloadid'] = None
+
+                result['seeders'] = i.find('description').text.split(' ')[1]
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error('Error parsing LimeTorrents XML.', exc_info=True)
+                continue
+
+        logging.info('Found {} results from LimeTorrents.'.format(len(results)))
+        return results
 
 
-'''
-{u'torrent_id': u'https://thepiratebay.org/torrent/6744588/Cars_(2006)_720p_BrRip_x264_-_600MB_-_YIFY',
-u'seeders': 381
-u'freeleech': False,
-u'details_url': u'https://thepiratebay.org/torrent/6744588/Cars_(2006)_720p_BrRip_x264_-_600MB_-_YIFY',
-u'download_url': u'magnet:?xt=urn:btih:532a821cd3e4a31594b661de2c9e8622546c4655&dn=Cars+%282006%29+720p+BrRip+x264+-+600MB+-+YIFY&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Fzer0day.ch%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fpublic.popcorn-tracker.org%3A6969',
-u'imdb_id': u'',
-u'leechers': 50,
-u'release_name': u'Cars (2006) 720p BrRip x264 - 600MB - YIFY',
-u'type': u'movie',
-u'size': 601}
-'''
-
-
-'''
-{
-  "results": [
-    {
-      "release_name": "John Wick Chapter 2 2017 1080p BluRay AC3 x264--English",
-      "torrent_id": "http://www.dnoid.me/files/download/3528456/",
-      "details_url": "http://www.dnoid.me/files/details/3528456/9936912/",
-      "download_url": "http://mxq:5060/download/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsIjoiaHR0cDovL3d3dy5kbm9pZC5tZS9maWxlcy9kb3dubG9hZC8zNTI4NDU2LyIsIm5iZiI6MTQ4NDU5Mzg0MiwicyI6ImRlbW9ub2lkIn0.l9-9GTbzoASi9G9IRY-IZ_j9d01ySYzLGcu51HW5U6w/John+Wick+Chapter+2+2017+1080p+BluRay+AC3+x264--English.torrent",
-      "imdb_id": "",
-      "freeleech": false,
-      "type": "movie",
-      "size": 963,
-      "leechers": 0,
-      "seeders": 1
-    },
-    {
-      "release_name": "68 latest trailers 2017 720p",
-      "torrent_id": "http://www.dnoid.me/files/download/3506006/",
-      "details_url": "http://www.dnoid.me/files/details/3506006/9936912/",
-      "download_url": "http://mxq:5060/download/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsIjoiaHR0cDovL3d3dy5kbm9pZC5tZS9maWxlcy9kb3dubG9hZC8zNTA2MDA2LyIsIm5iZiI6MTQ4NDU5Mzg0MiwicyI6ImRlbW9ub2lkIn0.KgS2IznzqKCLux2ay8-HUGxkDRdy_kFFv6mD-4DTLKQ/68+latest+trailers+2017+720p.torrent",
-      "imdb_id": "",
-      "freeleech": false,
-      "type": "movie",
-      "size": 1401,
-      "leechers": 2,
-      "seeders": 3
-    }
-  ],
-  "total_results": 2
-}
-
-'''
 class ExtraTorrent(object):
 
     @staticmethod

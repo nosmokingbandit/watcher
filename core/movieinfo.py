@@ -142,17 +142,6 @@ class TMDB(object):
             return 'Search Error.'
 
 
-class Update(object):
-
-    def __init__(self):
-        return
-
-    def update_all(self):
-        for movie in self.sql.get_user_movies():
-            if movie['rated'] == 'N/A' or int(movie['score']) == 0:
-                return
-
-
 class Trailer(object):
     def get_trailer(self, title_date):
         ''' Gets trailer embed url from Youtube.

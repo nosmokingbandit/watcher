@@ -516,19 +516,29 @@ class Ajax(object):
             return
 
     @cherrypy.expose
-    def update_quality_profile(self, quality, imdbid):
+    def update_movie_options(self, quality, status, imdbid):
         ''' Updates quality settings for individual title
         :param quality: str name of new quality
+        :param status: str status management state
         :param imdbid: str imdb identification number
 
         '''
 
         logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))
 
-        if self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
-            return json.dumps({'response': True})
-        else:
+        if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
             return json.dumps({'response': False})
+
+        logging.info(u'Updating status to {} for {}.'.format(status, imdbid))
+
+        if status == 'Automatic':
+            if not self.update.movie_status(imdbid):
+                return json.dumps({'response': False})
+        elif status == 'Finished':
+            if not self.sql.update('MOVIES', 'status', 'Disabled', imdbid=imdbid):
+                return json.dumps({'response': False})
+
+        return json.dumps({'response': True})
 
     @cherrypy.expose
     def get_log_text(self, logfile):

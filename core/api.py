@@ -145,9 +145,14 @@ class API(object):
         if imdbid:
             for i in movies:
                 if i['imdbid'] == imdbid:
+                    if i['status'] == 'Disabled':
+                        i['status'] = 'Finished'
                     response = {'response': True, 'movie': i}
                     return json.dumps(response, indent=1)
         else:
+            for i in movies:
+                if i['status'] == 'Disabled':
+                    i['status'] = 'Finished'
             response = {'response': True, 'movies': movies}
             return json.dumps(response, indent=1)
 

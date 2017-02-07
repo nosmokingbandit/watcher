@@ -18,8 +18,8 @@ class Status():
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css?v=02.02')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css?v=02.07')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css?v=02.17'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=02.02b')
 
         with doc:
@@ -76,7 +76,7 @@ class Status():
                             span(u'Snatched', cls='status snatched')
                         elif status == 'Downloading':
                             span(u'Downloading', cls='status downloading')
-                        elif status == 'Finished':
+                        elif status in ['Finished', 'Disabled']:
                             span(u'Finished', cls='status finished')
                         else:
                             span(u'Status Unknown', cls='status wanted')

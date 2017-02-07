@@ -104,15 +104,16 @@ $(document).ready(function() {
         });
     });
 
-    $('i#change_quality').click(function(){
+    $('i#update_options').click(function(){
         $this = $(this);
         $this.removeClass('fa-save');
         $this.addClass('fa-circle faa-burst animated');
 
-        quality = $this.siblings('select').val();
+        quality = $('select#quality_profile').val();
+        status = $('select#status_management').val();
         imdbid = $("span#title").attr("imdbid");
 
-        $.post(url_base + "/ajax/update_quality_profile", {"quality": quality, "imdbid": imdbid})
+        $.post(url_base + "/ajax/update_movie_options", {"quality": quality, "status": status, "imdbid": imdbid})
         .done(function(r){
             response = JSON.parse(r);
 
@@ -122,6 +123,7 @@ $(document).ready(function() {
 
             $this.addClass('fa-save');
             $this.removeClass('fa-circle faa-burst animated');
+            refresh_list('#movie_list');
         })
 
 

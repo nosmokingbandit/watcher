@@ -387,7 +387,7 @@ $(document).ready(function () {
         data["Downloader"]["Usenet"]["Sabnzbd"] = sabnzbd;
 
         var nzbget = {};
-        nzbget["enabled"] = is_checked($("i#nzbgenabled"));
+        nzbget["enabled"] = is_checked($("i#nzbgetenabled"));
         $("ul#nzbget li i.checkbox").each(function(){
             $this = $(this)
             nzbget[$this.attr("id")] = is_checked($this);

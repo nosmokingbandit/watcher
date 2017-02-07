@@ -41,6 +41,11 @@ class Torrent(object):
             for i in extra_results:
                 if i not in results:
                     results.append(i)
+        if torrent_indexers['skytorrents']:
+            sky_results = SkyTorrents.search(imdbid, title, year)
+            for i in sky_results:
+                if i not in results:
+                    results.append(i)
 
         return results
 
@@ -421,4 +426,78 @@ class ExtraTorrent(object):
                 continue
 
         logging.info('Found {} results from ExtraTorrent.'.format(len(results)))
+        return results
+
+
+class SkyTorrents(object):
+
+    @staticmethod
+    def search(imdbid, title, year):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info('Searching SkyTorrents for {}'.format(title))
+
+        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+')
+
+        print url
+
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.skytorrents.in') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = SkyTorrents.parse_sky(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'SkyTorrents search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse_sky(xml, imdbid):
+        logging.info('Parsing SkyTorrents results.')
+
+        tree = ET.fromstring(xml)
+
+        items = tree[0].findall('item')
+
+        results = []
+        for i in items:
+            result = {}
+            try:
+                result['score'] = 0
+
+                desc = i.find('description').text.split(' ')
+
+                m = (1024 ** 2) if desc[-2] == 'MB' else (1024 ** 3)
+                result['size'] = float(desc[-3]) * m
+
+                result['category'] = i.find('category').text
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i.find('title').text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.skytorrents.in'
+                result['info_link'] = i.find('guid').text
+                result['torrentfile'] = i.find('link').text
+                result['guid'] = result['torrentfile'].split('/')[4]
+                result['resolution'] = Torrent.get_resolution(result)
+                result['type'] = 'torrent'
+                result['downloadid'] = None
+
+                result['seeders'] = desc[0]
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error('Error parsing SkyTorrents XML.', exc_info=True)
+                continue
+
+        logging.info('Found {} results from SkyTorrents.'.format(len(results)))
         return results

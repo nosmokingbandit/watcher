@@ -44,22 +44,6 @@ $(document).ready(function() {
     });
 
     /* Button actions */
-    function search_now(imdbid, title, quality){
-        $('ul#result_list').hide();
-        $('div#results_thinker').show();
-        $('i#search_now').addClass('fa-circle faa-burst animated');
-
-        $.post(url_base + "/ajax/search", {"imdbid":imdbid, "title":title, "quality":quality})
-        .done(function(r){
-            refresh_list('#result_list', imdbid=imdbid, quality=quality)
-            refresh_list('#movie_list')
-
-            $('div#results_thinker').hide();
-            $('i#search_now').removeClass('fa-circle faa-burst animated');
-
-        });
-    };
-
     $('i#close').click(function(e) {
         $('div#overlay').fadeOut();
         $('div#status_pop_up').slideUp();
@@ -104,7 +88,20 @@ $(document).ready(function() {
         var imdbid = $this.attr('imdbid');
         var title = $this.attr('title');
         var quality = $("select#quality_profile").val()
-        search_now(imdbid, title, quality);
+        var year = $("span#year").text();
+
+        $('ul#result_list').hide();
+        $('div#results_thinker').show();
+        $('i#search_now').addClass('fa-circle faa-burst animated');
+
+        $.post(url_base + "/ajax/search", {"imdbid":imdbid, "title":title, "year":year, "quality":quality})
+        .done(function(r){
+            refresh_list('#result_list', imdbid=imdbid, quality=quality)
+            refresh_list('#movie_list')
+
+            $('div#results_thinker').hide();
+            $('i#search_now').removeClass('fa-circle faa-burst animated');
+        });
     });
 
     $('i#change_quality').click(function(){

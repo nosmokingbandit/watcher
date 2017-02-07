@@ -284,7 +284,7 @@ $(document).ready(function () {
             if(response["status"] == true){
                 toastr.success(response["message"]);
             } else {
-                toastr.error(response["message"]);
+                toastr.error(response["error"]);
             }
         })
     });

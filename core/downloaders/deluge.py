@@ -24,7 +24,7 @@ class DelugeRPC(object):
         '''
 
         host = data['host']
-        port = data['port']
+        port = int(data['port'])
         user = data['user']
         password = data['pass']
 

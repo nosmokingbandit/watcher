@@ -107,7 +107,7 @@ class Ajax(object):
             quality = data['quality']
             self.predb.check_one(data)
             if core.CONFIG['Search']['searchafteradd']:
-                if self.searcher.search(imdbid, title, quality):
+                if self.searcher.search(imdbid, title, year, quality):
                     # if we don't need to wait to grab the movie do it now.
                     if core.CONFIG['Search']['autograb'] and \
                             core.CONFIG['Search']['waitdays'] == 0:
@@ -256,7 +256,7 @@ class Ajax(object):
         return json.dumps(response)
 
     @cherrypy.expose
-    def search(self, imdbid, title, quality):
+    def search(self, imdbid, title, year, quality):
         ''' Search indexers for specific movie.
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year
@@ -266,7 +266,7 @@ class Ajax(object):
         Does not return
         '''
 
-        self.searcher.search(imdbid, title, quality)
+        self.searcher.search(imdbid, title, year, quality)
         return
 
     @cherrypy.expose
@@ -289,7 +289,6 @@ class Ajax(object):
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
-            data['title'] = title
             data['year'] = year
             return json.dumps(self.snatcher.snatch(data))
         else:

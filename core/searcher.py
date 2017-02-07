@@ -62,9 +62,12 @@ class Searcher():
         Loops through all movies to search for any that require it.
         '''
         for movie in movies:
+            status = movie['status']
+            if status == 'Disabled':
+                continue
+
             imdbid = movie['imdbid']
             title = movie['title']
-            status = movie['status']
             finisheddate = movie['finished_date']
             year = movie['year']
             quality = movie['quality']
@@ -99,10 +102,12 @@ class Searcher():
             if not movies:
                 return False
             for movie in movies:
+                status = movie['status']
+                if status == 'Disabled':
+                    continue
                 imdbid = movie['imdbid']
                 title = movie['title']
                 year = movie['year']
-                status = movie['status']
                 quality = movie['quality']
 
                 if status == u'Found':

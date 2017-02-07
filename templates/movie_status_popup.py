@@ -21,7 +21,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.02b')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.07')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -51,7 +51,17 @@ class MovieStatusPopup():
                 with a(href=url, target='_blank'):
                     span(u'Score: {}'.format(data['score']))
                 span('Rated: {}'.format(data['rated']))
-
+            with div(id='options'):
+                i(cls='fa fa-save', id='update_options')
+                with span('Status: ', id='status'):
+                    with select(id='status_management'):
+                        options = ['Automatic', 'Finished']
+                        if data['status'] == 'Disabled':
+                            option('Finished', value='Finished', selected='selected')
+                            option('Automatic', value='Automatic')
+                        else:
+                            option('Automatic', value='Automatic', selected='selected')
+                            option('Finished', value='Finished')
                 with span('Quality profile: ', id='quality'):
                     with select(id='quality_profile', value=data['quality']):
                         options = core.CONFIG['Quality']['Profiles'].keys()
@@ -59,8 +69,6 @@ class MovieStatusPopup():
                             item = option(opt, value=opt)
                             if opt == data['quality']:
                                 item['selected'] = 'selected'
-
-                    i(cls='fa fa-save', id='change_quality')
 
         return unicode(container)
 

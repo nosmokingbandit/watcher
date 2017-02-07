@@ -156,10 +156,6 @@ div#results_thinker{
 div#plot{
 }
 
-div#plot p{
-    font-size: 1.25em;
-}
-
 div#additional_info{
     height: 2em;
 }
@@ -178,14 +174,19 @@ div#additional_info span{
     float: left;
 }
 
-div#additional_info span#quality{
-    padding: 0;
-    margin: 0 1em 0em 0;
+div#options{
+    height: 2em;
     line-height: 2em;
-    float: right;
 }
 
-div#additional_info span#quality i{
+div#options span, div#options i{
+    line-height: 2em;
+    vertical-align: middle;
+    margin-right: 1em;
+}
+
+div#options i{
     font-size: 1.25em;
-    margin-left: 0.5em;
+    margin-top: 0;
+    margin-bottom: 0;
 }

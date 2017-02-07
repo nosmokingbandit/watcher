@@ -66,6 +66,7 @@ class Searcher():
             title = movie['title']
             status = movie['status']
             finisheddate = movie['finished_date']
+            year = movie['year']
             quality = movie['quality']
 
             if movie['predb'] != u'found':
@@ -73,7 +74,7 @@ class Searcher():
 
             if status in ['Wanted', 'Found']:
                     logging.info(u'{} status is {}. Searching now.'.format(title, status))
-                    self.search(imdbid, title, quality)
+                    self.search(imdbid, title, year, quality)
                     continue
 
             if status == u'Finished' and keepsearching is True:
@@ -81,7 +82,7 @@ class Searcher():
                 finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
                 if finisheddateobj + keepsearchingdelta >= today:
                     logging.info(u'{} finished on {}, searching again.'.format(title, finisheddate))
-                    self.search(imdbid, title, quality)
+                    self.search(imdbid, title, year, quality)
                     continue
                 else:
                     logging.info(u'{} finished on {} and is not within the search window.'.format(title, finisheddate))
@@ -124,7 +125,7 @@ class Searcher():
         logging.info(u'Autosearch complete.')
         return
 
-    def search(self, imdbid, title, quality):
+    def search(self, imdbid, title, year, quality):
         ''' Search indexers for releases
         :param imdbid: str imdb identification number (tt123456)
         :param title: str movie title and year (Movie Title 2016)
@@ -154,7 +155,7 @@ class Searcher():
             for i in self.nn.search_all(imdbid):
                 results.append(i)
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
-            for i in self.torrent.search_all(imdbid):
+            for i in self.torrent.search_all(imdbid, title, year):
                 results.append(i)
 
         proxy.Proxy.destroy()

@@ -234,7 +234,7 @@ class ScoreResults():
         for result in self.results:
             title = title.replace(u' ', u'.').replace(u':', u'.').lower()
             test = result['title'].replace(u' ', u'.').lower()
-            match = fuzz.partial_ratio(title, test)
+            match = fuzz.token_set_ratio(title, test)
             if match > 60:
                 result['score'] += (match / 20)
                 lst.append(result)

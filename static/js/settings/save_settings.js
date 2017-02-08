@@ -312,7 +312,6 @@ $(document).ready(function () {
                     newznab_indexers = {}
                     cancel = true;
                 }
-
                 // but ignore it if both are blank
                 else if (url + api !=="") {
                     newznab_indexers[ind] = [url, api, check];
@@ -462,6 +461,8 @@ $(document).ready(function () {
     function postprocessing(){
         var data = {};
         var postprocessing = {};
+        postprocessing['RemoteMapping'] = {};
+
         $("ul#postprocessing li i.checkbox").each(function(){
             $this = $(this);
             postprocessing[$this.attr("id")] = is_checked($this);
@@ -474,6 +475,21 @@ $(document).ready(function () {
             postprocessing[$this.attr("id")] = $this.val();
             }
         });
+
+        $("ul#remote_mapping li.remote_mapping_row").each(function(){
+            $this = $(this);
+            local = $this.find("input.local_path").val();
+            remote = $this.find("input.remote_path").val();
+
+            // check if one field is blank and both are not blank
+            if ( (local == "" || remote == "") && (local + remote !=="") ){
+                toastr.warning("Please complete or clear out incomplete remote mappings.");
+            }
+            // but ignore it if both are blank
+            else if (local + remote !=="") {
+                postprocessing['RemoteMapping'][remote] = local;
+            }
+        })
 
         data["Postprocessing"] = postprocessing;
 

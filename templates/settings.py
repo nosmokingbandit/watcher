@@ -23,12 +23,12 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.06')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.06'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.07')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.07'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.07')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.07')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.07b')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.07b')
 
         with doc:
             Header.insert_header(current="settings")
@@ -197,11 +197,15 @@ class Settings():
                 input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                 span(u' days for best release.')
                 span(u'After movie is found, wait to snatch in case better match is found.', cls='tip')
-            with li(cls='bbord'):
+            with li():
                 i(id='keepsearching', cls='fa fa-square-o checkbox', value=str(c[c_s]['keepsearching']))
                 span(u'Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(u' days for best release.')
+            with li(cls='bbord indent'):
+                span(u'Releases must score ')
+                input(type='number', min='0', id='keepsearchingscore', style='width: 3em', value=c[c_s]['keepsearchingscore'])
+                span(u' points higher to be snatched again.')
             with li(cls='bbord'):
                 span(u'Usenet server retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
@@ -640,6 +644,23 @@ class Settings():
                     span('* ? " < > |', cls='charlist')
             with li(u'Available tags:'):
                 span(u'{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
+
+        h2('Remote Mapping')
+        with ul(id='remote_mapping'):
+            with li(cls='tip'):
+                span('If your download client is on a remote server you may need to map directories '
+                     'so Watcher can access files.')
+                br()
+                span('See the wiki for more information.')
+            for remote, local in c[c_s]['RemoteMapping'].iteritems():
+                with li(cls='remote_mapping_row'):
+                    span('Remote path: ')
+                    input(cls='remote_path', placeholder=' /home/user/downloads/watcher', type='text', value=remote)
+                    span('Local path: ')
+                    input(cls='local_path', placeholder=' //server/downloads/watcher', type='text', value=local)
+                    i(cls='fa fa-trash-o mapping_clear')
+            with li():
+                i(cls='fa fa-plus-square', id='add_remote_mapping_row')
 
         with div(id='save', cat='postprocessing'):
             i(cls='fa fa-save')

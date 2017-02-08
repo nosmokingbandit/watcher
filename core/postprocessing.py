@@ -67,6 +67,9 @@ class Postprocessing(object):
             return json.dumps({'response': 'false',
                               'error': 'invalid mode value'})
 
+        # modify path based on remote mapping
+        data['path'] = self.map_remote(data['path'])
+
         # get the actual movie file name
         data['filename'] = self.get_filename(data['path'])
 
@@ -624,6 +627,38 @@ class Postprocessing(object):
         result['status'] = u'finished'
         return result
 
+    def map_remote(self, path):
+        ''' Alters directory based on remote mappings settings
+        path: str path from download client
+
+        Replaces the base of the file tree with the 'local' mapping.
+            Ie, '/home/user/downloads/Watcher' becomes '//server/downloads/Watcher'
+
+        'path' can be file or directory, it doesn't matter.
+
+        If more than one match is found, defaults to the longest path.
+            remote: local = '/home/users/downloads/': '//server/downloads/'
+                            '/home/users/downloads/Watcher/': '//server/downloads/Watcher/'
+            In this case, a supplied remote '/home/users/downloads/Watcher/' will match a
+            startswith() for both supplied settings. So we will default to the longest path.
+        Returns str new path
+        '''
+
+        maps = core.CONFIG['Postprocessing']['RemoteMapping']
+
+        matches = []
+
+        for remote in maps.keys():
+            if path.startswith(remote):
+                matches.append(remote)
+        if not matches:
+            return path
+        else:
+            match = max(matches, key=len)
+            new_path = path.replace(match, maps[match])
+            logging.info('Changing remote path from {} to {}'.format(path, new_path))
+            return new_path
+
     def compile_path(self, string, data):
         ''' Compiles string to file/path names
         :param string: str brace-formatted string to substitue values
@@ -650,6 +685,8 @@ class Postprocessing(object):
 
         while len(string) > 1 and string[-1] == u' ':
             string = string[:-1]
+
+        string = self.map_remote(string)
 
         return self.sanitize(string)
 

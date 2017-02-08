@@ -162,9 +162,8 @@ $(document).ready(function () {
 
     // clear row
     $("div.providers ul#newznab_list").on("click", "i.newznab_clear", function(){
-        $li = $(this).parent();
-        $li.find("input").each(function(){
-            $(this).val("");
+        $(this).siblings("input").each(function(){
+             $(this).val("");
         });
     });
 
@@ -287,6 +286,29 @@ $(document).ready(function () {
                 toastr.error(response["error"]);
             }
         })
+    });
+
+/* Post-Processing */
+
+    // Add new rows
+    $("div.postprocessing ul#remote_mapping i#add_remote_mapping_row").click(function (){
+        var row = `
+        <li class='remote_mapping_row'>
+            <span>Remote path: </span>
+            <input class='remote_path' placeholder=' /home/user/downloads/watcher' type='text'/>
+            <span>Local path: </span>
+            <input class='local_path' placeholder=' //server/downloads/watcher' type='text'/>
+            <i class='fa fa-trash-o mapping_clear'/>
+        </li>
+        `
+
+        $("ul#remote_mapping li:nth-last-child(2)").after(row);
+    });
+
+    $("div.postprocessing ul#remote_mapping").on("click", "i.mapping_clear", function(){
+        $(this).siblings("input").each(function(){
+             $(this).val("");
+        });
     });
 
 /* Quality */

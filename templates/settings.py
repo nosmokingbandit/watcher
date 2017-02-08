@@ -197,11 +197,15 @@ class Settings():
                 input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                 span(u' days for best release.')
                 span(u'After movie is found, wait to snatch in case better match is found.', cls='tip')
-            with li(cls='bbord'):
+            with li():
                 i(id='keepsearching', cls='fa fa-square-o checkbox', value=str(c[c_s]['keepsearching']))
                 span(u'Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(u' days for best release.')
+            with li(cls='bbord indent'):
+                span(u'Releases must score ')
+                input(type='number', min='0', id='keepsearchingscore', style='width: 3em', value=c[c_s]['keepsearchingscore'])
+                span(u' points higher to be snatched again.')
             with li(cls='bbord'):
                 span(u'Usenet server retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])

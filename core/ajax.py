@@ -117,13 +117,10 @@ class Ajax(object):
 
         if data.get('imdbid') is None:
             data['imdbid'], data['rated'] = self.omdb.get_info(title, year, tags=['imdbID', 'Rated'])
-        else:
-            data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
-
-        if not data['imdbid']:
-            response['response'] = False
-            response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
-            return json.dumps(response)
+            if not data['imdbid']:
+                response['response'] = False
+                response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
+                return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
@@ -132,45 +129,46 @@ class Ajax(object):
             response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
 
+        data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
+
+        poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+
+        data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
+        data['plot'] = data['overview']
+        data['url'] = u'https://www.themoviedb.org/movie/{}'.format(data['id'])
+        data['score'] = data['vote_average']
+        data['status'] = u'Wanted'
+        data['added_date'] = str(datetime.date.today())
+
+        required_keys = ['added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate']
+
+        for i in data.keys():
+            if i not in required_keys:
+                del data[i]
+
+        if data.get('quality') is None:
+            data['quality'] = 'Default'
+
+        if self.sql.write(TABLE, data):
+            t2 = threading.Thread(target=self.poster.save_poster,
+                                  args=(data['imdbid'], poster_url))
+            t2.start()
+
+            t = threading.Thread(target=thread_search_grab, args=(data,))
+            t.start()
+
+            response['response'] = True
+            response['message'] = u'{} {} added to wanted list.' \
+                .format(title, year)
+
+            self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
+
+            return json.dumps(response)
         else:
-            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
-
-            data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
-            data['plot'] = data['overview']
-            data['url'] = u'https://www.themoviedb.org/movie/{}'.format(data['id'])
-            data['score'] = data['vote_average']
-            data['status'] = u'Wanted'
-            data['added_date'] = str(datetime.date.today())
-
-            required_keys = ['added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate']
-
-            for i in data.keys():
-                if i not in required_keys:
-                    del data[i]
-
-            if data.get('quality') is None:
-                data['quality'] = 'Default'
-
-            if self.sql.write(TABLE, data):
-                t2 = threading.Thread(target=self.poster.save_poster,
-                                      args=(data['imdbid'], poster_url))
-                t2.start()
-
-                t = threading.Thread(target=thread_search_grab, args=(data,))
-                t.start()
-
-                response['response'] = True
-                response['message'] = u'{} {} added to wanted list.' \
-                    .format(title, year)
-
-                self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
-
-                return json.dumps(response)
-            else:
-                response['response'] = False
-                response['error'] = u'Could not write to database. ' \
-                    'Check logs for more information.'
-                return json.dumps(response)
+            response['response'] = False
+            response['error'] = u'Could not write to database. ' \
+                'Check logs for more information.'
+            return json.dumps(response)
 
     @cherrypy.expose
     def add_wanted_imdbid(self, imdbid, quality='Default'):

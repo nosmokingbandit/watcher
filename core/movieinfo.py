@@ -51,7 +51,7 @@ class OMDB(object):
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
-            result = json.load(urllib2.urlopen(request))
+            result = json.load(urllib2.urlopen(request, timeout=15))
             if result['Response'] == u'False':
                 return self._null_tuple(length)
             else:

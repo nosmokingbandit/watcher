@@ -722,7 +722,7 @@ class Postprocessing(object):
             logging.info(u'New file name would be blank. Cancelling renamer.')
             return None
 
-        if core['Postprocessing']['replacespaces']:
+        if core.CONFIG['Postprocessing']['replacespaces']:
             new_name = new_name.replace(' ', '.')
         new_name = new_name + ext
 

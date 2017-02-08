@@ -507,7 +507,7 @@ $(document).ready(function () {
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
             enabled = is_checked($li.find("i.checkbox"));
-            if(enabled == "true"){
+            if(is_checked($li.find("i.checkbox"))){
                 added[plugin] = [enabled, order];
                 order++;
             }
@@ -518,7 +518,6 @@ $(document).ready(function () {
         var arr = $("ul#snatched").sortable("toArray");
         var order = 0
         $.each(arr, function(index, value){
-            console.log(order)
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
             if(is_checked($li.find("i.checkbox"))){
@@ -535,7 +534,7 @@ $(document).ready(function () {
             $li = $("li#" + value);
             plugin = $li.attr("plugin");
             enabled = is_checked($li.find("i.checkbox"));
-            if(enabled == "true"){
+            if(is_checked($li.find("i.checkbox"))){
                 finished[plugin] = [enabled, order];
                 order++;
             }

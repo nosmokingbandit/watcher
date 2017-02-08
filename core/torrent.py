@@ -46,6 +46,11 @@ class Torrent(object):
             for i in sky_results:
                 if i not in results:
                     results.append(i)
+        if torrent_indexers['bitsnoop']:
+            bit_results = BitSnoop.search(imdbid, title, year)
+            for i in bit_results:
+                if i not in results:
+                    results.append(i)
 
         return results
 
@@ -439,8 +444,6 @@ class SkyTorrents(object):
 
         url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+')
 
-        print url
-
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             if proxy_enabled and Proxy.whitelist('https://www.skytorrents.in') is True:
@@ -500,4 +503,70 @@ class SkyTorrents(object):
                 continue
 
         logging.info('Found {} results from SkyTorrents.'.format(len(results)))
+        return results
+
+
+class BitSnoop(object):
+
+    @staticmethod
+    def search(imdbid, title, year):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info('Searching BitSnoop for {}'.format(title))
+
+        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year).replace(' ', '+')
+
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = BitSnoop.parse_bit(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'BitSnoop search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse_bit(xml, imdbid):
+        logging.info('Parsing BitSnoop results.')
+
+        tree = ET.fromstring(xml)
+
+        items = tree[0].findall('item')
+
+        results = []
+        for i in items:
+            result = {}
+            try:
+                result['score'] = 0
+                result['size'] = int(i.find('size').text)
+                result['category'] = i.find('category').text.replace(u'\xbb', '>')
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i.find('title').text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.bitsnoop.com'
+                result['info_link'] = i.find('link').text
+                result['torrentfile'] = i.find('{http://xmlns.ezrss.it/0.1/}torrent').find('{http://xmlns.ezrss.it/0.1/}magnetURI').text
+                result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
+                result['resolution'] = Torrent.get_resolution(result)
+                result['type'] = 'magnet'
+                result['downloadid'] = None
+                result['seeders'] = int(i.find('numSeeders').text)
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error('Error parsing BitSnoop XML.', exc_info=True)
+                continue
+
+        logging.info('Found {} results from BitSnoop.'.format(len(results)))
         return results

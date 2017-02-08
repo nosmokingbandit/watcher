@@ -367,6 +367,9 @@ class Settings():
                 with ul(id='torrentindexer_list'):
                     with li(cls='sub_cat'):
                         span(u'Torrent Indexers')
+                    with li(cls='torrent_indexer', id='bitsnoop'):
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['bitsnoop']))
+                        span('Search BitSnoop')
                     with li(cls='torrent_indexer', id='extratorrent'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['extratorrent']))
                         span('Search ExtraTorrent')

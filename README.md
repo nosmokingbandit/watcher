@@ -36,6 +36,7 @@ If you do not wish to use Git, follow these steps.
 ## Usage
 
 You can add the following arguments to Watcher when running the Python script.
+Always use the absolute path when supplying a directory or file argument.
 
 Run the server as a daemon (*nix only)
 
@@ -69,7 +70,11 @@ Change path to database.
 
 `$ watcher.py --db /path/to/database.sqlite`
 
-Create PID file in supplied path (use absolute path).
+Change path to plugins directory.
+
+`$ watcher.py --plugins /path/to/plugins/`
+
+Create PID file in supplied path.
 
 `$ watcher.py --pid /path/to/pid/file.pid`
 

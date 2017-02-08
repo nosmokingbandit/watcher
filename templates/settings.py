@@ -23,12 +23,12 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.06')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.06'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.07b')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.07b'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.07')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.07')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.07b')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.07b')
 
         with doc:
             Header.insert_header(current="settings")
@@ -197,11 +197,15 @@ class Settings():
                 input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                 span(u' days for best release.')
                 span(u'After movie is found, wait to snatch in case better match is found.', cls='tip')
-            with li(cls='bbord'):
+            with li():
                 i(id='keepsearching', cls='fa fa-square-o checkbox', value=str(c[c_s]['keepsearching']))
                 span(u'Continue searching for ')
                 input(type='number', min='0', id='keepsearchingdays', style='width: 2.5em', value=c[c_s]['keepsearchingdays'])
                 span(u' days for best release.')
+            with li(cls='bbord indent'):
+                span(u'Releases must score ')
+                input(type='number', min='0', id='keepsearchingscore', style='width: 3em', value=c[c_s]['keepsearchingscore'])
+                span(u' points higher to be snatched again.')
             with li(cls='bbord'):
                 span(u'Usenet server retention: ')
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
@@ -602,44 +606,61 @@ class Settings():
             with li(cls='bbord'):
                 i(id='cleanupfailed', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupfailed']))
                 span(u'Delete leftover files after a failed download.')
-            with li(cls='bbord'):
+            with li():
                 i(id='renamerenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['renamerenabled']))
                 span(u'Enable Renamer')
-            with ul(id='renamer'):
-                with li():
-                    input(id='renamerstring', type='text', style='width: 80%', value=str(c[c_s]['renamerstring']), placeholder='{title} ({year}) {resolution}')
-                    br()
-                    span(u'Example: ')
-                    br()
-                    span(u'{title} {year} - {videocodec} = How to Train Your Dragon 2010 - x264.mkv',  cls='taglist')
-
-            with li(cls='bbord'):
+            with li(cls='indent'):
+                input(id='renamerstring', type='text', style='width: 80%', value=str(c[c_s]['renamerstring']), placeholder='{title} ({year}) {resolution}')
+            with li(cls='indent bbord'):
+                i(id='replacespaces', cls='fa fa-square-o checkbox', value=str(c[c_s]['replacespaces']))
+                span('Replace spaces with periods.')
+            with li():
                 i(id='moverenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['moverenabled']))
                 span(u'Enable Mover')
-            with ul(id='mover'):
-                with li():
-                    span(u'Move movie file to: ')
-                    input(type='text', style='width: 28em', id='moverpath', value=c[c_s]['moverpath'])
-                    span(u'Use absolute path.', cls='tip')
-                    br()
-                    span(u'Example: ')
-                    br()
-                    span(u'/home/user/movies/{title} {year} = /home/user/movies/Black Swan 2010/',  cls='taglist bbord')
-                    with span(u'Move additional files:', cls='bbord'):
-                        input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
-                        span(u'Files will be renamed with Renamer settings.', cls='tip')
-                    with span(cls='bbord'):
-                        i(id='createhardlink', cls='fa fa-square-o checkbox', value=str(c[c_s]['createhardlink']))
-                        span(u'Create hardlink to enable seeding torrents.')
-                        span(u'Will disable clean up.', cls='tip')
-                    i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupenabled']))
-                    span(u'Clean up after move.')
-            with li(u'Replace illegal characters with: ', cls='bbord'):
+            with li(cls='indent'):
+                span(u'Move movie file to: ')
+                input(type='text', style='width: 24em', id='moverpath', value=c[c_s]['moverpath'])
+                span(u'Use absolute path.', cls='tip')
+            with li(cls='indent'):
+                span('Move additional files:')
+                input(type='text', style='width: 15em', id='moveextensions', value=c[c_s]['moveextensions'], placeholder='srt, nfo')
+                span(u'Files will be renamed with Renamer settings.', cls='tip')
+            with li(cls='indent'):
+                i(id='createhardlink', cls='fa fa-square-o checkbox', value=str(c[c_s]['createhardlink']))
+                span(u'Create hardlink to enable seeding torrents.')
+                span(u'Will disable clean up.', cls='tip')
+            with li(cls='indent'):
+                i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupenabled']))
+                span(u'Clean up after move.')
+            with li(u'Replace illegal characters with: ', cls='indent bbord'):
                 input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
                 with span(u'Cannot contain ', cls='tip'):
                     span('* ? " < > |', cls='charlist')
             with li(u'Available tags:'):
-                span(u'{title} {year} {resolution} {rated} {imdbid} {videocodec} {audiocodec} {releasegroup} {source}', cls='taglist')
+                br()
+                span(u'{title}  {year}  {resolution}  {rated}  {imdbid}  {videocodec}  {audiocodec}  {releasegroup}  {source}', cls='taglist')
+                br()
+                span('Example: ')
+                span('{title} ({year}) - {resolution} = Night of the Living Dead (1968) - 1080P.mkv', cls='taglist')
+
+        h2('Remote Mapping')
+        with ul(id='remote_mapping'):
+            with li(cls='tip'):
+                span('If your download client is on a remote server you may need to map directories '
+                     'so Watcher can access files.')
+                br()
+                span('See the ')
+                a('wiki', href='https://github.com/nosmokingbandit/watcher/wiki', target='_blank')
+                span('for more information.')
+            for remote, local in c[c_s]['RemoteMapping'].iteritems():
+                with li(cls='remote_mapping_row'):
+                    span('Remote path: ')
+                    input(cls='remote_path', placeholder=' /home/user/downloads/watcher', type='text', value=remote)
+                    span('Local path: ')
+                    input(cls='local_path', placeholder=' //server/downloads/watcher', type='text', value=local)
+                    i(cls='fa fa-trash-o mapping_clear')
+            with li():
+                i(cls='fa fa-plus-square', id='add_remote_mapping_row')
 
         with div(id='save', cat='postprocessing'):
             i(cls='fa fa-save')

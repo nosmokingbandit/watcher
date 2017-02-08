@@ -61,7 +61,7 @@ div#content ul li{
 }
 
 .bbord{
-    border-bottom: 1px solid #bdbdbd;
+    border-bottom: 1px solid #252c35;
     display: block;
 }
 
@@ -307,6 +307,27 @@ ul#renamer, ul#mover{
 ul#postprocessing li span.taglist{
     font-family: "Lucida Console", Monaco, monospace;
     font-size: .75em;
+}
+
+ul#remote_mapping li:nth-child(1){
+    font-size: 0.8em;
+}
+
+ul#remote_mapping li.remote_mapping_row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0.25em 0;
+}
+
+ul#remote_mapping li.remote_mapping_row span{
+    flex: 0 1 auto;
+    margin-right: 0.5em;
+}
+
+ul#remote_mapping li.remote_mapping_row input{
+    flex: 1 0 auto;
+    margin-right: 1.5em;
 }
 
 span.charlist{

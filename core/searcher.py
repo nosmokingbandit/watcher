@@ -97,6 +97,7 @@ class Searcher():
         '''
         if auto_grab is True:
             logging.info(u'Running automatic snatcher.')
+            keepsearchingscore = core.CONFIG['Search']['keepsearchingscore']
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
             if not movies:
@@ -118,8 +119,9 @@ class Searcher():
                 if status == u'Finished' and keepsearching is True:
                     logging.info(u'{} status is Finished but Keep Searching is enabled. Checking if Finished date is less than {} days ago.'.format(title, keepsearchingdays))
                     if finisheddateobj + keepsearchingdelta <= today:
-                        logging.info(u'{} finished on {}, checking for a better result.'.format(title, finisheddate))
-                        self.snatcher.auto_grab(title, year, imdbid, quality)
+                        minscore = movie['finished_score'] + keepsearchingscore
+                        logging.info(u'{} finished on {}, checking for a better result (min score {}).'.format(title, finisheddate, minscore))
+                        self.snatcher.auto_grab(title, year, imdbid, quality, minscore=minscore)
                         continue
                     else:
                         logging.info(u'{} finished on {} and is not within the Keep Searching window.'.format(title, finisheddate))

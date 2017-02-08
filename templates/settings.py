@@ -671,7 +671,7 @@ class Settings():
     def plugins(self, c):
         added = snatched = finished = []
 
-        for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, 'plugins')):
+        for root, dirs, filenames in os.walk(os.path.join(core.PROG_PATH, core.PLUGIN_DIR)):
             folder = os.path.split(root)[1]
             if folder == 'added':
                 added = filenames

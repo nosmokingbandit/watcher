@@ -41,9 +41,14 @@ if __name__ == '__main__':
                         help='Directory in which to create log files.', type=str)
     parser.add_argument('--db',
                         help='Absolute path to database file.', type=str)
+    parser.add_argument('--plugins',
+                        help='Directory in which plugins are stored.', type=str)
     parser.add_argument('--pid',
                         help='Directory in which to store pid file.', type=str)
     passed_args = parser.parse_args()
+
+    if passed_args.plugins:
+        core.PLUGIN_DIR = passed_args.plugins
 
     if passed_args.pid:
         PIDFile(cherrypy.engine, passed_args.pid).subscribe()

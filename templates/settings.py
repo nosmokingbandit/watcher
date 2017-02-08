@@ -28,7 +28,7 @@ def settings_page(page):
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.02')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.02'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.07b')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.07b')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.08')
 
         with doc:
             Header.insert_header(current="settings")

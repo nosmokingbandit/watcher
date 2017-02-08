@@ -649,7 +649,9 @@ class Settings():
                 span('If your download client is on a remote server you may need to map directories '
                      'so Watcher can access files.')
                 br()
-                span('See the wiki for more information.')
+                span('See the ')
+                a('wiki', href='https://github.com/nosmokingbandit/watcher/wiki', target='_blank')
+                span('for more information.')
             for remote, local in c[c_s]['RemoteMapping'].iteritems():
                 with li(cls='remote_mapping_row'):
                     span('Remote path: ')

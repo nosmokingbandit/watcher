@@ -477,7 +477,7 @@ class SkyTorrents(object):
                 desc = i.find('description').text.split(' ')
 
                 m = (1024 ** 2) if desc[-2] == 'MB' else (1024 ** 3)
-                result['size'] = float(desc[-3]) * m
+                result['size'] = int(float(desc[-3]) * m)
 
                 result['category'] = i.find('category').text
                 result['status'] = u'Available'

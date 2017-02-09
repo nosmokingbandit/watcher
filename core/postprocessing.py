@@ -18,7 +18,7 @@ class Postprocessing(object):
     exposed = True
 
     def __init__(self):
-        self.omdb = movieinfo.OMDB()
+        self.tmdb = movieinfo.TMDB()
         self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
         self.snatcher = snatcher.Snatcher()
@@ -77,7 +77,7 @@ class Postprocessing(object):
             logging.info(u'Parsing release name for information.')
             data.update(self.parse_filename(data))
 
-        # Get possible local data or get OMDB data to merge with self.params.
+        # Get possible local data or get TMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
         data.update(self.get_movie_info(data))
 
@@ -172,7 +172,7 @@ class Postprocessing(object):
         logging.info(u'Parsing release name for information.')
         data.update(self.parse_filename(data))
 
-        # Get possible local data or get OMDB data to merge with self.params.
+        # Get possible local data or get TMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
         data.update(self.get_movie_info(data))
 
@@ -289,10 +289,6 @@ class Postprocessing(object):
         else:
             logging.info(u'Found {} in filname.'.format(titledata))
 
-        # this key is useless
-        if 'excess' in titledata:
-            titledata.pop('excess')
-
         # Make sure this matches our key names
         if 'codec' in titledata:
             titledata['videocodec'] = titledata.pop('codec')
@@ -312,7 +308,7 @@ class Postprocessing(object):
 
         Uses guid to look up local details.
         If that fails, uses downloadid.
-        If that fails, uses title and year from  to search omdb for imdbid
+        If that fails, searches tmdb for imdbid
 
         If everything fails returns empty dict {}
 
@@ -349,38 +345,22 @@ class Postprocessing(object):
             else:
                 logging.info(u'Unable to find movie in local db.')
 
+        # Still no luck? Try to get the info from TMDB
         else:
-            # Still no luck? Try to get the imdbid from OMDB
-            logging.info(u'Unable to find local data for release. Searching OMDB.')
+            logging.info(u'Unable to find local data for release. Searching TMDB.')
 
-            title = data['title']
-            year = data['year']
+            search_term = '{} {}'.format(data['title'], data['year'])
+            logging.info(u'Searching tmdb for {}'.format(search_term))
 
-            logging.info(u'Searching omdb for {} {}'.format(title, year))
-            search_string = u'http://www.omdbapi.com/?t={}&y={}&plot=short&r=json'.format(title, year).replace(u' ', u'+')
-
-            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
-
-            try:
-                omdbdata = json.loads(urllib2.urlopen(request).read())
-            except Exception, e: # noqa
-                logging.error(u'Post-processing omdb request.', exc_info=True)
-                return {}
-
-            if omdbdata['Response'] == u'False':
-                logging.info(u'Nothing found in OMDB.')
-                return {}
-            else:
-                logging.info(u'Data found on OMDB.')
-
-                # make the keys all lower case
-                omdbdata_lower = dict((k.lower(), v) for (k, v) in omdbdata.iteritems())
-                return omdbdata_lower
+            tmdbdata = self.tmdb.search(search_term, single=True)
+            data['year'] = tmdbdata['release_date'][:4]
+            data['imdbid'] = self.tmdb.get_imdbid(tmdbdata['id'])
 
         if data:
             # remove unnecessary info
-            del data['quality']
-            del data['plot']
+            data.pop('quality', None)
+            data.pop('plot', None)
+            data.pop('overview', None)
 
             repl = config['replaceillegal']
 
@@ -388,16 +368,13 @@ class Postprocessing(object):
                 if type(v) == str:
                     data[k] = re.sub(r'[:"*?<>|]+', repl, v)
 
-            # get rating from omdb
-            if data['imdbid']:
-                data['rated'] = self.omdb.get_info(data.get('title'), data.get('year'), imdbid=data['imdbid'], tags=['Rated'])[0]
             return data
         else:
             return {}
 
     def failed(self, data):
         ''' Post-process failed downloads.
-        :param data: dict of gathered data from downloader and localdb/omdb
+        :param data: dict of gathered data from downloader and localdb/tmdb
 
         In SEARCHRESULTS marks guid as Bad
         In MARKEDRESULTS:

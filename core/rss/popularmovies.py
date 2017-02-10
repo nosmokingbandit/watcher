@@ -75,10 +75,10 @@ class PopularMoviesFeed(object):
 
         # do quick-add procedure
         for imdbid in movies_to_add:
-            movie_info = self.tmdb.find_imdbid(imdbid)[0]
+            movie_info = self.tmdb._find_imdbid(imdbid)[0]
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
-            time.sleep(2)  # We need to limit requests to OMDB
+            time.sleep(1)

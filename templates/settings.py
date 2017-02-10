@@ -382,6 +382,9 @@ class Settings():
                     with li(cls='torrent_indexer', id='skytorrents'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['skytorrents']))
                         span('Search SkyTorrents')
+                    with li(cls='torrent_indexer', id='torrentz2'):
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['torrentz2']))
+                        span('Search Torrentz2')
 
         with div(id='save', cat='providers'):
             i(cls='fa fa-save')

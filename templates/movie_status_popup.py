@@ -50,7 +50,6 @@ class MovieStatusPopup():
                 span(u'Theatrical Release Date: {}'.format(data['release_date']))
                 with a(href=url, target='_blank'):
                     span(u'Score: {}'.format(data['score']))
-                span('Rated: {}'.format(data['rated']))
             with div(id='options'):
                 i(cls='fa fa-save', id='update_options')
                 with span('Status: ', id='status'):

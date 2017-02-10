@@ -3,14 +3,13 @@ import json
 import logging
 import os
 import sys
-import urllib2
 import threading
 
 import cherrypy
 import core
 from core import config, newznab, plugins, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
-from core.movieinfo import OMDB, TMDB
+from core.movieinfo import TMDB
 from core.notification import Notification
 from core.rss import predb
 from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status
@@ -28,7 +27,6 @@ class Ajax(object):
     '''
 
     def __init__(self):
-        self.omdb = OMDB()
         self.tmdb = TMDB()
         self.config = config.Config()
         self.predb = predb.PreDB()
@@ -41,10 +39,10 @@ class Ajax(object):
 
     @cherrypy.expose
     def search_tmdb(self, search_term):
-        ''' Search omdb for movies
+        ''' Search tmdb for movies
         :param search_term: str title and year of movie (Movie Title 2016)
 
-        Returns str json-encoded list of dicts that contain omdb's data.
+        Returns str json-encoded list of dicts that contain tmdb's data.
         '''
 
         results = self.tmdb.search(search_term)
@@ -116,10 +114,10 @@ class Ajax(object):
         TABLE = u'MOVIES'
 
         if data.get('imdbid') is None:
-            data['imdbid'], data['rated'] = self.omdb.get_info(title, year, tags=['imdbID', 'Rated'])
+            data['imdbid'] = self.tmdb.get_imdbid(data['id'])
             if not data['imdbid']:
                 response['response'] = False
-                response['error'] = u'Could not find imdb id for {}.<br/> Try entering imdb id in search bar.'.format(title)
+                response['error'] = u'Could not find imdb id for {}. Unable to add.'.format(title)
                 return json.dumps(response)
 
         if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
@@ -128,8 +126,6 @@ class Ajax(object):
             response['response'] = False
             response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
             return json.dumps(response)
-
-        data['rated'] = self.omdb.get_info(title, year, imdbid=data['imdbid'], tags=['Rated'])[0]
 
         poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
 
@@ -186,7 +182,7 @@ class Ajax(object):
 
         response = {}
 
-        data = self.tmdb.find_imdbid(imdbid)[0]
+        data = self.tmdb._find_imdbid(imdbid)[0]
 
         if not data:
             response['status'] = u'false'

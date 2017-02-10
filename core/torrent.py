@@ -15,6 +15,12 @@ test_url = u'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef
 
 class Torrent(object):
 
+    trackers = ['udp://tracker.leechers-paradise.org:6969',
+                'udp://zer0day.ch:1337',
+                'udp://tracker.coppersurfer.tk:6969',
+                'udp://public.popcorn-tracker.org:6969'
+                ]
+
     def __init__(self):
         return
 
@@ -49,6 +55,11 @@ class Torrent(object):
         if torrent_indexers['bitsnoop']:
             bit_results = BitSnoop.search(imdbid, title, year)
             for i in bit_results:
+                if i not in results:
+                    results.append(i)
+        if torrent_indexers['torrentz2']:
+            torrentz_results = Torrentz2.search(imdbid, title, year)
+            for i in torrentz_results:
                 if i not in results:
                     results.append(i)
 
@@ -247,7 +258,7 @@ class Rarbg(object):
             response = urllib2.urlopen(request, timeout=60).read()
             response = json.loads(response).get('torrent_results')
             if response:
-                results = Rarbg.parse_rarbg(response)
+                results = Rarbg.parse(response)
                 return results
             else:
                 return []
@@ -274,7 +285,7 @@ class Rarbg(object):
             return None
 
     @staticmethod
-    def parse_rarbg(results):
+    def parse(results):
         logging.info('Parsing Rarbg results.')
         item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
@@ -318,7 +329,7 @@ class LimeTorrents(object):
 
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = LimeTorrents.parse_lime(response, imdbid)
+                results = LimeTorrents.parse(response, imdbid)
                 return results
             else:
                 return []
@@ -329,7 +340,7 @@ class LimeTorrents(object):
             return []
 
     @staticmethod
-    def parse_lime(xml, imdbid):
+    def parse(xml, imdbid):
         logging.info('Parsing LimeTorrents results.')
 
         tree = ET.fromstring(xml)
@@ -385,7 +396,7 @@ class ExtraTorrent(object):
 
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = ExtraTorrent.parse_extra(response, imdbid)
+                results = ExtraTorrent.parse(response, imdbid)
                 return results
             else:
                 return []
@@ -396,7 +407,7 @@ class ExtraTorrent(object):
             return []
 
     @staticmethod
-    def parse_extra(xml, imdbid):
+    def parse(xml, imdbid):
         logging.info('Parsing ExtraTorrent results.')
 
         tree = ET.fromstring(xml)
@@ -453,7 +464,7 @@ class SkyTorrents(object):
 
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = SkyTorrents.parse_sky(response, imdbid)
+                results = SkyTorrents.parse(response, imdbid)
                 return results
             else:
                 return []
@@ -464,7 +475,7 @@ class SkyTorrents(object):
             return []
 
     @staticmethod
-    def parse_sky(xml, imdbid):
+    def parse(xml, imdbid):
         logging.info('Parsing SkyTorrents results.')
 
         tree = ET.fromstring(xml)
@@ -525,7 +536,7 @@ class BitSnoop(object):
 
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = BitSnoop.parse_bit(response, imdbid)
+                results = BitSnoop.parse(response, imdbid)
                 return results
             else:
                 return []
@@ -536,7 +547,7 @@ class BitSnoop(object):
             return []
 
     @staticmethod
-    def parse_bit(xml, imdbid):
+    def parse(xml, imdbid):
         logging.info('Parsing BitSnoop results.')
 
         tree = ET.fromstring(xml)
@@ -569,4 +580,75 @@ class BitSnoop(object):
                 continue
 
         logging.info('Found {} results from BitSnoop.'.format(len(results)))
+        return results
+
+
+class Torrentz2(object):
+
+    @staticmethod
+    def search(imdbid, title, year):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info('Searching Torrentz2 for {}'.format(title))
+
+        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year).replace(' ', '+')
+
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = Torrentz2.parse(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Torrentz2 search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse(xml, imdbid):
+        logging.info('Parsing Torrentz2 results.')
+
+        tree = ET.fromstring(xml)
+
+        items = tree[0].findall('item')
+
+        results = []
+        for i in items:
+            result = {}
+            try:
+                desc = i.find('description').text.split(' ')
+                hsh = desc[-1]
+
+                m = (1024 ** 2) if desc[2] == 'MB' else (1024 ** 3)
+
+                result['score'] = 0
+                result['size'] = int(desc[1]) * m
+                result['category'] = i.find('category').text
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i.find('title').text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.torrentz2.eu'
+                result['info_link'] = i.find('link').text
+                result['torrentfile'] = u'magnet:?xt=urn:btih:{}&dn={}&tr={}'.format(hsh, result['title'], '&tr='.join(Torrent.trackers))
+                result['guid'] = hsh
+                result['resolution'] = Torrent.get_resolution(result)
+                result['type'] = 'magnet'
+                result['downloadid'] = None
+                result['seeders'] = int(desc[4])
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error('Error parsing Torrentz2 XML.', exc_info=True)
+                continue
+
+        logging.info('Found {} results from Torrentz2.'.format(len(results)))
         return results

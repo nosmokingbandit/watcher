@@ -102,7 +102,7 @@ class TMDB(object):
             return None
 
         if not tmdbid:
-            url = 'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year)
+            url = 'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year).replace(' ', '+')
             request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             try:
                 response = json.load(urllib2.urlopen(request))

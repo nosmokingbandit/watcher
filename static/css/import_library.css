@@ -56,8 +56,17 @@ div#wait{
     display: none;
 }
 
-div#list_files{
+div#list_files, div#review, div#incomplete, span#not_found{
     display: none;
+}
+
+a span{
+    vertical-align: middle;
+}
+
+span#not_found{
+    font-size: 1.5em;
+    line-height: 2.0em;
 }
 
 div#list_files span#import{

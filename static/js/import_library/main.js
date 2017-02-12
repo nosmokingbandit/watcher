@@ -53,8 +53,17 @@ $(document).ready(function() {
                                                  "recursive": recursive})
         .done(function(r){
             var file_list = JSON.parse(r);
+
+            if($.isEmptyObject(file_list)){
+                $("span#not_found").show();
+                $("span#import").hide();
+            }
+
+
             var $table = $("table#files")
             var missing_data = {}
+            var $mtable = $("table#missing_data")
+
 
             $table.append("<tr><th>Import</th><th>File path</th><th>Title</th><th>IMDB ID</th><th>Resolution</th><th>Size</th>")
 
@@ -97,14 +106,12 @@ $(document).ready(function() {
                 $table.append(item)
             })
 
-            if($table.find("tr").length <= 1){
-                $("div#review").hide();
+            if($table.find("tr").length > 1){
+                $("div#review").show();
             }
 
-            if($.isEmptyObject(missing_data) == false){
-                $("div#incomplete").append("<table id='missing_data'></table>");
-                var $mtable = $("table#missing_data")
 
+            if($.isEmptyObject(missing_data) == false){
                 $mtable.append("<tr><th>Import</th><th>File path</th><th>Title</th><th>IMDB ID</th><th>Resolution</th><th>Size</th>")
 
                 $.each(missing_data, function(filepath, data){
@@ -160,10 +167,10 @@ $(document).ready(function() {
                                 </tr>`
                     $mtable.append(item)
                 })
+            }
 
-                if($mtable.find("tr").length <= 1){
-                    $("div#review").hide();
-                }
+            if($mtable.find("tr").length > 1){
+                $("div#incomplete").show();
             }
 
             $("div#thinker").fadeOut();

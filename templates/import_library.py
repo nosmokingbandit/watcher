@@ -43,6 +43,11 @@ class ImportLibrary():
                     br()
                     span('This may take several minutes.')
                 with div(id='list_files'):
+                    with span('No movies found.', id='not_found'):
+                        br()
+                        with a(href='{}/import_library'.format(core.URL_BASE)):
+                            i(cls='fa fa-caret-left')
+                            span('Return')
                     with div(id='review'):
                         span('The following files have been found.', cls='title')
                         br()
@@ -52,6 +57,7 @@ class ImportLibrary():
                         span('The following movies are missing key data.', cls='title')
                         br()
                         span('Please fill out or correct IMDB ID and resolution, or uncheck to ignore.', cls='title')
+                        table(id='missing_data')
                     with span(id='import'):
                         i(cls='fa fa-check-circle')
                         span('Import')

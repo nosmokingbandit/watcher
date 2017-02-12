@@ -26,7 +26,7 @@ class ImportLibrary():
                 with div(id='scan_dir'):
                     with div(id='directory_info'):
                         span('Library directory: ')
-                        input(id='directory', type='text', placeholder=' /movies', value='\\\\MXQ\\hdd\\Movies')  # TODO REMOVE VALUE
+                        input(id='directory', type='text', placeholder=' /movies')
                         br()
                         span('Minimum file size to import: ')
                         input(id='minsize', type='number', value='500')

@@ -1,9 +1,5 @@
-div#content{
-    margin: 2em auto 0 auto;
-    width: 60%;
-    max-width: 1024px;
-    min-width: 650px;
-    text-align: center;
+input[type="number"], input[type="text"], select{
+    padding: 0.1em 0.5em;
 }
 
 input[type="number"]{
@@ -28,6 +24,14 @@ table tr{
 table i{
     font-size: 1.25em;
     margin: 0 0.5em;
+}
+
+div#content{
+    margin: 2em auto 0 auto;
+    width: 60%;
+    max-width: 1024px;
+    min-width: 650px;
+    text-align: center;
 }
 
 div#directory_info span, div#directory_info i{
@@ -64,6 +68,9 @@ div#results{
     display: none;
 }
 
+a#finished{
+    font-size: 1.5em;
+}
 
 #thinker {
     display: none;

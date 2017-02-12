@@ -606,6 +606,9 @@ class Ajax(object):
 
         movies = self.library.scan_dir(directory, minsize, recursive)
 
+        if not movies:
+            return json.dumps({})
+
         library = [i['imdbid'] for i in self.sql.get_user_movies()]
 
         new_movies = {k: v for k, v in movies.iteritems() if v['imdbid'] not in library}

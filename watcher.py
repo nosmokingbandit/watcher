@@ -94,7 +94,7 @@ if __name__ == '__main__':
     else:
         core.DB_FILE = os.path.join(core.PROG_PATH, core.DB_FILE)
     sql = sqldb.SQL()
-    if not os.path.isfile('watcher.sqlite'):
+    if not os.path.isfile(core.DB_FILE):
         logging.info(u'SQL DB not found. Creating.')
         sql = sqldb.SQL()
         sql.create_database()

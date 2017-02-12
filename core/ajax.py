@@ -639,14 +639,14 @@ class Ajax(object):
 
         if corrected_movies:
             for filepath, data in corrected_movies.iteritems():
+                data['filepath'] = filepath
                 tmdbdata = self.tmdb.search(data['imdbid'], single=True)
                 if tmdbdata:
                     data['year'] = tmdbdata['release_date'][:4]
                     data.update(tmdbdata)
-                    data['filepath'] = filepath
                     movie_data.append(data)
                 else:
-                    data['error'] = 'Unable to find {} on TMDB.'.format(data['imdbid'])
+                    data['error'] = 'Unable to find "{}" on TMDB.'.format(data['imdbid'])
                     results['failed'].append(data)
 
         for movie in movie_data:

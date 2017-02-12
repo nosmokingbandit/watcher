@@ -185,11 +185,6 @@ $(document).ready(function() {
             }
         })
 
-        $("div#list_files").hide();
-        $("div#thinker").fadeIn();
-
-        data = JSON.stringify(selected)
-
         corrected_movies = {};
 
         var $crows = $("table#missing_data tr");
@@ -210,6 +205,15 @@ $(document).ready(function() {
             })
         }
 
+        if(selected.length == 0 && $.isEmptyObject(corrected_movies) == true){
+            toastr.warning("All imports disabled.");
+            return false
+        }
+
+        $("div#list_files").hide();
+        $("div#thinker").fadeIn();
+
+        data = JSON.stringify(selected)
         corrected_movies = JSON.stringify(corrected_movies);
 
         $.post(url_base + "/ajax/submit_import", {"movie_data":data, "corrected_movies": corrected_movies})

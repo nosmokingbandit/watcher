@@ -148,9 +148,6 @@ class SQL(object):
         Takes list of dicts to write into SEARCHRESULTS.
         '''
 
-        if not LIST:
-            return True
-
         logging.info(u'Writing batch into SEARCHRESULTS')
 
         INSERT = self.SEARCHRESULTS.insert()

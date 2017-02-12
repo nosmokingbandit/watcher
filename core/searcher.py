@@ -180,7 +180,7 @@ class Searcher():
                     result.update(old)
                     results[idx] = result
 
-        scored_results = self.score.score(results, imdbid=imdbid)
+        scored_results = self.score.score(results, imdbid, 'nzb')
 
         # sets result status based off marked results table
         marked_results = self.sql.get_marked_results(imdbid)

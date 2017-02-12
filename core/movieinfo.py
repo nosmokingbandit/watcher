@@ -28,16 +28,13 @@ class TMDB(object):
         search_term = search_term.replace(" ", "+")
 
         if search_term[:2] == u'tt' and search_term[2:].isdigit():
-            movies = self._search_imdbid(search_term)
+            return self._search_imdbid(search_term)
         else:
             movies = self._search_title(search_term)
-
-        if not movies:
-            return None
-        if single is True:
-            return movies[0]
-        else:
-            return movies
+            if single is True:
+                return movies[0]
+            else:
+                return movies
 
     def _search_title(self, title):
         ''' Search TMDB for title
@@ -86,7 +83,7 @@ class TMDB(object):
             raise
         except Exception, e: # noqa
             logging.error(u'TMDB find.', exc_info=True)
-            return []
+            return {}
 
     def get_imdbid(self, tmdbid=None, title=None, year=''):
         ''' Gets imdbid from tmdbid
@@ -109,11 +106,8 @@ class TMDB(object):
             request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             try:
                 response = json.load(urllib2.urlopen(request))
-                results = response['results']
-                if results:
-                    tmdbid = results[0]['id']
-                else:
-                    return None
+                tmdbid = response['results'][0]['id']
+                return response.get('imdb_id')
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
@@ -121,7 +115,6 @@ class TMDB(object):
                 return None
 
         url = 'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
-
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             response = json.load(urllib2.urlopen(request))

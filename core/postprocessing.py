@@ -358,9 +358,11 @@ class Postprocessing(object):
 
         if data:
             # remove unnecessary info
-            data.pop('quality', None)
             data.pop('plot', None)
             data.pop('overview', None)
+
+            if not data.get('quality'):
+                data['quality'] = 'Default'
 
             repl = config['replaceillegal']
 
@@ -453,7 +455,7 @@ class Postprocessing(object):
         # grab the next best release
         if core.CONFIG['Search']['autograb']:
             result['tasks']['autograb'] = {'enabled': 'true'}
-            if data['imdbid'] and data['quality']:
+            if data.get('imdbid') and data.get('quality'):
                 if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid'], data['quality']):
                     r = u'true'
                 else:

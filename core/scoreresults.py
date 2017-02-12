@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+import json
 import core
 from core import sqldb
 from fuzzywuzzy import fuzz
@@ -290,7 +291,7 @@ class ScoreResults():
         self.results = lst
 
     def import_quality(self):
-        profile = core.CONFIG['Quality']['Profiles']['Default']
+        profile = json.loads(json.dumps(core.CONFIG['Quality']['Profiles']['Default']))
 
         profile['ignoredwords'] = u''
         profile['requiredwords'] = u''

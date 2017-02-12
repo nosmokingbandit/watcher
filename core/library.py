@@ -178,4 +178,6 @@ class ImportDirectory(object):
 
         result['title'] = title
 
+        result['guid'] = 'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
+
         return result

@@ -25,6 +25,10 @@ class Snatcher():
 
     def auto_grab(self, title, year, imdbid, quality, minscore=0):
         ''' Grabs the best scoring result that isn't 'Bad'
+        title: str title of movie
+        year: str year of movie release
+        imdbid: str imdb id #
+        quality: str name of quality profile, used to determine sort order
 
         This simply picks the best release, actual snatching is
             handled by self.snatch()
@@ -75,6 +79,9 @@ class Snatcher():
 
         Returns dict {u'response': True, 'message': 'lorem impsum'}
         '''
+
+        if data['type'] == 'import':
+            return {u'response': False, u'error': u'Cannot download imports.'}
 
         imdbid = data['imdbid']
         resolution = data['resolution']

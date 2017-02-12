@@ -120,6 +120,11 @@ class Status(object):
         Returns bool on success/failure.
         '''
 
+        current_status = self.sql.get_movie_details('imdbid', imdbid).get('status')
+
+        if current_status == 'Disabled':
+            return True
+
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
         if result_status is False:
             logging.info(u'Could not get SEARCHRESULT statuses for {}'.format(imdbid))

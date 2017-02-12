@@ -80,6 +80,9 @@ class Snatcher():
         Returns dict {u'response': True, 'message': 'lorem impsum'}
         '''
 
+        if data['type'] == 'import':
+            return {u'response': False, u'error': u'Cannot download imports.'}
+
         imdbid = data['imdbid']
         resolution = data['resolution']
         kind = data['type']

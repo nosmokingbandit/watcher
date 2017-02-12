@@ -162,14 +162,14 @@ class ImportDirectory(object):
                   'size': movie.get('size', '')
                   }
 
-        title = '{}.{}.{}.{}'.format(movie['title'],
-                                     movie['year'],
-                                     result['resolution'],
-                                     movie['source'],
-                                     movie['audiocodec'],
-                                     movie['videocodec'],
-                                     movie['releasegroup']
-                                     )
+        title = '{}.{}.{}.{}.{}.{}.{}'.format(movie['title'],
+                                              movie['year'],
+                                              result['resolution'],
+                                              movie['source'],
+                                              movie['audiocodec'],
+                                              movie['videocodec'],
+                                              movie['releasegroup']
+                                              )
         while title[-1] == '.':
             title = title[:-1]
 

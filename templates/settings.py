@@ -84,6 +84,8 @@ class Settings():
                     for opt in tl:
                         if opt == 'Default':
                             item = option(opt, value='')
+                            if c[c_s]['theme'] == 'Default':
+                                item['selected'] = 'selected'
                         else:
                             item = option(opt, value=opt)
                         if item['value'] == c[c_s]['theme']:

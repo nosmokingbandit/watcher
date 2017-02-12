@@ -1,0 +1,114 @@
+input[type="number"], input[type="text"], select{
+    padding: 0.1em 0.5em;
+}
+
+input[type="number"]{
+    width: 4em;
+}
+
+table{
+    margin: 1em 0 2em 0;
+    font-size: 1.0em;
+    width: 100%;
+}
+
+table tr:nth-child(odd){
+    background-color: #eee;
+}
+
+table tr{
+    padding: 0.1em 0;
+    margin: 0.1em 0;
+}
+
+table i{
+    font-size: 1.25em;
+    margin: 0 0.5em;
+}
+
+div#content{
+    margin: 2em auto 0 auto;
+    width: 60%;
+    max-width: 1024px;
+    min-width: 650px;
+    text-align: center;
+}
+
+div#directory_info span, div#directory_info i{
+    font-size: 1.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    vertical-align: middle;
+}
+
+div#directory_info span{
+    text-align: center;
+}
+
+span#start_scan{
+    display: inline-block;
+    cursor: pointer;
+    font-size: 3em;
+    margin: 3em auto 0 auto;
+}
+
+div#wait{
+    display: none;
+}
+
+div#list_files, div#review, div#incomplete, span#not_found{
+    display: none;
+}
+
+a span{
+    vertical-align: middle;
+}
+
+span#not_found{
+    font-size: 1.5em;
+    line-height: 2.0em;
+}
+
+div#list_files span#import{
+    font-size: 1.5em;
+}
+
+div#results{
+    display: none;
+}
+
+a#finished{
+    font-size: 1.5em;
+}
+
+#thinker {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    background-color: #212121;
+    position:fixed;
+    bottom: calc(50% - 20px);
+    right: calc(50% - 20px);
+    -webkit-animation: sk-scaleout 2.0s infinite ease-in-out;
+    animation: sk-scaleout 2.0s infinite ease-in-out;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+@-webkit-keyframes sk-scaleout {
+    0% { -webkit-transform: scale(0) }
+    100% { -webkit-transform: scale(5.8);
+        opacity: 0;
+        }
+}
+
+@keyframes sk-scaleout {
+    0% { -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    100% { -webkit-transform: scale(5.8);
+            transform: scale(5.8);
+            opacity: 0;
+            }
+}

@@ -96,18 +96,22 @@ div#toast-container > div.toast{
     background-image: none !important;
 }
 
-div.toast-success, div.toast-error, div.toast-info{
+div.toast-success, div.toast-error, div.toast-info, div.toast-warning{
     background-color: #000;
 }
 
-div.toast-success div.toast-message{
+div.toast-success div.toast-title, div.toast-success div.toast-message{
     color: #39FF14;
 }
 
-div.toast-info div.toast-message{
+div.toast-message div.toast-title, div.toast-info div.toast-message{
     color: #18D8F0;
 }
 
-div.toast-error div.toast-message{
+div.toast-error div.toast-title, div.toast-error div.toast-message{
     color: #ED145A;
+}
+
+div.toast-warning div.toast-title, div.toast-warning div.toast-message{
+    color: #FFCC00;
 }

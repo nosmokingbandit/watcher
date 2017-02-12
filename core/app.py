@@ -2,8 +2,8 @@ import cherrypy
 import core
 from core import ajax, scheduler
 from core.auth import AuthController
-from templates import (add_movie, fourohfour, restart, settings, shutdown,
-                       status, update)
+from templates import (add_movie, fourohfour, import_library, restart, settings,
+                       shutdown, status, update)
 
 
 class App(object):
@@ -24,6 +24,7 @@ class App(object):
         self.restart = restart.Restart()
         self.shutdown = shutdown.Shutdown()
         self.update = update.Update()
+        self.import_library = import_library.ImportLibrary()
 
         # point server toward custom 404
         cherrypy.config.update({

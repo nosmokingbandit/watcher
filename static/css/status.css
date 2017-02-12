@@ -234,6 +234,10 @@ ul#movie_list.compact li span.movie_info span.rated{
     opacity: 0.65;
 }
 
+div#import{
+    margin: 0 0 2em 0;
+    text-align: center;
+}
 
 /* Status colors */
 div#key span.wanted,

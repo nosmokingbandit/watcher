@@ -82,7 +82,7 @@ class Settings():
                 with select(id='theme', value=c[c_s]['theme']) as theme_select:
                     tl = self.get_themes()
                     for opt in tl:
-                        if opt == 'Default':
+                        if opt == u'Default':
                             item = option(opt, value='')
                             if c[c_s]['theme'] == 'Default':
                                 item['selected'] = 'selected'
@@ -90,7 +90,6 @@ class Settings():
                             item = option(opt, value=opt)
                         if item['value'] == c[c_s]['theme']:
                             item['selected'] = 'selected'
-                            theme_select['value'] = opt
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=str(c[c_s]['authrequired']))
                 span(u'Password-protect web-ui.')

@@ -88,7 +88,6 @@ class Proxy(object):
         for i in whitelist:
             if url.startswith(i.strip()):
                 logging.info('Bypassing proxy for whitelist url {}'.format(url))
-                print 'Bypassing proxy for whitelist url {}'.format(url)
                 return True
             else:
                 continue

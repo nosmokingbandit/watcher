@@ -27,6 +27,8 @@ class ImportDirectory(object):
         Returns list of dicts of movie info
         '''
 
+        logging.info('Scanning {} for movies.'.format(directory))
+
         files = []
         if recursive:
             for root, dirs, filenames in os.walk(directory):

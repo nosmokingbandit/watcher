@@ -74,7 +74,7 @@ class TMDB(object):
         try:
             results = json.load(urllib2.urlopen(request))
             if results['movie_results'] == []:
-                return None
+                return []
             else:
                 response = results['movie_results'][0]
                 response['imdbid'] = imdbid

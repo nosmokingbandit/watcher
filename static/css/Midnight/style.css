@@ -16,9 +16,6 @@ body{
 
 input{
     color: #ccc;
-    border: none;
-    border-radius: 4px;
-    background-color: #151c25;
 }
 
 div#overlay {
@@ -26,7 +23,7 @@ div#overlay {
 }
 
 select{
-    border: none;
+    border: 1px solid #ccc;
     background-color: #151c25;
     color: #ccc;
     padding-top: .1em;

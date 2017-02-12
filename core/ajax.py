@@ -7,7 +7,7 @@ import threading
 
 import cherrypy
 import core
-from core import config, newznab, plugins, poster, searcher, snatcher, sqldb, torrent, updatestatus, version
+from core import config, library, newznab, plugins, poster, scoreresults, searcher, snatcher, sqldb, torrent, updatestatus, version
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import TMDB
 from core.notification import Notification
@@ -29,9 +29,11 @@ class Ajax(object):
     def __init__(self):
         self.tmdb = TMDB()
         self.config = config.Config()
+        self.library = library.ImportDirectory()
         self.predb = predb.PreDB()
         self.plugins = plugins.Plugins()
         self.searcher = searcher.Searcher()
+        self.score = scoreresults.ScoreResults()
         self.sql = sqldb.SQL()
         self.poster = poster.Poster()
         self.snatcher = snatcher.Snatcher()
@@ -133,7 +135,8 @@ class Ajax(object):
         data['plot'] = data['overview']
         data['url'] = u'https://www.themoviedb.org/movie/{}'.format(data['id'])
         data['score'] = data['vote_average']
-        data['status'] = u'Wanted'
+        if not data.get('status'):
+            data['status'] = u'Wanted'
         data['added_date'] = str(datetime.date.today())
 
         required_keys = ['added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate']
@@ -587,3 +590,95 @@ class Ajax(object):
             response = {'response': False, 'error': str(e)}
 
         return json.dumps(response)
+
+    @cherrypy.expose
+    def scan_library(self, directory, minsize, recursive):
+        ''' Calls library to scan directory for movie files
+        directory: str directory to scan
+        minsize: str minimum file size in mb, coerced to int
+        resursive: str 'true' or 'false', coerced to bool
+
+        Removes all movies already in library.
+
+        returns str json.dumps dict. Keys = filepaths, values = dict of metadata
+        '''
+
+        recursive = bool(recursive)
+        minsize = int(minsize)
+
+        movies = self.library.scan_dir(directory, minsize, recursive)
+
+        if not movies:
+            return json.dumps({})
+
+        library = [i['imdbid'] for i in self.sql.get_user_movies()]
+
+        new_movies = {k: v for k, v in movies.iteritems() if v['imdbid'] not in library}
+
+        return json.dumps(new_movies)
+
+    @cherrypy.expose
+    def submit_import(self, movie_data, corrected_movies):
+        ''' Imports list of movies in data
+        movie_data: list of dicts of movie info ready to import
+        corrected_movies: list of dicts of user-corrected movie info
+
+        corrected_movies must be [{'/path/to/file': {'known': 'metadata'}}]
+
+        Iterates through corrected_movies and attmpts to get metadata again.
+
+        If imported, generates and stores fake search result.
+
+        Created dict {'success': [], 'failed': []} and
+            appends movie data to the appropriate list.
+
+        Returns json-formatted dict described above.
+        '''
+
+        movie_data = json.loads(movie_data)
+        corrected_movies = json.loads(corrected_movies)
+
+        fake_results = []
+
+        results = {'success': [], 'failed': []}
+
+        if corrected_movies:
+            for filepath, data in corrected_movies.iteritems():
+                data['filepath'] = filepath
+                tmdbdata = self.tmdb.search(data['imdbid'], single=True)
+                if tmdbdata:
+                    data['year'] = tmdbdata['release_date'][:4]
+                    data.update(tmdbdata)
+                    movie_data.append(data)
+                else:
+                    data['error'] = 'Unable to find "{}" on TMDB.'.format(data['imdbid'])
+                    results['failed'].append(data)
+
+        for movie in movie_data:
+            if movie['imdbid']:
+                movie['status'] = 'Disabled'
+                response = json.loads(self.add_wanted_movie(json.dumps(movie)))
+                if response['response'] is True:
+                    results['success'].append(movie)
+                    fake_results.append(self.library.fake_search_result(movie))
+                else:
+                    movie['error'] = response['error']
+                    results['failed'].append(movie)
+            else:
+                movie['error'] = "IMDB ID not supplied."
+                results['failed'].append(movie)
+
+        fake_results = self.score.score(fake_results, quality_profile='import')
+
+        for i in results['success']:
+            score = None
+            for r in fake_results:
+                if r['imdbid'] == i['imdbid']:
+                    score = r['score']
+                    break
+            if score:
+                self.sql.update('MOVIES', 'finished_score', score, imdbid=i['imdbid'])
+
+        self.sql.write_search_results(fake_results)
+
+        return json.dumps(results)

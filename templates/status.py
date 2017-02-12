@@ -16,8 +16,8 @@ class Status():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css?v=02.02')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css?v=02.02'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css?v=02.07')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/status.css?v=02.07'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css?v=02.07')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/movie_status_popup.css?v=02.17'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/status/main.js?v=02.02b')
@@ -46,6 +46,12 @@ class Status():
                     span(cls='finished')
                     span('Finished')
                 self.movie_list()
+
+            with div(id='import'):
+                with a(href='{}/import_library'.format(core.URL_BASE)):
+                    i(cls='fa fa-hdd-o', id='import_library')
+                    span('Import existing library.')
+
             div(id='overlay')
             div(id='status_pop_up')
 

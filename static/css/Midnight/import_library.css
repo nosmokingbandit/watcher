@@ -1,0 +1,12 @@
+table tr:nth-child(odd){
+    background-color: #151c25;
+}
+
+table tr:nth-child(odd) input,
+table tr:nth-child(odd) select{
+    background-color: #080f18;
+}
+
+#thinker {
+    background-color: #ccc;
+}

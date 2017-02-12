@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+import json
 import core
 from core import sqldb
 from fuzzywuzzy import fuzz
@@ -15,11 +16,19 @@ class ScoreResults():
         return
 
     # returns list of dictionary results after filtering and scoring
-    def score(self, results, imdbid, type):
+    def score(self, results, imdbid=None, quality_profile=None):
         ''' Scores and filters search results.
-        :param results: list of dicts of search results
-        :param imdbid: str imdb identification number (tt123456)
-        :param type: str 'nzb' or 'torrent'
+        results: list of dicts of search results
+        imdbid: str imdb identification number (tt123456)   <optional*>
+        quality_profile: str quality profile name           <optional*>
+
+        Either imdbid or quality_profile MUST be passed.
+
+        If imdbid passed, finds quality in database row.
+        If profile_quality passed, uses that quality and ignores db.
+
+        quality_profile can be set to 'import', which uses 'Default' settings,
+            but doesn't allow the result to be filtered out.
 
         Iterates over the list and filters movies based on Words.
         Scores movie based on reslution priority, title match, and
@@ -31,15 +40,22 @@ class ScoreResults():
         Returns list of dicts.
         '''
 
+        if imdbid is None and quality_profile is None:
+            logging.warning('Neither imdbid or quality_profile passed.')
+            return results
+
         self.results = results
 
-        movie_details = self.sql.get_movie_details('imdbid', imdbid)
+        if quality_profile is None:
+            movie_details = self.sql.get_movie_details('imdbid', imdbid)
+            quality_profile = movie_details['quality']
+            title = movie_details['title']
+        else:
+            title = None
 
-        title = movie_details['title']
-
-        quality_profile = movie_details['quality']
-        # get quality settings from database, or config if not found
-        if quality_profile in core.CONFIG['Quality']['Profiles']:
+        if quality_profile == 'import':
+            quality = self.import_quality()
+        elif quality_profile in core.CONFIG['Quality']['Profiles']:
             quality = core.CONFIG['Quality']['Profiles'][quality_profile]
         else:
             quality = core.CONFIG['Quality']['Profiles']['Default']
@@ -93,7 +109,7 @@ class ScoreResults():
 
         keep = []
         for result in self.results:
-            if result['type'] in ['torrent', 'magnet']:
+            if result['type'] in ['torrent', 'magnet', 'import']:
                 keep.append(result)
             for indexer in active:
                 if indexer in result['guid']:
@@ -221,23 +237,30 @@ class ScoreResults():
 
     def fuzzy_title(self, title):
         ''' Score and remove results based on title match
-        :param title: str title of movie
+        title: str title of movie   <optional*>
 
         Iterates through self.results and removes any entry that does not
             fuzzy match 'title' > 60.
         Adds fuzzy_score / 20 points to ['score']
 
+        *If title is passed as None, assumes perfect match and scores +20
+
         Does not return
         '''
 
         lst = []
-        for result in self.results:
-            title = title.replace(u' ', u'.').replace(u':', u'.').lower()
-            test = result['title'].replace(u' ', u'.').lower()
-            match = fuzz.token_set_ratio(title, test)
-            if match > 60:
-                result['score'] += (match / 20)
+        if title is None:
+            for result in self.results:
+                result['score'] += 20
                 lst.append(result)
+        else:
+            for result in self.results:
+                title = title.replace(u' ', u'.').replace(u':', u'.').lower()
+                test = result['title'].replace(u' ', u'.').lower()
+                match = fuzz.token_set_ratio(title, test)
+                if match > 60:
+                    result['score'] += (match / 5)
+                    lst.append(result)
         self.results = lst
 
     def score_resolution(self, resolutions):
@@ -261,12 +284,28 @@ class ScoreResults():
                 priority = v[1]
                 min_size = v[2]
                 max_size = v[3]
-
                 if result_res == k:
                     if min_size < size < max_size:
                         result['score'] += (8 - priority) * 100
                         lst.append(result)
         self.results = lst
+
+    def import_quality(self):
+        profile = json.loads(json.dumps(core.CONFIG['Quality']['Profiles']['Default']))
+
+        profile['ignoredwords'] = u''
+        profile['requiredwords'] = u''
+        resolutions = ['4K', '1080P', '720P', 'SD']
+
+        for i in resolutions:
+            if profile[i][0] is False:
+                profile[i][1] = 4
+                profile[i][0] = True
+
+            profile[i][2] = 0
+            profile[i][3] = Ellipsis
+
+        return profile
 
 
 """

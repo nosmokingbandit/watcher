@@ -127,8 +127,6 @@ class Torrent(object):
 
         url = u'{}?passkey={}'.format(indexer, apikey)
 
-        print url
-
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             response = urllib2.urlopen(request).read()

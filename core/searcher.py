@@ -169,6 +169,10 @@ class Searcher():
 
         old_results = [dict(r) for r in self.sql.get_search_results(imdbid, quality)]
 
+        for old in old_results:
+            if old['type'] == 'import':
+                results.append(old)
+
         # update results with old info if guids match
         for idx, result in enumerate(results):
             for old in old_results:

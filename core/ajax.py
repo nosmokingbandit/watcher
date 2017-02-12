@@ -185,12 +185,14 @@ class Ajax(object):
 
         response = {}
 
-        data = self.tmdb._find_imdbid(imdbid)[0]
+        data = self.tmdb._search_imdbid(imdbid)
 
         if not data:
             response['status'] = u'false'
             response['message'] = u'{} not found on TMDB.'.format(imdbid)
             return response
+        else:
+            data = data[0]
 
         data['quality'] = quality
 

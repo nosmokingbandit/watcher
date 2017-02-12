@@ -138,7 +138,7 @@ class ImdbRss(object):
 
         # do quick-add procedure
         for imdbid in movies_to_add:
-            movie_info = self.tmdb._find_imdbid(imdbid)[0]
+            movie_info = self.tmdb._search_imdbid(imdbid)[0]
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue

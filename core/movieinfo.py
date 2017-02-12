@@ -31,6 +31,9 @@ class TMDB(object):
             movies = self._search_imdbid(search_term)
         else:
             movies = self._search_title(search_term)
+
+        if not movies:
+            return None
         if single is True:
             return movies[0]
         else:

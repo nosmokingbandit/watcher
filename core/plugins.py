@@ -73,7 +73,7 @@ class Plugins(object):
                     with open(conf_file) as f:
                         args.append(json.dumps(json.load(f)))
             except Exception, e: #noqa
-                logging.error('Loading config {} failed.'.format(conf_file), exc_info=True)
+                logging.error(u'Loading config {} failed.'.format(conf_file), exc_info=True)
                 continue
 
             command = [sys.executable, plugin] + args
@@ -84,7 +84,7 @@ class Plugins(object):
             name = os.path.split(plugin)[1]
 
             try:
-                logging.info('Executing plugin {}.'.format(name))
+                logging.info(u'Executing plugin {}.'.format(name))
 
                 process = subprocess.Popen(command,
                                            stdin=subprocess.PIPE,
@@ -97,14 +97,14 @@ class Plugins(object):
                 exit_code = process.returncode
 
                 for line in output.splitlines():
-                    logging.info('{} - {}'.format(name, line))
+                    logging.info(u'{} - {}'.format(name, line))
                 if exit_code == 0:
-                    logging.info('{} - Execution finished. Exit code {}.'.format(name, '0'))
+                    logging.info(u'{} - Execution finished. Exit code {}.'.format(name, '0'))
                 else:
-                    logging.info('{} - Execution failed. Exit code {}.'.format(name, exit_code))
+                    logging.info(u'{} - Execution failed. Exit code {}.'.format(name, exit_code))
 
             except Exception, e: #noqa
-                logging.error('Executing plugin {} failed.'.format(plugin), exc_info=True)
+                logging.error(u'Executing plugin {} failed.'.format(plugin), exc_info=True)
                 continue
 
         return

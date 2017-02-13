@@ -161,12 +161,15 @@ class NewzNab():
 
         '''
 
+        if not indexer:
+            return {'response': False, 'error': 'Indexer field is blank.'}
+
         while indexer[-1] == '/':
             indexer = indexer[:-1]
 
         response = {}
 
-        logging.info('Testing connection to {}'.format(indexer))
+        logging.info(u'Testing connection to {}'.format(indexer))
 
         url = u'{}/api?apikey={}&t=search&id=tt0063350'.format(indexer, apikey)
 

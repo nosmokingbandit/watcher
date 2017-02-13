@@ -139,7 +139,7 @@ $(document).ready(function () {
             <input class='newznab_url' placeholder=' http://indexer.url' type='text'/>
             <input class='newznab_api' placeholder=' Api Key' type='text'/>
             <i class='newznab_clear fa fa-trash-o'/>
-            <i class='imdexer_test fa fa-plug', type='newznab'/>
+            <i class='indexer_test fa fa-plug', type='newznab'/>
         </li>
         `
 

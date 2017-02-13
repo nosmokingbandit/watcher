@@ -169,7 +169,7 @@ class NewzNab():
 
         response = {}
 
-        logging.info('Testing connection to {}'.format(indexer))
+        logging.info(u'Testing connection to {}'.format(indexer))
 
         url = u'{}/api?apikey={}&t=search&id=tt0063350'.format(indexer, apikey)
 

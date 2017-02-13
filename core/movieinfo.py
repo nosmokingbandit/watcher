@@ -101,7 +101,7 @@ class TMDB(object):
         '''
 
         if not tmdbid and not title:
-            logging.warning('Neither tmdbid or title supplied. Unable to find imdbid.')
+            logging.warning(u'Neither tmdbid or title supplied. Unable to find imdbid.')
             return None
 
         if not tmdbid:

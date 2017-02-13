@@ -232,7 +232,7 @@ class Rarbg(object):
     def search(imdbid):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching Rarbg for {}'.format(imdbid))
+        logging.info(u'Searching Rarbg for {}'.format(imdbid))
         if Rarbg.timeout:
             now = datetime.datetime.now()
             while Rarbg.timeout > now:
@@ -242,7 +242,7 @@ class Rarbg(object):
         if not Rarbg.token:
             Rarbg.token = Rarbg.get_token()
             if Rarbg.token is None:
-                logging.error('Unable to get rarbg token.')
+                logging.error(u'Unable to get rarbg token.')
                 return []
 
         url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
@@ -262,6 +262,7 @@ class Rarbg(object):
                 results = Rarbg.parse(response)
                 return results
             else:
+                logging.info(u'Nothing found on rarbg.to')
                 return []
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -287,7 +288,7 @@ class Rarbg(object):
 
     @staticmethod
     def parse(results):
-        logging.info('Parsing Rarbg results.')
+        logging.info(u'Parsing Rarbg results.')
         item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
 
         for result in results:
@@ -308,7 +309,7 @@ class Rarbg(object):
             result['status'] = u'Available'
             result['score'] = 0
             result['downloadid'] = None
-        logging.info('Found {} results from Rarbg.'.format(len(results)))
+        logging.info(u'Found {} results from Rarbg.'.format(len(results)))
         return results
 
 
@@ -318,7 +319,7 @@ class LimeTorrents(object):
     def search(imdbid, title, year):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching LimeTorrents for {}'.format(title))
+        logging.info(u'Searching LimeTorrents for {}'.format(title))
         url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year).replace(' ', '+')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -342,7 +343,7 @@ class LimeTorrents(object):
 
     @staticmethod
     def parse(xml, imdbid):
-        logging.info('Parsing LimeTorrents results.')
+        logging.info(u'Parsing LimeTorrents results.')
 
         tree = ET.fromstring(xml)
 
@@ -371,10 +372,10 @@ class LimeTorrents(object):
 
                 results.append(result)
             except Exception, e: #noqa
-                logging.error('Error parsing LimeTorrents XML.', exc_info=True)
+                logging.error(u'Error parsing LimeTorrents XML.', exc_info=True)
                 continue
 
-        logging.info('Found {} results from LimeTorrents.'.format(len(results)))
+        logging.info(u'Found {} results from LimeTorrents.'.format(len(results)))
         return results
 
 
@@ -384,7 +385,7 @@ class ExtraTorrent(object):
     def search(imdbid, title, year):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching ExtraTorrent for {}'.format(title))
+        logging.info(u'Searching ExtraTorrent for {}'.format(title))
 
         url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year).replace(' ', '+')
 
@@ -409,7 +410,7 @@ class ExtraTorrent(object):
 
     @staticmethod
     def parse(xml, imdbid):
-        logging.info('Parsing ExtraTorrent results.')
+        logging.info(u'Parsing ExtraTorrent results.')
 
         tree = ET.fromstring(xml)
 
@@ -439,10 +440,10 @@ class ExtraTorrent(object):
 
                 results.append(result)
             except Exception, e: #noqa
-                logging.error('Error parsing ExtraTorrent XML.', exc_info=True)
+                logging.error(u'Error parsing ExtraTorrent XML.', exc_info=True)
                 continue
 
-        logging.info('Found {} results from ExtraTorrent.'.format(len(results)))
+        logging.info(u'Found {} results from ExtraTorrent.'.format(len(results)))
         return results
 
 
@@ -452,7 +453,7 @@ class SkyTorrents(object):
     def search(imdbid, title, year):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching SkyTorrents for {}'.format(title))
+        logging.info(u'Searching SkyTorrents for {}'.format(title))
 
         url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+')
 
@@ -477,7 +478,7 @@ class SkyTorrents(object):
 
     @staticmethod
     def parse(xml, imdbid):
-        logging.info('Parsing SkyTorrents results.')
+        logging.info(u'Parsing SkyTorrents results.')
 
         tree = ET.fromstring(xml)
 
@@ -511,10 +512,10 @@ class SkyTorrents(object):
 
                 results.append(result)
             except Exception, e: #noqa
-                logging.error('Error parsing SkyTorrents XML.', exc_info=True)
+                logging.error(u'Error parsing SkyTorrents XML.', exc_info=True)
                 continue
 
-        logging.info('Found {} results from SkyTorrents.'.format(len(results)))
+        logging.info(u'Found {} results from SkyTorrents.'.format(len(results)))
         return results
 
 
@@ -524,7 +525,7 @@ class BitSnoop(object):
     def search(imdbid, title, year):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching BitSnoop for {}'.format(title))
+        logging.info(u'Searching BitSnoop for {}'.format(title))
 
         url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year).replace(' ', '+')
 
@@ -549,7 +550,7 @@ class BitSnoop(object):
 
     @staticmethod
     def parse(xml, imdbid):
-        logging.info('Parsing BitSnoop results.')
+        logging.info(u'Parsing BitSnoop results.')
 
         tree = ET.fromstring(xml)
 
@@ -577,10 +578,10 @@ class BitSnoop(object):
 
                 results.append(result)
             except Exception, e: #noqa
-                logging.error('Error parsing BitSnoop XML.', exc_info=True)
+                logging.error(u'Error parsing BitSnoop XML.', exc_info=True)
                 continue
 
-        logging.info('Found {} results from BitSnoop.'.format(len(results)))
+        logging.info(u'Found {} results from BitSnoop.'.format(len(results)))
         return results
 
 
@@ -590,7 +591,7 @@ class Torrentz2(object):
     def search(imdbid, title, year):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info('Searching Torrentz2 for {}'.format(title))
+        logging.info(u'Searching Torrentz2 for {}'.format(title))
 
         url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year).replace(' ', '+')
 
@@ -615,7 +616,7 @@ class Torrentz2(object):
 
     @staticmethod
     def parse(xml, imdbid):
-        logging.info('Parsing Torrentz2 results.')
+        logging.info(u'Parsing Torrentz2 results.')
 
         tree = ET.fromstring(xml)
 
@@ -648,8 +649,8 @@ class Torrentz2(object):
 
                 results.append(result)
             except Exception, e: #noqa
-                logging.error('Error parsing Torrentz2 XML.', exc_info=True)
+                logging.error(u'Error parsing Torrentz2 XML.', exc_info=True)
                 continue
 
-        logging.info('Found {} results from Torrentz2.'.format(len(results)))
+        logging.info(u'Found {} results from Torrentz2.'.format(len(results)))
         return results

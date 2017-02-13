@@ -32,7 +32,7 @@ class PluginConfPopup(object):
                     f.close()
                 except Exception, e: #noqa
                     f.close()
-                    logging.error('Read plugin config.', exc_info=True)
+                    logging.error(u'Read plugin config.', exc_info=True)
                     return u''
 
         return unicode(container)

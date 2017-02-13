@@ -493,7 +493,7 @@ class SQL(object):
         print 'Database update required. This may take some time.'
 
         backup_dir = os.path.join(core.PROG_PATH, 'db')
-        logging.info('Backing up database to {}.'.format(backup_dir))
+        logging.info(u'Backing up database to {}.'.format(backup_dir))
         print 'Backing up database to {}.'.format(backup_dir)
         try:
             if not os.path.isdir(backup_dir):
@@ -505,7 +505,7 @@ class SQL(object):
             logging.error(u'Copying SQL DB.', exc_info=True)
             raise
 
-        logging.info('Modifying tables.')
+        logging.info(u'Modifying tables.')
         print 'Modifying tables.'
 
         '''
@@ -514,7 +514,7 @@ class SQL(object):
         Create the new table, then copy data from TMP table
         '''
         for table, schema in diff.iteritems():
-            logging.info('Modifying table {}'.format(table))
+            logging.info(u'Modifying table {}'.format(table))
             print 'Modifying table {}'.format(table)
             for name, kind in schema.iteritems():
                 command = 'ALTER TABLE {} ADD COLUMN {} {}'.format(table, name, kind)
@@ -529,33 +529,33 @@ class SQL(object):
 
             # move TABLE to TABLE_TMP
             table_tmp = '{}_TMP'.format(table)
-            logging.info('Renaming table to {}'.format(table_tmp))
+            logging.info(u'Renaming table to {}'.format(table_tmp))
             print 'Renaming table to {}'.format(table_tmp)
             command = 'ALTER TABLE {} RENAME TO {}'.format(table, table_tmp)
             self.execute(command)
 
             # create new table
-            logging.info('Creating new table {}'.format(table))
+            logging.info(u'Creating new table {}'.format(table))
             print 'Creating new table {}'.format(table)
             table_meta = getattr(self, table)
             table_meta.create(self.engine)
 
             # copy data over
-            logging.info('Merging data from {} to {}'.format(table_tmp, table))
+            logging.info(u'Merging data from {} to {}'.format(table_tmp, table))
             print 'Merging data from {} to {}'.format(table_tmp, table)
             names = ', '.join(intended[table].keys())
             command = 'INSERT INTO {} ({}) SELECT {} FROM {}'.format(table, names, names, table_tmp)
             self.execute(command)
 
-            logging.info('Dropping table {}'.format(table_tmp))
+            logging.info(u'Dropping table {}'.format(table_tmp))
             print 'Dropping table {}'.format(table_tmp)
             command = 'DROP TABLE {}'.format(table_tmp)
             self.execute(command)
 
-            logging.info('Finished updating table {}'.format(table))
+            logging.info(u'Finished updating table {}'.format(table))
             print 'Finished updating table {}'.format(table)
 
-        logging.info('Database updated')
+        logging.info(u'Database updated')
         print 'Database updated.'
 
 # pylama:ignore=W0401

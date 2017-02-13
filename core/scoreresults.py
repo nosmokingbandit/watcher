@@ -41,7 +41,7 @@ class ScoreResults():
         '''
 
         if imdbid is None and quality_profile is None:
-            logging.warning('Neither imdbid or quality_profile passed.')
+            logging.warning(u'Neither imdbid or quality_profile passed.')
             return results
 
         self.results = results
@@ -131,7 +131,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Filtering Ignored Words')
+        logging.info(u'Filtering Ignored Words')
 
         keep = []
 
@@ -142,7 +142,7 @@ class ScoreResults():
             cond = False
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
-                    logging.info('{} found in {}, removing from search results.'.format(word_group, r['title']))
+                    logging.info(u'{} found in {}, removing from search results.'.format(word_group, r['title']))
                     cond = True
                     break
             if cond is False and r not in keep:
@@ -160,7 +160,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Filtering Required Words')
+        logging.info(u'Filtering Required Words')
 
         keep = []
 
@@ -170,7 +170,7 @@ class ScoreResults():
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
-                    logging.info('{} found in {}, keeping this search result.'.format(word_group, r['title']))
+                    logging.info(u'{} found in {}, keeping this search result.'.format(word_group, r['title']))
                     keep.append(r)
                     break
                 else:
@@ -188,7 +188,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Checking retention')
+        logging.info(u'Checking retention')
 
         if retention == 0:
             return
@@ -202,7 +202,7 @@ class ScoreResults():
                 if age < retention:
                     lst.append(result)
                 else:
-                    logging.info('{} published {} days ago, removing search result.'.format(result['title'], age))
+                    logging.info(u'{} published {} days ago, removing search result.'.format(result['title'], age))
         self.results = lst
 
     def seed_check(self, seeds):
@@ -212,7 +212,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Checking torrent seeds')
+        logging.info(u'Checking torrent seeds')
 
         if seeds == 0:
             return
@@ -224,7 +224,7 @@ class ScoreResults():
                 if int(result['seeders']) >= seeds:
                     lst.append(result)
                 else:
-                    logging.info('{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
+                    logging.info(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
 
     def score_preferred(self, group_list):
@@ -238,7 +238,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Scoring Preferred Words')
+        logging.info(u'Scoring Preferred Words')
 
         if not group_list or group_list == [u'']:
             return
@@ -246,7 +246,7 @@ class ScoreResults():
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
-                    logging.info('{} found in {}, adding 10 points.'.format(word_group, r['title']))
+                    logging.info(u'{} found in {}, adding 10 points.'.format(word_group, r['title']))
                     r['score'] += 10
                     break
                 else:
@@ -265,7 +265,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info('Checking title match')
+        logging.info(u'Checking title match')
 
         lst = []
         if title is None:
@@ -281,7 +281,7 @@ class ScoreResults():
                     result['score'] += (match / 5)
                     lst.append(result)
                 else:
-                    logging.info('{} only matched {}\% of {}, removing search result.'.format(test, match, title))
+                    logging.info(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
         self.results = lst
 
     def score_resolution(self, resolutions):

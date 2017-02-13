@@ -27,7 +27,7 @@ class ImportDirectory(object):
         Returns list of dicts of movie info
         '''
 
-        logging.info('Scanning {} for movies.'.format(directory))
+        logging.info(u'Scanning {} for movies.'.format(directory))
 
         files = []
         if recursive:
@@ -59,7 +59,7 @@ class ImportDirectory(object):
         Returns dict
         '''
 
-        logging.info('Gathering metada for {}.'.format(filepath))
+        logging.info(u'Gathering metada for {}.'.format(filepath))
 
         data = {
             'title': '',
@@ -99,7 +99,7 @@ class ImportDirectory(object):
             data.update(metadata)
 
         except Exception, e: #noqa
-            logging.warning('Unable to parse metadata.', exc_info=True)
+            logging.warning(u'Unable to parse metadata.', exc_info=True)
 
         if metadata and not data['resolution']:
             if metadata.get('Metadata'):
@@ -134,7 +134,7 @@ class ImportDirectory(object):
             data.update(tmdbdata)
 
         else:
-            logging.warning('Unable to find imdbid.')
+            logging.warning(u'Unable to find imdbid.')
 
         return data
 

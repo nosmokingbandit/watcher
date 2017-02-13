@@ -24,18 +24,18 @@ class Proxy(object):
             password = core.CONFIG['Server']['Proxy']['pass'] or None
 
             if core.CONFIG['Server']['Proxy']['type'] == 'socks5':
-                logging.info('Creating socket for SOCKS5 proxy at {}:{}'.format(host, port))
+                logging.info(u'Creating socket for SOCKS5 proxy at {}:{}'.format(host, port))
                 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, host, port, username=user, password=password)
                 Proxy.proxy_socket = socket.socket = socks.socksocket
                 socks.wrapmodule(urllib2)
                 Proxy.on = True
             elif core.CONFIG['Server']['Proxy']['type'] == 'socks4':
-                logging.info('Creating socket for SOCKS4 proxy at {}:{}'.format(host, port))
+                logging.info(u'Creating socket for SOCKS4 proxy at {}:{}'.format(host, port))
                 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, host, port, username=user, password=password)
                 Proxy.proxy_socket = socket.socket = socks.socksocket
                 Proxy.on = True
             elif core.CONFIG['Server']['Proxy']['type'] == 'http(s)':
-                logging.info('Creating HTTP(S) proxy at {}:{}'.format(host, port))
+                logging.info(u'Creating HTTP(S) proxy at {}:{}'.format(host, port))
                 protocol = host.split(':')[0]
 
                 proxies = {}
@@ -50,14 +50,14 @@ class Proxy(object):
                 if protocol == 'https':
                     proxies['https'] = url
                 else:
-                    logging.warning('HTTP-only proxy. HTTPS traffic will not be tunneled through proxy.')
+                    logging.warning(u'HTTP-only proxy. HTTPS traffic will not be tunneled through proxy.')
 
                 proxy = urllib2.ProxyHandler(proxies)
                 opener = urllib2.build_opener(proxy)
                 urllib2.install_opener(opener)
                 Proxy.on = True
             else:
-                logging.info('Invalid proxy type {}'.format(core.CONFIG['Server']['Proxy']['type']))
+                logging.info(u'Invalid proxy type {}'.format(core.CONFIG['Server']['Proxy']['type']))
                 return
         else:
             return
@@ -87,7 +87,7 @@ class Proxy(object):
 
         for i in whitelist:
             if url.startswith(i.strip()):
-                logging.info('Bypassing proxy for whitelist url {}'.format(url))
+                logging.info(u'Bypassing proxy for whitelist url {}'.format(url))
                 return True
             else:
                 continue

@@ -41,7 +41,7 @@ class ScoreResults():
         '''
 
         if imdbid is None and quality_profile is None:
-            logging.warning('Neither imdbid or quality_profile passed.')
+            logging.warning(u'Neither imdbid or quality_profile passed.')
             return results
 
         self.results = results
@@ -131,6 +131,8 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info(u'Filtering Ignored Words')
+
         keep = []
 
         if not group_list or group_list == [u'']:
@@ -140,6 +142,7 @@ class ScoreResults():
             cond = False
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
+                    logging.info(u'{} found in {}, removing from search results.'.format(word_group, r['title']))
                     cond = True
                     break
             if cond is False and r not in keep:
@@ -157,6 +160,8 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info(u'Filtering Required Words')
+
         keep = []
 
         if not group_list or group_list == [u'']:
@@ -165,6 +170,7 @@ class ScoreResults():
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
+                    logging.info(u'{} found in {}, keeping this search result.'.format(word_group, r['title']))
                     keep.append(r)
                     break
                 else:
@@ -182,6 +188,8 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info(u'Checking retention')
+
         if retention == 0:
             return
         lst = []
@@ -193,6 +201,8 @@ class ScoreResults():
                 age = (today - pubdate).days
                 if age < retention:
                     lst.append(result)
+                else:
+                    logging.info(u'{} published {} days ago, removing search result.'.format(result['title'], age))
         self.results = lst
 
     def seed_check(self, seeds):
@@ -201,6 +211,8 @@ class ScoreResults():
 
         Does not return
         '''
+
+        logging.info(u'Checking torrent seeds')
 
         if seeds == 0:
             return
@@ -211,6 +223,8 @@ class ScoreResults():
             else:
                 if int(result['seeders']) >= seeds:
                     lst.append(result)
+                else:
+                    logging.info(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
 
     def score_preferred(self, group_list):
@@ -224,12 +238,15 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info(u'Scoring Preferred Words')
+
         if not group_list or group_list == [u'']:
             return
 
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
+                    logging.info(u'{} found in {}, adding 10 points.'.format(word_group, r['title']))
                     r['score'] += 10
                     break
                 else:
@@ -248,6 +265,8 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info(u'Checking title match')
+
         lst = []
         if title is None:
             for result in self.results:
@@ -261,6 +280,8 @@ class ScoreResults():
                 if match > 60:
                     result['score'] += (match / 5)
                     lst.append(result)
+                else:
+                    logging.info(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
         self.results = lst
 
     def score_resolution(self, resolutions):
@@ -288,6 +309,7 @@ class ScoreResults():
                     if min_size < size < max_size:
                         result['score'] += (8 - priority) * 100
                         lst.append(result)
+
         self.results = lst
 
     def import_quality(self):

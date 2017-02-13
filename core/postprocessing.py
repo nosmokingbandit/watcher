@@ -321,7 +321,7 @@ class Postprocessing(object):
         logging.info(u'Searching local database for guid.')
         result = self.sql.get_single_search_result('guid', data['guid'])
         if not result:
-            logging.info('Guid not found.')
+            logging.info(u'Guid not found.')
             if 'downloadid' in data.keys():
                 # try to get result from downloadid
                 logging.info(u'Searching local database for downloadid.')
@@ -584,14 +584,14 @@ class Postprocessing(object):
             result['tasks']['cleanup'] = {'enabled': 'true'}
 
             if config['createhardlink']:
-                logging.info('Hardlink creation enabled. Skipping Cleanup.')
+                logging.info(u'Hardlink creation enabled. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = 'skipped'
                 return result
 
             # fail if mover disabled or failed
             if config['moverenabled'] is False or \
                     result['tasks']['mover']['response'] == u'false':
-                logging.info('Mover either disabled or failed. Skipping Cleanup.')
+                logging.info(u'Mover either disabled or failed. Skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = u'false'
             else:
                 if self.cleanup(data['path']):
@@ -635,7 +635,7 @@ class Postprocessing(object):
         else:
             match = max(matches, key=len)
             new_path = path.replace(match, maps[match])
-            logging.info('Changing remote path from {} to {}'.format(path, new_path))
+            logging.info(u'Changing remote path from {} to {}'.format(path, new_path))
             return new_path
 
     def compile_path(self, string, data):
@@ -760,7 +760,7 @@ class Postprocessing(object):
         # Create hardlink
 
         if config['createhardlink']:
-            logging.info('Creating hardlink from {} to {}.'.format(new_file_location, data['orig_filename']))
+            logging.info(u'Creating hardlink from {} to {}.'.format(new_file_location, data['orig_filename']))
             if os.name == 'nt':
                 import ctypes
                 ctypes.windll.kernel32.CreateHardLinkA(data['orig_filename'], new_file_location, 0)

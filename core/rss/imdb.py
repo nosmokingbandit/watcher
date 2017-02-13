@@ -142,7 +142,7 @@ class ImdbRss(object):
             if not movie_info:
                 logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
-            logging.info('Adding movie {} {} from imdb watchlist.'.format(title, imdbid))
+            logging.info(u'Adding movie {} {} from imdb watchlist.'.format(title, imdbid))
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
             time.sleep(1)

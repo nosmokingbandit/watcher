@@ -161,6 +161,9 @@ class NewzNab():
 
         '''
 
+        if not indexer:
+            return {'response': False, 'error': 'Indexer field is blank.'}
+
         while indexer[-1] == '/':
             indexer = indexer[:-1]
 

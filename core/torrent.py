@@ -120,7 +120,10 @@ class Torrent(object):
 
         '''
 
-        while indexer[-1] == u'/':
+        if not indexer:
+            return {'response': False, 'error': 'Indexer field is blank.'}
+
+        while indexer[-1] == '/':
             indexer = indexer[:-1]
 
         response = {}

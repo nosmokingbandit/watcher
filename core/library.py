@@ -170,11 +170,12 @@ class ImportDirectory(object):
                                               movie['videocodec'],
                                               movie['releasegroup']
                                               )
+
         while title[-1] == '.':
             title = title[:-1]
 
         while '..' in title:
-            title.replace('..', '.')
+            title = title.replace('..', '.')
 
         result['title'] = title
 

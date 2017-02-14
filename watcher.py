@@ -1,4 +1,5 @@
 import argparse
+import locale
 import logging
 import os
 import ssl
@@ -26,6 +27,16 @@ os.chdir(core.PROG_PATH)
 
 if __name__ == '__main__':
     ssl._create_default_https_context = ssl._create_unverified_context
+
+    # have to set locale for date parsing
+    try:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    except Exception, e:
+        try:
+            locale.setlocale(locale.LC_ALL, 'English_United States.1252')
+        except Exception, e:
+            print 'Unable to set locale. Date parsing may not work correctly.'
+
 
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")

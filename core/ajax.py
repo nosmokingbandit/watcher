@@ -153,8 +153,10 @@ class Ajax(object):
                                   args=(data['imdbid'], poster_url))
             t2.start()
 
-            t = threading.Thread(target=thread_search_grab, args=(data,))
-            t.start()
+            # disable immediately grabbing new release for imports
+            if data['status'] != 'Disabled':
+                t = threading.Thread(target=thread_search_grab, args=(data,))
+                t.start()
 
             response['response'] = True
             response['message'] = u'{} {} added to wanted list.' \

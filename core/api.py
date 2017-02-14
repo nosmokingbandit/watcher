@@ -41,6 +41,9 @@ mode=removemovie
     input: imdbid=tt1234567
     output: {'removed': 'tt1234567'}
 
+mode=get_config
+    output: JSON-formatted config. Basically just the config file.
+
 mode=version
     output: {'version': '4fcdda1df1a4ff327c3219311578d703a288e598', 'api_version': 1.0}
 
@@ -121,7 +124,7 @@ class API(object):
             return self.version()
 
         elif params['mode'] == u'get_config':
-            return json.dumps(core.CONFIG)
+            return json.dumps(core.CONFIG, sort_keys=True, indent=4)
 
         else:
             return json.dumps({'response': False,

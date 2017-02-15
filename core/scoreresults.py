@@ -70,6 +70,8 @@ class ScoreResults():
 
         today = datetime.today()
 
+        logging.info('Scoring {} results.'.format(len(self.results)))
+
         # These all just modify self.results
         self.reset()
         self.remove_inactive()
@@ -131,13 +133,12 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Filtering Ignored Words')
-
         keep = []
 
         if not group_list or group_list == [u'']:
             return
 
+        logging.info(u'Filtering Ignored Words.')
         for r in self.results:
             cond = False
             for word_group in group_list:
@@ -147,7 +148,9 @@ class ScoreResults():
                     break
             if cond is False and r not in keep:
                 keep.append(r)
+
         self.results = keep
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def keep_required(self, group_list):
         ''' Remove results without required groups of 'words'
@@ -160,13 +163,12 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Filtering Required Words')
-
         keep = []
 
         if not group_list or group_list == [u'']:
             return
 
+        logging.info(u'Filtering Required Words.')
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
@@ -175,7 +177,9 @@ class ScoreResults():
                     break
                 else:
                     continue
+
         self.results = keep
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def retention_check(self, retention, today):
         ''' Remove results older than 'retention' days
@@ -188,10 +192,10 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Checking retention')
-
         if retention == 0:
             return
+
+        logging.info(u'Checking retention.')
         lst = []
         for result in self.results:
             if result['type'] != u'nzb':
@@ -203,7 +207,9 @@ class ScoreResults():
                     lst.append(result)
                 else:
                     logging.info(u'{} published {} days ago, removing search result.'.format(result['title'], age))
+
         self.results = lst
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def seed_check(self, seeds):
         ''' Remove any torrents with fewer than 'seeds' seeders
@@ -212,10 +218,9 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Checking torrent seeds')
-
         if seeds == 0:
             return
+        logging.info(u'Checking torrent seeds.')
         lst = []
         for result in self.results:
             if result['type'] not in ['torrent', 'magnet']:
@@ -226,6 +231,7 @@ class ScoreResults():
                 else:
                     logging.info(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def score_preferred(self, group_list):
         ''' Increase score for each group of 'words' match
@@ -238,7 +244,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Scoring Preferred Words')
+        logging.info(u'Scoring Preferred Words.')
 
         if not group_list or group_list == [u'']:
             return
@@ -265,7 +271,7 @@ class ScoreResults():
         Does not return
         '''
 
-        logging.info(u'Checking title match')
+        logging.info(u'Checking title match.')
 
         lst = []
         if title is None:
@@ -283,6 +289,7 @@ class ScoreResults():
                 else:
                     logging.info(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
         self.results = lst
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def score_resolution(self, resolutions):
         ''' Score releases based on quality preferences
@@ -295,6 +302,7 @@ class ScoreResults():
         Does not return
         '''
 
+        logging.info('Filtering resolution and size requirements.')
         lst = []
         for result in self.results:
             result_res = result['resolution']
@@ -311,6 +319,7 @@ class ScoreResults():
                         lst.append(result)
 
         self.results = lst
+        logging.info('Keeping {} results.'.format(len(self.results)))
 
     def import_quality(self):
         profile = json.loads(json.dumps(core.CONFIG['Quality']['Profiles']['Default']))

@@ -29,6 +29,8 @@ class TMDB(object):
 
         if search_term[:2] == u'tt' and search_term[2:].isdigit():
             movies = self._search_imdbid(search_term)
+        elif search_term.isdigit():
+            movies = self._search_tmdbid(search_term)
         else:
             movies = self._search_title(search_term)
 
@@ -55,8 +57,8 @@ class TMDB(object):
         else:
             query = u'query={}'.format(title)
 
-        search_string = url + query
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        url = url + query
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 
         try:
             results = json.load(urllib2.urlopen(request))
@@ -71,9 +73,9 @@ class TMDB(object):
             return ['']
 
     def _search_imdbid(self, imdbid):
-        search_string = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
+        url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             results = json.load(urllib2.urlopen(request))
             if results['movie_results'] == []:
@@ -81,6 +83,22 @@ class TMDB(object):
             else:
                 response = results['movie_results'][0]
                 response['imdbid'] = imdbid
+                return [response]
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'TMDB find.', exc_info=True)
+            return []
+
+    def _search_tmdbid(self, tmdbid):
+        url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
+        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+
+        try:
+            response = json.load(urllib2.urlopen(request))
+            if response.get('status_code'):
+                return []
+            else:
                 return [response]
         except (SystemExit, KeyboardInterrupt):
             raise

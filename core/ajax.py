@@ -126,7 +126,9 @@ class Ajax(object):
             logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
 
             response['response'] = False
-            response['error'] = u'{} {} is already wanted, cannot add.'.format(title, year)
+            movie = self.sql.get_movie_details('imdbid', data['imdbid'])
+            status = movie['status']
+            response['error'] = u'{} {} is {}, cannot add.'.format(title, year, status)
             return json.dumps(response)
 
         poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
@@ -153,8 +155,10 @@ class Ajax(object):
                                   args=(data['imdbid'], poster_url))
             t2.start()
 
-            t = threading.Thread(target=thread_search_grab, args=(data,))
-            t.start()
+            # disable immediately grabbing new release for imports
+            if data['status'] != 'Disabled':
+                t = threading.Thread(target=thread_search_grab, args=(data,))
+                t.start()
 
             response['response'] = True
             response['message'] = u'{} {} added to wanted list.' \
@@ -194,7 +198,38 @@ class Ajax(object):
         else:
             data = data[0]
 
+        data['imdbid'] = imdbid
         data['quality'] = quality
+
+        return self.add_wanted_movie(json.dumps(data))
+
+    @cherrypy.expose
+    def add_wanted_tmdbid(self, tmdbid, quality='Default'):
+        ''' Method to quckly add movie with just tmdbid
+        :param imdbid: str imdb id #
+
+        Submits movie with base quality options
+
+        Generally just used for the api
+
+        Returns dict of success/fail with message.
+
+        Returns str json.dumps(dict)
+        '''
+
+        response = {}
+
+        data = self.tmdb._search_tmdbid(tmdbid)
+
+        if not data:
+            response['status'] = u'false'
+            response['message'] = u'{} not found on TMDB.'.format(tmdbid)
+            return response
+        else:
+            data = data[0]
+
+        data['quality'] = quality
+        data['status'] = 'Wanted'
 
         return self.add_wanted_movie(json.dumps(data))
 

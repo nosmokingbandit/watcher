@@ -31,7 +31,8 @@ mode=liststatus:
         output: {'movies': [{'key': 'value', 'key2', 'value2'}, {'key': 'value', 'key2', 'value2'}] }
 
 mode=addmovie
-    input: imdbid=tt1234567
+    input: imdbid=tt1234567     Either this or tmdbid required
+    input: tmdbid=123456        Either this or imdbid required
     input: quality=Default      <optional>
     output: {'message': 'MOVIE TITLE YEAR added to wanted list.'}
 
@@ -40,6 +41,9 @@ mode=addmovie
 mode=removemovie
     input: imdbid=tt1234567
     output: {'removed': 'tt1234567'}
+
+mode=get_config
+    output: JSON-formatted config. Basically just the config file.
 
 mode=version
     output: {'version': '4fcdda1df1a4ff327c3219311578d703a288e598', 'api_version': 1.0}
@@ -101,14 +105,18 @@ class API(object):
                 return self.liststatus()
 
         elif params['mode'] == u'addmovie':
-            if 'imdbid' not in params:
+            if 'imdbid' not in params and 'tmdbid' not in params:
                 return json.dumps({'response': False,
-                                   'error': 'no imdbid supplied'})
+                                   'error': 'no movie id supplied'})
+            if params.get('imdbid') and params.get('tmdbid'):
+                return json.dumps({'response': False,
+                                   'error': 'multiple movie ids supplied'})
             else:
-                imdbid = params['imdbid']
                 quality = params.get('quality')
-            return self.addmovie(imdbid, quality)
-
+                if params.get('imdbid'):
+                    return self.addmovie(imdbid=params['imdbid'], quality=quality)
+                elif params.get('tmdbid'):
+                    return self.addmovie(tmdbid=params['tmdbid'], quality=quality)
         elif params['mode'] == u'removemovie':
             if 'imdbid' not in params:
                 return json.dumps({'response': False,
@@ -121,7 +129,7 @@ class API(object):
             return self.version()
 
         elif params['mode'] == u'get_config':
-            return json.dumps(core.CONFIG)
+            return json.dumps(core.CONFIG, sort_keys=True, indent=4)
 
         else:
             return json.dumps({'response': False,
@@ -156,7 +164,7 @@ class API(object):
             response = {'response': True, 'movies': movies}
             return json.dumps(response, indent=1)
 
-    def addmovie(self, imdbid, quality):
+    def addmovie(self, imdbid=None, tmdbid=None, quality=None):
         ''' Add movie with default quality settings
         :param imdbid: imdb id number of movie
 
@@ -166,9 +174,12 @@ class API(object):
         if quality is None:
             quality = 'Default'
 
-        logging.info(u'API request add movie {}'.format(imdbid))
-
-        return self.ajax.add_wanted_imdbid(imdbid, quality)
+        if imdbid:
+            logging.info(u'API request add movie {}'.format(imdbid))
+            return self.ajax.add_wanted_imdbid(imdbid, quality)
+        else:
+            logging.info(u'API request add movie {}'.format(tmdbid))
+            return self.ajax.add_wanted_tmdbid(tmdbid, quality)
 
     def removemovie(self, imdbid):
         ''' Remove movie from wanted list

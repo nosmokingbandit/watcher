@@ -116,7 +116,6 @@ class Snatcher():
         guid = data['guid']
         imdbid = data['imdbid']
         title = data['title']
-        data['title'] = u'{}.Watcher'.format(data['title'])
 
         # If sending to SAB
         sab_conf = core.CONFIG['Downloader']['Usenet']['Sabnzbd']
@@ -162,7 +161,6 @@ class Snatcher():
         guid = data['guid']
         imdbid = data['imdbid']
         title = data['title']
-        data['title'] = u'{}.Watcher'.format(data['title'])
         kind = data['type']
 
         # If sending to Transmission

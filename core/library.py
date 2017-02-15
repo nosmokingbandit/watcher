@@ -177,8 +177,6 @@ class ImportDirectory(object):
         while '..' in title:
             title = title.replace('..', '.')
 
-        print title
-
         result['title'] = title
 
         result['guid'] = 'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])

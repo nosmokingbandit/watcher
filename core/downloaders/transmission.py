@@ -32,7 +32,7 @@ class Transmission(object):
             raise
         except Exception, e:
             logging.error(u'Transmission test_connection', exc_info=True)
-            return '{}.'.format(e)
+            return u'{}.'.format(e)
 
     @staticmethod
     def add_torrent(data):

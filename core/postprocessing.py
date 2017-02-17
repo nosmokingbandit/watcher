@@ -53,7 +53,7 @@ class Postprocessing(object):
             if key not in data:
                 logging.info(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
-                                  'error': 'missing key: {}'.format(key)})
+                                  'error': u'missing key: {}'.format(key)})
 
         # check if api key is correct
         if data['apikey'] != core.CONFIG['Server']['apikey']:
@@ -152,7 +152,7 @@ class Postprocessing(object):
             if key not in data:
                 logging.info(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
-                                  'error': 'missing key: {}'.format(key)})
+                                  'error': u'missing key: {}'.format(key)})
 
         # check if api key is correct
         if data['apikey'] != core.CONFIG['Server']['apikey']:
@@ -349,7 +349,7 @@ class Postprocessing(object):
         else:
             logging.info(u'Unable to find local data for release. Searching TMDB.')
 
-            search_term = '{} {}'.format(data['title'], data['year'])
+            search_term = u'{} {}'.format(data['title'], data['year'])
             logging.info(u'Searching tmdb for {}'.format(search_term))
 
             tmdbdata = self.tmdb.search(search_term, single=True)

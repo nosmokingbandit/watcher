@@ -76,6 +76,6 @@ class SysTrayPlugin(plugins.SimplePlugin):
 
     # sys tray functions:
     def open(self, systray):
-        webbrowser.open('http://{}:{}{}'.format(
+        webbrowser.open(u'http://{}:{}{}'.format(
             core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
         return

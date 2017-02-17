@@ -47,7 +47,7 @@ class QBittorrent(object):
 
         host = conf['host']
         port = conf['port']
-        base_url = '{}:{}/'.format(host, port)
+        base_url = u'{}:{}/'.format(host, port)
 
         user = conf['user']
         password = conf['pass']
@@ -69,7 +69,7 @@ class QBittorrent(object):
 
         post_data['urls'] = data['torrentfile']
 
-        post_data['savepath'] = '{}{}'.format(download_dir, conf['category'])
+        post_data['savepath'] = u'{}{}'.format(download_dir, conf['category'])
 
         post_data['category'] = conf['category']
 

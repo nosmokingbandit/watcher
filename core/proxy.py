@@ -41,9 +41,9 @@ class Proxy(object):
                 proxies = {}
 
                 if user and password:
-                    url = '{}:{}@{}:{}'.format(user, password, host, port)
+                    url = u'{}:{}@{}:{}'.format(user, password, host, port)
                 else:
-                    url = '{}:{}'.format(host, port)
+                    url = u'{}:{}'.format(host, port)
 
                 proxies['http'] = url
 

@@ -82,7 +82,7 @@ class Poster():
         lParser = parseImages()
 
         search_term = search_term.replace(" ", "+")
-        search_string = "https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
+        search_string = u"https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 

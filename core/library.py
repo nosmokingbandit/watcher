@@ -120,7 +120,7 @@ class ImportDirectory(object):
         else:
             if data.get('resolution'):
                 if data['resolution'] in ['4K, 1080P, 720P']:
-                    data['resolution'] = 'BluRay-{}'.format(data['resolution'])
+                    data['resolution'] = u'BluRay-{}'.format(data['resolution'])
                 else:
                     data['resolution'] = 'DVD-SD'
 
@@ -168,7 +168,7 @@ class ImportDirectory(object):
                   'size': movie.get('size', '')
                   }
 
-        title = '{}.{}.{}.{}.{}.{}.{}'.format(movie['title'],
+        title = u'{}.{}.{}.{}.{}.{}.{}'.format(movie['title'],
                                               movie['year'],
                                               result['resolution'],
                                               movie['source'],
@@ -185,6 +185,6 @@ class ImportDirectory(object):
 
         result['title'] = title
 
-        result['guid'] = 'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
+        result['guid'] = u'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
 
         return result

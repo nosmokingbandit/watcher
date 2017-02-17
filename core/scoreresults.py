@@ -72,7 +72,7 @@ class ScoreResults():
 
         today = datetime.today()
 
-        logging.info('Scoring {} results.'.format(len(self.results)))
+        logging.info(u'Scoring {} results.'.format(len(self.results)))
 
         # These all just modify self.results
         self.reset()
@@ -152,7 +152,7 @@ class ScoreResults():
                 keep.append(r)
 
         self.results = keep
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def keep_required(self, group_list):
         ''' Remove results without required groups of 'words'
@@ -181,7 +181,7 @@ class ScoreResults():
                     continue
 
         self.results = keep
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def retention_check(self, retention, today):
         ''' Remove results older than 'retention' days
@@ -211,7 +211,7 @@ class ScoreResults():
                     logging.info(u'{} published {} days ago, removing search result.'.format(result['title'], age))
 
         self.results = lst
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def seed_check(self, seeds):
         ''' Remove any torrents with fewer than 'seeds' seeders
@@ -233,7 +233,7 @@ class ScoreResults():
                 else:
                     logging.info(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def score_preferred(self, group_list):
         ''' Increase score for each group of 'words' match
@@ -291,7 +291,7 @@ class ScoreResults():
                 else:
                     logging.info(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
         self.results = lst
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def score_sources(self, sources, check_size=True):
         ''' Score releases based on quality/source preferences
@@ -331,7 +331,7 @@ class ScoreResults():
                         lst.append(result)
 
         self.results = lst
-        logging.info('Keeping {} results.'.format(len(self.results)))
+        logging.info(u'Keeping {} results.'.format(len(self.results)))
 
     def import_quality(self):
         profile = json.loads(json.dumps(core.CONFIG['Quality']['Profiles']['Default']))

@@ -66,7 +66,7 @@ class Plugins(object):
         args = list(args)
 
         for plugin in plugins:
-            conf_file = '{}.conf'.format(os.path.splitext(plugin)[0])
+            conf_file = u'{}.conf'.format(os.path.splitext(plugin)[0])
 
             try:
                 if os.path.isfile(conf_file):

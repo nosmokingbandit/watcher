@@ -219,9 +219,9 @@ class Torrent(object):
         title = title.lower()
         for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
             if any(i in title for i in aliases):
-                return '{}-{}'.format(source, resolution)
+                return u'{}-{}'.format(source, resolution)
                 break
-        return 'Unknown-{}'.format(resolution)
+        return u'Unknown-{}'.format(resolution)
 
 
 class Rarbg(object):

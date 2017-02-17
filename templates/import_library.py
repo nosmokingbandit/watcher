@@ -53,7 +53,7 @@ class ImportLibrary():
             if not review_movies and not incomplete_movies:
                 with span('No movies found.', id='not_found'):
                     br()
-                    with a(href='{}/import_library'.format(core.URL_BASE)):
+                    with a(href=u'{}/import_library'.format(core.URL_BASE)):
                         i(cls='fa fa-caret-left')
                         span('Return')
             else:
@@ -86,7 +86,7 @@ class ImportLibrary():
                                                     option(src, value=src, selected='selected')
                                                 else:
                                                     option(src, value=src)
-                                    td('{} MB'.format(movie['size'] / 1024**2))
+                                    td(u'{} MB'.format(movie['size'] / 1024**2))
                 if incomplete_movies:
                     with div(id='incomplete'):
                         span('The following movies are missing key data.', cls='title')
@@ -109,7 +109,7 @@ class ImportLibrary():
                                     td(path, cls='short_name')
                                     td(movie.get('title'))
                                     with td():
-                                        input(type='text', placeholder='tt0123456', cls='input_imdbid', value=movie['imdbid'])
+                                        input(type='text', placeholder='tt0123456', cls='input_imdbid', value=movie['imdbid'] or '')
                                     with td():
                                         with select(cls='input_resolution'):
                                             for src in core.RESOLUTIONS:
@@ -117,7 +117,7 @@ class ImportLibrary():
                                                     option(src, value=src, selected='selected')
                                                 else:
                                                     option(src, value=src)
-                                    td('{} MB'.format(movie['size'] / 1024**2))
+                                    td(u'{} MB'.format(movie['size'] / 1024**2))
                 with span(id='import'):
                     i(cls='fa fa-check-circle')
                     span('Import')
@@ -145,10 +145,10 @@ class ImportLibrary():
                         th('IMDB ID')
                     for movie in successful:
                         with tr():
-                            td('{} ({})'.format(movie['title'], movie['year']))
+                            td(u'{} ({})'.format(movie['title'], movie['year']))
                             td(movie['imdbid'])
 
-            with a(id='finished', href='{}/status'.format(core.URL_BASE)):
+            with a(id='finished', href=u'{}/status'.format(core.URL_BASE)):
                 i(cls='fa fa-thumbs-o-up')
                 span('Cool')
         return unicode(div_results)

@@ -123,7 +123,7 @@ class TMDB(object):
             return None
 
         if not tmdbid:
-            url = 'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year).replace(' ', '+')
+            url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year).replace(' ', '+')
             request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             try:
                 response = json.load(urllib2.urlopen(request))
@@ -138,7 +138,7 @@ class TMDB(object):
                 logging.error(u'TMDB find.', exc_info=True)
                 return None
 
-        url = 'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
+        url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -162,7 +162,7 @@ class Trailer(object):
 
         search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
 
-        search_string = "https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', _k('youtube'))
+        search_string = u"https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', _k('youtube'))
 
         request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
 

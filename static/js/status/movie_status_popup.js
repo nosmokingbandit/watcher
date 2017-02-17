@@ -138,9 +138,6 @@ $(document).ready(function() {
         var guid = $this.attr('guid');
         var imdbid = $('span#title').attr('imdbid')
 
-        console.log(title)
-        console.log(year)
-
         $this.addClass('fa-circle faa-burst animated');
 
         $.post(url_base + "/ajax/manual_download", {"title": title,

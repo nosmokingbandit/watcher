@@ -101,7 +101,7 @@ class ImportDirectory(object):
         except Exception, e: #noqa
             logging.warning(u'Unable to parse metadata.', exc_info=True)
 
-        if metadata and not data['resolution']:
+        if metadata:
             if metadata.get('Metadata'):
                 width = metadata['Metadata'].get('width')
             elif metadata.get('video[1]'):
@@ -110,13 +110,19 @@ class ImportDirectory(object):
             if width:
                 width = int(width)
                 if width > 1920:
-                    data['resolution'] = '4K'
+                    data['resolution'] = 'BluRay-4K'
                 elif 1920 >= width > 1440:
-                    data['resolution'] = '1080P'
+                    data['resolution'] = 'BluRay-1080P'
                 elif 1440 >= width > 720:
-                    data['resolution'] = '720P'
+                    data['resolution'] = 'BluRay-720P'
                 else:
-                    data['resolution'] = 'SD'
+                    data['resolution'] = 'DVD-SD'
+        else:
+            if data.get('resolution'):
+                if data['resolution'] in ['4K, 1080P, 720P']:
+                    data['resolution'] = 'BluRay-{}'.format(data['resolution'])
+                else:
+                    data['resolution'] = 'DVD-SD'
 
         if metadata and not data['audiocodec']:
             if metadata.get('audio[1]'):

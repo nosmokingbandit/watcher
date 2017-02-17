@@ -79,7 +79,7 @@ class TMDB(object):
         try:
             results = json.load(urllib2.urlopen(request))
             if results['movie_results'] == []:
-                return []
+                return ['']
             else:
                 response = results['movie_results'][0]
                 response['imdbid'] = imdbid
@@ -88,7 +88,7 @@ class TMDB(object):
             raise
         except Exception, e: # noqa
             logging.error(u'TMDB find.', exc_info=True)
-            return []
+            return ['']
 
     def _search_tmdbid(self, tmdbid):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
@@ -97,14 +97,14 @@ class TMDB(object):
         try:
             response = json.load(urllib2.urlopen(request))
             if response.get('status_code'):
-                return []
+                return ['']
             else:
                 return [response]
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'TMDB find.', exc_info=True)
-            return []
+            return ['']
 
     def get_imdbid(self, tmdbid=None, title=None, year=''):
         ''' Gets imdbid from tmdbid

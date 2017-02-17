@@ -2,10 +2,13 @@ input[type='text']{
     color: #212121;
 }
 
-div.quality ul.quality_profile{
+div.quality div.quality_profile{
     background-color: #000;
 }
 
+div.quality table#sources tr:nth-child(even){
+    background: #000;
+}
 div.plugins ul{
     background-color: #000;
 }

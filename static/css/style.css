@@ -2,6 +2,7 @@
 
 body, html{
     width: 100%;
+    min-width: 918px;
     min-height: 100%;
 }
 

@@ -198,9 +198,9 @@ class API(object):
         if removed is True:
             response = {'response': True, 'removed': imdbid}
         elif removed is False:
-            response = {'response': False, 'error': 'unable to remove {}'.format(imdbid)}
+            response = {'response': False, 'error': u'unable to remove {}'.format(imdbid)}
         elif removed is None:
-            response = {'response': False, 'error': '{} does not exist'.format(imdbid)}
+            response = {'response': False, 'error': u'{} does not exist'.format(imdbid)}
 
         return json.dumps(response, indent=1)
 

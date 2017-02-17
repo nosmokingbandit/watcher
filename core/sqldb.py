@@ -459,7 +459,7 @@ class SQL(object):
 
         for i in tables:
             i = i[0]
-            command = 'PRAGMA table_info({})'.format(i)
+            command = u'PRAGMA table_info({})'.format(i)
             columns = self.execute(command)
             if not columns:
                 continue
@@ -494,11 +494,11 @@ class SQL(object):
 
         backup_dir = os.path.join(core.PROG_PATH, 'db')
         logging.info(u'Backing up database to {}.'.format(backup_dir))
-        print 'Backing up database to {}.'.format(backup_dir)
+        print u'Backing up database to {}.'.format(backup_dir)
         try:
             if not os.path.isdir(backup_dir):
                 os.mkdir(backup_dir)
-            backup = '{}.{}'.format(core.DB_FILE, datetime.date.today())
+            backup = u'{}.{}'.format(core.DB_FILE, datetime.date.today())
             shutil.copyfile(core.DB_FILE, os.path.join(backup_dir, backup))
         except Exception, e: # noqa
             print 'Error backing up database.'
@@ -515,45 +515,45 @@ class SQL(object):
         '''
         for table, schema in diff.iteritems():
             logging.info(u'Modifying table {}'.format(table))
-            print 'Modifying table {}'.format(table)
+            print u'Modifying table {}'.format(table)
             for name, kind in schema.iteritems():
-                command = 'ALTER TABLE {} ADD COLUMN {} {}'.format(table, name, kind)
+                command = u'ALTER TABLE {} ADD COLUMN {} {}'.format(table, name, kind)
 
                 self.execute(command)
 
                 if table in self.convert_names.keys():
                     for pair in self.convert_names[table]:
                         if pair[0] == name:
-                            command = 'UPDATE {} SET {} = {}'.format(table, pair[0], pair[1])
+                            command = u'UPDATE {} SET {} = {}'.format(table, pair[0], pair[1])
                             self.execute(command)
 
             # move TABLE to TABLE_TMP
-            table_tmp = '{}_TMP'.format(table)
+            table_tmp = u'{}_TMP'.format(table)
             logging.info(u'Renaming table to {}'.format(table_tmp))
-            print 'Renaming table to {}'.format(table_tmp)
-            command = 'ALTER TABLE {} RENAME TO {}'.format(table, table_tmp)
+            print u'Renaming table to {}'.format(table_tmp)
+            command = u'ALTER TABLE {} RENAME TO {}'.format(table, table_tmp)
             self.execute(command)
 
             # create new table
             logging.info(u'Creating new table {}'.format(table))
-            print 'Creating new table {}'.format(table)
+            print u'Creating new table {}'.format(table)
             table_meta = getattr(self, table)
             table_meta.create(self.engine)
 
             # copy data over
             logging.info(u'Merging data from {} to {}'.format(table_tmp, table))
-            print 'Merging data from {} to {}'.format(table_tmp, table)
-            names = ', '.join(intended[table].keys())
-            command = 'INSERT INTO {} ({}) SELECT {} FROM {}'.format(table, names, names, table_tmp)
+            print u'Merging data from {} to {}'.format(table_tmp, table)
+            names = u', '.join(intended[table].keys())
+            command = u'INSERT INTO {} ({}) SELECT {} FROM {}'.format(table, names, names, table_tmp)
             self.execute(command)
 
             logging.info(u'Dropping table {}'.format(table_tmp))
-            print 'Dropping table {}'.format(table_tmp)
-            command = 'DROP TABLE {}'.format(table_tmp)
+            print u'Dropping table {}'.format(table_tmp)
+            command = u'DROP TABLE {}'.format(table_tmp)
             self.execute(command)
 
             logging.info(u'Finished updating table {}'.format(table))
-            print 'Finished updating table {}'.format(table)
+            print u'Finished updating table {}'.format(table)
 
         logging.info(u'Database updated')
         print 'Database updated.'

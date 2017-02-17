@@ -74,7 +74,7 @@ if __name__ == '__main__':
     conf = config.Config()
     if not os.path.isfile(core.CONF_FILE):
         print u'Config file not found. Creating new basic config {}. ' \
-            'Please review settings.'.format(core.CONF_FILE)
+            u'Please review settings.'.format(core.CONF_FILE)
         conf.new_config()
     else:
         print 'Config file found, merging any new options.'
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 
     # if everything goes well so far, open the browser
     if passed_args.browser or core.CONFIG['Server']['launchbrowser']:
-        webbrowser.open("http://{}:{}{}".format(
+        webbrowser.open(u"http://{}:{}{}".format(
             core.SERVER_ADDRESS, core.SERVER_PORT, core.URL_BASE))
         logging.info(u'Launching web browser.')
 

@@ -125,7 +125,7 @@ class Settings():
                     span(u'Check for updates now.')
                     with span(u'Current version hash: ', cls='tip'):
                         if core.CURRENT_HASH is not None:
-                            a(core.CURRENT_HASH[0:7], href='{}/commits'.format(core.GIT_URL), target='_blank')
+                            a(core.CURRENT_HASH[0:7], href=u'{}/commits'.format(core.GIT_URL), target='_blank')
         h2('Proxy')
         with ul(id='proxy', cls='wide'):
             with li():
@@ -751,8 +751,8 @@ class Settings():
                 continue
             name = plugin[:-3]
 
-            if '{}.conf'.format(name) in plugins:
-                conf = '{}.conf'.format(name)
+            if u'{}.conf'.format(name) in plugins:
+                conf = u'{}.conf'.format(name)
             else:
                 conf = None
 
@@ -762,7 +762,7 @@ class Settings():
             else:
                 sort = 900 + fid
                 enabled = 'False'
-            with li(id='{}{}'.format(folder, fid), plugin=plugin, sort=sort):
+            with li(id=u'{}{}'.format(folder, fid), plugin=plugin, sort=sort):
                 i(cls='fa fa-bars')
                 i(cls='fa fa-square-o checkbox', value=str(enabled))
                 span(name)

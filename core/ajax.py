@@ -319,7 +319,7 @@ class Ajax(object):
         if kind == 'nzb' and not usenet_enabled:
             return json.dumps({'response': False, 'error': 'Link is NZB but no Usent downloader is enabled.'})
         if kind in ['torrent', 'magnet'] and not torrent_enabled:
-            return json.dumps({'response': False, 'error': 'Link is {} but no Torrent downloader is enabled.'.format(kind)})
+            return json.dumps({'response': False, 'error': u'Link is {} but no Torrent downloader is enabled.'.format(kind)})
 
         data = dict(self.sql.get_single_search_result('guid', guid))
         if data:
@@ -689,7 +689,7 @@ class Ajax(object):
                     data.update(tmdbdata)
                     movie_data.append(data)
                 else:
-                    data['error'] = 'Unable to find "{}" on TMDB.'.format(data['imdbid'])
+                    data['error'] = u'Unable to find "{}" on TMDB.'.format(data['imdbid'])
                     results['failed'].append(data)
 
         for movie in movie_data:

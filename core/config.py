@@ -51,7 +51,7 @@ class Config():
 
         with open(self.file, 'w') as f:
             json.dump(config, f, indent=4, sort_keys=True)
-        return 'Config created at {}'.format(self.file)
+        return u'Config created at {}'.format(self.file)
 
     def write_dict(self, data):
         ''' Writes a dict to the config file.

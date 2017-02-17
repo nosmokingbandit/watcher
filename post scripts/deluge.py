@@ -37,7 +37,7 @@ if parent_folder.lower() != category.lower():
 data['apikey'] = watcherapi
 
 data['name'] = args[2]
-data['path'] = '{}/{}'.format(download_dir, args[2])
+data['path'] = u'{}/{}'.format(download_dir, args[2])
 data['downloadid'] = args[1]
 data['guid'] = args[1]
 data['mode'] = 'complete'

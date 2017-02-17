@@ -48,7 +48,7 @@ class Status():
                 self.movie_list()
 
             with div(id='import'):
-                with a(href='{}/import_library'.format(core.URL_BASE)):
+                with a(href=u'{}/import_library'.format(core.URL_BASE)):
                     i(cls='fa fa-hdd-o', id='import_library')
                     span('Import existing library.')
 
@@ -70,7 +70,7 @@ class Status():
         movie_list = ul(id='movie_list')
         with movie_list:
             for data in movies:
-                poster_path = core.URL_BASE + '/static/images/posters/{}.jpg'.format(data['imdbid'])
+                poster_path = core.URL_BASE + u'/static/images/posters/{}.jpg'.format(data['imdbid'])
                 with li(cls='movie', imdbid=data['imdbid']):
                     with div():
                         status = data['status']
@@ -87,7 +87,7 @@ class Status():
                         else:
                             span(u'Status Unknown', cls='status wanted')
 
-                        img(src=poster_path, alt='Poster for {}'.format(data['imdbid']))
+                        img(src=poster_path, alt=u'Poster for {}'.format(data['imdbid']))
 
                         with span(cls='movie_info'):
                             span(data['title'], cls='title', title=data['title'])

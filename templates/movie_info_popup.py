@@ -21,10 +21,10 @@ class MovieInfoPopup():
 
         title_date = data['title'] + ' ' + data['release_date'][:4]
         youtube_id = trailer.get_trailer(title_date)
-        tmdb_url = "https://www.themoviedb.org/movie/{}".format(data['id'])
+        tmdb_url = u"https://www.themoviedb.org/movie/{}".format(data['id'])
 
         if youtube_id:
-            trailer_embed = "https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
+            trailer_embed = u"https://www.youtube.com/embed/{}?&showinfo=0".format(youtube_id)
         else:
             trailer_embed = ''
         if data['poster_path'] is None:

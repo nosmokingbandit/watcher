@@ -32,7 +32,7 @@ class DelugeRPC(object):
         try:
             error = client.connect()
             if error:
-                return '{}.'.format(error)
+                return u'{}.'.format(error)
         except Exception, e:
             return str(e)
         return True
@@ -68,7 +68,7 @@ class DelugeRPC(object):
             logging.error(u'Unable to get download path.', exc_info=True)
             return {'response': False, 'error': 'Unable to get download path.'}
 
-        download_path = '{}/{}'.format(def_download_path, conf['category'])
+        download_path = u'{}/{}'.format(def_download_path, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -137,7 +137,7 @@ class DelugeWeb(object):
 
         host = conf['host']
         port = conf['port']
-        url = '{}:{}/json'.format(host, port)
+        url = u'{}:{}/json'.format(host, port)
 
         # check cookie validity while getting default download dir
         download_dir = DelugeWeb._get_download_dir(url)
@@ -153,7 +153,7 @@ class DelugeWeb(object):
             return {'response': False, 'error': 'Unable to get path information.'}
         # if we got download_dir we can connect.
 
-        download_dir = '{}/{}'.format(download_dir, conf['category'])
+        download_dir = u'{}/{}'.format(download_dir, conf['category'])
 
         priority_keys = {
             'Normal': 0,
@@ -249,4 +249,4 @@ class DelugeWeb(object):
             raise
         except Exception, e:
             logging.error(u'DelugeWeb test_connection', exc_info=True)
-            return '{}.'.format(e.reason)
+            return u'{}.'.format(e.reason)

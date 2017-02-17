@@ -53,14 +53,16 @@ class ScoreResults():
         else:
             title = None
 
+        check_size = True
         if quality_profile == 'import':
             quality = self.import_quality()
+            check_size = False
         elif quality_profile in core.CONFIG['Quality']['Profiles']:
             quality = core.CONFIG['Quality']['Profiles'][quality_profile]
         else:
             quality = core.CONFIG['Quality']['Profiles']['Default']
 
-        resolution = {k: v for k, v in quality.iteritems() if k in ['4K', '1080P', '720P', 'SD']}
+        sources = quality['Sources']
         retention = core.CONFIG['Search']['retention']
         seeds = core.CONFIG['Search']['mintorrentseeds']
 
@@ -79,7 +81,7 @@ class ScoreResults():
         self.keep_required(required)
         self.retention_check(retention, today)
         self.seed_check(seeds)
-        self.score_resolution(resolution)
+        self.score_sources(sources, check_size=check_size)
         if quality['scoretitle']:
             self.fuzzy_title(title)
         self.score_preferred(preferred)
@@ -291,31 +293,41 @@ class ScoreResults():
         self.results = lst
         logging.info('Keeping {} results.'.format(len(self.results)))
 
-    def score_resolution(self, resolutions):
-        ''' Score releases based on quality preferences
-        :param qualities: dict of quality preferences from MOVIES table
+    def score_sources(self, sources, check_size=True):
+        ''' Score releases based on quality/source preferences
+        :param sources: dict of Source information
+        :param check_size: bool whether or not to filter based on size
 
         Iterates through self.results and removes any entry that does not
-            fit into quality criteria (resoution, filesize)
-        Adds to ['score'] based on resolution priority
+            fit into quality criteria (source-resoution, filesize)
+        Adds to ['score'] based on priority of match
 
         Does not return
         '''
 
         logging.info('Filtering resolution and size requirements.')
+        score_range = len(core.RESOLUTIONS) + 1
+
+        sizes = core.CONFIG['Quality']['Sources']
+
         lst = []
         for result in self.results:
             result_res = result['resolution']
             size = result['size'] / 1000000
-            for k, v in resolutions.iteritems():
+            for k, v in sources.iteritems():
                 if v[0] is False:
                     continue
                 priority = v[1]
-                min_size = v[2]
-                max_size = v[3]
+                if check_size:
+                    min_size = sizes[k]['min']
+                    max_size = sizes[k]['max']
+                else:
+                    min_size = 0
+                    max_size = Ellipsis
+
                 if result_res == k:
                     if min_size < size < max_size:
-                        result['score'] += (8 - priority) * 100
+                        result['score'] += abs(priority - score_range) * 40
                         lst.append(result)
 
         self.results = lst
@@ -326,15 +338,9 @@ class ScoreResults():
 
         profile['ignoredwords'] = u''
         profile['requiredwords'] = u''
-        resolutions = ['4K', '1080P', '720P', 'SD']
 
-        for i in resolutions:
-            if profile[i][0] is False:
-                profile[i][1] = 4
-                profile[i][0] = True
-
-            profile[i][2] = 0
-            profile[i][3] = Ellipsis
+        for i in profile['Sources']:
+            profile['Sources'][i][0] = True
 
         return profile
 

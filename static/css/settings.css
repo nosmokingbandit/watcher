@@ -31,6 +31,13 @@ h2{
     margin: 1.5em 0 .25em 0;
 }
 
+h3{
+    font-size: 1.25em;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
 .bold{
     font-weight: bold;
 }
@@ -78,7 +85,7 @@ div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
 }
 
-div#content ul li.indent{
+.indent{
     margin-left: 2em;
 }
 
@@ -113,107 +120,120 @@ input#retention{
 }
 
 /* Quality */
-
-div.quality li{
-    line-height: 2.5em;
-}
-
-div.quality ul.quality_profile{
+div.quality div.quality_profile{
     margin-bottom: 2em;
     padding: 0 1em 1em 1em;
-}
-
-div.quality li.name{
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-div.quality li.name input{
-    font-size: 0.65em;
-    height: 1.75em;
-    vertical-align: middle;
-}
-
-div.quality ul#quality{
-    overflow: hidden;
-}
-
-div.quality ul.quality_profile{
-    background-color: #eee;
+    background: #eee;
     border-radius: 4px;
+    padding: 1em;
+    overflow: auto;
+    position: relative;
 }
 
-div.quality ul.quality_profile input{
+div.quality div.quality_profile input{
     background-color: #fff;
 }
 
-div.quality div.delete_profile{
-    float: right;
-    font-size: 1rem;
+div.quality div.quality_profile div.name{
+    font-size: 1.5em;
+    margin: 0 0 1em 0;
 }
 
-div.quality ul#resolution{
-    width: 30%;
+div.quality div.quality_profile span.sub_heading{
+    font-size: 1.25em;
+    font-weight: bold;
+    clear: both;
+    line-height: 1.25em;
+}
 
+div.quality div.quality_profile div.sources{
     float: left;
+    width: 30%
+}
+div.quality div.quality_profile div.sources ul{
+    margin-top: 0.5em;
+    border-right: 1px solid #bdbdbd;
 }
 
-div.quality ul#resolution li{
-    height: 2.5em;
-    line-height: 2.5em;
+div.quality div.quality_profile ul li{
+    margin-left: 0.75em;
+    line-height: 2.0em;
+    display: inline-block;
+    width: calc(100% - 0.75em);
 }
 
-div.quality ul#resolution_size li{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
+div.quality div.quality_profile div#filters,
+div.quality div.quality_profile div#toggles{
+    float: right;
+    width: 67%;
 }
 
-div.quality ul#resolution_size li span{
-    min-width: 1em;
-    text-align: center;
-    flex: 0 1 auto;
-    align-self: auto;
+div.quality div.quality_profile div#filters input{
+    width: calc(100% - 0.75em);
+    margin-bottom: 1em;
 }
 
-div.quality ul#resolution_size li span:nth-child(1){
-    min-width: 5em;
+div.quality div.quality_profile div#toggles{
+    margin-top: 2em;
 }
 
-div.quality ul#resolution_size li input{
-    flex: 1 0 auto;
-    align-self: auto;
-}
-
-div.quality ul#filters{
-    margin: 1em 0 1em 0;
-}
-
-div.quality ul#filters li{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
-div.quality ul#filters li span{
-    flex: 0 1 auto;
-}
-
-div.quality ul#filters li span:nth-child(1){
-    width: 8em;
-}
-
-div.quality ul#filters li input{
-    flex: 1 0 auto;
-    margin: 0 1em;
-    max-width: 24em;
+div.quality div.quality_profile div#toggles ul{
+    margin-top: 1em;
 }
 
 div.quality div#add_new_profile{
-    margin: 0 0 2.5em 0;
+    margin-bottom: 1.5em;
 }
+
+div.quality table#sources{
+    padding: 1em;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+div.quality table#sources tr{
+    border-radius: 4px;
+    height: 2em;
+}
+
+td:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+td:last-child {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+div.quality table#sources tr:nth-child(even){
+    background: #eee;
+}
+
+div.quality table#sources input{
+    background: #fff;
+}
+
+div.quality table#aliases{
+    width: 100%;
+}
+
+div.quality table#aliases td:first-child{
+    width: 1px;
+}
+
+div.quality table#aliases input{
+    margin-left: 1em;
+    width: 60%;
+}
+
+div.quality i.delete_profile{
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+}
+
 
 /* Providers */
 

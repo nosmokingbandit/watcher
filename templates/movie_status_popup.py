@@ -103,9 +103,9 @@ class MovieStatusPopup():
                             i(cls='fa fa-download', id='manual_download', kind=kind, guid=guid)
                             i(cls='fa fa-ban', id='mark_bad', guid=guid)
                     with li(cls='data ' + bbord):
-                        span(u'Type: ')
+                        span(u'Type:')
                         span(kind, cls='bold')
-                        span(u' Status: ')
+                        span(u' Status:')
                         if status == 'Snatched':
                             span(status, cls='bold snatched')
                         elif status == 'Bad':
@@ -114,11 +114,11 @@ class MovieStatusPopup():
                             span(status, cls='bold finished')
                         else:
                             span(status, cls='bold')
-                        span(u' Size: ')
+                        span(u' Size:')
                         span(size, cls='bold')
-                        span(u' Score: ')
+                        span(u' Score:')
                         span(res['score'], cls='bold')
-                        span(u' Source: ')
+                        span(u' Source:')
                         span(res['indexer'] or '', cls='bold')
                         if pubdate:
                             span(u' Published: ')

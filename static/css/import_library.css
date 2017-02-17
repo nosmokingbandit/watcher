@@ -56,10 +56,6 @@ div#wait{
     display: none;
 }
 
-div#list_files, div#review, div#incomplete, span#not_found{
-    display: none;
-}
-
 a span{
     vertical-align: middle;
 }

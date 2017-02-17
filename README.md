@@ -4,7 +4,9 @@ Watcher is an automated movie NZB searcher and snatcher. You can add a list of w
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features.
 
-Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any events that require user interaction.
+Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any announcements, feature discussion, or events that require user interaction.
+
+Refer to the [wiki](https://github.com/nosmokingbandit/watcher/wiki) for more information about post-processing, start scripts, and other features.
 
 ## Installation
 
@@ -66,7 +68,7 @@ Change path of log directory.
 
 `$ watcher.py --log /path/to/logs/`
 
-Change path to database.
+Change path to database. If not present, a new, empty database will be created.
 
 `$ watcher.py --db /path/to/database.sqlite`
 
@@ -74,21 +76,9 @@ Change path to plugins directory.
 
 `$ watcher.py --plugins /path/to/plugins/`
 
-Create PID file in supplied path.
+Create PID file.
 
 `$ watcher.py --pid /path/to/pid/file.pid`
-
-#### Docker
-A [Docker container](https://hub.docker.com/r/williambroown/watcherdocker/) has been created and maintained by Williambroown.
-
-## Post-Processing
-For more descriptive instructions see the [wiki](https://github.com/nosmokingbandit/watcher/wiki/Post-Processing).
-
-Watcher supports post-processing for Sabnzb and NZBGet. To enable, copy the appropriate script from `watcher/post scripts` to your downloader's scripts directory.
-
-For *Sabnzb*, edit the script file and add your api keys and server information. Then, in Sabnzb, disable `Post-Process Only Verified Jobs`, create a new Category using the same category name you have in Watcher. Select the post-processing script and save.
-
-For *NZBGet*, go to Settings and set up a Category with the same category name you have in Watcher. In `Post-Script` select the Watcher post-processing script. In the left column, select Watcher and add your server information. Save your settings and restart NZBGet.
 
 ## Backup / Restore
 

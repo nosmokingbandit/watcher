@@ -737,7 +737,7 @@ class Postprocessing(object):
         mover_path = config['moverpath']
 
         target_folder = os.path.normpath(self.compile_path(mover_path, data))
-        target_folder = os.path.join(target_folder, '')
+
         # if the new folder doesn't exist, make it
         try:
             if not os.path.exists(target_folder):

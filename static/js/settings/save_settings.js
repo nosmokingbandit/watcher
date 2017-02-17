@@ -209,10 +209,10 @@ $(document).ready(function () {
         var blanks = false;
         var names = [];
 
-        $("ul.quality_profile").each(function(){
+        $("div.quality_profile").each(function(){
             var $this = $(this);
             var tmp = {};
-            var name = $this.find("li.name input.name").val();
+            var name = $this.find("div.name input.name").val();
 
             if(name === undefined){
                 name = "Default"
@@ -225,7 +225,6 @@ $(document).ready(function () {
             }
 
             if(names.includes(name)){
-                blanks = true;
                 toastr.warning("Please enter a unique name for each profile.");
                 return false;
             }
@@ -233,43 +232,38 @@ $(document).ready(function () {
             names.push(name);
 
             profile[name] = {};
-
-            var q_list = [];
-            $this.find("ul#resolution i.checkbox").each(function(){
-                $_this = $(this);
-                res = $_this.attr("id");
-                enabled = is_checked($_this)
-                profile[name][res] = [enabled];
-            });
-
-            // order of resolutions
-            var arr = $this.find("ul#resolution").sortable("toArray");
-            arr.shift();
-            $.each(arr, function(value, res){
-                profile[name][res].push(value)
-            });
-
-            // min/max sizes
-            $this.find("#resolution_size :input").each(function(){
-                $_this = $(this);
-                if($_this.val() == ""){
-                    blanks = true;
-                    highlight($_this);
+            profile[name]['Sources'] = {};
+            $sources = $this.find("div.sources ul");
+            $enabled_sources = [];
+            $disabled_sources = [];
+            // Get order and enabled status for sources
+            $.each($sources.find("li"), function(idx, elem){
+                $elem = $(elem);
+                id = $elem.attr("id");
+                enabled = is_checked($elem.find('i.checkbox'));
+                profile[name]['Sources'][id] = [enabled];
+                if(enabled){
+                    $enabled_sources.push($elem);
+                } else {
+                    $disabled_sources.push($elem);
                 }
-                res = $_this.attr("id");
-                size = parseInt($_this.val());
-                profile[name][res].push(size);
             });
+            $sorted_sources = $.merge($enabled_sources, $disabled_sources)
+
+            $.each($sorted_sources, function(idx, $elem){
+                id = $elem.attr("id");
+                profile[name]['Sources'][id].push(idx);
+            })
 
             // word lists
-            $this.find("ul#filters li input").each(function(){
+            $this.find("div#filters ul li input").each(function(){
                 $_this = $(this);
                 id = $_this.attr("id");
                 value = $_this.val();
                 profile[name][id] = value;
             });
 
-            $this.find("ul#toggles li i.checkbox").each(function(){
+            $this.find("div#toggles ul li i.checkbox").each(function(){
                 profile[name][$(this).attr("id")] = is_checked($(this));
             });
 
@@ -279,16 +273,29 @@ $(document).ready(function () {
             return false;
         };
 
-        $("ul#quality i.checkbox").each(function(){
-            $this = $(this)
-            profile[name][$this.attr("id")] = is_checked($this);
-        })
-
-
         data["Quality"] = {}
         data["Quality"]["Profiles"] = {}
         data["Quality"]["Profiles"] = profile
 
+        data['Quality']['Sources'] = {};
+        $("table#sources tr.source_size").each(function(i, elem){
+            $this = $(this);
+            $tds = $(elem).find("td");
+            name = $($tds[0]).attr("id");
+            min = parseInt($this.find("input.min_size").val());
+            max = parseInt($this.find("input.max_size").val());
+            data['Quality']['Sources'][name] = {};
+            data['Quality']['Sources'][name]['min'] = min;
+            data['Quality']['Sources'][name]['max'] = max;
+        });
+
+        data["Quality"]["Aliases"] = {}
+        $("table#aliases input").each(function(index, elem){
+            $elem = $(elem);
+            name = $elem.attr('id')
+            value = $elem.val().replace(/ /g,'').split(',')
+            data["Quality"]["Aliases"][name] = value;
+        })
         return data;
     }
 
@@ -576,5 +583,4 @@ $(document).ready(function () {
         element.css("background-color", "#f4693b");
         element.delay(500).animate({"background-color": orig_bg}, 1000);
     }
-
 });

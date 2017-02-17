@@ -4,6 +4,7 @@ from cherrypy import expose
 from dominate.tags import *
 from header import Header
 from head import Head
+import json
 
 
 class ImportLibrary():
@@ -42,32 +43,114 @@ class ImportLibrary():
                     span('Scanning library for new movies.')
                     br()
                     span('This may take several minutes.')
-                with div(id='list_files'):
-                    with span('No movies found.', id='not_found'):
-                        br()
-                        with a(href='{}/import_library'.format(core.URL_BASE)):
-                            i(cls='fa fa-caret-left')
-                            span('Return')
+
+            div(id='thinker')
+        return doc.render()
+
+    @staticmethod
+    def render_review(review_movies, incomplete_movies):
+        with div(id='list_files') as div_list:
+            if not review_movies and not incomplete_movies:
+                with span('No movies found.', id='not_found'):
+                    br()
+                    with a(href='{}/import_library'.format(core.URL_BASE)):
+                        i(cls='fa fa-caret-left')
+                        span('Return')
+            else:
+                if review_movies:
                     with div(id='review'):
                         span('The following files have been found.', cls='title')
                         br()
                         span('Review and un-check any unwanted files.', cls='title')
-                        table(id='files')
+                        with table(cls='files'):
+                            with tr():
+                                th('Import')
+                                th('File Path')
+                                th('Title')
+                                th('IMDB ID')
+                                th('Source')
+                                th('Size')
+                            for path, movie in review_movies.iteritems():
+                                source = movie['resolution']
+                                with tr():
+                                    td(json.dumps(movie), cls='hidden data')
+                                    with td():
+                                        i(cls='fa fa-check-square checkbox', value='True')
+                                    td(path, cls='short_name')
+                                    td(movie['title'])
+                                    td(movie['imdbid'])
+                                    with td():
+                                        with select(cls='input_resolution'):
+                                            for src in core.RESOLUTIONS:
+                                                if src == source:
+                                                    option(src, value=src, selected='selected')
+                                                else:
+                                                    option(src, value=src)
+                                    td('{} MB'.format(movie['size'] / 1024**2))
+                if incomplete_movies:
                     with div(id='incomplete'):
                         span('The following movies are missing key data.', cls='title')
                         br()
-                        span('Please fill out or correct IMDB ID and resolution, or uncheck to ignore.', cls='title')
-                        table(id='missing_data')
-                    with span(id='import'):
-                        i(cls='fa fa-check-circle')
-                        span('Import')
-                with div(id='results'):
+                        span('Please fill out or correct IMDB ID and source, or uncheck to ignore.', cls='title')
+                        with table(cls='files'):
+                            with tr():
+                                th('Import')
+                                th('File Path')
+                                th('Title')
+                                th('IMDB ID')
+                                th('Source')
+                                th('Size')
+                            for path, movie in incomplete_movies.iteritems():
+                                source = movie.get('resolution', 'BluRay-1080P')
+                                with tr():
+                                    td(json.dumps(movie), cls='hidden data')
+                                    with td():
+                                        i(cls='fa fa-check-square checkbox', value='True')
+                                    td(path, cls='short_name')
+                                    td(movie.get('title'))
+                                    with td():
+                                        input(type='text', placeholder='tt0123456', cls='input_imdbid', value=movie['imdbid'])
+                                    with td():
+                                        with select(cls='input_resolution'):
+                                            for src in core.RESOLUTIONS:
+                                                if src == source:
+                                                    option(src, value=src, selected='selected')
+                                                else:
+                                                    option(src, value=src)
+                                    td('{} MB'.format(movie['size'] / 1024**2))
+                with span(id='import'):
+                    i(cls='fa fa-check-circle')
+                    span('Import')
+        return unicode(div_list)
 
-                    with a(id='finished', href='{}/status'.format(core.URL_BASE)):
-                        i(cls='fa fa-thumbs-o-up')
-                        span('Cool')
+    @staticmethod
+    def render_complete(successful, failed):
+        with div(id='results') as div_results:
 
-                div(id='thinker')
-        return doc.render()
+            if failed:
+                span('The following movies failed to import.')
+                with table(id='failed'):
+                    with tr():
+                        th('File Path')
+                        th('Error')
+                    for movie in failed:
+                        with tr():
+                            td(movie['filepath'])
+                            td(movie['error'])
+            if successful:
+                span('Successfully imported the following movies.')
+                with table(id='success'):
+                    with tr():
+                        th('Title')
+                        th('IMDB ID')
+                    for movie in successful:
+                        with tr():
+                            td('{} ({})'.format(movie['title'], movie['year']))
+                            td(movie['imdbid'])
+
+            with a(id='finished', href='{}/status'.format(core.URL_BASE)):
+                i(cls='fa fa-thumbs-o-up')
+                span('Cool')
+        return unicode(div_results)
 
 # pylama:ignore=W0401

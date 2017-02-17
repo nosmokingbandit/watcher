@@ -14,11 +14,19 @@ div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
 }
 
-div.quality ul.quality_profile{
+div.quality div.quality_profile{
     background-color: #151c25;
 }
 
-div.quality ul.quality_profile input{
+div.quality div.quality_profile input{
+    background-color: #080f18;
+}
+
+div.quality table#sources tr:nth-child(even){
+    background: #151c25;
+}
+
+div.quality table#sources input{
     background-color: #080f18;
 }
 

@@ -12,7 +12,7 @@ from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import TMDB
 from core.notification import Notification
 from core.rss import predb
-from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status
+from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status, import_library
 
 logging = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ class Ajax(object):
 
             response['response'] = False
             movie = self.sql.get_movie_details('imdbid', data['imdbid'])
-            status = movie['status']
+            status = 'Finished' if movie['status'] == 'Disabled' else movie['status']
             response['error'] = u'{} {} is {}, cannot add.'.format(title, year, status)
             return json.dumps(response)
 
@@ -635,7 +635,7 @@ class Ajax(object):
 
         Removes all movies already in library.
 
-        returns str json.dumps dict. Keys = filepaths, values = dict of metadata
+        returns str html of review/incomplete tables
         '''
 
         recursive = bool(recursive)
@@ -643,14 +643,18 @@ class Ajax(object):
 
         movies = self.library.scan_dir(directory, minsize, recursive)
 
-        if not movies:
-            return json.dumps({})
-
         library = [i['imdbid'] for i in self.sql.get_user_movies()]
+        new_movies = {k.replace(directory, ''): v for k, v in movies.iteritems() if v['imdbid'] not in library}
 
-        new_movies = {k: v for k, v in movies.iteritems() if v['imdbid'] not in library}
+        review_movies = {}
+        incomplete_movies = {}
+        for k, v in new_movies.iteritems():
+            if v.get('imdbid') and v.get('resolution'):
+                review_movies[k] = v
+            else:
+                incomplete_movies[k] = v
 
-        return json.dumps(new_movies)
+        return import_library.ImportLibrary.render_review(review_movies, incomplete_movies)
 
     @cherrypy.expose
     def submit_import(self, movie_data, corrected_movies):
@@ -660,14 +664,14 @@ class Ajax(object):
 
         corrected_movies must be [{'/path/to/file': {'known': 'metadata'}}]
 
-        Iterates through corrected_movies and attmpts to get metadata again.
+        Iterates through corrected_movies and attmpts to get metadata again if required.
 
         If imported, generates and stores fake search result.
 
-        Created dict {'success': [], 'failed': []} and
+        Creates dict {'success': [], 'failed': []} and
             appends movie data to the appropriate list.
 
-        Returns json-formatted dict described above.
+        Returns str html of success/failed movie imports
         '''
 
         movie_data = json.loads(movie_data)
@@ -678,9 +682,8 @@ class Ajax(object):
         results = {'success': [], 'failed': []}
 
         if corrected_movies:
-            for filepath, data in corrected_movies.iteritems():
-                data['filepath'] = filepath
-                tmdbdata = self.tmdb.search(data['imdbid'], single=True)
+            for data in corrected_movies:
+                tmdbdata = self.tmdb._search_imdbid(data['imdbid'])[0]
                 if tmdbdata:
                     data['year'] = tmdbdata['release_date'][:4]
                     data.update(tmdbdata)
@@ -700,7 +703,7 @@ class Ajax(object):
                     movie['error'] = response['error']
                     results['failed'].append(movie)
             else:
-                movie['error'] = "IMDB ID not supplied."
+                movie['error'] = "IMDB ID invalid or missing."
                 results['failed'].append(movie)
 
         fake_results = self.score.score(fake_results, quality_profile='import')
@@ -716,4 +719,4 @@ class Ajax(object):
 
         self.sql.write_search_results(fake_results)
 
-        return json.dumps(results)
+        return import_library.ImportLibrary.render_complete(results['success'], results['failed'])

@@ -260,8 +260,36 @@ class Settings():
                 self.render_profile(name, profile)
 
         with div(id='add_new_profile'):
-            i(cls='fa fa-plus-square')
-            span('Add Profile')
+            with span(id='add_new_profile'):
+                i(cls='fa fa-plus-square')
+                span('Add Profile')
+
+        h1(u'Sources')
+        br()
+        span('Specify acceptable size range in MB for each media source.', cls='indent')
+        with table(id='sources'):
+            with tr():
+                th()
+                th('Minimum Size')
+                th('Maximum size')
+            for k in core.RESOLUTIONS:
+                v = c[c_s]['Sources'][k]
+                with tr(cls='source_size'):
+                    td(k, id=k)
+                    with td():
+                        input(type='number', cls='min_size', value=v['min'])
+                    with td():
+                        input(type='number', cls='max_size', value=v['max'])
+        h2('Aliases')
+        span('These keywords are used to determine the source media.', cls='indent')
+        br()
+        br()
+        with table(id='aliases'):
+            for name, aliases in c[c_s]['Aliases'].iteritems():
+                with tr():
+                    td(name)
+                    with td():
+                        input(type='text', value=', '.join(aliases), id=name)
 
         div(u','.join(self.resolutions), cls='hidden')
         with div(id='save', cat='quality'):
@@ -273,61 +301,56 @@ class Settings():
         name: str name of profile
         profile: dict of profile Settings
         '''
-        with ul(id=name, cls='quality_profile wide') as profile_list:
-            with li('Name: ', cls='name bold'):
+        profile = core.CONFIG['Quality']['Profiles'][name]
+
+        with div(id=name, cls='quality_profile') as profile_list:
+            with div(cls='name bold'):
                 if name == 'Default':
                     span('Default')
                     span('Used for Quick-Add and default API quality.', cls='tip')
                 else:
                     input(value=name, type='text', cls='name')
-                    with div(cls='delete_profile', name=name):
-                        i(cls='fa fa-trash-o')
-                        span('Delete profile')
 
-            # Resolution Block
-            with ul(id='resolution', cls='sortable'):
-                li(u'Resolution Priority', cls='sub_cat')
-                for res in self.resolutions:
-                    with li(cls='rbord', id=res, sort=profile[res][1]):
-                        i(cls='fa fa-bars')
-                        i(id=res, cls='fa fa-square-o checkbox', value=str(profile[res][0]))
-                        span(res)
+            with div(cls='sources'):
+                span('Sources', cls='sub_heading')
+                with ul(cls='sortable'):
+                    for res in core.RESOLUTIONS:
+                        with li(id=res, sort=profile['Sources'][res][1]):
+                            i(cls='fa fa-bars')
+                            i(id=res, cls='fa fa-square-o checkbox', value=str(profile['Sources'][res][0]))
+                            span(res)
 
-            # Size restriction block
-            with ul(id='resolution_size'):
-                li(u'Size Restrictions (MB)', cls='sub_cat')
-
-                for res in self.resolutions:
+            with div(id='filters'):
+                with span('Filters', cls='sub_heading'):
+                    span(u'Make groups with ampersands ( & ) and split groups with commas ( , )', cls='tip')
+                with ul():
+                    with li('Required words:', cls='bold'):
+                        span('Releases must contain one of these words or groups.', cls='tip')
                     with li():
-                        span(res)
-                        input(type='number', id=res, cls='min', value=profile[res][2], min='0', placeholder='min')
-                        span('-')
-                        input(type='number', id=res, cls='max', value=profile[res][3], min='0', placeholder='max')
+                        input(type='text', id='requiredwords', value=profile['requiredwords'])
+                    with li('Preferred words:', cls='bold'):
+                        span(u'Releases with these words score higher.', cls='tip')
+                    with li():
+                        input(type='text', id='preferredwords', value=profile['preferredwords'])
+                    with li('Ignored words:', cls='bold'):
+                        span(u'Releases with these words are ignored.', cls='tip')
+                    with li():
+                        input(type='text', id='ignoredwords', value=profile['ignoredwords'])
 
-            with ul(id='filters', cls='wide'):
-                with li(cls='sub_cat'):
-                    span(u'Filter words')
-                    span(u'Group words with ampersands ( & ) and separate groups with commas ( , )', cls='tip')
-                with li(cls='bbord'):
-                    span(u'Required words:', cls='bold')
-                    input(type='text', id='requiredwords', value=profile['requiredwords'])
-                    span(u'Releases must contain one of these words.', cls='tip')
-                with li(cls='bbord'):
-                    span(u'Preferred words:', cls='bold')
-                    input(type='text', id='preferredwords', value=profile['preferredwords'])
-                    span(u'Releases with these words score higher.', cls='tip')
-                with li():
-                    span(u'Ignored words:', cls='bold')
-                    input(type='text', id='ignoredwords', value=profile['ignoredwords'])
-                    span(u'Releases with these words are ignored.', cls='tip')
-            with ul(id='toggles'):
-                with li(cls='bbord'):
-                    i(id='scoretitle', cls='fa fa-square-o checkbox', value=str(profile['scoretitle']))
-                    span('Score and filter titles.')
-                    span('May need to disable for non-English results. Can cause incorrect downloads', cls='tip')
-                with li():
-                    i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(profile['prefersmaller']))
-                    span('Prefer smaller file sizes for identically-scored releases.')
+            with div(id='toggles'):
+                span('Misc.', cls='sub_heading')
+                with ul():
+                    with li():
+                        i(id='scoretitle', cls='fa fa-square-o checkbox', value=str(profile['scoretitle']))
+                        span('Score and filter titles.')
+                    with li():
+                        span('May need to disable for non-English results. Can cause incorrect downloads', cls='tip')
+                    with li():
+                        i(id='prefersmaller', cls='fa fa-square-o checkbox', value=str(profile['prefersmaller']))
+                        span('Prefer smaller file sizes for identically-scored releases.')
+
+            if name != 'Default':
+                i(cls='fa fa-trash delete_profile')
 
         return unicode(profile_list)
 

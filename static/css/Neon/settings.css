@@ -25,14 +25,23 @@ div#content ul li.lbord{
     border-left: 1px solid #bdbdbd;
 }
 
-div.quality ul.quality_profile{
+div.quality div.quality_profile{
     background-color: #fff;
     color: #000;
 }
 
-div.quality ul.quality_profile input{
-    background-color: #080f18;
+div.quality div.quality_profile input{
+    background-color: #000;
     color: #fff;
+}
+
+div.quality table#sources tr:nth-child(even){
+    background: #252c35;
+}
+
+div.quality table#sources input{
+    background-color: #fff;
+    color: #000;
 }
 
 div.plugins ul{

@@ -314,109 +314,22 @@ $(document).ready(function () {
 /* Quality */
 
     // add new profile
-    $("div.quality div#add_new_profile").click(function(){
+    $("div.quality span#add_new_profile").click(function(){
 
-        html = `
-        <ul class="quality_profile wide hidden">
-            <li class="name bold">Name:
-                <input class="name" type="text" value="New Profile">
-                <div class="delete_profile" name="New Profile">
-                    <i class="fa fa-trash-o"></i>
-                    <span>Delete profile.</span>
-                </div>
-            </li>
-            <ul class="sortable ui-sortable" id="resolution">
-                <li class="sub_cat ui-sortable-handle">Resolution Priority</li>
-                <li class="rbord ui-sortable-handle" id="4K" sort="0">
-                    <i class="fa fa-bars"></i>
-                    <i class="fa fa-square-o checkbox" id="4K" value="False"></i>
-                    <span>4K</span>
-                </li><li class="rbord ui-sortable-handle" id="1080P" sort="1">
-                    <i class="fa fa-bars"></i>
-                    <i class="fa checkbox fa-check-square" id="1080P" value="True"></i>
-                    <span>1080P</span>
-                </li><li class="rbord ui-sortable-handle" id="720P" sort="2">
-                    <i class="fa fa-bars"></i>
-                    <i class="fa checkbox fa-check-square" id="720P" value="True"></i>
-                    <span>720P</span>
-                </li><li class="rbord ui-sortable-handle" id="SD" sort="3">
-                    <i class="fa fa-bars"></i>
-                    <i class="fa fa-square-o checkbox" id="SD" value="False"></i>
-                    <span>SD</span>
-                </li>
-            </ul>
-            <ul id="resolution_size">
-                <li class="sub_cat">Size Restrictions (MB)</li>
-                <li>
-                    <span>4K</span>
-                    <input class="min" id="4K" min="0" type="number" value="10000">
-                    <span>-</span>
-                    <input class="max" id="4K" min="0" type="number" value="50000">
-                </li>
-                <li>
-                    <span>1080P</span>
-                    <input class="min" id="1080P" min="0" type="number" value="2000">
-                    <span>-</span>
-                    <input class="max" id="1080P" min="0" type="number" value="10000">
-                </li>
-                <li>
-                    <span>720P</span>
-                    <input class="min" id="720P" min="0" type="number" value="500">
-                     <span>-</span>
-                    <input class="max" id="720P" min="0" type="number" value="10000">
-                </li>
-                <li>
-                    <span>SD</span>
-                    <input class="min" id="SD" min="0" type="number" value="200">
-                    <span>-</span>
-                    <input class="max" id="SD" min="0" type="number" value="1000">
-                </li>
-            </ul>
-            <ul class="wide" id="filters">
-                <li class="bbord">
-                    <span class="bold">Required words:</span>
-                    <input id="requiredwords" type="text" value="">
-                    <span class="tip">Releases must contain one of these words.</span>
-                </li>
-                <li class="bbord">
-                    <span class="bold">Preferred words:</span>
-                    <input id="preferredwords" type="text" value="">
-                    <span class="tip">Releases with these words score higher.</span>
-                </li>
-                <li>
-                    <span class="bold">Ignored words:</span>
-                    <input id="ignoredwords" type="text" value="subs,german,dutch,french,truefrench,danish,swedish,spanish,italian,korean,dubbed,swesub,korsub,dksubs,vain,HC,blurred">
-                    <span class="tip">Releases with these words are ignored.</span>
-                </li>
-            </ul>
-            <ul id="toggles">
-                <li class="bbord">
-                    <i class="fa fa-check-square checkbox" id="scoretitle" value="True"></i>
-                    <span>Score and filter titles.</span>
-                    <span class="tip">May need to disable for non-English results. Can cause incorrect downloads</span>
-                </li>
-                <li>
-                    <i class="fa fa-square-o checkbox" id="prefersmaller" value="False"></i>
-                    <span>Prefer smaller file sizes for identically-scored releases.</span>
-                </li>
-            </ul>
-        </ul>
-        `
+        $("div#qualities").append(new_profile_html);
 
-        $("div#qualities").append(html);
+        $new_profile = $("div#qualities div.quality_profile").last();
 
-        $new_ul = $("div#qualities ul.quality_profile").last();
-
-        $new_sortable = $new_ul.find("ul.sortable")
+        $new_sortable = $new_profile.find("ul.sortable")
 
         init_sortables($sortables=$new_sortable);
 
-        $new_ul.slideDown();
+        $new_profile.slideDown();
     })
 
 
     // remove profile
-    $("div.quality").on("click", "div.delete_profile", function(){
+    $("div.quality").on("click", "i.delete_profile", function(){
         $this = $(this);
 
         swal({
@@ -428,7 +341,7 @@ $(document).ready(function () {
             confirmButtonText: "Delete profile",
             closeOnConfirm: true
         }, function(){
-            $profile = $this.parents("ul.quality_profile");
+            $profile = $this.parents("div.quality_profile");
             $profile.slideUp(500, function(){$(this).remove()})
         });
     })
@@ -476,6 +389,132 @@ $(document).ready(function () {
         window.open(url_base + "/logs/" + logfile)
     });
 
+    var new_profile_html = `
+    <div class="quality_profile hidden">
+      <div class="name bold">
+        <input class="name" type="text" value="New Profile"/>
+      </div>
+      <div class="sources">
+        <span class="sub_heading">Sources</span>
+        <ul class="sortable">
+          <li id="BluRay-4K" sort="0">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="BluRay-4K" value="False"></i>
+            <span>BluRay-4K</span>
+          </li>
+          <li id="BluRay-1080P" sort="1">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="BluRay-1080P" value="True"></i>
+            <span>BluRay-1080P</span>
+          </li>
+          <li id="BluRay-720P" sort="2">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="BluRay-720P" value="True"></i>
+            <span>BluRay-720P</span>
+          </li>
+          <li id="WebDL-4K" sort="3">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="WebDL-4K" value="False"></i>
+            <span>WebDL-4K</span>
+          </li>
+          <li id="WebDL-1080P" sort="4">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="WebDL-1080P" value="True"></i>
+            <span>WebDL-1080P</span>
+          </li>
+          <li id="WebDL-720P" sort="5">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="WebDL-720P" value="True"></i>
+            <span>WebDL-720P</span>
+          </li>
+          <li id="WebRip-4K" sort="6">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="WebRip-4K" value="False"></i>
+            <span>WebRip-4K</span>
+          </li>
+          <li id="WebRip-1080P" sort="7">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="WebRip-1080P" value="True"></i>
+            <span>WebRip-1080P</span>
+          </li>
+          <li id="WebRip-720P" sort="8">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-check-square checkbox" id="WebRip-720P" value="True"></i>
+            <span>WebRip-720P</span>
+          </li>
+          <li id="DVD-SD" sort="9">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="DVD-SD" value="False"></i>
+            <span>DVD-SD</span>
+          </li>
+          <li id="Screener-1080P" sort="10">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="Screener-1080P" value="False"></i>
+            <span>Screener-1080P</span>
+          </li>
+          <li id="Screener-720P" sort="11">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="Screener-720P" value="False"></i>
+            <span>Screener-720P</span>
+          </li>
+          <li id="Telesync-SD" sort="12">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="Telesync-SD" value="False"></i>
+            <span>Telesync-SD</span>
+          </li>
+          <li id="CAM-SD" sort="13">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-square-o checkbox" id="CAM-SD" value="False"></i>
+            <span>CAM-SD</span>
+          </li>
+        </ul>
+      </div>
+      <div id="filters">
+        <span class="sub_heading">Filters
+          <span class="tip">Make groups with ampersands ( &amp; ) and split groups with commas ( , )</span>
+        </span>
+        <ul>
+          <li class="bold">Required words:
+            <span class="tip">Releases must contain one of these words or groups.</span>
+          </li>
+          <li>
+            <input id="requiredwords" type="text" value="">
+          </li>
+          <li class="bold">Preferred words:
+            <span class="tip">Releases with these words score higher.</span>
+          </li>
+          <li>
+            <input id="preferredwords" type="text" value="">
+          </li>
+          <li class="bold">Ignored words:
+            <span class="tip">Releases with these words are ignored.</span>
+          </li>
+          <li>
+            <input id="ignoredwords" type="text" value="subs,german,dutch,french,truefrench,danish,swedish,spanish,italian,korean,dubbed,swesub,korsub,dksubs,vain,HC,blurred">
+          </li>
+        </ul>
+      </div>
+      <div id="toggles">
+        <span class="sub_heading">Misc.</span>
+        <ul>
+          <li>
+            <i class="fa fa-check-square checkbox" id="scoretitle" value="True"></i>
+            <span>Score and filter titles.</span>
+          </li>
+          <li>
+            <span class="tip">May need to disable for non-English results. Can cause incorrect downloads</span>
+          </li>
+          <li>
+            <i class="fa fa-square-o checkbox" id="prefersmaller" value="False"></i>
+            <span>Prefer smaller file sizes for identically-scored releases.</span>
+          </li>
+        </ul>
+      </div>
+      <i class='fa fa-trash delete_profile'/>
+    </div>
+    `
+
+
 });
 
 function init_sortables($sortables=false){
@@ -483,7 +522,7 @@ function init_sortables($sortables=false){
         var $sortables = $("ul.sortable")
     }
 
-    $sortables.sortable({cancel: "span.not_sortable"});
+    $sortables.sortable({cancel: ".not_sortable"});
     $sortables.disableSelection();
 
     $sortables.each(function(){

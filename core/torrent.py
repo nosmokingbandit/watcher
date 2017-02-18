@@ -324,7 +324,7 @@ class LimeTorrents(object):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
         logging.info(u'Searching LimeTorrents for {}'.format(title))
-        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year).replace(' ', '+')
+        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -391,7 +391,7 @@ class ExtraTorrent(object):
 
         logging.info(u'Searching ExtraTorrent for {}'.format(title))
 
-        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year).replace(' ', '+')
+        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -459,7 +459,7 @@ class SkyTorrents(object):
 
         logging.info(u'Searching SkyTorrents for {}'.format(title))
 
-        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+')
+        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -531,7 +531,7 @@ class BitSnoop(object):
 
         logging.info(u'Searching BitSnoop for {}'.format(title))
 
-        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year).replace(' ', '+')
+        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -597,7 +597,7 @@ class Torrentz2(object):
 
         logging.info(u'Searching Torrentz2 for {}'.format(title))
 
-        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year).replace(' ', '+')
+        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
         request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:

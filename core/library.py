@@ -22,7 +22,7 @@ class ImportDirectory(object):
         ''' Scans directory for movie files
         directory: str base directory of movie library
         minsize: int minimum filesize in MB <default 500>
-        recursive: bool scan recusrively or just root directory <default True>
+        recursive: bool scan recursively or just root directory <default True>
 
         Returns list of dicts of movie info
         '''
@@ -31,11 +31,11 @@ class ImportDirectory(object):
 
         files = []
         if recursive:
-            for root, dirs, filenames in os.walk(directory):
-                for f in filenames:
-                    files.append(os.path.join(root, f))
+            files = self._walk(directory)
         else:
             files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
+
+        print files
 
         files = [unicode(i) for i in files if os.path.getsize(i) >= (minsize * 1024**2)]
 
@@ -169,13 +169,13 @@ class ImportDirectory(object):
                   }
 
         title = u'{}.{}.{}.{}.{}.{}.{}'.format(movie['title'],
-                                              movie['year'],
-                                              result['resolution'],
-                                              movie['source'],
-                                              movie['audiocodec'],
-                                              movie['videocodec'],
-                                              movie['releasegroup']
-                                              )
+                                               movie['year'],
+                                               result['resolution'],
+                                               movie['source'],
+                                               movie['audiocodec'],
+                                               movie['videocodec'],
+                                               movie['releasegroup']
+                                               )
 
         while title[-1] == '.':
             title = title[:-1]
@@ -188,3 +188,19 @@ class ImportDirectory(object):
         result['guid'] = u'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
 
         return result
+
+    def _walk(self, directory):
+        ''' Recursively gets all files in dir
+        dir: directory to scan for files
+
+        Returns list of absolute file paths
+        '''
+        files = []
+        dir_contents = os.listdir(directory)
+        for i in dir_contents:
+            full_path = os.path.join(directory, i)
+            if os.path.isdir(full_path):
+                files = files + self._walk(full_path)
+            else:
+                files.append(full_path)
+        return files

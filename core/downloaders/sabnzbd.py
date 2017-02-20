@@ -3,6 +3,7 @@ import logging
 import urllib2
 
 import core
+from core.helpers import Url
 
 logging = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class Sabnzbd():
 
         url = u'http://{}:{}/sabnzbd/api?apikey={}&mode=server_stats'.format(host, port, api)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         try:
             response = urllib2.urlopen(request).read()
@@ -58,8 +59,8 @@ class Sabnzbd():
         base_url = u'http://{}:{}/sabnzbd/api?apikey={}'.format(host, port, api)
 
         mode = u'addurl'
-        name = urllib2.quote(data['guid'].encode('utf-8'))
-        nzbname = urllib2.quote(data['title'].encode('ascii', 'ignore'))
+        name = urllib2.quote(data['guid'])
+        nzbname = data['title']
         cat = conf['category']
         priority_keys = {
             'Paused': '-2',
@@ -74,7 +75,7 @@ class Sabnzbd():
 
         url = base_url + command_url
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         try:
             response = json.loads(urllib2.urlopen(request).read())

@@ -9,6 +9,7 @@ import urllib2
 import zipfile
 
 import core
+from core.helpers import Url
 
 # get remote hash # git rev-parse origin/master
 # get local hash  # git rev-parse HEAD
@@ -277,7 +278,7 @@ class ZipUpdater(object):
 
     def get_newest_hash(self):
         api_url = u'{}/commits/{}'.format(core.GIT_API, core.CONFIG['Server']['gitbranch'])
-        request = urllib2.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(api_url)
         try:
             response = json.load(urllib2.urlopen(request))
             hash = response['sha']
@@ -322,7 +323,7 @@ class ZipUpdater(object):
 
         compare_url = u'{}/compare/{}...{}'.format(core.GIT_API, newest_hash, local_hash)
 
-        request = urllib2.Request(compare_url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(compare_url)
         try:
             response = json.load(urllib2.urlopen(request))
             behind_count = response['behind_by']
@@ -409,7 +410,7 @@ class ZipUpdater(object):
 
         logging.info(u'Downloading latest Zip.')
         zip_url = u'{}/archive/{}.zip'.format(core.GIT_URL, core.CONFIG['Server']['gitbranch'])
-        request = urllib2.Request(zip_url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(zip_url)
         try:
             zip_response = urllib2.urlopen(request).read()
             with open(update_zip, 'wb') as f:

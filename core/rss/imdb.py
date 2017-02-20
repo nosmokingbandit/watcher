@@ -1,5 +1,6 @@
 from core import ajax, sqldb
 from core.movieinfo import TMDB
+from core.helpers import Url
 from datetime import datetime
 import json
 import logging
@@ -18,7 +19,7 @@ class ImdbRss(object):
         self.ajax = ajax.Ajax()
         return
 
-    def get_rss(self, list_url):
+    def get_rss(self, url):
         ''' Gets rss feed from imdb
         :param rss_url: str url to rss feed
 
@@ -27,10 +28,10 @@ class ImdbRss(object):
         Returns True or None on success or failure (due to exception or empty movie list)
         '''
 
-        if 'rss' in list_url:
-            list_id = filter(unicode.isdigit, list_url)
-            logging.info(u'Syncing rss IMDB watchlist {}'.format(list_url))
-            request = urllib2.Request(list_url, headers={'User-Agent': 'Mozilla/5.0'})
+        if 'rss' in url:
+            list_id = filter(unicode.isdigit, url)
+            logging.info(u'Syncing rss IMDB watchlist {}'.format(url))
+            request = Url.request(url)
             try:
                 response = urllib2.urlopen(request).read()
             except (SystemExit, KeyboardInterrupt):

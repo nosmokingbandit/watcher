@@ -33,6 +33,9 @@ class Torrent(object):
         potato_results = self.search_potato(imdbid)
         results = potato_results
 
+        title = Url.encode(title)
+        year = Url.encode(year)
+
         if torrent_indexers['rarbg']:
             rarbg_results = Rarbg.search(imdbid)
             for i in rarbg_results:
@@ -326,9 +329,7 @@ class LimeTorrents(object):
 
         logging.info(u'Searching LimeTorrents for {}'.format(title))
 
-        search_term = Url.encode('{} {}'.format(title, year))
-
-        url = u'https://www.limetorrents.cc/searchrss/{}'.format(search_term)
+        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year)
         request = Url.request(url)
 
         try:

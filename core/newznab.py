@@ -3,6 +3,7 @@ import urllib2
 import xml.etree.cElementTree as ET
 
 import core
+from core.helpers import Url
 from core.proxy import Proxy
 
 logging = logging.getLogger(__name__)
@@ -33,16 +34,16 @@ class NewzNab():
         for indexer in indexers:
             if indexer[2] is False:
                 continue
-            url = indexer[0]
-            if url[-1] != u'/':
-                url = url + '/'
+            url_base = indexer[0]
+            if url_base[-1] != u'/':
+                url_base = url_base + '/'
             apikey = indexer[1]
 
-            search_string = u'{}api?apikey={}&t=movie&imdbid={}'.format(url, apikey, imdbid_s)
+            url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid_s)
 
             logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
 
-            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+            request = Url.request(url)
 
             try:
                 if proxy_enabled and Proxy.whitelist(url) is True:
@@ -178,7 +179,7 @@ class NewzNab():
 
         url = u'{}/api?apikey={}&t=search&id=tt0063350'.format(indexer, apikey)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             response = urllib2.urlopen(request).read()
         except (SystemExit, KeyboardInterrupt):

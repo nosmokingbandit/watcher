@@ -1,7 +1,7 @@
 import json
 import logging
 import urllib2
-from core.helpers import Comparisons
+from core.helpers import Comparisons, Url
 _k = Comparisons._k
 
 logging = logging.getLogger(__name__)
@@ -50,6 +50,8 @@ class TMDB(object):
         Returns list results or str error/fail message
         '''
 
+        title = Url.encode(title)
+
         url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(_k('tmdb'))
 
         if title[-4:].isdigit():
@@ -58,7 +60,7 @@ class TMDB(object):
             query = u'query={}'.format(title)
 
         url = url + query
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         try:
             results = json.load(urllib2.urlopen(request))
@@ -75,7 +77,7 @@ class TMDB(object):
     def _search_imdbid(self, imdbid):
         url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             results = json.load(urllib2.urlopen(request))
             if results['movie_results'] == []:
@@ -92,7 +94,7 @@ class TMDB(object):
 
     def _search_tmdbid(self, tmdbid):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         try:
             response = json.load(urllib2.urlopen(request))
@@ -123,8 +125,11 @@ class TMDB(object):
             return None
 
         if not tmdbid:
-            url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year).replace(' ', '+').encode('ascii', 'ignore')
-            request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            title = Url.encode(title)
+            year = Url.encode(year)
+
+            url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year)
+            request = Url.request(url)
             try:
                 response = json.load(urllib2.urlopen(request))
                 results = response['results']
@@ -140,7 +145,7 @@ class TMDB(object):
 
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             response = json.load(urllib2.urlopen(request))
             return response.get('imdb_id')
@@ -160,11 +165,11 @@ class Trailer(object):
         Returns str or None
         '''
 
-        search_term = (title_date + 'trailer').replace(' ', '+').encode('utf-8')
+        search_term = Url.encode((title_date + '+trailer'))
 
-        search_string = u"https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults={}&key={}".format(search_term, '1', _k('youtube'))
+        search_string = u"https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&maxResults=1&key={}".format(search_term, _k('youtube'))
 
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(search_string)
 
         tries = 0
         while tries < 3:

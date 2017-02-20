@@ -4,6 +4,8 @@ import shutil
 import urllib2
 from HTMLParser import HTMLParser
 
+from core.helpers import Url
+
 logging = logging.getLogger(__name__)
 
 
@@ -36,7 +38,7 @@ class Poster():
                 shutil.copy2(poster_url, new_poster_path)
 
             else:
-                request = urllib2.Request(poster_url, headers={'User-Agent': 'Mozilla/5.0'})
+                request = Url.request(poster_url)
                 try:
                     result = urllib2.urlopen(request).read()
                 except (SystemExit, KeyboardInterrupt):
@@ -84,7 +86,7 @@ class Poster():
         search_term = search_term.replace(" ", "+")
         search_string = u"https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
 
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(search_string)
 
         html = urllib2.urlopen(request)
 

@@ -4,6 +4,8 @@ import logging
 import os
 import ssl
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import webbrowser
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
 

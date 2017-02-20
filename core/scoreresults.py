@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import core
 from core import sqldb
+from core.helpers import Url
 from fuzzywuzzy import fuzz
 
 logging = logging.getLogger(__name__)
@@ -274,6 +275,8 @@ class ScoreResults():
         '''
 
         logging.info(u'Checking title match.')
+
+        title = Url.encode(title)
 
         lst = []
         if title is None:

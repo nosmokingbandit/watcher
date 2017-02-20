@@ -195,9 +195,11 @@ class ImportDirectory(object):
 
         Returns list of absolute file paths
         '''
+
         files = []
         dir_contents = os.listdir(directory)
         for i in dir_contents:
+            logging.info(u'Scanning {}{}{}'.format(directory, os.sep, i))
             full_path = os.path.join(directory, i)
             if os.path.isdir(full_path):
                 files = files + self._walk(full_path)

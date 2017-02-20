@@ -1,5 +1,6 @@
 from core import ajax, sqldb
 from core.movieinfo import TMDB
+from core.helpers import Url
 import json
 import logging
 import urllib2
@@ -26,8 +27,8 @@ class PopularMoviesFeed(object):
         movies = None
 
         logging.info(u'Syncing popular movie feed')
-        request = urllib2.Request('https://s3.amazonaws.com/popular-movies/movies.json',
-                                  headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request('https://s3.amazonaws.com/popular-movies/movies.json',
+                              headers={'User-Agent': 'Mozilla/5.0'})
         try:
             movies = json.load(urllib2.urlopen(request))
         except (SystemExit, KeyboardInterrupt):

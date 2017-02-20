@@ -80,7 +80,7 @@ class Plugins(object):
             if os.name == 'nt':
                 cmd = ['cmd', '/c']
                 command = cmd + command
-            command = [i.encode('iso-8859-1') for i in command if i is not None]
+            command = [str(i) for i in command if i is not None]
             name = os.path.split(plugin)[1]
 
             try:

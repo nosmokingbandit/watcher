@@ -3,6 +3,7 @@ import urllib2
 import xml.etree.cElementTree as ET
 
 from core import sqldb
+from core.helpers import Url
 from fuzzywuzzy import fuzz
 
 logging = logging.getLogger(__name__)
@@ -73,12 +74,10 @@ class PreDB(object):
 
         title_year = title_year.replace(':', '').replace('-', '')
 
-        search_term = urllib2.quote(title_year.replace(u' ', u'+').lower(), safe='')
-
-        search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(search_term)
+        search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(title_year)
 
         search_string = search_string.encode('ascii', 'replace')
-        request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(search_string)
 
         try:
             results_xml = urllib2.urlopen(request).read().replace('&', '%26')

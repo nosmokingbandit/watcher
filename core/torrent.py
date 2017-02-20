@@ -6,6 +6,7 @@ import urllib2
 import xml.etree.cElementTree as ET
 import core
 from core.proxy import Proxy
+from core.helpers import Url
 
 
 logging = logging.getLogger(__name__)
@@ -31,6 +32,9 @@ class Torrent(object):
 
         potato_results = self.search_potato(imdbid)
         results = potato_results
+
+        title = Url.encode(title)
+        year = Url.encode(year)
 
         if torrent_indexers['rarbg']:
             rarbg_results = Rarbg.search(imdbid)
@@ -88,7 +92,7 @@ class Torrent(object):
 
             logging.info(u'SEARCHING: {}?passkey=PASSKEY&t=movie&imdbid={}'.format(url, imdbid))
 
-            request = urllib2.Request(search_string, headers={'User-Agent': 'Mozilla/5.0'})
+            request = Url.request(search_string)
 
             try:
                 if proxy_enabled and Proxy.whitelist(url) is True:
@@ -130,7 +134,7 @@ class Torrent(object):
 
         url = u'{}?passkey={}'.format(indexer, apikey)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             response = urllib2.urlopen(request).read()
         except (SystemExit, KeyboardInterrupt):
@@ -251,7 +255,7 @@ class Rarbg(object):
 
         url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
@@ -278,7 +282,7 @@ class Rarbg(object):
     def get_token():
         url = u'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
 
         try:
             response = json.loads(urllib2.urlopen(request, timeout=60).read())
@@ -324,9 +328,10 @@ class LimeTorrents(object):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
         logging.info(u'Searching LimeTorrents for {}'.format(title))
-        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year)
+        request = Url.request(url)
+
         try:
             if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
                 response = Proxy.bypass(request)
@@ -391,9 +396,9 @@ class ExtraTorrent(object):
 
         logging.info(u'Searching ExtraTorrent for {}'.format(title))
 
-        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
+        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
                 response = Proxy.bypass(request)
@@ -459,9 +464,9 @@ class SkyTorrents(object):
 
         logging.info(u'Searching SkyTorrents for {}'.format(title))
 
-        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
+        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             if proxy_enabled and Proxy.whitelist('https://www.skytorrents.in') is True:
                 response = Proxy.bypass(request)
@@ -531,9 +536,9 @@ class BitSnoop(object):
 
         logging.info(u'Searching BitSnoop for {}'.format(title))
 
-        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
+        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
                 response = Proxy.bypass(request)
@@ -597,9 +602,9 @@ class Torrentz2(object):
 
         logging.info(u'Searching Torrentz2 for {}'.format(title))
 
-        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year).replace(' ', '+').encode('ascii', 'ignore')
+        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year)
 
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         try:
             if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
                 response = Proxy.bypass(request)

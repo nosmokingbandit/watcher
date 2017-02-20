@@ -4,7 +4,7 @@ import urllib
 import urllib2
 
 import core
-from core.helpers import Torrent
+from core.helpers import Torrent, Url
 
 logging = logging.getLogger(__name__)
 
@@ -73,9 +73,9 @@ class QBittorrent(object):
 
         post_data['category'] = conf['category']
 
-        req_url = u'{}command/download'.format(base_url)
+        url = u'{}command/download'.format(base_url)
         post_data = urllib.urlencode(post_data)
-        request = urllib2.Request(req_url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url, post_data=post_data)
         request.add_header('cookie', QBittorrent.cookie)
 
         try:
@@ -92,7 +92,7 @@ class QBittorrent(object):
     def _get_download_dir(base_url):
         try:
             url = u'{}query/preferences'.format(base_url)
-            request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            request = Url.request(url)
             request.add_header('cookie', QBittorrent.cookie)
             response = json.loads(urllib2.urlopen(request).read())
             return response['save_path']
@@ -105,7 +105,7 @@ class QBittorrent(object):
     @staticmethod
     def get_torrents(base_url):
         url = u'{}query/torrents'.format(base_url)
-        request = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url)
         request.add_header('cookie', QBittorrent.cookie)
         return urllib2.urlopen(request).read()
 
@@ -119,7 +119,7 @@ class QBittorrent(object):
         post_data = urllib.urlencode(data)
 
         url = u'{}login'.format(url)
-        request = urllib2.Request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url, post_data=post_data)
 
         try:
             response = urllib2.urlopen(request)

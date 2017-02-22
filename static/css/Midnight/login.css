@@ -1,9 +1,0 @@
-body, html{
-    background-color: #080f18;
-}
-
-
-input[type="text"], input[type="password"]{
-    background-color: #151c25;
-    border: 1px solid #ccc;
-}

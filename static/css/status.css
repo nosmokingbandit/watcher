@@ -73,11 +73,10 @@ ul#movie_list.posters li div span.status{
     height: 24px;
     line-height: 24px;
     width: 100%;
-    border-width: 1px 1px 0px 1px;
-    border-style: solid;
-    border-color: #212121;
+    border-radius: 4px 4px 0 0;
     display: block;
     text-align: center;
+    color: #080f18;
 }
 
 ul#movie_list.posters li div img{
@@ -85,9 +84,7 @@ ul#movie_list.posters li div img{
     height: 256px;
     margin: 0;
     padding: 0;
-    border-width: 0px 1px 1px 1px;
-    border-color: #212121;
-    border-style: solid;
+    border-radius: 0 0 4px 4px;
 }
 
 ul#movie_list.posters li span.movie_info{
@@ -109,7 +106,6 @@ ul#movie_list.posters li span.movie_info span.rated{
 /* List layout */
 ul#movie_list.list{
     display: block;
-    border: 1px solid #eee;
     text-align: left;
 }
 
@@ -126,12 +122,12 @@ ul#movie_list.list li div{
     padding: 0.5em;
 }
 
-
 ul#movie_list.list li:nth-child(odd) div{
-    background-color: #eee;
+    background-color: #151c25;
 }
 
 ul#movie_list.list li div span.status{
+    color: #080f18;
     font-size: 0.8em;
     transform: rotate(90deg);
 	transform-origin: left top 0;
@@ -175,8 +171,6 @@ ul#movie_list.list li span.movie_info span.rated{
 /* Compact layout */
 ul#movie_list.compact{
     display: block;
-    border: 1px solid #eee;
-
 }
 
 ul#movie_list.compact li{
@@ -185,14 +179,15 @@ ul#movie_list.compact li{
 
 ul#movie_list.compact li div{
     height: 1.5em;
-    border: 1px solid #eee;
+    border: 1px solid #080f18; /* TODO can remove? */
 }
 
 ul#movie_list.compact li:nth-child(odd) div{
-    background-color: #eee;
+    background-color: #151c25;
 }
 
 ul#movie_list.compact li div span.status{
+    color: #080f18;
     text-indent: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -200,6 +195,7 @@ ul#movie_list.compact li div span.status{
     height: 1.5em;
     width: 1.5em;
     float: left;
+    border-radius: 4px;
 }
 
 ul#movie_list.compact li div img{
@@ -266,8 +262,8 @@ ul#movie_list li div span.finished{
 }
 
 #status_pop_up {
-    background: white;
-    border-top: 1px solid #bdbdbd;
+    background: #080f18;
+    border-top: 1px solid #ccc;
     width: 100%;
     position: fixed;
     bottom: 0;

@@ -27,6 +27,47 @@ $(document).ready(function() {
         }
     });
 
+    // file browser
+    $file_list = $("ul#file_list");
+
+    $current_dir = $("div#current_dir")
+
+    $("div#browse").click(function(){
+        $("div#browser").show();
+        $("div#overlay").fadeIn();
+    });
+
+    $("i#close_browser").click(function(){
+        $("div#browser").hide();
+        $("div#overlay").fadeOut();
+    });
+
+    $("i#select_dir").click(function(){
+        $("input#directory").val($current_dir.text());
+        $("div#browser").hide();
+        $("div#overlay").fadeOut();
+    });
+
+    $file_list.on("click", "li", function(){
+        $this = $(this)
+        path = $this.text()
+        $.post(url_base+'/ajax/list_files', {"current_dir": $current_dir.text(),
+                                          "move_dir": path})
+        .done(function(r){
+            response = JSON.parse(r);
+
+            if(response['error']){
+                toastr.warning(response['error'])
+            } else {
+                $current_dir.text(response['new_path'])
+                $file_list.html(response['html']);
+            }
+        });
+    });
+
+
+
+
     // submit directory information
     $("span#start_scan").click(function(){
         directory = $("input#directory").val();

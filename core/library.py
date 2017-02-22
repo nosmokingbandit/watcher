@@ -106,6 +106,8 @@ class ImportDirectory(object):
                 width = metadata['Metadata'].get('width')
             elif metadata.get('video[1]'):
                 width = metadata['video[1]'].get('width')
+            else:
+                width = None
 
             if width:
                 width = int(width)

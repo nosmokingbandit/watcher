@@ -7,13 +7,12 @@
 
 input#search_input{
     height: 32px;
-    width: calc(100% - 65px);
+    width: calc(100% - 64px);
     font-size: 2em;
     padding: 8px;
     margin: 32px 0;
-    border-color:  #212121;
-    background-color: #ffffff;
-    border-width: 1px 0px 1px 1px;
+    border: none;
+    background-color: #151c25;
     border-radius: 4px 0 0 4px;
     font-family: Raleway, sans-serif;
 }
@@ -21,18 +20,18 @@ input#search_input{
 button#search_button{
     float: right;
     width: 48px;
-    height: 50px;
+    height: 48px;
     margin: 32px 0;
-    border-style: solid;
-    border-color:  #212121;
-    border-width: 1px 1px 1px 0px;
     outline: none;
+    color: #ccc;
+    background-color: #151c25;
     border-radius: 0 4px 4px 0;
 }
 
 button#search_button:hover{
-    background-color: #212121;
-    color: #fff;
+    background-color: #ccc;
+    color: #151c25;
+    border-radius: 4px;
 }
 
 /* results fade-in */
@@ -64,17 +63,18 @@ ul#movie_list li img{
     margin: 0 0 5px 0;
     float: left;
     cursor: pointer;
-    border: 1px solid #bdbdbd;
+    border: none;
+    border-radius: 4px;
 }
 
 span.quickadd{
     position: absolute;
     cursor: pointer;
-    background-color: #212121;
+    background-color: #080f18;
     top: 15em;
     left: 0;
     padding: 0.25em .4em .25em 0.4em;
-    color:  white;
+    color: #ccc;
     height: 1.5em;
     line-height: 1.5em;
     border-radius: 0 .5em .5em 0;
@@ -96,42 +96,9 @@ i.button_add{
 }
 
 
-/* loading animation */
-#thinker {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto;
-    background-color: #333;
-    display: none;
-    position:absolute;
-    bottom: calc(50% - 20px);
-    right: calc(50% - 20px);
-    -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
-    animation: sk-scaleout 1.0s infinite ease-in-out;
-    border-radius: 50%;
-    opacity: 0.5;
-}
-
-@-webkit-keyframes sk-scaleout {
-    0% { -webkit-transform: scale(0) }
-    100% { -webkit-transform: scale(2.0);
-        opacity: 0;
-        }
-}
-
-@keyframes sk-scaleout {
-    0% { -webkit-transform: scale(0);
-        transform: scale(0);
-    }
-    100% { -webkit-transform: scale(2.0);
-            transform: scale(2.0);
-            opacity: 0;
-            }
-}
-
 #info_pop_up {
-    background: white;
-    border-top: 1px solid #bdbdbd;
+    background: #151c25;
+    border-top: 1px solid #ccc;
     width: 100%;
     position: fixed;
     bottom: 0;

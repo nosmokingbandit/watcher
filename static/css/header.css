@@ -1,10 +1,10 @@
 #header{
-    background-color: #eee;
+    background-color: #151c25;
     height: 64px;
     padding: 0;
     margin: 0;
     width: 100%;
-    border-bottom: 1px solid #bdbdbd;
+    border-bottom: 1px solid #ccc;
     clear: both;
 }
 
@@ -34,11 +34,11 @@
 }
 
 #nav > a > li:hover, #nav > li:hover{
-    border-bottom: 4px solid #bdbdbd;
+    border-bottom: 4px solid #ccc;
 }
 
 #nav li.current{
-    border-bottom: 4px solid #f4693b;
+    border-bottom: 4px solid #ccc;
 }
 
 /* Dropdown Settings Menu */
@@ -50,9 +50,9 @@
 #nav ul.settings_menu{
     display: none;
     position: absolute;
-    background: #eeeeee;
+    background: #151c25;
     box-sizing: border-box;
-    border: 1px solid #bdbdbd;
+    border: 1px solid #ccc;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -78,8 +78,8 @@
 }
 
 #nav ul.settings_menu li:hover{
-    background-color: #f4693b;
-    color: white;
+    background-color: #080f18;
+    color: #ccc;
 }
 
 #nav li.settings:hover .settings_menu{

@@ -1,0 +1,31 @@
+ul#result_list{
+    background-color: #bdbdbd;
+}
+
+ul#result_list li.bbord{
+    border-bottom: 1px solid #eee;
+}
+
+span.bad{
+    color: #F44336;
+}
+
+li.data span.snatched{
+    color: #00BCD4;
+}
+
+li.data span.finished{
+    color: #4CAF50;
+}
+
+ul#result_list::-webkit-scrollbar-thumb {
+  background: #212121;
+}
+
+ul#result_list::-webkit-scrollbar-thumb:hover {
+  background: #212121;
+}
+
+ul#result_list::-webkit-scrollbar-thumb:active {
+  background: #212121;
+}

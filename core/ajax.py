@@ -12,7 +12,7 @@ from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import TMDB
 from core.notification import Notification
 from core.rss import predb
-from templates import movie_info_popup, movie_status_popup, plugin_conf_popup, status, import_library
+from templates import movie_info_popup, import_library, movie_status_popup, plugin_conf_popup, status, import_library
 
 logging = logging.getLogger(__name__)
 
@@ -720,3 +720,30 @@ class Ajax(object):
         self.sql.write_search_results(fake_results)
 
         return import_library.ImportLibrary.render_complete(results['success'], results['failed'])
+
+    @cherrypy.expose
+    def list_files(self, current_dir, move_dir):
+        ''' Lists files in directory
+        current_dir: str base path
+        move_dir: str child path to read
+
+        Joins and normalizes paths:
+            ('/home/user/movies', '..')
+            Becomes /home/user
+
+        Sends path to import_library template to generate html
+
+        Returns json dict {'new_path': '/path', 'html': '<li>...'}
+        '''
+
+        response = {}
+
+        new_path = os.path.normpath(os.path.join(current_dir, move_dir))
+        response['new_path'] = new_path
+
+        try:
+            response['html'] = import_library.ImportLibrary.file_list(new_path)
+        except Exception, e:
+            response = {'error': str(e)}
+
+        return json.dumps(response)

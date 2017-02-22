@@ -1,3 +1,7 @@
+div#plugin_conf_popup{
+    background-color: #080f18;
+}
+
 div#container{
     padding: 1em;
     max-width: 512px;
@@ -38,8 +42,4 @@ div#container ul li input{
     display: inline-block;
     margin: 0;
     width: 48%;
-}
-
-div#container ul li input{
-    padding: 0 1%;
 }

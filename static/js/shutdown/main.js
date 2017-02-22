@@ -1,4 +1,7 @@
 $(document).ready(function () {
+
+    $("div#thinker").show();
+
     var url_base = $("meta[name='url_base']").attr("content");
 
     $.post(url_base + "/ajax/server_status", {

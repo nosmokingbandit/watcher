@@ -253,7 +253,7 @@ class Rarbg(object):
                 logging.error(u'Unable to get rarbg token.')
                 return []
 
-        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended'.format(Rarbg.token, imdbid)
+        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token, imdbid)
 
         request = Url.request(url)
 

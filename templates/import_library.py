@@ -5,6 +5,7 @@ from dominate.tags import *
 from header import Header
 from head import Head
 import json
+import os
 
 
 class ImportLibrary():
@@ -16,9 +17,9 @@ class ImportLibrary():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.17')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/import_library.css?v=02.17'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=02.17')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.22')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/import_library.css?v=02.22'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=02.22')
 
         with doc:
             Header.insert_header(current=None)
@@ -27,7 +28,9 @@ class ImportLibrary():
                 with div(id='scan_dir'):
                     with div(id='directory_info'):
                         span('Library directory: ')
-                        input(id='directory', type='text', placeholder=' /movies')
+                        input(id='directory', type='text', placeholder=' /movies', style='width:20em')
+                        with div(id='browse'):
+                            i(cls='fa fa-ellipsis-h')
                         br()
                         span('Minimum file size to import: ')
                         input(id='minsize', type='number', value='500')
@@ -39,13 +42,36 @@ class ImportLibrary():
                             with span(id='start_scan'):
                                 i(cls='fa fa-binoculars', id='start_scan')
                                 span('Start scan')
+
+                    with div(id='browser', cls='hidden'):
+                        div(os.getcwd(), id='current_dir')
+                        with ul(id='file_list'):
+                            ImportLibrary.file_list(os.getcwd())
+                        with div(id='browser_actions'):
+                            i(id='select_dir', cls='fa fa-check-circle')
+                            i(id='close_browser', cls='fa fa-times-circle')
+
                 with div(id='wait'):
                     span('Scanning library for new movies.')
                     br()
                     span('This may take several minutes.')
 
+            div(id='overlay')
             div(id='thinker')
         return doc.render()
+
+    @staticmethod
+    def file_list(directory):
+        subdirs = [i for i in os.listdir(directory) if os.path.isdir(os.path.join(directory, i))]
+
+        subdirs.insert(0, '..')
+
+        html = ''
+
+        for i in subdirs:
+            html += unicode(li(i))
+
+        return html
 
     @staticmethod
     def render_review(review_movies, incomplete_movies):

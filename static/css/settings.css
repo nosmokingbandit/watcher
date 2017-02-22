@@ -1,13 +1,3 @@
-input[type="number"], input[type="text"]{
-    font-family: "Lucida Console", Monaco, monospace;
-    border: 1px solid #212121;
-    outline: none;
-    background-color: #eeeeee;
-    height: 1.5em;
-    padding: 0.1em 0.5em;
-    font-size: .85em;
-}
-
 select{
     height: 2em;
     font-size: 0.85em;
@@ -78,11 +68,11 @@ span.bbord{
 }
 
 div#content ul li.rbord{
-    border-right: 1px solid #bdbdbd;
+    border-right: 1px solid #ccc;
 }
 
 div#content ul li.lbord{
-    border-left: 1px solid #bdbdbd;
+    border-left: 1px solid #ccc;
 }
 
 .indent{
@@ -123,7 +113,7 @@ input#retention{
 div.quality div.quality_profile{
     margin-bottom: 2em;
     padding: 0 1em 1em 1em;
-    background: #eee;
+    background-color: #151c25;
     border-radius: 4px;
     padding: 1em;
     overflow: auto;
@@ -131,7 +121,7 @@ div.quality div.quality_profile{
 }
 
 div.quality div.quality_profile input{
-    background-color: #fff;
+    background-color: #080f18;
 }
 
 div.quality div.quality_profile div.name{
@@ -208,11 +198,11 @@ td:last-child {
 }
 
 div.quality table#sources tr:nth-child(even){
-    background: #eee;
+    background: #151c25;
 }
 
 div.quality table#sources input{
-    background: #fff;
+    background: #080f18;
 }
 
 div.quality table#aliases{
@@ -236,6 +226,9 @@ div.quality i.delete_profile{
 
 
 /* Providers */
+div.plugins ul{
+    background-color: #151c25;
+}
 
 div.providers li{
     line-height: 2.5em;
@@ -360,7 +353,7 @@ div.plugins ul{
     font-size: 1.5em;
     padding: 1em;
     margin-bottom: 2em;
-    background-color: #eee;
+    background-color: #151c25;
     border-radius: 4px;
 }
 
@@ -382,8 +375,7 @@ div.plugins ul li i.edit_conf{
     float: right;
 }
 
-#plugin_conf_popup {
-    background: white;
+#plugin_conf_popup{
     border-top: 1px solid #bdbdbd;
     width: 100%;
     position: fixed;
@@ -393,7 +385,6 @@ div.plugins ul li i.edit_conf{
 }
 
 /* logs */
-
 div.logs i{
     font-size: 1em;
 }
@@ -419,15 +410,14 @@ div#log_actions{
     cursor: pointer;
 }
 
-
 pre#log_display {
     display: none;
     padding: 3px;
     font-family: monospace;
     font-size: 0.75em;
     max-width: 1024px;
-    background-color: #eee;
-    border: 1px solid #bdbdbd;
+    background-color: #151c25;
+    border-radius: 4px;
     white-space: pre-wrap;
     word-wrap: break-word;
     text-indent: 2em;

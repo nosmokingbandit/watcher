@@ -4,6 +4,7 @@ ul{
 
 div#container i{
     font-size: 1.5em;
+
 }
 
 .bold{
@@ -61,7 +62,6 @@ div#search_results {
 }
 
 ul#result_list{
-    border: 1px solid #bdbdbd;
     border-radius: 4px;
     font-size: .9em;
     overflow-y: scroll;
@@ -71,6 +71,7 @@ ul#result_list{
     right: 0px;
     height: 99%;
     width: 100%;
+    background-color: #151c25;
 }
 
 ul#result_list li{
@@ -109,7 +110,7 @@ ul#result_list li.data{
 }
 
 ul#result_list li.bbord{
-    border-bottom: 1px solid #bdbdbd;
+    border-bottom: 1px solid #ccc;
 }
 
 span.bad{
@@ -122,38 +123,6 @@ li.data span.snatched{
 
 li.data span.finished{
     color: #4CAF50;
-}
-
-div#results_thinker{
-    display:none;
-    height: 40px;
-    width: 40px;
-    margin: 150px auto;
-    background-color: #333;
-    right: calc(50% - 20px);
-    -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
-    animation: sk-scaleout 1.0s infinite ease-in-out;
-    border-radius: 50%;
-}
-
-@-webkit-keyframes sk-scaleout {
-    0% { -webkit-transform: scale(0) }
-    100% { -webkit-transform: scale(2.0);
-        opacity: 0;
-        }
-}
-
-@keyframes sk-scaleout {
-    0% { -webkit-transform: scale(0);
-        transform: scale(0);
-    }
-    100% { -webkit-transform: scale(2.0);
-            transform: scale(2.0);
-            opacity: 0;
-            }
-}
-
-div#plot{
 }
 
 div#additional_info{
@@ -189,4 +158,17 @@ div#options i{
     font-size: 1.25em;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+
+ul#result_list::-webkit-scrollbar-thumb {
+  background: #080f18;
+}
+
+ul#result_list::-webkit-scrollbar-thumb:hover {
+  background: #080f18;
+}
+
+ul#result_list::-webkit-scrollbar-thumb:active {
+  background: #080f18;
 }

@@ -1,0 +1,34 @@
+table tr:nth-child(odd){
+    background-color: #151c25;
+}
+
+/* File browser */
+div#browse{
+    background-color: #bdbdbd;
+}
+
+div#browser{
+    background-color: #eee;
+}
+
+div#browser div#current_dir{
+    background-color: #bdbdbd;
+}
+
+div#browser ul{
+    background-color: #eee;
+}
+
+div#browser ul::-webkit-scrollbar-thumb {
+  background: #212121;
+}
+div#browser ul::-webkit-scrollbar-thumb:hover {
+  background: #212121;
+}
+div#browser ul::-webkit-scrollbar-thumb:active {
+  background: #212121;
+}
+
+div#browser ul li{
+    background-color: #bdbdbd;
+}

@@ -16,9 +16,9 @@ class ImportLibrary():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.17')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/import_library.css?v=02.17'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=02.17')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.22')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/import_library.css?v=02.22'.format(core.CONFIG['Server']['theme']))
 
         with doc:
             Header.insert_header(current=None)

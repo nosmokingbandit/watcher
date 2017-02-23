@@ -313,11 +313,11 @@ $(document).ready(function () {
                 var url = $this.children("input.newznab_url").val();
                 var api = $this.children("input.newznab_api").val();
 
-                // check if one field is blank and both are not blank
-                if ( (url == "" || api == "") && (url + api !=="") ){
-                    toastr.warning("Please complete or clear out incomplete providers.");
-                    newznab_indexers = {}
+                // if url is blank but apikey filled continue loop withuot storing
+                if (url == "" && api !== ""){
                     cancel = true;
+                    highlight($this.children("input.newznab_url"));
+                    return false;
                 }
                 // but ignore it if both are blank
                 else if (url + api !=="") {

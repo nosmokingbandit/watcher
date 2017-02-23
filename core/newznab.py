@@ -103,7 +103,7 @@ class NewzNab():
 
         permalink = True
 
-        item_keep = ('title', 'category', 'link', 'guid', 'size', 'pubDate', 'comments')
+        item_keep = ('title', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}
         permalink = True
         for ic in item:

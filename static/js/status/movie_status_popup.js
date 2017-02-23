@@ -214,6 +214,8 @@ $(document).ready(function() {
                 children = 'li';
                 sortOrder(order, $parent, children);
             }
+            setTimeout(function(){
+                $(list).scrollTop(scroll_position)}, 20);
         });
     }
 });

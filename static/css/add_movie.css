@@ -26,6 +26,7 @@ button#search_button{
     color: #ccc;
     background-color: #151c25;
     border-radius: 0 4px 4px 0;
+	border: none;
 }
 
 button#search_button:hover{

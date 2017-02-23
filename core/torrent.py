@@ -174,7 +174,6 @@ class Torrent(object):
 
         for result in results:
             result['size'] = result['size'] * 1024 * 1024
-            result['category'] = result['type']
             result['pubdate'] = None
             result['title'] = result['release_name']
             result['indexer'] = result['torrent_id'].split('/')[2]
@@ -306,7 +305,6 @@ class Rarbg(object):
             result['guid'] = result['download'].split('&')[0].split(':')[-1]
             result['type'] = 'magnet'
             result['pubdate'] = None
-            result['category'] = None
 
             result['resolution'] = Torrent.get_source(result)
 
@@ -364,7 +362,6 @@ class LimeTorrents(object):
             try:
                 result['score'] = 0
                 result['size'] = int(i.find('size').text)
-                result['category'] = i.find('category').text
                 result['status'] = u'Available'
                 result['pubdate'] = None
                 result['title'] = i.find('title').text
@@ -431,7 +428,6 @@ class ExtraTorrent(object):
             try:
                 result['score'] = 0
                 result['size'] = int(i.find('size').text)
-                result['category'] = i.find('category').text
                 result['status'] = u'Available'
                 result['pubdate'] = None
                 result['title'] = i.find('title').text
@@ -504,7 +500,6 @@ class SkyTorrents(object):
                 m = (1024 ** 2) if desc[-2] == 'MB' else (1024 ** 3)
                 result['size'] = int(float(desc[-3]) * m)
 
-                result['category'] = i.find('category').text
                 result['status'] = u'Available'
                 result['pubdate'] = None
                 result['title'] = i.find('title').text
@@ -571,7 +566,6 @@ class BitSnoop(object):
             try:
                 result['score'] = 0
                 result['size'] = int(i.find('size').text)
-                result['category'] = i.find('category').text.replace(u'\xbb', '>')
                 result['status'] = u'Available'
                 result['pubdate'] = None
                 result['title'] = i.find('title').text
@@ -642,7 +636,6 @@ class Torrentz2(object):
 
                 result['score'] = 0
                 result['size'] = int(desc[1]) * m
-                result['category'] = i.find('category').text
                 result['status'] = u'Available'
                 result['pubdate'] = None
                 result['title'] = i.find('title').text

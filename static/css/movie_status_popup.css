@@ -76,6 +76,7 @@ ul#result_list{
 
 ul#result_list li{
     overflow: hidden;
+	margin: 0 0 0 8px;
 }
 
 ul#result_list li.title{
@@ -160,6 +161,20 @@ div#options i{
     margin-bottom: 0;
 }
 
+div#results_thinker{
+	width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    background-color: #ccc;
+    display: none;
+    position:absolute;
+    bottom: calc(50% - 20px);
+    right: calc(50% - 20px);
+    -webkit-animation: sk-scaleout 2.0s infinite ease-in-out;
+    animation: sk-scaleout 2.0s infinite ease-in-out;
+    border-radius: 50%;
+    opacity: 0.5;
+}
 
 ul#result_list::-webkit-scrollbar-thumb {
   background: #080f18;

@@ -50,7 +50,6 @@ class SQL(object):
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                    Column('score', SMALLINT),
                                    Column('size', SMALLINT),
-                                   Column('category', TEXT),
                                    Column('status', TEXT),
                                    Column('pubdate', TEXT),
                                    Column('title', TEXT),

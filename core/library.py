@@ -153,8 +153,7 @@ class ImportDirectory(object):
         Resturns dict to match SEARCHRESULTS table
         '''
 
-        result = {'category': 'Movie',
-                  'status': 'Finished',
+        result = {'status': 'Finished',
                   'info_link': '#',
                   'pubdate': None,
                   'title': None,

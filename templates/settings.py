@@ -24,11 +24,11 @@ def settings_page(page):
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.22')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/settings.css?v=02.22'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=02.22'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.22')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}/plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.17')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.17')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.23')
 
         with doc:
             Header.insert_header(current="settings")
@@ -79,7 +79,7 @@ class Settings():
         h2('Interface')
         with ul(id='interface', cls='wide'):
             with li(u'Theme:', cls='bbord'):
-                with select(id='theme', value=c[c_s]['theme']) as theme_select:
+                with select(id='theme', value=c[c_s]['theme']):
                     tl = self.get_themes()
                     for opt in tl:
                         if opt == u'Default':
@@ -87,8 +87,8 @@ class Settings():
                             if c[c_s]['theme'] == 'Default':
                                 item['selected'] = 'selected'
                         else:
-                            item = option(opt, value=opt)
-                        if item['value'] == c[c_s]['theme']:
+                            item = option(opt, value='{}/'.format(opt))
+                        if item['value'] == '{}/'.format(c[c_s]['theme']):
                             item['selected'] = 'selected'
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=str(c[c_s]['authrequired']))

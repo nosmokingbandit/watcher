@@ -329,9 +329,13 @@ class ScoreResults():
                     max_size = Ellipsis
 
                 if result_res == k:
+                    logging.info('{} matches source {}, checking size.'.format(result['title'], k))
                     if min_size < size < max_size:
                         result['score'] += abs(priority - score_range) * 40
                         lst.append(result)
+                        logging.info('{} size {} is within range {}-{}.'.format(result['title'], size, min_size, max_size))
+                    else:
+                        logging.info('Removing {}, size {} not in range {}-{}.'.format(result['title'], size, min_size, max_size))
 
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))

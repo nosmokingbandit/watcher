@@ -35,8 +35,6 @@ class ImportDirectory(object):
         else:
             files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
 
-        print files
-
         files = [unicode(i) for i in files if os.path.getsize(i) >= (minsize * 1024**2)]
 
         movies = {}
@@ -138,8 +136,11 @@ class ImportDirectory(object):
 
         if data['imdbid']:
             tmdbdata = self.tmdb.search(data['imdbid'], single=True)
-            data['year'] = tmdbdata['release_date'][:4]
-            data.update(tmdbdata)
+            if tmdbdata:
+                data['year'] = tmdbdata['release_date'][:4]
+                data.update(tmdbdata)
+            else:
+                logging.warning('Unable to get data from TMDB for {}'.format(data['imdbid']))
 
         else:
             logging.warning(u'Unable to find imdbid.')

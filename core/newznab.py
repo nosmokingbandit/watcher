@@ -114,7 +114,6 @@ class NewzNab():
             if 'newznab' in ic.tag and ic.attrib['name'] == u'size':
                 d['size'] = int(ic.attrib['value'])
 
-        d['resolution'] = self.get_source(d)
         d['imdbid'] = self.imdbid
         d['pubdate'] = d['pubdate'][5:16]
         d['type'] = u'nzb'
@@ -133,33 +132,6 @@ class NewzNab():
         d['downloadid'] = None
 
         return d
-
-    @staticmethod
-    def get_source(result):
-        ''' Parses release resolution and source from title.
-        :param result: dict of individual search result info
-
-        Helper function for make_item_dict()
-
-        Returns str source based on core.RESOLUTIONS
-        '''
-
-        title = result['title']
-        if '4K' in title or 'UHD' in title or '2160P' in title:
-            resolution = u'4K'
-        elif '1080' in title:
-            resolution = u'1080P'
-        elif '720' in title:
-            resolution = u'720P'
-        else:
-            resolution = u'SD'
-
-        title = title.lower()
-        for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
-            if any(i in title for i in aliases):
-                return u'{}-{}'.format(source, resolution)
-                break
-        return u'Unknown-{}'.format(resolution)
 
     @staticmethod
     def test_connection(indexer, apikey):

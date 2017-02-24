@@ -180,6 +180,9 @@ class Searcher():
                     result.update(old)
                     results[idx] = result
 
+        for idx, result in enumerate(results):
+            results[idx]['resolution'] = self.get_source(result)
+
         scored_results = self.score.score(results, imdbid=imdbid)
 
         # sets result status based off marked results table
@@ -231,3 +234,28 @@ class Searcher():
                 return False
         else:
             return True
+
+    def get_source(self, result):
+        ''' Parses release resolution and source from title.
+        :param result: dict of individual search result info
+
+        Returns str source based on core.RESOLUTIONS
+        '''
+
+        title = result['title']
+        if '4K' in title or 'UHD' in title or '2160P' in title:
+            resolution = u'4K'
+        elif '1080' in title:
+            resolution = u'1080P'
+        elif '720' in title:
+            resolution = u'720P'
+        else:
+            resolution = u'SD'
+
+        # lowercase and remove dts so we don't accidentally call it a telesync
+        title = title.lower().replace('dts', '')
+        for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
+            if any(i in title for i in aliases):
+                return u'{}-{}'.format(source, resolution)
+                break
+        return u'Unknown-{}'.format(resolution)

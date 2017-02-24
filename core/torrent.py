@@ -187,8 +187,6 @@ class Torrent(object):
                 result['guid'] = result['download_url']
                 result['type'] = 'torrent'
 
-            result['resolution'] = Torrent.get_source(result)
-
             for i in result.keys():
                 if i not in item_keep:
                     del result[i]
@@ -198,34 +196,6 @@ class Torrent(object):
             result['downloadid'] = None
 
         return results
-
-    @staticmethod
-    def get_source(result):
-        ''' Parses release resolution and source from title.
-        :param result: dict of individual search result info
-
-        Helper function for make_item_dict()
-
-        Returns str source based on core.RESOLUTIONS
-        '''
-
-        title = result['title']
-        if '4K' in title or 'UHD' in title or '2160P' in title:
-            resolution = u'4K'
-        elif '1080' in title:
-            resolution = u'1080P'
-        elif '720' in title:
-            resolution = u'720P'
-        else:
-            resolution = u'SD'
-
-        title = title.lower()
-        for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
-            if any(i in title for i in aliases):
-                return u'{}-{}'.format(source, resolution)
-                break
-        return u'Unknown-{}'.format(resolution)
-
 
 class Rarbg(object):
     '''
@@ -306,8 +276,6 @@ class Rarbg(object):
             result['type'] = 'magnet'
             result['pubdate'] = None
 
-            result['resolution'] = Torrent.get_source(result)
-
             for i in result.keys():
                 if i not in item_keep:
                     del result[i]
@@ -370,7 +338,6 @@ class LimeTorrents(object):
                 result['info_link'] = i.find('comments').text
                 result['torrentfile'] = i.find('enclosure').attrib['url']
                 result['guid'] = result['torrentfile'].split('.')[1].split('/')[-1].lower()
-                result['resolution'] = Torrent.get_source(result)
                 result['type'] = 'torrent'
                 result['downloadid'] = None
 
@@ -436,7 +403,6 @@ class ExtraTorrent(object):
                 result['info_link'] = i.find('link').text
                 result['torrentfile'] = i.find('magnetURI').text
                 result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
-                result['resolution'] = Torrent.get_source(result)
                 result['type'] = 'magnet'
                 result['downloadid'] = None
 
@@ -508,7 +474,6 @@ class SkyTorrents(object):
                 result['info_link'] = i.find('guid').text
                 result['torrentfile'] = i.find('link').text
                 result['guid'] = result['torrentfile'].split('/')[4]
-                result['resolution'] = Torrent.get_source(result)
                 result['type'] = 'torrent'
                 result['downloadid'] = None
 
@@ -574,7 +539,6 @@ class BitSnoop(object):
                 result['info_link'] = i.find('link').text
                 result['torrentfile'] = i.find('{http://xmlns.ezrss.it/0.1/}torrent').find('{http://xmlns.ezrss.it/0.1/}magnetURI').text
                 result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
-                result['resolution'] = Torrent.get_source(result)
                 result['type'] = 'magnet'
                 result['downloadid'] = None
                 result['seeders'] = int(i.find('numSeeders').text)
@@ -644,7 +608,6 @@ class Torrentz2(object):
                 result['info_link'] = i.find('link').text
                 result['torrentfile'] = u'magnet:?xt=urn:btih:{}&dn={}&tr={}'.format(hsh, result['title'], '&tr='.join(Torrent.trackers))
                 result['guid'] = hsh
-                result['resolution'] = Torrent.get_source(result)
                 result['type'] = 'magnet'
                 result['downloadid'] = None
                 result['seeders'] = int(desc[4])

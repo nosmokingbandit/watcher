@@ -197,6 +197,7 @@ class Torrent(object):
 
         return results
 
+
 class Rarbg(object):
     '''
     This api is limited to once request every 2 seconds.

@@ -175,15 +175,3 @@ div#results_thinker{
     border-radius: 50%;
     opacity: 0.5;
 }
-
-ul#result_list::-webkit-scrollbar-thumb {
-  background: #080f18;
-}
-
-ul#result_list::-webkit-scrollbar-thumb:hover {
-  background: #080f18;
-}
-
-ul#result_list::-webkit-scrollbar-thumb:active {
-  background: #080f18;
-}

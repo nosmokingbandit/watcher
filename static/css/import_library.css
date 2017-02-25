@@ -83,16 +83,6 @@ div#browser ul{
     overflow-y: scroll;
 }
 
-div#browser ul::-webkit-scrollbar-thumb {
-  background: #080f18;
-}
-div#browser ul::-webkit-scrollbar-thumb:hover {
-  background: #080f18;
-}
-div#browser ul::-webkit-scrollbar-thumb:active {
-  background: #080f18;
-}
-
 div#browser ul li{
     background-color: #080f18;
     margin: 0.5em;

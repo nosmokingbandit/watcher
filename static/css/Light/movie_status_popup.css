@@ -17,15 +17,3 @@ li.data span.snatched{
 li.data span.finished{
     color: #4CAF50;
 }
-
-ul#result_list::-webkit-scrollbar-thumb {
-  background: #212121;
-}
-
-ul#result_list::-webkit-scrollbar-thumb:hover {
-  background: #212121;
-}
-
-ul#result_list::-webkit-scrollbar-thumb:active {
-  background: #212121;
-}

@@ -138,30 +138,3 @@ class QBittorrent(object):
         except Exception, e:
             logging.error(u'qbittorrent test_connection', exc_info=True)
             return u'{}.'.format(str(e.reason))
-
-
-'''
-{
-u'category': u'Watcher',
-u'num_incomplete': -1,
-u'num_complete': -1,
-u'force_start': False,
-u'hash': u'e1e8bc80e9e34547661d16f03d10756421d8278c',
-u'name': u'Toy Story 3 (BDrip 1080p ENG-ITA DTS) X264 bluray (2010)',
-u'completion_on': 4294967295L,
-u'super_seeding': False,
-u'seq_dl': False,
-u'num_seeds': 0,
-u'upspeed': 0,
-u'priority': 1,
-u'state': u'pausedDL',
-u'eta': 8640000,
-u'added_on': 1484858904,
-u'save_path': u'C:\\Users\\Steven\\Downloads\\',
-u'num_leechs': 0,
-u'progress': 0,
-u'size': 0,
-u'dlspeed': 0,
-u'ratio': 0
-}
-'''

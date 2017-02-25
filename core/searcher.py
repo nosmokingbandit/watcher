@@ -252,10 +252,15 @@ class Searcher():
         else:
             resolution = u'SD'
 
-        # lowercase and remove dts so we don't accidentally call it a telesync
-        title = title.lower().replace('dts', '')
+        delimiters = ['.', '_', ' ', '-']
+        brk = False
         for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
-            if any(i in title for i in aliases):
-                return u'{}-{}'.format(source, resolution)
+            for a in aliases:
+                aliases_delimited = ['{}{}'.format(d, a) for d in delimiters]
+                if any(i in title.lower() for i in aliases_delimited):
+                    return u'{}-{}'.format(source, resolution)
+                    brk = True
+                    break
+            if brk is True:
                 break
         return u'Unknown-{}'.format(resolution)

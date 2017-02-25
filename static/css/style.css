@@ -131,15 +131,15 @@ div#overlay {
   height: 0px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #151c25;
+  background: #ccc;
   border: none;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #151c25;
+  background: #ccc;
 }
 ::-webkit-scrollbar-thumb:active {
-  background: #151c25;
+  background: #ccc;
 }
 ::-webkit-scrollbar-track {
   border-radius: 4px;

@@ -19,16 +19,6 @@ div#browser ul{
     background-color: #eee;
 }
 
-div#browser ul::-webkit-scrollbar-thumb {
-  background: #212121;
-}
-div#browser ul::-webkit-scrollbar-thumb:hover {
-  background: #212121;
-}
-div#browser ul::-webkit-scrollbar-thumb:active {
-  background: #212121;
-}
-
 div#browser ul li{
     background-color: #bdbdbd;
 }

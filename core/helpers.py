@@ -42,7 +42,7 @@ class Url(object):
 
         ascii_s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
 
-        s = urllib2.quote(ascii_s.replace(' ', '+'), safe='')
+        s = urllib2.quote(ascii_s.replace(' ', '+'), safe='+')
 
         return s
 

@@ -84,7 +84,7 @@ class Settings():
                     for opt in tl:
                         if opt == u'Default':
                             item = option(opt, value='')
-                            if c[c_s]['theme'] == 'Default':
+                            if c[c_s]['theme'] == '':
                                 item['selected'] = 'selected'
                         else:
                             item = option(opt, value='{}/'.format(opt))

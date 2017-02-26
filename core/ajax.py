@@ -643,6 +643,10 @@ class Ajax(object):
 
         movies = self.library.scan_dir(directory, minsize, recursive)
 
+        err_check = movies[0].get('error')
+        if err_check:
+            return unicode(err_check)
+
         library = [i['imdbid'] for i in self.sql.get_user_movies()]
         new_movies = {k.replace(directory, ''): v for k, v in movies.iteritems() if v['imdbid'] not in library}
 

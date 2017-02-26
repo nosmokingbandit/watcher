@@ -276,14 +276,13 @@ class ScoreResults():
 
         logging.info(u'Checking title match.')
 
-        title = Url.encode(title.replace(u' ', u'.').replace(u':', u'.').lower())
-
         lst = []
         if title is None:
             for result in self.results:
                 result['score'] += 20
                 lst.append(result)
         else:
+            title = Url.encode(title)
             for result in self.results:
                 test = result['title'].replace(u' ', u'.').replace(u':', u'.').lower()
                 match = fuzz.token_set_ratio(title, test)

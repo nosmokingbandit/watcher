@@ -18,7 +18,6 @@ class NewzNab():
     def search_all(self, imdbid):
         ''' Search all Newznab indexers.
         :param imdbid: string imdb movie id.
-            tt123456
 
         Returns list of dicts with sorted nzb information.
         '''

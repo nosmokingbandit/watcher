@@ -1,7 +1,9 @@
 import json
 import logging
 import urllib2
+from time import time, sleep
 from core.helpers import Comparisons, Url
+import core
 _k = Comparisons._k
 
 logging = logging.getLogger(__name__)
@@ -10,7 +12,22 @@ logging = logging.getLogger(__name__)
 class TMDB(object):
 
     def __init__(self):
+        self.cap = 40
+        self.rate = 3.9
+        if not core.TMDB_LAST_FILL:
+            core.TMDB_LAST_FILL = time()
         return
+
+    def get_tokens(self):
+        if core.TMDB_TOKENS < self.cap:
+            now = time()
+            fill_amount = self.rate * (now - core.TMDB_LAST_FILL)
+            core.TMDB_TOKENS = min(self.cap, core.TMDB_TOKENS + fill_amount)
+            core.TMDB_LAST_FILL = time()
+        return core.TMDB_TOKENS
+
+    def use_token(self):
+        core.TMDB_TOKENS -= 1
 
     def search(self, search_term, single=False):
         ''' Search TMDB for all matches
@@ -53,7 +70,6 @@ class TMDB(object):
         title = Url.encode(title)
 
         url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(_k('tmdb'))
-
         if title[-4:].isdigit():
             query = u'query={}&year={}'.format(title[:-5], title[-4:])
         else:
@@ -61,6 +77,10 @@ class TMDB(object):
 
         url = url + query
         request = Url.request(url)
+
+        while self.get_tokens() < 1:
+            sleep(0.3)
+        self.use_token()
 
         try:
             results = json.load(urllib2.urlopen(request))
@@ -75,9 +95,14 @@ class TMDB(object):
             return ['']
 
     def _search_imdbid(self, imdbid):
-        url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
 
+        url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
         request = Url.request(url)
+
+        while self.get_tokens() < 1:
+            sleep(0.3)
+        self.use_token()
+
         try:
             results = json.load(urllib2.urlopen(request))
             if results['movie_results'] == []:
@@ -93,8 +118,13 @@ class TMDB(object):
             return ['']
 
     def _search_tmdbid(self, tmdbid):
+
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
         request = Url.request(url)
+
+        while self.get_tokens() < 1:
+            sleep(0.3)
+        self.use_token()
 
         try:
             response = json.load(urllib2.urlopen(request))
@@ -130,6 +160,11 @@ class TMDB(object):
 
             url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year)
             request = Url.request(url)
+
+            while self.get_tokens() < 1:
+                sleep(0.3)
+            self.use_token()
+
             try:
                 response = json.load(urllib2.urlopen(request))
                 results = response['results']
@@ -144,8 +179,12 @@ class TMDB(object):
                 return None
 
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
-
         request = Url.request(url)
+
+        while self.get_tokens() < 1:
+            sleep(0.3)
+        self.use_token()
+
         try:
             response = json.load(urllib2.urlopen(request))
             return response.get('imdb_id')

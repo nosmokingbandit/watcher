@@ -31,8 +31,11 @@ CONFIG = None
 # A list of notification data
 NOTIFICATIONS = []
 
-# Global Media Constants
+# Rate limiting
+TMDB_TOKENS = 40
+TMDB_LAST_FILL = None
 
+# Global Media Constants
 RESOLUTIONS = ['BluRay-4K', 'BluRay-1080P', 'BluRay-720P',
                'WebDL-4K', 'WebDL-1080P', 'WebDL-720P',
                'WebRip-4K', 'WebRip-1080P', 'WebRip-720P',

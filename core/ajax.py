@@ -643,7 +643,7 @@ class Ajax(object):
 
         movies = self.library.scan_dir(directory, minsize, recursive)
 
-        err_check = movies[0].get('error')
+        err_check = movies.get('error')
         if err_check:
             return unicode(err_check)
 

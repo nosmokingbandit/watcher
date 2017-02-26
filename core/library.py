@@ -24,7 +24,7 @@ class ImportDirectory(object):
         minsize: int minimum filesize in MB <default 500>
         recursive: bool scan recursively or just root directory <default True>
 
-        Returns list of dicts of movie info
+        Returns dict of movie info {'filepath': {'meta': 'data'}}
         '''
 
         logging.info(u'Scanning {} for movies.'.format(directory))
@@ -36,7 +36,7 @@ class ImportDirectory(object):
             else:
                 files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
         except Exception, e: #noqa
-            return [{'error': e}]
+            return {'error': e}
 
         files = [unicode(i) for i in files if os.path.getsize(i) >= (minsize * 1024**2)]
 

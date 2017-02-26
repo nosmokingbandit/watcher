@@ -30,10 +30,13 @@ class ImportDirectory(object):
         logging.info(u'Scanning {} for movies.'.format(directory))
 
         files = []
-        if recursive:
-            files = self._walk(directory)
-        else:
-            files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
+        try:
+            if recursive:
+                files = self._walk(directory)
+            else:
+                files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
+        except Exception, e: #noqa
+            return [{'error': e}]
 
         files = [unicode(i) for i in files if os.path.getsize(i) >= (minsize * 1024**2)]
 

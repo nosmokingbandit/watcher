@@ -40,7 +40,7 @@ class NewzNab():
 
             url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid_s)
 
-            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url, imdbid_s))
+            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url_base, imdbid_s))
 
             request = Url.request(url)
 

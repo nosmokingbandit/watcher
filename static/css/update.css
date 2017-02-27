@@ -18,3 +18,10 @@ div#content span{
     font-size: 2.5em;
     display: block;
 }
+
+div#thinker{
+    width: 128px;
+    height: 128px;
+    bottom: calc(50% - 64px);
+    right: calc(50% - 64px);
+}

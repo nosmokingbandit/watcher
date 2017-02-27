@@ -84,7 +84,7 @@ class Plugins(object):
             name = os.path.split(plugin)[1]
 
             try:
-                logging.info(u'Executing plugin {}.'.format(name))
+                logging.info(u'Executing plugin {} as {}.'.format(name, command))
 
                 process = subprocess.Popen(command,
                                            stdin=subprocess.PIPE,

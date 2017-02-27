@@ -173,9 +173,11 @@ class Searcher():
             if old['type'] == 'import':
                 results.append(old)
 
+        active_old_results = self.remove_inactive(old_results)
+
         # update results with old info if guids match
         for idx, result in enumerate(results):
-            for old in old_results:
+            for old in active_old_results:
                 if old['guid'] == result['guid']:
                     result.update(old)
                     results[idx] = result
@@ -200,6 +202,36 @@ class Searcher():
             return False
 
         return True
+
+    def remove_inactive(self, results):
+        ''' Removes results from indexers no longer enabled
+        results: list of dicts of search results
+
+        Pulls active indexers from config, then removes any
+            result that isn't from an active indexer.
+
+        Does not filter Torrent results.
+            Since torrent names don't always match their domain
+            ie demonoid == dnoid.me, we can't filter out disabled torrent
+            indexers since all would be removed
+
+        returns list of search results to keep
+        '''
+
+        active = []
+        for i in core.CONFIG['Indexers']['NewzNab'].values():
+            if i[2] is True:
+                active.append(i[0])
+
+        keep = []
+        for result in results:
+            if result['type'] in ['torrent', 'magnet', 'import']:
+                keep.append(result)
+            for indexer in active:
+                if indexer in result['guid']:
+                    keep.append(result)
+
+        return keep
 
     def store_results(self, results, imdbid):
         ''' Stores search results in database.

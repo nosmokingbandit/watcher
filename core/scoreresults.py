@@ -143,6 +143,9 @@ class ScoreResults():
 
         logging.info(u'Filtering Ignored Words.')
         for r in self.results:
+            if r['type'] == 'import':
+                keep.append(r)
+                continue
             cond = False
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
@@ -173,6 +176,9 @@ class ScoreResults():
 
         logging.info(u'Filtering Required Words.')
         for r in self.results:
+            if r['type'] == 'import':
+                keep.append(r)
+                continue
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
                     logging.info(u'{} found in {}, keeping this search result.'.format(word_group, r['title']))
@@ -284,6 +290,9 @@ class ScoreResults():
         else:
             title = Url.encode(title)
             for result in self.results:
+                if result['type'] == 'import':
+                    result['score'] += 20
+                    lst.append(result)
                 test = result['title'].replace(u' ', u'.').replace(u':', u'.').lower()
                 match = fuzz.token_set_ratio(title, test)
                 if match > 60:
@@ -316,7 +325,7 @@ class ScoreResults():
             result_res = result['resolution']
             size = result['size'] / 1000000
             for k, v in sources.iteritems():
-                if v[0] is False:
+                if v[0] is False and result['type'] != 'import':
                     continue
                 priority = v[1]
                 if check_size:
@@ -328,12 +337,21 @@ class ScoreResults():
 
                 if result_res == k:
                     logging.info('{} matches source {}, checking size.'.format(result['title'], k))
+                    if result['type'] == 'import':
+                        result['score'] += abs(priority - score_range) * 40
+                        lst.append(result)
+                        logging.info('{} is an import, skipping size check.'.format(result['title']))
+                        break
                     if min_size < size < max_size:
                         result['score'] += abs(priority - score_range) * 40
                         lst.append(result)
                         logging.info('{} size {} is within range {}-{}.'.format(result['title'], size, min_size, max_size))
+                        break
                     else:
                         logging.info('Removing {}, size {} not in range {}-{}.'.format(result['title'], size, min_size, max_size))
+                        break
+                else:
+                    continue
 
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))

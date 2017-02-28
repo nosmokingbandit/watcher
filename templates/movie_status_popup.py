@@ -21,7 +21,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.28')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.28b')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()

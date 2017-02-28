@@ -7,12 +7,13 @@ import threading
 
 import cherrypy
 import core
-from core import config, library, newznab, plugins, poster, scoreresults, searcher, snatcher, sqldb, torrent, updatestatus, version
+from core import config, library, plugins, poster, scoreresults, searcher, snatcher, sqldb, updatestatus, version
+from core.providers import torrent, newznab
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
 from core.movieinfo import TMDB
 from core.notification import Notification
 from core.rss import predb
-from templates import movie_info_popup, import_library, movie_status_popup, plugin_conf_popup, status, import_library
+from templates import movie_info_popup, import_library, movie_status_popup, plugin_conf_popup, status
 
 logging = logging.getLogger(__name__)
 
@@ -586,10 +587,10 @@ class Ajax(object):
     def indexer_test(self, indexer, apikey, mode):
         if mode == 'newznab':
             return json.dumps(newznab.NewzNab.test_connection(indexer, apikey))
-        elif mode == 'potato':
-            return json.dumps(torrent.Torrent.test_potato_connection(indexer, apikey))
+        elif mode == 'torznab':
+            return json.dumps(torrent.Torrent.test_connection(indexer, apikey))
         else:
-            return None
+            return json.dumps({'response': 'false', 'error': 'Invalid test mode.'})
 
     @cherrypy.expose
     def get_plugin_conf(self, folder, conf):

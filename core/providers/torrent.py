@@ -7,14 +7,13 @@ import xml.etree.cElementTree as ET
 import core
 from core.proxy import Proxy
 from core.helpers import Url
+from core.providers.base import NewzNabProvider
 
 
 logging = logging.getLogger(__name__)
 
-test_url = u'http://mxq:5060/torrentpotato/thepiratebay?passkey=135fdfdfd895c1ef9ceba603d2dd8ba1&t=movie&imdbid=tt3748528'
 
-
-class Torrent(object):
+class Torrent(NewzNabProvider):
 
     trackers = ['udp://tracker.leechers-paradise.org:6969',
                 'udp://zer0day.ch:1337',
@@ -26,12 +25,35 @@ class Torrent(object):
         return
 
     def search_all(self, imdbid, title, year):
-        torrent_indexers = core.CONFIG['Indexers']['Torrent']
+        ''' Search all Torrent indexers.
+        imdbid: string imdb movie id.
+        title: str movie title
+        year: str year of movie release
+
+        Returns list of dicts with sorted nzb information.
+        '''
+
+        torz_indexers = core.CONFIG['Indexers']['TorzNab'].values()
+
+        self.imdbid = imdbid
 
         results = []
 
-        potato_results = self.search_potato(imdbid)
-        results = potato_results
+        term = '{} {}'.format(title, year)
+
+        for indexer in torz_indexers:
+            if indexer[2] is False:
+                continue
+            url_base = indexer[0]
+            if url_base[-1] != u'/':
+                url_base = url_base + '/'
+            apikey = indexer[1]
+
+            r = self.search_newznab(url_base, apikey, term=term)
+            for i in r:
+                results.append(i)
+
+        torrent_indexers = core.CONFIG['Indexers']['Torrent']
 
         title = Url.encode(title)
         year = Url.encode(year)
@@ -42,160 +64,37 @@ class Torrent(object):
                 if i not in results:
                     results.append(i)
         if torrent_indexers['limetorrents']:
-            lime_results = LimeTorrents.search(imdbid, title, year)
+            lime_results = LimeTorrents.search(imdbid, term)
             for i in lime_results:
                 if i not in results:
                     results.append(i)
         if torrent_indexers['extratorrent']:
-            extra_results = ExtraTorrent.search(imdbid, title, year)
+            extra_results = ExtraTorrent.search(imdbid, term)
             for i in extra_results:
                 if i not in results:
                     results.append(i)
         if torrent_indexers['skytorrents']:
-            sky_results = SkyTorrents.search(imdbid, title, year)
+            sky_results = SkyTorrents.search(imdbid, term)
             for i in sky_results:
                 if i not in results:
                     results.append(i)
         if torrent_indexers['bitsnoop']:
-            bit_results = BitSnoop.search(imdbid, title, year)
+            bit_results = BitSnoop.search(imdbid, term)
             for i in bit_results:
                 if i not in results:
                     results.append(i)
         if torrent_indexers['torrentz2']:
-            torrentz_results = Torrentz2.search(imdbid, title, year)
+            torrentz_results = Torrentz2.search(imdbid, term)
             for i in torrentz_results:
                 if i not in results:
                     results.append(i)
 
+        self.imdbid = None
         return results
 
-    def search_potato(self, imdbid):
-        ''' Search all TorrentPotato providers
-        imdbid: str imdb id #
-
-        Returns list of dicts with movie info
-        '''
-        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
-
-        indexers = core.CONFIG['Indexers']['TorrentPotato'].values()
-        results = []
-
-        for indexer in indexers:
-            if indexer[2] is False:
-                continue
-            url = indexer[0]
-            if url[-1] == u'/':
-                url = url[:-1]
-            passkey = indexer[1]
-
-            search_string = u'{}?passkey={}&t=movie&imdbid={}'.format(url, passkey, imdbid)
-
-            logging.info(u'SEARCHING: {}?passkey=PASSKEY&t=movie&imdbid={}'.format(url, imdbid))
-
-            request = Url.request(search_string)
-
-            try:
-                if proxy_enabled and Proxy.whitelist(url) is True:
-                    response = Proxy.bypass(request)
-                else:
-                    response = urllib2.urlopen(request)
-
-                torrent_results = json.loads(response.read()).get('results')
-
-                if torrent_results:
-                    for i in torrent_results:
-                        results.append(i)
-                else:
-                    continue
-            except (SystemExit, KeyboardInterrupt):
-                raise
-            except Exception, e: # noqa
-                logging.error(u'Torrent search_potato.', exc_info=True)
-                continue
-
-        if results:
-            return Torrent.parse_torrent_potato(results)
-        else:
-            return []
-
     @staticmethod
-    def test_potato_connection(indexer, apikey):
-        ''' Tests connection to TorrentPotato API
-
-        '''
-
-        if not indexer:
-            return {'response': False, 'error': 'Indexer field is blank.'}
-
-        while indexer[-1] == '/':
-            indexer = indexer[:-1]
-
-        response = {}
-
-        url = u'{}?passkey={}'.format(indexer, apikey)
-
-        request = Url.request(url)
-        try:
-            response = urllib2.urlopen(request).read()
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception, e: # noqa
-            logging.error(u'Torrent Potato connection check.', exc_info=True)
-            return {'response': 'false', 'message': str(e)}
-
-        try:
-            results = json.loads(response)
-            if 'results' in results.keys():
-                return {'response': True, 'message': 'Connection successful.'}
-            else:
-                return {'response': False, 'message': 'Malformed json response.'}
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except ValueError:
-            try:
-                tree = ET.fromstring(response)
-                return {'response': False, 'message': tree.text}
-            except Exception, e:
-                return {'response': False, 'message': 'Unknown response format.'}
-        except Exception, e: # noqa
-            logging.error(u'Torrent Potato connection check.', exc_info=True)
-            return {'response': 'false', 'message': 'Unknown response format.'}
-
-    @staticmethod
-    def parse_torrent_potato(results):
-        ''' Sorts and correct keys in results.
-        results: list of dicts of results
-
-        Renames, corrects, and adds missing keys
-
-        Returns list of dicts of results
-        '''
-        item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
-
-        for result in results:
-            result['size'] = result['size'] * 1024 * 1024
-            result['pubdate'] = None
-            result['title'] = result['release_name']
-            result['indexer'] = result['torrent_id'].split('/')[2]
-            result['info_link'] = result['details_url']
-            result['torrentfile'] = result['download_url']
-
-            if result['download_url'].startswith('magnet'):
-                result['guid'] = result['download_url'].split('&')[0].split(':')[-1]
-                result['type'] = 'magnet'
-            else:
-                result['guid'] = result['download_url']
-                result['type'] = 'torrent'
-
-            for i in result.keys():
-                if i not in item_keep:
-                    del result[i]
-
-            result['status'] = u'Available'
-            result['score'] = 0
-            result['downloadid'] = None
-
-        return results
+    def test_connection(indexer, apikey):
+        return NewzNabProvider.test_connection(indexer, apikey)
 
 
 class Rarbg(object):
@@ -291,12 +190,12 @@ class Rarbg(object):
 class LimeTorrents(object):
 
     @staticmethod
-    def search(imdbid, title, year):
+    def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching LimeTorrents for {}'.format(title))
+        logging.info(u'Searching LimeTorrents for {}'.format(term))
 
-        url = u'https://www.limetorrents.cc/searchrss/{}+{}'.format(title, year)
+        url = u'https://www.limetorrents.cc/searchrss/term'.format(term)
         request = Url.request(url)
 
         try:
@@ -356,12 +255,12 @@ class LimeTorrents(object):
 class ExtraTorrent(object):
 
     @staticmethod
-    def search(imdbid, title, year):
+    def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching ExtraTorrent for {}'.format(title))
+        logging.info(u'Searching ExtraTorrent for {}'.format(term))
 
-        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}+{}'.format(title, year)
+        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}'.format(term)
 
         request = Url.request(url)
         try:
@@ -422,12 +321,12 @@ class ExtraTorrent(object):
 class SkyTorrents(object):
 
     @staticmethod
-    def search(imdbid, title, year):
+    def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching SkyTorrents for {}'.format(title))
+        logging.info(u'Searching SkyTorrents for {}'.format(term))
 
-        url = u'https://www.skytorrents.in/rss/all/ed/1/{}+{}'.format(title, year)
+        url = u'https://www.skytorrents.in/rss/all/ed/1/{}'.format(term)
 
         request = Url.request(url)
         try:
@@ -492,12 +391,12 @@ class SkyTorrents(object):
 class BitSnoop(object):
 
     @staticmethod
-    def search(imdbid, title, year):
+    def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching BitSnoop for {}'.format(title))
+        logging.info(u'Searching BitSnoop for {}'.format(term))
 
-        url = u'https://bitsnoop.com/search/video/{}+{}/c/d/1/?fmt=rss'.format(title, year)
+        url = u'https://bitsnoop.com/search/video/{}/c/d/1/?fmt=rss'.format(term)
 
         request = Url.request(url)
         try:
@@ -556,12 +455,12 @@ class BitSnoop(object):
 class Torrentz2(object):
 
     @staticmethod
-    def search(imdbid, title, year):
+    def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching Torrentz2 for {}'.format(title))
+        logging.info(u'Searching Torrentz2 for {}'.format(term))
 
-        url = u'https://torrentz2.eu/feed?f={}+{}'.format(title, year)
+        url = u'https://torrentz2.eu/feed?f={}'.format(term)
 
         request = Url.request(url)
         try:

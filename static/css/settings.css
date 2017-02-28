@@ -239,13 +239,13 @@ div.providers ul#providers{
 }
 
 div.providers ul#newznab_list,
-div.providers ul#potato_list,{
+div.providers ul#torznab_list,{
     float: left;
     width: 100%;
 }
 
 div.providers ul#newznab_list li,
-div.providers ul#potato_list li{
+div.providers ul#torznab_list li{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -254,7 +254,7 @@ div.providers ul#potato_list li{
 
 
 div.providers i.newznab_check,
-div.providers i.potato_check,
+div.providers i.torznab_check,
 div.providers i.torrent_check{
     width: 1.2em;
     text-align: left;
@@ -262,20 +262,20 @@ div.providers i.torrent_check{
 }
 
 div.providers i.newznab_clear, div.providers i.newznab_test,
-div.providers i.potato_clear, div.providers i.potato_test{
+div.providers i.torznab_clear, div.providers i.torznab_test{
     width: 1.5em;
     text-align: center;
     flex: 0 1 auto;
 }
 
 div.providers input.newznab_url, div.providers input.newznab_api,
-div.providers input.potato_url, div.providers input.potato_api{
+div.providers input.torznab_url, div.providers input.torznab_api{
     flex: 1 0 auto;
     margin: 0 0.5em;
 }
 
 div.providers li.add_newznab_row,
-div.providers li.add_potato_row{
+div.providers li.add_torznab_row{
     margin: 0 0 2em 0;
 }
 

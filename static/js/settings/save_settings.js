@@ -328,31 +328,31 @@ $(document).ready(function () {
         });
         data["Indexers"]["NewzNab"] = newznab_indexers;
 
-        potato_indexers = {};
+        torznab_indexers = {};
         ind = 1;
-        $("#potato_list li").each(function(){
+        $("#torznab_list li").each(function(){
             $this = $(this);
-            if ($this.attr("class") == "potato_indexer"){
-                var check = is_checked($this.children("i.potato_check"));
-                var url = $this.children("input.potato_url").val();
-                var api = $this.children("input.potato_api").val();
+            if ($this.attr("class") == "torznab_indexer"){
+                var check = is_checked($this.children("i.torznab_check"));
+                var url = $this.children("input.torznab_url").val();
+                var api = $this.children("input.torznab_api").val();
 
                 // check if one field is blank and both are not blank
                 if ( (url == "" || api == "") && (url + api !=="") ){
                     toastr.warning("Please complete or clear out incomplete providers.");
-                    potato_indexers = {}
+                    torznab_indexers = {}
                     cancel = true;
                 }
 
                 // but ignore it if both are blank
                 else if (url + api !=="") {
-                    potato_indexers[ind] = [url, api, check]
+                    torznab_indexers[ind] = [url, api, check]
                     ind++;
                 }
             }
         });
 
-        data["Indexers"]["TorrentPotato"] = potato_indexers;
+        data["Indexers"]["TorzNab"] = torznab_indexers;
 
         torrent_indexers = {}
         $("#torrentindexer_list li").each(function(){

@@ -45,7 +45,8 @@ class SQL(object):
                             Column('predb', TEXT),
                             Column('quality', TEXT),
                             Column('finished_date', TEXT),
-                            Column('finished_score', SMALLINT)
+                            Column('finished_score', SMALLINT),
+                            Column('backlog', SMALLINT)
                             )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                    Column('score', SMALLINT),
@@ -236,10 +237,15 @@ class SQL(object):
         else:
             return False
 
-    def get_search_results(self, imdbid, quality):
+    def get_search_results(self, imdbid, quality=None):
         ''' Gets all search results for a given movie
         :param imdbid: str imdb id #
-        quality: str quality profile. Used to sort order
+        quality: str name of quality profile. Used to sort order <optional>
+
+        Gets all search results sorted by score, then size.
+
+        Looks at quality to determine size sort direction. If not passed defaults to
+            DESC, with bigger files first.
 
         Returns list of dicts for all SEARCHRESULTS that match imdbid
         '''

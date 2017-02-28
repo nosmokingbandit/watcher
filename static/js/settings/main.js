@@ -146,18 +146,18 @@ $(document).ready(function () {
         $("ul#newznab_list li:nth-last-child(2)").after(row);
     });
 
-    $("div.providers i#add_potato_row").click(function (){
+    $("div.providers i#add_torznab_row").click(function (){
         var row = `
-        <li class='potato_indexer'>
-            <i class='fa fa-square-o potato_check checkbox' value='False'/>
-            <input class='potato_url' placeholder=' http://indexer.url' type='text'/>
-            <input class='potato_api' placeholder=' Api Key' type='text'/>
-            <i class='potato_clear fa fa-trash-o'/>
-            <i class='indexer_test fa fa-plug', type='potato'/>
+        <li class='torznab_indexer'>
+            <i class='fa fa-square-o torznab_check checkbox' value='False'/>
+            <input class='torznab_url' placeholder=' http://indexer.url' type='text'/>
+            <input class='torznab_api' placeholder=' Api Key' type='text'/>
+            <i class='torznab_clear fa fa-trash-o'/>
+            <i class='indexer_test fa fa-plug', type='torznab'/>
         </li>
         `
 
-        $("div.providers ul#potato_list li:nth-last-child(2)").after(row);
+        $("div.providers ul#torznab_list li:nth-last-child(2)").after(row);
     });
 
     // clear row
@@ -188,6 +188,7 @@ $(document).ready(function () {
 
         $.post(url_base + "/ajax/indexer_test", {"indexer": url, "apikey": api, "mode": mode})
         .done(function(r){
+            console.log(r)
             response = JSON.parse(r);
             if(response["response"] == true){
                 toastr.success(response["message"]);

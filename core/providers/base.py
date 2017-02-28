@@ -1,6 +1,6 @@
 import logging
-import urllib2
 import xml.etree.cElementTree as ET
+import urllib2
 
 import core
 from core.helpers import Url
@@ -9,26 +9,80 @@ from core.proxy import Proxy
 logging = logging.getLogger(__name__)
 
 
-class NewzNab():
+class NewzNabProvider(object):
+    '''
+    Base class for NewzNab and TorzNab providers.
+    Methods:
+        search_newznab      searches indexer for imdbid
+        parse_newznab_xml   parses newznab-formatted xml into dictionary
+        test_connection     static_method to test connetion and apikey
 
-    def __init__(self):
-        return
+    Required imports:
+        import xml.etree.cElementTree as ET
+        import urllib2
+        from core.helpers import Url
+        from core.proxy import Proxy
+        from core.providers.base import NewzNabProvider
 
-    # Returns a list of results stored as dicts
-    def search_all(self, imdbid):
-        ''' Search all Newznab indexers.
-        :param imdbid: string imdb movie id.
+    '''
 
-        Returns list of dicts with sorted nzb information.
+    def search_newznab(self, url_base, apikey, imdbid=None, term=None):
+        ''' Searches Newznab for imdbid
+        url_base: str base url for all requests (https://indexer.com/)
+        apikey: str api key for indexer
+        imdbid: str imdbid *numbers only* ie 0055447    <optional*>
+        term: str title and year of movie to search     <optional*>
+
+        *Either imdbid or term MUST be passed.
+        Pass term for torznab searches, imdbid for newznab searches.
+
+        Returns list of dicts of search results
         '''
+
+        if not imdbid and not term:
+            logging.warning('Neither imdbid or term supplied to search.')
+            return []
+        elif imdbid:
+            url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid)
+            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url_base, imdbid))
+            kind = 'nzb'
+        elif term:
+            term = Url.encode(term.replace(' ', '+'))
+            url = u'{}api?apikey={}&t=movie&q={}'.format(url_base, apikey, term)
+            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&q={}'.format(url_base, term))
+            kind = 'torrent'
+
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        request = Url.request(url)
+
+        try:
+            if proxy_enabled and Proxy.whitelist(url) is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            results_xml = response.read()
+            return self.parse_newznab_xml(results_xml, kind)
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Newz/TorzNab backlog search', exc_info=True)
+            return []
+
+    def get_rss(self):
+        self.imdbid = None
+
+        ''' Get latest uploads from all indexers
+
+        Returns list of dicts with parsed nzb info
+        '''
+
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
         indexers = core.CONFIG['Indexers']['NewzNab'].values()
 
-        self.imdbid = imdbid
-
         results = []
-        imdbid_s = imdbid[2:]  # just imdbid numbers
 
         for indexer in indexers:
             if indexer[2] is False:
@@ -38,9 +92,9 @@ class NewzNab():
                 url_base = url_base + '/'
             apikey = indexer[1]
 
-            url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid_s)
+            url = u'{}api?t=movie&cat=2000&extended=1&offset=0&apikey={}'.format(url_base, apikey)
 
-            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url_base, imdbid_s))
+            logging.info(u'RSS_SYNC: {}api?t=movie&cat=2000&extended=1&offset=0&apikey=APIKEY'.format(url_base))
 
             request = Url.request(url)
 
@@ -57,14 +111,15 @@ class NewzNab():
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error(u'NewzNab search_all get xml', exc_info=True)
+                logging.error(u'NewzNab get_rss get xml', exc_info=True)
 
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
-    def parse_newznab_xml(self, feed):
+    def parse_newznab_xml(self, feed, kind):
         ''' Parse xml from Newnzb api.
         :param feed: str nn xml feed
+        kind: str type of feed we are parsing, either nzb or torrent
 
         Returns dict of sorted nzb information.
         '''
@@ -81,14 +136,15 @@ class NewzNab():
                     if not indexer and channel_child.tag == u'link':
                         indexer = channel_child.text
                     if channel_child.tag == u'item':
-                        result_item = self.make_item_dict(channel_child)
+                        result_item = self._make_item_dict(channel_child, kind)
                         result_item['indexer'] = indexer
                         res_list.append(result_item)
         return res_list
 
-    def make_item_dict(self, item):
+    def _make_item_dict(self, item, kind):
         ''' Converts parsed xml into dict.
         :param item: string of xml nzb information
+        kind: str 'nzb' or 'torrent' depending on type of feed
 
         Helper function for parse_newznab_xml().
 
@@ -97,25 +153,30 @@ class NewzNab():
 
         If newznab guid is NOT a permalink, uses the comments link for info_link.
 
+        Gets torrent hash and determines if download is torrent file or magnet uri.
+
         Returns dict.
         '''
-
-        permalink = True
 
         item_keep = ('title', 'link', 'guid', 'size', 'pubDate', 'comments')
         d = {}
         permalink = True
         for ic in item:
             if ic.tag in item_keep:
-                if ic.tag == u'guid' and ic.attrib['isPermaLink'] == u'false':
+                if ic.tag == u'guid' and ic.attrib.get('isPermaLink', 'false') == u'false':
                     permalink = False
                 d[ic.tag.lower()] = ic.text
-            if 'newznab' in ic.tag and ic.attrib['name'] == u'size':
-                d['size'] = int(ic.attrib['value'])
+            if not d.get('size') and 'newznab' in ic.tag and ic.attrib['name'] == u'size':
+                d['size'] = ic.attrib['value']
+            if 'torznab' in ic.tag and ic.attrib['name'] == 'seeders':
+                d['seeders'] = int(ic.attrib['value'])
+            if 'newznab' in ic.tag and ic.attrib['name'] == u'imdb':
+                d['imdbid'] = 'tt{}'.format(ic.attrib['value'])
 
-        d['imdbid'] = self.imdbid
+        d['size'] = int(d['size'])
+        if not d.get('imdbid'):
+            d['imdbid'] = self.imdbid
         d['pubdate'] = d['pubdate'][5:16]
-        d['type'] = u'nzb'
 
         if not permalink:
             d['info_link'] = d['comments']
@@ -129,6 +190,16 @@ class NewzNab():
         d['status'] = u'Available'
         d['torrentfile'] = None
         d['downloadid'] = None
+
+        if kind == 'nzb':
+            d['type'] = u'nzb'
+        else:
+            d['torrentfile'] = d['guid']
+            if d['guid'].startswith('magnet'):
+                d['guid'] = d['guid'].split('&')[0].split(':')[-1]
+                d['type'] = 'magnet'
+            else:
+                d['type'] = 'torrent'
 
         return d
 

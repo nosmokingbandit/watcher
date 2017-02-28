@@ -23,12 +23,12 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.22')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=02.22'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.28')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=02.28'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.17')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.23')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.28')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.28')
 
         with doc:
             Header.insert_header(current="settings")
@@ -375,18 +375,18 @@ class Settings():
                     with li(cls='add_newznab_row'):
                         i(cls='fa fa-plus-square', id='add_newznab_row')
 
-                with ul(id='potato_list'):
+                with ul(id='torznab_list'):
                     with li(cls='sub_cat'):
-                        span(u'Torrent Potato Indexers')
-                    for n in c[c_s]['TorrentPotato']:
-                        with li(cls='potato_indexer'):
-                            i(cls='potato_check fa fa-square-o checkbox', value=str(c[c_s]['TorrentPotato'][n][2]))
-                            input(type='text', cls='potato_url', value=c[c_s]['TorrentPotato'][n][0], placeholder=" http://www.indexer-url.com/")
-                            input(type='text', cls='potato_api', value=c[c_s]['TorrentPotato'][n][1], placeholder=" Api Key")
-                            i(cls='potato_clear fa fa-trash-o')
-                            i(cls='indexer_test fa fa-plug', type='potato')
-                    with li(cls='add_potato_row'):
-                        i(cls='fa fa-plus-square', id='add_potato_row')
+                        span(u'TorzNab Indexers')
+                    for k, v in c[c_s]['TorzNab'].iteritems():
+                        with li(cls='torznab_indexer'):
+                            i(cls='torznab_check fa fa-square-o checkbox', value=str(v[2]))
+                            input(type='text', cls='torznab_url', value=v[0], placeholder=" http://www.indexer-url.com/")
+                            input(type='text', cls='torznab_api', value=v[1], placeholder=" Api Key")
+                            i(cls='torznab_clear fa fa-trash-o')
+                            i(cls='indexer_test fa fa-plug', type='torznab')
+                    with li(cls='add_torznab_row'):
+                        i(cls='fa fa-plus-square', id='add_torznab_row')
 
                 with ul(id='torrentindexer_list'):
                     with li(cls='sub_cat'):

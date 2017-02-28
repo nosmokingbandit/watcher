@@ -148,10 +148,10 @@ $(document).ready(function() {
         .done(function(r){
             response = JSON.parse(r);
             refresh_list('#movie_list');
-            refresh_list('#result_list', imdbid=imdbid)
 
             if(response['response'] == true){
                 toastr.success(response['message']);
+                $(`span.status_text['guid=${guid}']`).text('Snatched').attr('class', 'status_text bold snatched')
             } else {
                 toastr.error(response['error']);
             }
@@ -176,9 +176,10 @@ $(document).ready(function() {
             response = JSON.parse(r);
 
             refresh_list('#movie_list');
-            refresh_list('#result_list', imdbid=imdbid);
+
             if (response['response'] == true){
                 toastr.success(response['message']);
+                $(`span.status_text['guid=${guid}']`).text('Bad').attr('class', 'status_text bold bad')
             } else {
                 toastr.error(response['error']);
             };
@@ -187,7 +188,6 @@ $(document).ready(function() {
     });
 
     function refresh_list(list, imdbid, quality){
-        scroll_position = $(list).scrollTop();
         if(imdbid === undefined) {
             imdbid = '';
         };
@@ -201,7 +201,6 @@ $(document).ready(function() {
             classes = classes + v + ' '
         })
 
-
         $.post(url_base + "/ajax/refresh_list", {"list":list, 'imdbid':imdbid, "quality":quality})
         .done(function(html){
             var $parent = $list.parent()
@@ -214,8 +213,6 @@ $(document).ready(function() {
                 children = 'li';
                 sortOrder(order, $parent, children);
             }
-            setTimeout(function(){
-                $(list).scrollTop(scroll_position)}, 20);
         });
     }
 });

@@ -21,7 +21,7 @@ class MovieStatusPopup():
 
         container = div(id='container')
         with container:
-            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.07')
+            script(src=core.URL_BASE + '/static/js/status/movie_status_popup.js?v=02.28')
             if not data:
                 span(u'Unable to get movie information from database. Check logs for more information.')
                 return doc.render()
@@ -30,9 +30,9 @@ class MovieStatusPopup():
                 with p():
                     span(title, id='title', imdbid=imdbid)
                     span(year, id='year')
-                    i(cls='fa fa-times', id='close')
-                    i(cls='fa fa-trash', id='remove')
-                    i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title=data['title'])
+                    i(cls='fa fa-times', id='close', title='Close.')
+                    i(cls='fa fa-trash', id='remove', title='Remove movie.')
+                    i(cls='fa fa-search', id='search_now', imdbid=data['imdbid'], title='Force backlog search.')
             with div(id='media'):
                 img(id='poster', src=poster_path)
                 with div(id='search_results'):
@@ -107,13 +107,13 @@ class MovieStatusPopup():
                         span(kind, cls='bold')
                         span(u' Status:')
                         if status == 'Snatched':
-                            span(status, cls='bold snatched')
+                            span(status, cls='status_text bold snatched')
                         elif status == 'Bad':
-                            span(status, cls='bold bad')
+                            span(status, cls='status_text bold bad')
                         elif status == 'Finished':
-                            span(status, cls='bold finished')
+                            span(status, cls='status_text bold finished')
                         else:
-                            span(status, cls='bold')
+                            span(status, cls='status_text bold')
                         span(u' Size:')
                         span(size, cls='bold')
                         span(u' Score:')

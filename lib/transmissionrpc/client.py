@@ -20,7 +20,7 @@ if PY3:
     from urllib.request import urlopen
 else:
     from urlparse import urlparse
-    from urllib2 import urlopen
+    from urllib2 import urlopen, Request
 
 def debug_httperror(error):
     """
@@ -375,7 +375,8 @@ class Client(object):
         if parsed_uri.scheme in ['ftp', 'ftps', 'http', 'https']:
             # there has been some problem with T's built in torrent fetcher,
             # use a python one instead
-            torrent_file = urlopen(torrent)
+            req = Request(torrent, headers={'User-Agent' : 'TransmissionRPC'})
+            torrent_file = urlopen(req)
             torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')
         if parsed_uri.scheme in ['file']:
@@ -810,7 +811,7 @@ class Client(object):
         """Move transfer to the bottom of the queue."""
         self._rpc_version_warning(14)
         self._request('queue-move-bottom', ids=ids, require_ids=True, timeout=timeout)
-        
+
     def queue_up(self, ids, timeout=None):
         """Move transfer up in the queue."""
         self._rpc_version_warning(14)

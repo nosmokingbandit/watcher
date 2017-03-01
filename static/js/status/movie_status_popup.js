@@ -152,7 +152,7 @@ $(document).ready(function() {
 
             if(response['response'] == true){
                 toastr.success(response['message']);
-                $(`span.status_text['guid=${guid}']`).text('Snatched').attr('class', 'status_text bold snatched')
+                $(`span.status_text[guid="${guid}"]`).text('Snatched').attr('class', 'status_text bold snatched')
             } else {
                 toastr.error(response['error']);
             }
@@ -180,7 +180,7 @@ $(document).ready(function() {
 
             if (response['response'] == true){
                 toastr.success(response['message']);
-                $(`span.status_text['guid=${guid}']`).text('Bad').attr('class', 'status_text bold bad')
+                $(`span.status_text[guid="${guid}"]`).text('Bad').attr('class', 'status_text bold bad')
             } else {
                 toastr.error(response['error']);
             };

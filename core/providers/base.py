@@ -48,8 +48,8 @@ class NewzNabProvider(object):
             kind = 'nzb'
         elif term:
             term = Url.encode(term.replace(' ', '+'))
-            url = u'{}api?apikey={}&t=movie&q={}'.format(url_base, apikey, term)
-            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&q={}'.format(url_base, term))
+            url = u'{}api?apikey={}&t=search&cat=2000&q={}'.format(url_base, apikey, term)
+            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=search&cat=2000&q={}'.format(url_base, term))
             kind = 'torrent'
 
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']

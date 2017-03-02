@@ -65,9 +65,6 @@ $(document).ready(function() {
         });
     });
 
-
-
-
     // submit directory information
     $("span#start_scan").click(function(){
         directory = $("input#directory").val();

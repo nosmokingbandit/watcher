@@ -63,7 +63,7 @@ class NewzNabProvider(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Newz/TorzNab backlog search', exc_info=True)
+            logging.error(u'Newz/TorzNab backlog search.', exc_info=True)
             return []
 
     def _get_rss(self):
@@ -214,7 +214,7 @@ class NewzNabProvider(object):
 
         response = {}
 
-        logging.info(u'Testing connection to {}'.format(indexer))
+        logging.info(u'Testing connection to {}.'.format(indexer))
 
         url = u'{}/api?apikey={}&t=search&id=tt0063350'.format(indexer, apikey)
 
@@ -224,16 +224,20 @@ class NewzNabProvider(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'NewzNab connection check.', exc_info=True)
+            logging.error(u'Newz/TorzNab connection check.', exc_info=True)
             return {'response': False, 'message': 'No connection could be made because the target machine actively refused it.'}
 
         if '<error code="' in response:
             error = ET.fromstring(response)
             if error.attrib['description'] == 'Missing parameter':
+                logging.info('Newz/TorzNab connection test successful.')
                 return {'response': True, 'message': 'Connection successful.'}
             else:
+                logging.error('Newz/TorzNab connection test failed. {}'.format(error.attrib['description']))
                 return {'response': False, 'message': error.attrib['description']}
         elif 'unauthorized' in response.lower():
+            logging.error('Newz/TorzNab connection failed - Incorrect API key.')
             return {'response': False, 'message': 'Incorrect API key.'}
         else:
+            logging.info('Newz/TorzNab connection test successful.')
             return {'response': True, 'message': 'Connection successful.'}

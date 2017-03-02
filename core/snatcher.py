@@ -38,7 +38,7 @@ class Snatcher():
 
         search_results = self.sql.get_search_results(imdbid, quality)
         if not search_results:
-            logging.info(u'Unable to automatically grab {}, no results.'.format(imdbid))
+            logging.warning(u'Unable to automatically grab {}, no results.'.format(imdbid))
             return False
 
         # Filter out any results we don't want to grab
@@ -49,7 +49,7 @@ class Snatcher():
             search_results = [i for i in search_results if i['type'] not in ['torrent', 'magnet']]
 
         if not search_results:
-            logging.info(u'Unable to automatically grab {}, no results for enabled downloader.'.format(imdbid))
+            logging.warning(u'Unable to automatically grab {}, no results for enabled downloader.'.format(imdbid))
             return False
 
         # Check if we are past the 'waitdays'
@@ -79,7 +79,7 @@ class Snatcher():
                 logging.info(u'Top-scoring release for {} has already been snatched.'.format(imdbid))
                 return False
 
-        logging.info(u'Unable to automatically grab {}, no Available results.'.format(imdbid))
+        logging.warning(u'Unable to automatically grab {}, no Available results.'.format(imdbid))
         return False
 
     def snatch(self, data):
@@ -177,7 +177,7 @@ class Snatcher():
         # If sending to Transmission
         transmission_conf = core.CONFIG['Downloader']['Torrent']['Transmission']
         if transmission_conf['enabled'] is True:
-            logging.info(u'Sending {} to Transmission'.format(kind))
+            logging.info(u'Sending {} to Transmission.'.format(kind))
             response = transmission.Transmission.add_torrent(data)
 
             if response['response'] is True:
@@ -197,7 +197,7 @@ class Snatcher():
         # If sending to QBittorrent
         qbit_conf = core.CONFIG['Downloader']['Torrent']['QBittorrent']
         if qbit_conf['enabled'] is True:
-            logging.info(u'Sending {} to QBittorrent'.format(kind))
+            logging.info(u'Sending {} to QBittorrent.'.format(kind))
             response = qbittorrent.QBittorrent.add_torrent(data)
 
             if response['response'] is True:
@@ -217,7 +217,7 @@ class Snatcher():
         # If sending to DelugeRPC
         delugerpc_conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
         if delugerpc_conf['enabled'] is True:
-            logging.info(u'Sending {} to DelugeRPC'.format(kind))
+            logging.info(u'Sending {} to DelugeRPC.'.format(kind))
             response = deluge.DelugeRPC.add_torrent(data)
 
             if response['response'] is True:
@@ -237,7 +237,7 @@ class Snatcher():
         # If sending to DelugeWeb
         delugeweb_conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
         if delugeweb_conf['enabled'] is True:
-            logging.info(u'Sending {} to DelugeWeb'.format(kind))
+            logging.info(u'Sending {} to DelugeWeb.'.format(kind))
             response = deluge.DelugeWeb.add_torrent(data)
 
             if response['response'] is True:
@@ -264,12 +264,15 @@ class Snatcher():
         '''
 
         if not self.update.searchresults(guid, 'Snatched'):
+            logging.error('Unable to update search result status to Snatched.')
             return False
 
         if not self.update.markedresults(guid, 'Snatched', imdbid=imdbid):
+            logging.error('Unable to store marked search result as Snatched.')
             return False
 
         if not self.update.movie_status(imdbid):
+            logging.error('Unable to update movie status to Snatched.')
             return False
 
         return True

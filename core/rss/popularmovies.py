@@ -26,7 +26,7 @@ class PopularMoviesFeed(object):
 
         movies = None
 
-        logging.info(u'Syncing popular movie feed')
+        logging.info(u'Syncing popular movie feed.')
         request = Url.request('https://s3.amazonaws.com/popular-movies/movies.json',
                               headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -34,7 +34,7 @@ class PopularMoviesFeed(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Popular feed request.', exc_info=True)
+            logging.error(u'Popular feed request failed.', exc_info=True)
             return None
 
         if movies:
@@ -78,7 +78,7 @@ class PopularMoviesFeed(object):
         for imdbid in movies_to_add:
             movie_info = self.tmdb._search_imdbid(imdbid)[0]
             if not movie_info:
-                logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
+                logging.warning(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))

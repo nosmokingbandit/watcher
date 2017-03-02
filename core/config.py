@@ -1,12 +1,8 @@
 import ConfigParser
 import json
-import logging
 import random
-import shutil
 import core
 import collections
-
-logging = logging.getLogger(__name__)
 
 
 class Config():

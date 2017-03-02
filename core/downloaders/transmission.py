@@ -27,11 +27,12 @@ class Transmission(object):
             if type(client.rpc_version) == int:
                 return True
             else:
+                logging.warning('Unable to connect to TransmissionRPC.')
                 return 'Unable to connect.'
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error(u'Transmission test_connection', exc_info=True)
+            logging.error(u'Unable to connect to TransmissionRPC.', exc_info=True)
             return u'{}.'.format(e)
 
     @staticmethod
@@ -79,9 +80,10 @@ class Transmission(object):
         try:
             download = client.add_torrent(url, paused=paused, bandwidthPriority=bandwidthPriority, download_dir=download_dir, timeout=30)
             download_id = download.hashString
+            logging.info('Torrent sent to TransmissionRPC - downloadid {}'.format(download_id))
             return {'response': True, 'downloadid': download_id}
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error(u'Transmission add_torrent', exc_info=True)
+            logging.error(u'Unable to send torrent to TransmissionRPC.', exc_info=True)
             return {'response': False, 'error': str(e)}

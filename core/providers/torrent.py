@@ -141,7 +141,7 @@ class Rarbg(object):
     def search(imdbid):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching Rarbg for {}'.format(imdbid))
+        logging.info(u'Searching Rarbg for {}.'.format(imdbid))
         if Rarbg.timeout:
             now = datetime.datetime.now()
             while Rarbg.timeout > now:
@@ -151,7 +151,7 @@ class Rarbg(object):
         if not Rarbg.token:
             Rarbg.token = Rarbg.get_token()
             if Rarbg.token is None:
-                logging.error(u'Unable to get rarbg token.')
+                logging.error(u'Unable to get Rarbg token.')
                 return []
 
         url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token, imdbid)
@@ -171,19 +171,19 @@ class Rarbg(object):
                 results = Rarbg.parse(response)
                 return results
             else:
-                logging.info(u'Nothing found on rarbg.to')
+                logging.info(u'Nothing found on Rarbg.')
                 return []
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Rarbg search.', exc_info=True)
+            logging.error(u'Rarbg search failed.', exc_info=True)
             return []
 
     @staticmethod
     def get_rss():
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Fetching latest RSS from Rarbg')
+        logging.info(u'Fetching latest RSS from Rarbg.')
         if Rarbg.timeout:
             now = datetime.datetime.now()
             while Rarbg.timeout > now:
@@ -193,7 +193,7 @@ class Rarbg(object):
         if not Rarbg.token:
             Rarbg.token = Rarbg.get_token()
             if Rarbg.token is None:
-                logging.error(u'Unable to get rarbg token.')
+                logging.error(u'Unable to get Rarbg token.')
                 return []
 
         url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token)
@@ -213,12 +213,12 @@ class Rarbg(object):
                 results = Rarbg.parse(response)
                 return results
             else:
-                logging.info(u'Nothing found on rarbg.to')
+                logging.info(u'Nothing found in Rarbg RSS.')
                 return []
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Rarbg RSS.', exc_info=True)
+            logging.error(u'Rarbg RSS fetch failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -234,7 +234,7 @@ class Rarbg(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Rarbg get_token.', exc_info=True)
+            logging.error(u'Failed to get Rarbg token.', exc_info=True)
             return None
 
     @staticmethod
@@ -267,7 +267,7 @@ class LimeTorrents(object):
     def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching LimeTorrents for {}'.format(term))
+        logging.info(u'Searching LimeTorrents for {}.'.format(term))
 
         url = u'https://www.limetorrents.cc/searchrss/{}'.format(term)
         request = Url.request(url)
@@ -287,7 +287,7 @@ class LimeTorrents(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'LimeTorrent search.', exc_info=True)
+            logging.error(u'LimeTorrent search failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -314,7 +314,7 @@ class LimeTorrents(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'LimeTorrent RSS.', exc_info=True)
+            logging.error(u'LimeTorrent RSS fetch failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -365,7 +365,7 @@ class ExtraTorrent(object):
     def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching ExtraTorrent for {}'.format(term))
+        logging.info(u'Searching ExtraTorrent for {}.'.format(term))
 
         url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}'.format(term)
 
@@ -385,7 +385,7 @@ class ExtraTorrent(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'ExtraTorrent search.', exc_info=True)
+            logging.error(u'ExtraTorrent search failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -412,7 +412,7 @@ class ExtraTorrent(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'ExtraTorrent search.', exc_info=True)
+            logging.error(u'ExtraTorrent RSS fetch failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -459,7 +459,7 @@ class SkyTorrents(object):
     def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching SkyTorrents for {}'.format(term))
+        logging.info(u'Searching SkyTorrents for {}.'.format(term))
 
         url = u'https://www.skytorrents.in/rss/all/ed/1/{}'.format(term)
 
@@ -479,7 +479,7 @@ class SkyTorrents(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'SkyTorrents search.', exc_info=True)
+            logging.error(u'SkyTorrents search failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -530,7 +530,7 @@ class BitSnoop(object):
     def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching BitSnoop for {}'.format(term))
+        logging.info(u'Searching BitSnoop for {}.'.format(term))
 
         url = u'https://bitsnoop.com/search/video/{}/c/d/1/?fmt=rss'.format(term)
 
@@ -550,7 +550,7 @@ class BitSnoop(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'BitSnoop search.', exc_info=True)
+            logging.error(u'BitSnoop search failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -577,7 +577,7 @@ class BitSnoop(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'BitSnoop search.', exc_info=True)
+            logging.error(u'BitSnoop RSS fetch failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -621,7 +621,7 @@ class Torrentz2(object):
     def search(imdbid, term):
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        logging.info(u'Searching Torrentz2 for {}'.format(term))
+        logging.info(u'Searching Torrentz2 for {}.'.format(term))
 
         url = u'https://torrentz2.eu/feed?f={}'.format(term)
 
@@ -641,7 +641,7 @@ class Torrentz2(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Torrentz2 search.', exc_info=True)
+            logging.error(u'Torrentz2 search failed.', exc_info=True)
             return []
 
     @staticmethod
@@ -668,7 +668,7 @@ class Torrentz2(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'Torrentz2 search.', exc_info=True)
+            logging.error(u'Torrentz2 RSS fetch failed.', exc_info=True)
             return []
 
     @staticmethod

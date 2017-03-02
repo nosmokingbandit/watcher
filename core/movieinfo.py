@@ -91,7 +91,7 @@ class TMDB(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'TMDB search.', exc_info=True)
+            logging.error(u'Error searching for title on TMDB.', exc_info=True)
             return ['']
 
     def _search_imdbid(self, imdbid):
@@ -114,7 +114,7 @@ class TMDB(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'TMDB find.', exc_info=True)
+            logging.error(u'Error searching for IMDBID on TMDB.', exc_info=True)
             return ['']
 
     def _search_tmdbid(self, tmdbid):
@@ -135,7 +135,7 @@ class TMDB(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'TMDB find.', exc_info=True)
+            logging.error(u'Error searching for TMDBID on TMDB.', exc_info=True)
             return ['']
 
     def get_imdbid(self, tmdbid=None, title=None, year=''):
@@ -175,7 +175,7 @@ class TMDB(object):
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error(u'TMDB find.', exc_info=True)
+                logging.error(u'Error attempting to get TMDBID from TMDB.', exc_info=True)
                 return None
 
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
@@ -189,7 +189,7 @@ class TMDB(object):
             response = json.load(urllib2.urlopen(request))
             return response.get('imdb_id')
         except Exception, e: # noqa
-            logging.error(u'TMDB get imdbid.', exc_info=True)
+            logging.error(u'Error attempting to get IMDBID from TMDB.', exc_info=True)
             return None
 
 
@@ -219,6 +219,7 @@ class Trailer(object):
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error(u'Tailer get_trailer.', exc_info=True)
+                if tries == 2:
+                    logging.error(u'Unable to get trailer from Youtube.', exc_info=True)
                 tries += 1
         return None

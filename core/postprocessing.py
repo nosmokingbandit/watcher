@@ -51,19 +51,19 @@ class Postprocessing(object):
         # check for required keys
         for key in ['apikey', 'mode', 'guid', 'path']:
             if key not in data:
-                logging.info(u'Missing key {}'.format(key))
+                logging.warning(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
                                   'error': u'missing key: {}'.format(key)})
 
         # check if api key is correct
         if data['apikey'] != core.CONFIG['Server']['apikey']:
-            logging.info(u'Incorrect API key.'.format(key))
+            logging.warning(u'Incorrect API key.'.format(key))
             return json.dumps({'response': 'false',
                               'error': 'incorrect api key'})
 
         # check if mode is valid
         if data['mode'] not in ['failed', 'complete']:
-            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            logging.warning(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                               'error': 'invalid mode value'})
 
@@ -89,10 +89,9 @@ class Postprocessing(object):
 
         # At this point we have all of the information we're going to get.
         if data['mode'] == u'failed':
-            logging.info(u'Post-processing as Failed.')
-            # returns to url:
+            logging.warning(u'Post-processing as Failed.')
             response = self.failed(data)
-            logging.info(response)
+            logging.warning(response)
         elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
 
@@ -108,17 +107,17 @@ class Postprocessing(object):
             downloadid = response.get('downloadid')
             finished_date = response.get('finished_date')
 
-            self.plugins.finished(title, year, imdbid, resolution, rated, original_file,
-                                  new_file_location, downloadid, finished_date)
+            self.plugins.finished(title, year, imdbid, resolution, rated, original_file, new_file_location, downloadid, finished_date)
 
             logging.info(response)
         else:
-            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            logging.warning(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                                'error': 'invalid mode value'}, indent=2, sort_keys=True)
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
+        logging.warning(json.dumps(response, indent=2, sort_keys=True))
         logging.info(u'#################################')
 
         return json.dumps(response, indent=2, sort_keys=True)
@@ -150,19 +149,19 @@ class Postprocessing(object):
 
         for key in required_keys:
             if key not in data:
-                logging.info(u'Missing key {}'.format(key))
+                logging.warning(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
                                   'error': u'missing key: {}'.format(key)})
 
         # check if api key is correct
         if data['apikey'] != core.CONFIG['Server']['apikey']:
-            logging.info(u'Incorrect API key.'.format(key))
+            logging.warning(u'Incorrect API key.'.format(key))
             return json.dumps({'response': 'false',
                               'error': 'incorrect api key'})
 
         # check if mode is valid
         if data['mode'] not in ['failed', 'complete']:
-            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            logging.warning(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                               'error': 'invalid mode value'})
 
@@ -185,22 +184,20 @@ class Postprocessing(object):
         # At this point we have all of the information we're going to get.
         if data['mode'] == u'failed':
             logging.info(u'Post-processing as Failed.')
-            # returns to url:
             response = json.dumps(self.failed(data), indent=2, sort_keys=True)
             logging.info(response)
         elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
-            # returns to url:
             response = json.dumps(self.complete(data), indent=2, sort_keys=True)
             logging.info(response)
         else:
-            logging.info(u'Invalid mode value: {}.'.format(data['mode']))
+            logging.warning(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
                                'error': 'invalid mode value'})
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
-        logging.info(response)
+        logging.debug(response)
         logging.info(u'#################################')
 
         return response
@@ -350,7 +347,7 @@ class Postprocessing(object):
             logging.info(u'Unable to find local data for release. Searching TMDB.')
 
             search_term = u'{} {}'.format(data['title'], data['year'])
-            logging.info(u'Searching tmdb for {}'.format(search_term))
+            logging.info(u'Searching TMDB for {}'.format(search_term))
 
             tmdbdata = self.tmdb.search(search_term, single=True)
             data['year'] = tmdbdata['release_date'][:4]
@@ -455,6 +452,7 @@ class Postprocessing(object):
         # grab the next best release
         if core.CONFIG['Search']['autograb']:
             result['tasks']['autograb'] = {'enabled': 'true'}
+            logging.info('Grabbing the next best release.')
             if data.get('imdbid') and data.get('quality'):
                 if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid'], data['quality']):
                     r = u'true'
@@ -626,7 +624,6 @@ class Postprocessing(object):
         maps = core.CONFIG['Postprocessing']['RemoteMapping']
 
         matches = []
-
         for remote in maps.keys():
             if path.startswith(remote):
                 matches.append(remote)

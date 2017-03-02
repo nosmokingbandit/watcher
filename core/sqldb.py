@@ -108,13 +108,13 @@ class SQL(object):
                 return result
 
             except Exception as e:
-                logging.error(u'SQL Databse Query: {}'.format(command), exc_info=True)
+                logging.error(u'SQL Database Query: {}.'.format(command), exc_info=True)
                 if 'database is locked' in e.args[0]:
-                    logging.info(u'SQL Query attempt # {}'.format(tries))
+                    logging.debug(u'SQL Query attempt # {}.'.format(tries))
                     tries += 1
                     time.sleep(1)
                 else:
-                    logging.error(u'SQL Databse Query: {}'.format(command), exc_info=True)
+                    logging.error(u'SQL Databse Query: {}.'.format(command), exc_info=True)
                     raise
         # all tries exhausted
         return False
@@ -126,7 +126,7 @@ class SQL(object):
         Returns Bool on success.
         '''
 
-        logging.info(u'Writing data to {}'.format(TABLE))
+        logging.info(u'Writing data to {}.'.format(TABLE))
 
         cols = u', '.join(DB_STRING.keys())
         vals = DB_STRING.values()
@@ -140,7 +140,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error(u'EXECUTE SQL.WRITE FAILED.')
+            logging.error(u'Unable to write to database.')
             return False
 
     def write_search_results(self, LIST):
@@ -151,7 +151,7 @@ class SQL(object):
         if not LIST:
             return True
 
-        logging.info(u'Writing batch into SEARCHRESULTS')
+        logging.info(u'Writing batch into SEARCHRESULTS.')
 
         INSERT = self.SEARCHRESULTS.insert()
 
@@ -160,7 +160,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error(u'EXECUTE SQL.WRITE_SEARCH_RESULTS FAILED.')
+            logging.error(u'Unable to write search results.')
             return False
 
     def update(self, TABLE, COLUMN, VALUE, imdbid='', guid=''):
@@ -190,7 +190,7 @@ class SQL(object):
         if self.execute(command):
             return True
         else:
-            logging.error(u'EXECUTE SQL.UPDATE FAILED.')
+            logging.error(u'Unable to update database row.')
             return False
 
     def get_user_movies(self):
@@ -212,7 +212,7 @@ class SQL(object):
                 lst.append(dict(i))
             return lst
         else:
-            logging.error(u'EXECUTE SQL.GET_USER_MOVIES FAILED.')
+            logging.error(u'Unable to get list of user\'s movies.')
             return False
 
     def get_movie_details(self, idcol, idval):
@@ -389,7 +389,7 @@ class SQL(object):
                 lst.append(i[column])
             return lst
         else:
-            logging.error(u'EXECUTE SQL.GET_DISTINCT FAILED.')
+            logging.error(u'Unable to read database.')
             return False
 
     def row_exists(self, TABLE, imdbid='', guid='', downloadid=''):
@@ -510,7 +510,7 @@ class SQL(object):
             logging.error(u'Copying SQL DB.', exc_info=True)
             raise
 
-        logging.info(u'Modifying tables.')
+        logging.info(u'Modifying database tables.')
         print 'Modifying tables.'
 
         '''
@@ -519,7 +519,7 @@ class SQL(object):
         Create the new table, then copy data from TMP table
         '''
         for table, schema in diff.iteritems():
-            logging.info(u'Modifying table {}'.format(table))
+            logging.info(u'Modifying table {}.'.format(table))
             print u'Modifying table {}'.format(table)
             for name, kind in schema.iteritems():
                 command = u'ALTER TABLE {} ADD COLUMN {} {}'.format(table, name, kind)
@@ -534,30 +534,30 @@ class SQL(object):
 
             # move TABLE to TABLE_TMP
             table_tmp = u'{}_TMP'.format(table)
-            logging.info(u'Renaming table to {}'.format(table_tmp))
+            logging.info(u'Renaming table to {}.'.format(table_tmp))
             print u'Renaming table to {}'.format(table_tmp)
             command = u'ALTER TABLE {} RENAME TO {}'.format(table, table_tmp)
             self.execute(command)
 
             # create new table
-            logging.info(u'Creating new table {}'.format(table))
+            logging.info(u'Creating new table {}.'.format(table))
             print u'Creating new table {}'.format(table)
             table_meta = getattr(self, table)
             table_meta.create(self.engine)
 
             # copy data over
-            logging.info(u'Merging data from {} to {}'.format(table_tmp, table))
+            logging.info(u'Merging data from {} to {}.'.format(table_tmp, table))
             print u'Merging data from {} to {}'.format(table_tmp, table)
             names = u', '.join(intended[table].keys())
             command = u'INSERT INTO {} ({}) SELECT {} FROM {}'.format(table, names, names, table_tmp)
             self.execute(command)
 
-            logging.info(u'Dropping table {}'.format(table_tmp))
+            logging.info(u'Dropping table {}.'.format(table_tmp))
             print u'Dropping table {}'.format(table_tmp)
             command = u'DROP TABLE {}'.format(table_tmp)
             self.execute(command)
 
-            logging.info(u'Finished updating table {}'.format(table))
+            logging.info(u'Finished updating table {}.'.format(table))
             print u'Finished updating table {}'.format(table)
 
         logging.info(u'Database updated')

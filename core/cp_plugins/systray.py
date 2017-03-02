@@ -7,9 +7,6 @@ import core
 from cherrypy.process import plugins
 from infi.systray import SysTrayIcon
 
-logging = logging.getLogger(__name__)
-
-
 class SysTrayPlugin(plugins.SimplePlugin):
     '''
     CherryPy plugin that creates a system tray icon for Windows.

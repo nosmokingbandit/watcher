@@ -68,6 +68,7 @@ class Searcher():
 
         if backlog_movies:
             logging.info('Performing backlog search for {} movies.'.format(len(backlog_movies)))
+            logging.debug('Backlog movies: {}'.format(backlog_movies))
             for movie in backlog_movies:
                 if movie['predb'] != u'found':
                     continue
@@ -405,7 +406,7 @@ class Searcher():
         movies: list of dicts of movie rows in movies
 
         Filters movies so it includes movies where backlog == 1 and
-            status is Wanted, Found, or Finished
+            status is Wanted, Found, Snatched, or Finished
         If status is Finished checks if it is within the KeepSearching window
 
         Returns list of dicts of movies that require backlog search
@@ -427,7 +428,7 @@ class Searcher():
             year = i['year']
             status = i['status']
 
-            if status in ['Wanted', 'Found']:
+            if status in ['Wanted', 'Found', 'Snatched']:
                 rss_movies.append(i)
                 logging.info('{} {} is {}. Will look for new releases in RSS feed.'.format(title, year, status))
             if status == 'Finished' and keepsearching is True:

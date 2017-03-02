@@ -100,7 +100,7 @@ class ImportDirectory(object):
             data.update(metadata)
 
         except Exception, e: #noqa
-            logging.warning(u'Unable to parse metadata.', exc_info=True)
+            logging.error(u'Unable to parse metadata.', exc_info=True)
 
         if metadata:
             if metadata.get('Metadata'):

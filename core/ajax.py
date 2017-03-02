@@ -540,7 +540,7 @@ class Ajax(object):
             update_status = version.Version().manager.execute_update()
             core.UPDATING = False
             if update_status is False:
-                logging.info(u'Update Failed.')
+                logging.error(u'Update Failed.')
                 yield json.dumps({'response': False})
             elif update_status is True:
                 yield json.dumps({'response': True})
@@ -660,7 +660,14 @@ class Ajax(object):
             else:
                 incomplete_movies[k] = v
 
-        return import_library.ImportLibrary.render_review(review_movies, incomplete_movies)
+        logging.debug('Sending import list to html template:')
+        logging.debug(review_movies)
+        logging.debug(incomplete_movies)
+
+        try:
+            return import_library.ImportLibrary.render_review(review_movies, incomplete_movies)
+        except Exception, e: #noqa
+            return 'Error {}'.format(str(e))
 
     @cherrypy.expose
     def submit_import(self, movie_data, corrected_movies):
@@ -751,5 +758,6 @@ class Ajax(object):
             response['html'] = import_library.ImportLibrary.file_list(new_path)
         except Exception, e:
             response = {'error': str(e)}
+            logging.error('Error listing directory.', exc_info=True)
 
         return json.dumps(response)

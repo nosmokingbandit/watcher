@@ -85,7 +85,8 @@ class Nzbget():
 
         try:
             response = nzbg_server.append(filename, contenturl, category, priority, False, paused, dupekey, dupescore, dupemode)
+            logging.info('NZB sent to NZBGet - downloadid {}'.format(response))
             return {'response': True, 'downloadid': response}
-
         except Exception, e:
+            logging.error('Unable to add NZB to NZBGet.')
             return {'response': False, 'error': str(e)}

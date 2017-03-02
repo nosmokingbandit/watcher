@@ -36,7 +36,7 @@ class Sabnzbd():
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error(u'Sabnzbd test_connection', exc_info=True)
+            logging.error(u'Sabnzbd connection test failed.', exc_info=True)
             return u'{}.'.format(e.reason)
 
     # returns dict {'status': <>, 'nzo_ids': [<>] }
@@ -82,9 +82,12 @@ class Sabnzbd():
 
             if response['status'] is True and len(response['nzo_ids']) > 0:
                 downloadid = response['nzo_ids'][0]
+                logging.info('NZB sent to SABNzbd - downloadid {}.'.format(downloadid))
                 return {'response': True, 'downloadid': downloadid}
             else:
+                logging.error('Unable to send NZB to Sabnzbd. {}'.format(response))
                 return {'response': False, 'error': 'Unable to add NZB.'}
 
         except Exception as e:
+            logging.error('Unable to send NZB to Sabnzbd.', exc_info=True)
             return {'response': False, 'error': str(e.reason)}

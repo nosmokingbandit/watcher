@@ -13,6 +13,7 @@ logging = logging.getLogger(__name__)
 class Plugins(object):
 
     def added(self, *args):
+        # title, year, imdbid, quality
 
         plugin_dir = os.path.join(core.PROG_PATH, core.PLUGIN_DIR, 'added')
 
@@ -27,6 +28,7 @@ class Plugins(object):
         return
 
     def snatched(self, *args):
+        # title, year, imdbid, resolution, kind, downloader, downloadid, indexer, info_link
 
         plugin_dir = os.path.join(core.PROG_PATH, core.PLUGIN_DIR, 'snatched')
 
@@ -80,11 +82,11 @@ class Plugins(object):
             if os.name == 'nt':
                 cmd = ['cmd', '/c']
                 command = cmd + command
-            command = [str(i) for i in command if i is not None]
+            command = [str(i) for i in command]
             name = os.path.split(plugin)[1]
 
             try:
-                logging.info(u'Executing plugin {} as {}.'.format(name, command))
+                logging.debug(u'Executing plugin {} as {}.'.format(name, command))
 
                 process = subprocess.Popen(command,
                                            stdin=subprocess.PIPE,
@@ -101,7 +103,7 @@ class Plugins(object):
                 if exit_code == 0:
                     logging.info(u'{} - Execution finished. Exit code {}.'.format(name, '0'))
                 else:
-                    logging.info(u'{} - Execution failed. Exit code {}.'.format(name, exit_code))
+                    logging.warning(u'{} - Execution failed. Exit code {}.'.format(name, exit_code))
 
             except Exception, e: #noqa
                 logging.error(u'Executing plugin {} failed.'.format(plugin), exc_info=True)

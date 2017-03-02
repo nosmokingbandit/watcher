@@ -85,7 +85,7 @@ class QBittorrent(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:
-            logging.error(u'qbittorrent test_connection', exc_info=True)
+            logging.error(u'QBittorrent connection test failed.', exc_info=True)
             return {'response': False, 'error': str(e.reason)}
 
     @staticmethod
@@ -99,7 +99,7 @@ class QBittorrent(object):
         except urllib2.HTTPError:
             return False
         except Exception, e:
-            logging.error(u'qbittorrent get_download_dir', exc_info=True)
+            logging.error(u'QBittorrent unable to get download dir.', exc_info=True)
             return {'response': False, 'error': str(e.reason)}
 
     @staticmethod

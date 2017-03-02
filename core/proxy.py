@@ -57,7 +57,7 @@ class Proxy(object):
                 urllib2.install_opener(opener)
                 Proxy.on = True
             else:
-                logging.info(u'Invalid proxy type {}'.format(core.CONFIG['Server']['Proxy']['type']))
+                logging.warning(u'Invalid proxy type {}'.format(core.CONFIG['Server']['Proxy']['type']))
                 return
         else:
             return

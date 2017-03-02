@@ -85,7 +85,7 @@ class PreDB(object):
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
-            logging.error(u'PREDB search.', exc_info=True)
+            logging.error(u'Predb.me search failed.', exc_info=True)
             return None
 
     def parse_predb_xml(self, feed):

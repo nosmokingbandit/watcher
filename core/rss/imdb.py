@@ -141,13 +141,13 @@ class ImdbRss(object):
         for imdbid in movies_to_add:
             movie_info = self.tmdb._search_imdbid(imdbid)[0]
             if not movie_info:
-                logging.info(u'{} not found on TMDB. Cannot add.'.format(imdbid))
+                logging.warning(u'{} not found on TMDB. Cannot add.'.format(imdbid))
                 continue
             logging.info(u'Adding movie {} {} from imdb watchlist.'.format(title, imdbid))
             movie_info['quality'] = 'Default'
             self.ajax.add_wanted_movie(json.dumps(movie_info))
             time.sleep(1)
 
-        logging.info(u'Storing last synced date')
+        logging.info(u'Storing last synced date.')
         with open(data_file, 'w') as f:
             json.dump({list_id: self.lastbuilddate}, f)

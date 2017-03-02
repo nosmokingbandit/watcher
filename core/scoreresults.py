@@ -42,7 +42,7 @@ class ScoreResults():
         '''
 
         if imdbid is None and quality_profile is None:
-            logging.warning(u'Neither imdbid or quality_profile passed.')
+            logging.warning(u'Neither imdbid or quality_profile passed. Unable to score results.')
             return results
 
         self.results = results
@@ -119,7 +119,7 @@ class ScoreResults():
             cond = False
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
-                    logging.info(u'{} found in {}, removing from search results.'.format(word_group, r['title']))
+                    logging.debug(u'{} found in {}, removing from search results.'.format(word_group, r['title']))
                     cond = True
                     break
             if cond is False and r not in keep:
@@ -151,7 +151,7 @@ class ScoreResults():
                 continue
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
-                    logging.info(u'{} found in {}, keeping this search result.'.format(word_group, r['title']))
+                    logging.debug(u'{} found in {}, keeping this search result.'.format(word_group, r['title']))
                     keep.append(r)
                     break
                 else:
@@ -185,7 +185,7 @@ class ScoreResults():
                 if age < retention:
                     lst.append(result)
                 else:
-                    logging.info(u'{} published {} days ago, removing search result.'.format(result['title'], age))
+                    logging.debug(u'{} published {} days ago, removing search result.'.format(result['title'], age))
 
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))
@@ -208,7 +208,7 @@ class ScoreResults():
                 if int(result['seeders']) >= seeds:
                     lst.append(result)
                 else:
-                    logging.info(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
+                    logging.debug(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))
 
@@ -231,7 +231,7 @@ class ScoreResults():
         for r in self.results:
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group):
-                    logging.info(u'{} found in {}, adding 10 points.'.format(word_group, r['title']))
+                    logging.debug(u'{} found in {}, adding 10 points.'.format(word_group, r['title']))
                     r['score'] += 10
                     break
                 else:
@@ -269,7 +269,7 @@ class ScoreResults():
                     result['score'] += (match / 5)
                     lst.append(result)
                 else:
-                    logging.info(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
+                    logging.debug(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))
 
@@ -306,19 +306,19 @@ class ScoreResults():
                     max_size = Ellipsis
 
                 if result_res == k:
-                    logging.info('{} matches source {}, checking size.'.format(result['title'], k))
+                    logging.debug('{} matches source {}, checking size.'.format(result['title'], k))
                     if result['type'] == 'import':
                         result['score'] += abs(priority - score_range) * 40
                         lst.append(result)
-                        logging.info('{} is an import, skipping size check.'.format(result['title']))
+                        logging.debug('{} is an import, skipping size check.'.format(result['title']))
                         break
                     if min_size < size < max_size:
                         result['score'] += abs(priority - score_range) * 40
                         lst.append(result)
-                        logging.info('{} size {} is within range {}-{}.'.format(result['title'], size, min_size, max_size))
+                        logging.debug('{} size {} is within range {}-{}.'.format(result['title'], size, min_size, max_size))
                         break
                     else:
-                        logging.info('Removing {}, size {} not in range {}-{}.'.format(result['title'], size, min_size, max_size))
+                        logging.debug('Removing {}, size {} not in range {}-{}.'.format(result['title'], size, min_size, max_size))
                         break
                 else:
                     continue

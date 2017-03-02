@@ -29,13 +29,13 @@ class Status(object):
             # Mark bad in SEARCHRESULTS
             logging.info(u'Marking {} as {} in SEARCHRESULTS.'.format(guid, status))
             if not self.sql.update(TABLE, 'status', status, guid=guid):
-                logging.info(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid, status))
+                logging.error(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid, status))
                 return False
             else:
                 logging.info(u'Successfully marked {} as {} in SEARCHRESULTS.'.format(guid, status))
                 return True
         else:
-            logging.info(u'Guid {} not found in SEARCHRESULTS.'.format(guid))
+            logging.warning(u'Guid {} not found in SEARCHRESULTS.'.format(guid))
             return False
 
     def markedresults(self, guid, status, imdbid=None):
@@ -74,10 +74,10 @@ class Status(object):
                     logging.info(u'Successfully created entry in MARKEDRESULTS for {}.'.format(guid))
                     return True
                 else:
-                    logging.info(u'Unable to create entry in MARKEDRESULTS for {}.'.format(guid))
+                    logging.error(u'Unable to create entry in MARKEDRESULTS for {}.'.format(guid))
                     return False
             else:
-                logging.info(u'Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')
+                logging.warning(u'Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')
                 return False
 
     def mark_bad(self, guid, imdbid=None):
@@ -127,7 +127,7 @@ class Status(object):
 
         result_status = self.sql.get_distinct('SEARCHRESULTS', 'status', 'imdbid', imdbid)
         if result_status is False:
-            logging.info(u'Could not get SEARCHRESULT statuses for {}'.format(imdbid))
+            logging.error(u'Could not get SEARCHRESULTS statuses for {}'.format(imdbid))
             return False
         elif result_status is None:
             status = u'Wanted'
@@ -145,5 +145,5 @@ class Status(object):
         if self.sql.update('MOVIES', 'status', status, imdbid=imdbid):
             return True
         else:
-            logging.info(u'Could not set {} to {}'.format(imdbid, status))
+            logging.error(u'Could not set {} to {}'.format(imdbid, status))
             return False

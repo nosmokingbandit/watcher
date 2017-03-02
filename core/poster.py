@@ -52,11 +52,11 @@ class Poster():
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e: # noqa
-                    logging.error(u'Poster save_poster write', exc_info=True)
+                    logging.error(u'Unable to save poster to disk.', exc_info=True)
 
             logging.info(u'Poster saved to {}'.format(new_poster_path))
         else:
-            logging.info(u'{} already exists.'.format(new_poster_path))
+            logging.warning(u'{} already exists.'.format(new_poster_path))
 
     def remove_poster(self, imdbid):
         ''' Deletes poster from disk.
@@ -70,7 +70,7 @@ class Poster():
         if os.path.exists(path):
             os.remove(path)
         else:
-            logging.info(u'{} doesn\'t seem to exist.'.format(path))
+            logging.warning(u'{} doesn\'t exist, cannot remove.'.format(path))
 
     def find_poster(self, search_term):
         ''' Searches Yahoo images for movie poster.

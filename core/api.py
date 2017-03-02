@@ -175,10 +175,10 @@ class API(object):
             quality = 'Default'
 
         if imdbid:
-            logging.info(u'API request add movie {}'.format(imdbid))
+            logging.info(u'API request add movie imdb {}'.format(imdbid))
             return self.ajax.add_wanted_imdbid(imdbid, quality)
         else:
-            logging.info(u'API request add movie {}'.format(tmdbid))
+            logging.info(u'API request add movie tmdb {}'.format(tmdbid))
             return self.ajax.add_wanted_tmdbid(tmdbid, quality)
 
     def removemovie(self, imdbid):

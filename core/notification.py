@@ -32,8 +32,8 @@ class Notification(object):
 
         base.update(data)
 
-        logging.info(u'Creating notification:')
-        logging.info(base)
+        logging.debug(u'Creating new notification:')
+        logging.debug(base)
 
         # if it already exists, ignore it
         if base in core.NOTIFICATIONS:
@@ -71,8 +71,10 @@ class Notification(object):
         Does not return
         '''
 
+        logging.debug('Remove notification #{}.'.format(index))
         core.NOTIFICATIONS[int(index)] = None
 
+        logging.debug('Cleaning notification queue.')
         while len(core.NOTIFICATIONS) > 0 and core.NOTIFICATIONS[-1] is None:
             core.NOTIFICATIONS.pop()
 

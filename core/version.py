@@ -131,7 +131,7 @@ class GitUpdater(object):
     def check_git_available(self):
         git_available = self.git.available()
         if git_available[2] == 1:
-            logging.info(u'Could not execute git: {}'.format(git_available[0]))
+            logging.error(u'Could not execute git: {}'.format(git_available[0]))
             return git_available
         else:
             return git_available
@@ -159,7 +159,7 @@ class GitUpdater(object):
         pull = self.git.pull()
 
         if pull[2] == 1:
-            logging.info(u'Update failed: {}'.format(pull[0]))
+            logging.error(u'Update failed: {}'.format(pull[0]))
             return False
         else:
             logging.info(u'Update successful.')

@@ -72,12 +72,11 @@ class PreDB(object):
         Returns list of found rss entries or None if not found.
         '''
 
-        title_year = title_year.replace(':', '').replace('-', '')
+        title_year = Url.encode(title_year)
 
-        search_string = u'https://predb.me/?cats=movies&search={}&rss=1'.format(title_year)
+        url = u'http://predb.me/?cats=movies&search={}&rss=1'.format(title_year)
 
-        search_string = search_string.encode('ascii', 'replace')
-        request = Url.request(search_string)
+        request = Url.request(url)
 
         try:
             results_xml = urllib2.urlopen(request).read().replace('&', '%26')

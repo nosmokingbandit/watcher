@@ -7,6 +7,7 @@ $(document).ready(function () {
         return;
     }
 
+    $("div#thinker").show();
 
     /*
     This repeats every 3 seconds to check if the server is back online.

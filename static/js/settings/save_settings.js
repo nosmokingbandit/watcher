@@ -178,6 +178,10 @@ $(document).ready(function () {
             }
         });
 
+        if(search['rsssyncfrequency'] < 10){
+            search['rsssyncfrequency'] = 10;
+        }
+
         data["Search"] = search;
 
         if(blanks == true){

@@ -74,6 +74,12 @@ class MovieStatusPopup():
     def result_list(self, imdbid, quality):
         results = self.sql.get_search_results(imdbid, quality)
 
+        # Filter out any results we don't want to show
+        if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
+            results = [res for res in results if res['type'] != 'nzb']
+        if not core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            results = [res for res in results if res['type'] not in ['torrent', 'magnet']]
+
         result_list = ul(id='result_list')
         with result_list:
 

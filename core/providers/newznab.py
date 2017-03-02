@@ -9,6 +9,7 @@ logging = logging.getLogger(__name__)
 class NewzNab(NewzNabProvider):
 
     def __init__(self):
+        self.feed_type = 'nzb'
         return
 
     # Returns a list of results stored as dicts
@@ -40,3 +41,6 @@ class NewzNab(NewzNabProvider):
 
         self.imdbid = None
         return results
+
+    def get_rss(self):
+        return self._get_rss()

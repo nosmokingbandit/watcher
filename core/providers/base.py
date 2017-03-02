@@ -1,12 +1,10 @@
-import logging
 import xml.etree.cElementTree as ET
 import urllib2
+import logging
 
 import core
 from core.helpers import Url
 from core.proxy import Proxy
-
-logging = logging.getLogger(__name__)
 
 
 class NewzNabProvider(object):
@@ -45,12 +43,10 @@ class NewzNabProvider(object):
         elif imdbid:
             url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid)
             logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url_base, imdbid))
-            kind = 'nzb'
         elif term:
             term = Url.encode(term.replace(' ', '+'))
             url = u'{}api?apikey={}&t=search&cat=2000&q={}'.format(url_base, apikey, term)
             logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=search&cat=2000&q={}'.format(url_base, term))
-            kind = 'torrent'
 
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
@@ -63,24 +59,27 @@ class NewzNabProvider(object):
                 response = urllib2.urlopen(request)
 
             results_xml = response.read()
-            return self.parse_newznab_xml(results_xml, kind)
+            return self.parse_newznab_xml(results_xml)
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
             logging.error(u'Newz/TorzNab backlog search', exc_info=True)
             return []
 
-    def get_rss(self):
-        self.imdbid = None
-
+    def _get_rss(self):
         ''' Get latest uploads from all indexers
 
         Returns list of dicts with parsed nzb info
         '''
 
+        self.imdbid = None
+
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
-        indexers = core.CONFIG['Indexers']['NewzNab'].values()
+        if self.feed_type == 'nzb':
+            indexers = core.CONFIG['Indexers']['NewzNab'].values()
+        else:
+            indexers = core.CONFIG['Indexers']['TorzNab'].values()
 
         results = []
 
@@ -105,18 +104,16 @@ class NewzNabProvider(object):
                     response = urllib2.urlopen(request)
 
                 results_xml = response.read()
-                nn_results = self.parse_newznab_xml(results_xml)
-                for result in nn_results:
-                    results.append(result)
+                return self.parse_newznab_xml(results_xml)
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa
-                logging.error(u'NewzNab get_rss get xml', exc_info=True)
+                logging.error(u'Newz/TorzNab rss get xml.', exc_info=True)
 
         return results
 
     # Returns a list of results in dictionaries. Adds to each dict a key:val of 'indexer':<indexer>
-    def parse_newznab_xml(self, feed, kind):
+    def parse_newznab_xml(self, feed):
         ''' Parse xml from Newnzb api.
         :param feed: str nn xml feed
         kind: str type of feed we are parsing, either nzb or torrent
@@ -136,12 +133,12 @@ class NewzNabProvider(object):
                     if not indexer and channel_child.tag == u'link':
                         indexer = channel_child.text
                     if channel_child.tag == u'item':
-                        result_item = self._make_item_dict(channel_child, kind)
+                        result_item = self._make_item_dict(channel_child)
                         result_item['indexer'] = indexer
                         res_list.append(result_item)
         return res_list
 
-    def _make_item_dict(self, item, kind):
+    def _make_item_dict(self, item):
         ''' Converts parsed xml into dict.
         :param item: string of xml nzb information
         kind: str 'nzb' or 'torrent' depending on type of feed
@@ -191,7 +188,7 @@ class NewzNabProvider(object):
         d['torrentfile'] = None
         d['downloadid'] = None
 
-        if kind == 'nzb':
+        if self.feed_type == 'nzb':
             d['type'] = u'nzb'
         else:
             d['torrentfile'] = d['guid']

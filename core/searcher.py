@@ -29,12 +29,13 @@ class Searcher():
 
         First checks for all movies on predb.
 
-        Searches only for movies where predb == u'found'.
+        Searches only for movies where predb == 'found'.
 
         Searches only for movies that are Wanted, Found,
             or Finished -- if inside user-set date range.
 
-        Will search update RSS for everything, runs backlog search for new additions.
+        Checks each movie's backlog status. Runs a backlog search if neccesary, else Looks
+            in RSS feeds for any matches.
 
         Will grab movie if autograb is 'true' and
             movie is 'Found' or 'Finished'.
@@ -44,7 +45,7 @@ class Searcher():
         Does not return
         '''
 
-        interval = core.CONFIG['Search']['searchfrequency'] * 3600
+        interval = core.CONFIG['Search']['rsssyncfrequency'] * 60
         now = datetime.datetime.today().replace(second=0, microsecond=0)
         core.NEXT_SEARCH = now + datetime.timedelta(0, interval)
 
@@ -55,9 +56,9 @@ class Searcher():
         auto_grab = core.CONFIG['Search']['autograb']
 
         self.predb.check_all()
-        logging.info(u'Running automatic search.')
+        logging.info(u'############# Running automatic search #############')
         if keepsearching is True:
-            logging.info(u'Search for finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
+            logging.info(u'Search for Finished movies enabled. Will search again for any movie that has finished in the last {} days.'.format(keepsearchingdays))
         movies = self.sql.get_user_movies()
         if not movies:
             return False
@@ -65,31 +66,33 @@ class Searcher():
         # Get movies that require backlog search and execute it
         backlog_movies = self._get_backlog_movies(movies)
 
-        for movie in backlog_movies:
-            if movie['predb'] != u'found':
-                continue
-            imdbid = movie['imdbid']
-            title = movie['title']
-            finisheddate = movie['finished_date']
-            year = movie['year']
-            quality = movie['quality']
-            status = movie['status']
+        if backlog_movies:
+            logging.info('Performing backlog search for {} movies.'.format(len(backlog_movies)))
+            for movie in backlog_movies:
+                if movie['predb'] != u'found':
+                    continue
+                imdbid = movie['imdbid']
+                title = movie['title']
+                finisheddate = movie['finished_date']
+                year = movie['year']
+                quality = movie['quality']
+                status = movie['status']
 
-            logging.info('Executing backlog search for {} {}.'.format(title, year))
-            self.search(imdbid, title, year, quality)
-            continue
+                logging.info('Executing backlog search for {} {}.'.format(title, year))
+                self.search(imdbid, title, year, quality)
+                continue
 
         rss_movies = self._get_rss_movies(movies)
 
         if rss_movies:
-            logging.info('Performing RSS sync for {} movies.'.format(len(rss_movies)))
+            logging.info('Checking RSS feeds for {} movies.'.format(len(rss_movies)))
             self.rss_sync(rss_movies)
 
         '''
         If autograb is enabled, loops through movies and grabs any appropriate releases.
         '''
         if auto_grab is True:
-            logging.info(u'Running automatic snatcher.')
+            logging.info(u'############ Running automatic snatcher ############')
             keepsearchingscore = core.CONFIG['Search']['keepsearchingscore']
             # In case we found something we'll check this again.
             movies = self.sql.get_user_movies()
@@ -121,7 +124,7 @@ class Searcher():
                         continue
                 else:
                     continue
-        logging.info(u'Autosearch complete.')
+        logging.info(u'######### Automatic search/snatch complete #########')
         return
 
     def search(self, imdbid, title, year, quality):
@@ -179,6 +182,9 @@ class Searcher():
 
         scored_results = self.score.score(results, imdbid=imdbid)
 
+        if len(scored_results) == 0:
+            return True
+
         # sets result status based off marked results table
         marked_results = self.sql.get_marked_results(imdbid)
         if marked_results:
@@ -200,8 +206,6 @@ class Searcher():
 
         return True
 
-        # TODO maybe try this thing?
-        # change self.search to backlog_search and make sure to change all calls (probably just ajax?)
     def rss_sync(self, movies):
         ''' Gets latests RSS feed from all indexers
         movies: list of dicts of movies to look for
@@ -235,6 +239,7 @@ class Searcher():
             year = movie['year']
 
             nn_found = [i for i in newznab_results if i['imdbid'] == imdbid]
+
             tor_found = [i for i in torrent_results if
                          self._match_torrent_name(title, year, i['title'])]
             for idx, result in enumerate(tor_found):
@@ -244,11 +249,10 @@ class Searcher():
             results = nn_found + tor_found
 
             if not results:
-                return
+                continue
 
             # Ignore results we've already stored
             old_results = [dict(r) for r in self.sql.get_search_results(imdbid)]
-
             new_results = []
             for res in results:
                 guid = res['guid']
@@ -264,6 +268,9 @@ class Searcher():
                 new_results[idx]['resolution'] = self.get_source(result)
 
             scored_results = self.score.score(new_results, imdbid=imdbid)
+
+            if len(scored_results) == 0:
+                continue
 
             if not self.store_results(scored_results, imdbid):
                 return False
@@ -382,7 +389,16 @@ class Searcher():
         Returns list of dicts of movies that require backlog search
         '''
 
-        return [i for i in movies if i['backlog'] == 0 and i['status'] in ['Wanted', 'Found', 'Finished']]
+        backlog_movies = []
+
+        for i in movies:
+            if i['predb'] != 'found':
+                continue
+            if i['backlog'] != 1 and i['status'] in ('Wanted', 'Found', 'Finished'):
+                logging.info(u'{} {} has not yet recieved a full backlog search, will execute.'.format(i['title'], i['year']))
+                backlog_movies.append(i)
+
+        return backlog_movies
 
     def _get_rss_movies(self, movies):
         ''' Gets list of movies that we'll look in the rss feed for
@@ -402,11 +418,13 @@ class Searcher():
         rss_movies = []
 
         for i in movies:
-            if i['backlog'] == 0:
+            if i['backlog'] != 1:
+                continue
+            if i['predb'] != 'found':
                 continue
 
             title = i['title']
-            year = i['title']
+            year = i['year']
             status = i['status']
 
             if status in ['Wanted', 'Found']:

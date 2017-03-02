@@ -27,8 +27,8 @@ def settings_page(page):
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=02.28'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=02.28')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=02.28')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=03.01')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=03.01')
 
         with doc:
             Header.insert_header(current="settings")
@@ -176,23 +176,17 @@ class Settings():
         with ul(id='search', cls='wide'):
             with li(cls='bbord'):
                 i(id='searchafteradd', cls='fa fa-square-o checkbox', value=str(c[c_s]['searchafteradd']))
-                span(u'Search immediately after adding movie.')
+                span(u'Perform backlog search immediately after adding movie.')
                 span(u'Skips wait until next scheduled search.', cls='tip')
             with li(cls='bbord'):
                 i(id='autograb', cls='fa fa-square-o checkbox', value=str(c[c_s]['autograb']))
                 span(u'Automatically grab best result.')
                 span(u'Will still wait X days if set.', cls='tip')
             with li(cls='bbord'):
-                span(u'Search time:')
-                input(type='number', min='0', max='23', id='searchtimehr', style='width: 2.5em', value=c[c_s]['searchtimehr'])
-                span(u':')
-                input(type='number', min='0', max='59', id='searchtimemin', style='width: 2.5em', value=c[c_s]['searchtimemin'])
-                span(u'What time of day to begin searches (24h time). Requires Restart.', cls='tip')
-            with li(cls='bbord'):
-                span(u'Search every ')
-                input(type='number', min='1', id='searchfrequency', style='width: 2.5em', value=c[c_s]['searchfrequency'])
-                span(u'hours.')
-                span(u'Once releases are available according to predb.me. Requires Restart.', cls='tip')
+                span(u'RSS sync interval: ')
+                input(type='number', min='10', id='rsssyncfrequency', style='width: 2.5em', value=c[c_s]['rsssyncfrequency'])
+                span(u'minutes.')
+                span(u'Min 10 minutes. Requires Restart.', cls='tip')
             with li(cls='bbord'):
                 span(u'Wait ')
                 input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])

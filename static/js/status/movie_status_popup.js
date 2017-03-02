@@ -89,7 +89,6 @@ $(document).ready(function() {
         var quality = $("select#quality_profile").val()
         var title = $("span#title").text();
         var year = $("span#year").text();
-        console.log(title)
 
         $('ul#result_list').hide();
         $('div#results_thinker').show();

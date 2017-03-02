@@ -86,6 +86,7 @@ class ScoreResults():
             self.fuzzy_title(title)
         self.score_preferred(preferred)
 
+        logging.info('Finished scoring search results.')
         return self.results
 
     def reset(self):

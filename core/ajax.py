@@ -141,8 +141,9 @@ class Ajax(object):
         if not data.get('status'):
             data['status'] = u'Wanted'
         data['added_date'] = str(datetime.date.today())
+        data['backlog'] = 0
 
-        required_keys = ['added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate']
+        required_keys = ('added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate', 'backlog')
 
         for i in data.keys():
             if i not in required_keys:

@@ -24,10 +24,11 @@ class AutoSearch(object):
     @staticmethod
     def create():
         search = searcher.Searcher()
-        interval = core.CONFIG['Search']['searchfrequency'] * 3600
+        interval = core.CONFIG['Search']['rsssyncfrequency'] * 60
 
-        hr = core.CONFIG['Search']['searchtimehr']
-        min = core.CONFIG['Search']['searchtimemin']
+        now = datetime.datetime.today()
+        hr = now.hour
+        min = now.minute + 5
 
         task_search = taskscheduler.ScheduledTask(hr, min, interval,
                                                   search.auto_search_and_grab,
@@ -48,7 +49,7 @@ class AutoUpdateCheck(object):
 
         now = datetime.datetime.today()
         hr = now.hour
-        min = now.minute
+        min = now.minute + 1
         if now.second > 30:
             min += 1
 
@@ -155,8 +156,7 @@ class ImdbRssSync(object):
 
     @staticmethod
     def create():
-        interval = core.CONFIG['Search']['Watchlists']['imdbfrequency']
-        interval = 6 * 3600
+        interval = core.CONFIG['Search']['Watchlists']['imdbfrequency'] * 60
         now = datetime.datetime.now()
 
         hr = now.hour

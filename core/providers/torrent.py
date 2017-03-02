@@ -22,6 +22,7 @@ class Torrent(NewzNabProvider):
                 ]
 
     def __init__(self):
+        self.feed_type = 'torrent'
         return
 
     def search_all(self, imdbid, title, year):
@@ -39,7 +40,7 @@ class Torrent(NewzNabProvider):
 
         results = []
 
-        term = '{} {}'.format(title, year)
+        term = '{}+{}'.format(title, year).replace(' ', '+')
 
         for indexer in torz_indexers:
             if indexer[2] is False:
@@ -92,9 +93,40 @@ class Torrent(NewzNabProvider):
         self.imdbid = None
         return results
 
-    @staticmethod
-    def test_connection(indexer, apikey):
-        return NewzNabProvider.test_connection(indexer, apikey)
+    def get_rss(self):
+        ''' Gets rss from all torznab providers and individual providers
+
+        Returns list of dicts of latest movies
+        '''
+
+        results = []
+
+        results = self._get_rss()
+
+        torrent_indexers = core.CONFIG['Indexers']['Torrent']
+
+        if torrent_indexers['rarbg']:
+            rarbg_results = Rarbg.get_rss()
+            for i in rarbg_results:
+                if i not in results:
+                    results.append(i)
+        if torrent_indexers['limetorrents']:
+            lime_results = LimeTorrents.get_rss()
+            for i in lime_results:
+                if i not in results:
+                    results.append(i)
+        if torrent_indexers['extratorrent']:
+            extra_results = ExtraTorrent.get_rss()
+            for i in extra_results:
+                if i not in results:
+                    results.append(i)
+        if torrent_indexers['torrentz2']:
+            torrentz_results = Torrentz2.get_rss()
+            for i in torrentz_results:
+                if i not in results:
+                    results.append(i)
+
+        return results
 
 
 class Rarbg(object):
@@ -148,6 +180,48 @@ class Rarbg(object):
             return []
 
     @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from Rarbg')
+        if Rarbg.timeout:
+            now = datetime.datetime.now()
+            while Rarbg.timeout > now:
+                time.sleep(1)
+                now = datetime.datetime.now()
+
+        if not Rarbg.token:
+            Rarbg.token = Rarbg.get_token()
+            if Rarbg.token is None:
+                logging.error(u'Unable to get rarbg token.')
+                return []
+
+        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token)
+
+        request = Url.request(url)
+
+        Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
+        try:
+            if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            response = json.loads(response).get('torrent_results')
+            if response:
+                results = Rarbg.parse(response)
+                return results
+            else:
+                logging.info(u'Nothing found on rarbg.to')
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Rarbg RSS.', exc_info=True)
+            return []
+
+    @staticmethod
     def get_token():
         url = u'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
 
@@ -195,7 +269,7 @@ class LimeTorrents(object):
 
         logging.info(u'Searching LimeTorrents for {}'.format(term))
 
-        url = u'https://www.limetorrents.cc/searchrss/term'.format(term)
+        url = u'https://www.limetorrents.cc/searchrss/{}'.format(term)
         request = Url.request(url)
 
         try:
@@ -214,6 +288,33 @@ class LimeTorrents(object):
             raise
         except Exception, e: # noqa
             logging.error(u'LimeTorrent search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from LimeTorrents.')
+
+        url = u'https://www.limetorrents.cc/rss/16/'
+        request = Url.request(url)
+
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = LimeTorrents.parse(response, None)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'LimeTorrent RSS.', exc_info=True)
             return []
 
     @staticmethod
@@ -241,7 +342,13 @@ class LimeTorrents(object):
                 result['type'] = 'torrent'
                 result['downloadid'] = None
 
-                result['seeders'] = i.find('description').text.split(' ')[1]
+                s = i.find('description').text.split('Seeds: ')[1]
+                seed_str = ''
+                while s[0].isdigit():
+                    seed_str += s[0]
+                    s = s[1:]
+
+                result['seeders'] = int(seed_str)
 
                 results.append(result)
             except Exception, e: #noqa
@@ -264,7 +371,7 @@ class ExtraTorrent(object):
 
         request = Url.request(url)
         try:
-            if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.extratorrent.cc') is True:
                 response = Proxy.bypass(request)
             else:
                 response = urllib2.urlopen(request)
@@ -272,6 +379,33 @@ class ExtraTorrent(object):
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
                 results = ExtraTorrent.parse(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'ExtraTorrent search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from ExtraTorrent.')
+
+        url = u'http://extratorrent.cc/rss.xml?cid=4&type=today'
+
+        request = Url.request(url)
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.extratorrent.cc') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = ExtraTorrent.parse(response, None)
                 return results
             else:
                 return []
@@ -420,6 +554,33 @@ class BitSnoop(object):
             return []
 
     @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from BitSnoop.')
+
+        url = u'https://bitsnoop.com/browse/video-movies/?sort=dt_reg&fmt=rss'
+
+        request = Url.request(url)
+        try:
+            if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = BitSnoop.parse(response, None)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'BitSnoop search.', exc_info=True)
+            return []
+
+    @staticmethod
     def parse(xml, imdbid):
         logging.info(u'Parsing BitSnoop results.')
 
@@ -474,6 +635,33 @@ class Torrentz2(object):
             response = urllib2.urlopen(request, timeout=60).read()
             if response:
                 results = Torrentz2.parse(response, imdbid)
+                return results
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'Torrentz2 search.', exc_info=True)
+            return []
+
+    @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from Torrentz2.')
+
+        url = u'https://torrentz2.eu/feed?f=movies'
+
+        request = Url.request(url)
+        try:
+            if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = urllib2.urlopen(request)
+
+            response = urllib2.urlopen(request, timeout=60).read()
+            if response:
+                results = Torrentz2.parse(response, None)
                 return results
             else:
                 return []

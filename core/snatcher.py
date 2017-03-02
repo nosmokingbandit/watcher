@@ -36,10 +36,20 @@ class Snatcher():
         Returns True or False if movie is snatched
         '''
 
-        logging.info(u'Selecting best result for {}'.format(imdbid))
         search_results = self.sql.get_search_results(imdbid, quality)
         if not search_results:
             logging.info(u'Unable to automatically grab {}, no results.'.format(imdbid))
+            return False
+
+        # Filter out any results we don't want to grab
+        search_results = [i for i in search_results if i['type'] != 'import']
+        if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
+            search_results = [i for i in search_results if i['type'] != 'nzb']
+        if not core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            search_results = [i for i in search_results if i['type'] not in ['torrent', 'magnet']]
+
+        if not search_results:
+            logging.info(u'Unable to automatically grab {}, no results for enabled downloader.'.format(imdbid))
             return False
 
         # Check if we are past the 'waitdays'
@@ -55,6 +65,7 @@ class Snatcher():
         # Since seach_results comes back in order of score we can go
         # through in order until we find the first Available result
         # and grab it.
+        logging.info(u'Selecting best result for {}'.format(imdbid))
         for result in search_results:
             result = dict(result)
             status = result['status']

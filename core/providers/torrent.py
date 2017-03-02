@@ -319,6 +319,7 @@ class ExtraTorrent(object):
 
 
 class SkyTorrents(object):
+    ''' Does not supply rss feed -- backlog searches only. '''
 
     @staticmethod
     def search(imdbid, term):
@@ -389,6 +390,7 @@ class SkyTorrents(object):
 
 
 class BitSnoop(object):
+    ''' RSS feed doesn't give download links. RSS disabled until I figure it out. '''
 
     @staticmethod
     def search(imdbid, term):

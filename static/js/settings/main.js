@@ -188,7 +188,6 @@ $(document).ready(function () {
 
         $.post(url_base + "/ajax/indexer_test", {"indexer": url, "apikey": api, "mode": mode})
         .done(function(r){
-            console.log(r)
             response = JSON.parse(r);
             if(response["response"] == true){
                 toastr.success(response["message"]);

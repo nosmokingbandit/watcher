@@ -127,6 +127,7 @@ span#not_found{
 
 div#list_files span#import{
     font-size: 1.5em;
+    margin-bottom: 2em;
 }
 
 div#results{

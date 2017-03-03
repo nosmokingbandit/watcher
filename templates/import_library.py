@@ -19,7 +19,7 @@ class ImportLibrary():
             Head.insert()
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}import_library.css?v=02.22'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=02.22')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=03.03')
 
         with doc:
             Header.insert_header(current=None)
@@ -53,6 +53,11 @@ class ImportLibrary():
 
                 with div(id='wait'):
                     span('Scanning library for new movies.')
+                    br()
+                    span('This may take several minutes.')
+
+                with div(id='wait_importing', cls='hidden'):
+                    span('Importing selected movies.')
                     br()
                     span('This may take several minutes.')
 

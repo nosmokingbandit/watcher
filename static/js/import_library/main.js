@@ -99,10 +99,32 @@ $(document).ready(function() {
         })
     });
 
+
+    // Send import instructions
     $content.on("click", "span#import", function(){
+        movie_data = [];
+        corrected_movies = [];
 
-        var movie_data = [];
+        corrected_movies = _get_corrected_movies();
+        movie_data = _get_movie_data();
 
+        if(movie_data.length == 0 && corrected_movies.length == 0){
+            toastr.warning("All imports disabled.");
+            return false
+        } else {
+            $("div#list_files").hide();
+            $('div#wait_import').fadeIn();
+            $("div#thinker").fadeIn();
+
+            movie_data = JSON.stringify(movie_data)
+            corrected_movies = JSON.stringify(corrected_movies);
+
+            _submit_import(movie_data, corrected_movies)
+        }
+    });
+
+    function _get_movie_data(){
+        movie_data = [];
         var $rows = $("div#review table.files tr")
         $.each($rows, function(){
             $this = $(this);
@@ -114,52 +136,45 @@ $(document).ready(function() {
                 movie_data.push(metadata);
             }
         })
+        return movie_data || [];
+    }
 
-        corrected_movies = [];
-
+    function _get_corrected_movies(){
+        corrected_movies = []
         var $crows = $("div#incomplete table.files tr").slice(1);
-        if($.isEmptyObject($crows) == false){
-            $.each($crows, function(idx, elem){
-                $elem = $(elem);
-                if(is_checked($elem.find("i"))){
-                    var imdbid = $elem.find("input.input_imdbid").val();
-                    var resolution = $elem.find("select.input_resolution").val();
-                    var metadata = JSON.parse($elem.find('td.data').text());
 
-                    if($.trim(imdbid) == ''){
-                        highlight($elem.find("input.input_imdbid"))
-                        return false;
-                    }
+        $.each($crows, function(idx, elem){
+            $elem = $(elem);
+            if(is_checked($elem.find("i"))){
+                var imdbid = $elem.find("input.input_imdbid").val();
+                var resolution = $elem.find("select.input_resolution").val();
+                var metadata = JSON.parse($elem.find('td.data').text());
 
-                    metadata['imdbid'] = imdbid;
-                    metadata['resolution'] = resolution;
-                    metadata['filepath'] = directory + $.trim($elem.find("td.short_name").text());
-                    corrected_movies.push(metadata);
+                if($.trim(imdbid) == ''){
+                    highlight($elem.find("input.input_imdbid"))
+                    return false;
                 }
-            })
-        }
+                metadata['imdbid'] = imdbid;
+                metadata['resolution'] = resolution;
+                metadata['filepath'] = directory + $.trim($elem.find("td.short_name").text());
+                corrected_movies.push(metadata);
+            }
+        })
+        return corrected_movies;
+    }
 
-        if(movie_data.length == 0 && corrected_movies.length == 0){
-            toastr.warning("All imports disabled.");
-            return false
-        }
-
-        $("div#list_files").hide();
-        $("div#thinker").fadeIn();
-
-        movie_data = JSON.stringify(movie_data)
-        corrected_movies = JSON.stringify(corrected_movies);
+    function _submit_import(movie_data, corrected_movies){
 
         $.post(url_base + "/ajax/submit_import", {"movie_data":movie_data, "corrected_movies": corrected_movies})
         .done(function(r){
             $content.html(r)
 
+            $('div#wait_import').fadeOut();
             $("div#thinker").fadeOut();
             $("div#results").fadeIn();
 
         })
-
-    });
+    }
 
     function is_checked(checkbox){
         // Turns value of checkbox "True"/"False" into bool

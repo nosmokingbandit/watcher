@@ -132,7 +132,10 @@ class Ajax(object):
             response['error'] = u'{} {} is {}, cannot add.'.format(title, year, status)
             return json.dumps(response)
 
-        poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+        if data['poster_path']:
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+        else:
+            poster_url = '{}/static/images/missing_poster.jpg'.format(core.PROG_PATH)
 
         data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
         data['plot'] = data['overview']

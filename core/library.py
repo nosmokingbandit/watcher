@@ -122,7 +122,7 @@ class ImportDirectory(object):
                     data['resolution'] = 'DVD-SD'
         else:
             if data.get('resolution'):
-                if data['resolution'] in ['4K, 1080P, 720P']:
+                if data['resolution'].lower() in ['4k, 1080p, 720p']:
                     data['resolution'] = u'BluRay-{}'.format(data['resolution'])
                 else:
                     data['resolution'] = 'DVD-SD'

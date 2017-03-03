@@ -24,7 +24,6 @@ class TMDB(object):
             fill_amount = self.rate * (now - core.TMDB_LAST_FILL)
             core.TMDB_TOKENS = min(self.cap, core.TMDB_TOKENS + fill_amount)
             core.TMDB_LAST_FILL = time()
-        print 'TOKENS: {}'.format(core.TMDB_TOKENS)
         return core.TMDB_TOKENS
 
     def use_token(self):

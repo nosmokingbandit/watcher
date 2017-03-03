@@ -20,7 +20,7 @@ class log(object):
 
         logfile = os.path.join(path, 'log.txt')
         backup_days = core.CONFIG['Server']['keeplog']
-        logging_level = logging.INFO
+        logging_level = logging.DEBUG
 
         formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s.%(funcName)s: %(message)s')
         handler = logging.handlers.TimedRotatingFileHandler(logfile, when="D", interval=1, backupCount=backup_days)

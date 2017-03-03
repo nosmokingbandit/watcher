@@ -664,8 +664,8 @@ class Ajax(object):
                 incomplete_movies[k] = v
 
         logging.debug('Sending import list to html template:')
-        logging.debug(review_movies)
-        logging.debug(incomplete_movies)
+        logging.debug(json.dumps(review_movies, indent=2))
+        logging.debug(json.dumps(incomplete_movies, indent=2))
 
         try:
             return import_library.ImportLibrary.render_review(review_movies, incomplete_movies)

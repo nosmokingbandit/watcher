@@ -12,8 +12,8 @@ logging = logging.getLogger(__name__)
 class TMDB(object):
 
     def __init__(self):
-        self.cap = 40
-        self.rate = 3.9
+        self.cap = 35
+        self.rate = 3.5
         if not core.TMDB_LAST_FILL:
             core.TMDB_LAST_FILL = time()
         return
@@ -24,6 +24,7 @@ class TMDB(object):
             fill_amount = self.rate * (now - core.TMDB_LAST_FILL)
             core.TMDB_TOKENS = min(self.cap, core.TMDB_TOKENS + fill_amount)
             core.TMDB_LAST_FILL = time()
+        print 'TOKENS: {}'.format(core.TMDB_TOKENS)
         return core.TMDB_TOKENS
 
     def use_token(self):
@@ -78,7 +79,7 @@ class TMDB(object):
         url = url + query
         request = Url.request(url)
 
-        while self.get_tokens() < 1:
+        while self.get_tokens() < 2:
             sleep(0.3)
         self.use_token()
 
@@ -99,7 +100,7 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 1:
+        while self.get_tokens() < 2:
             sleep(0.3)
         self.use_token()
 
@@ -122,7 +123,7 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 1:
+        while self.get_tokens() < 2:
             sleep(0.3)
         self.use_token()
 
@@ -161,7 +162,7 @@ class TMDB(object):
             url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year)
             request = Url.request(url)
 
-            while self.get_tokens() < 1:
+            while self.get_tokens() < 2:
                 sleep(0.3)
             self.use_token()
 
@@ -181,7 +182,7 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 1:
+        while self.get_tokens() < 2:
             sleep(0.3)
         self.use_token()
 

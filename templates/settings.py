@@ -660,7 +660,12 @@ class Settings():
                 input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
                 with span(u'Cannot contain ', cls='tip'):
                     span('* ? " < > |', cls='charlist')
-            with li(u'Available tags:'):
+            with li():
+                i(id='recyclebinenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['recyclebinenabled']))
+                span(u'Use "Recycle Bin" folder when redownloading a movie.')
+            with li(u'Recycle Bin path: ', cls='indent bbord'):
+                input(type='text', id='recyclebindirectory', value=c[c_s]['recyclebindirectory'], style='width: 15em')
+            with li(u'Available tags:', cls='bbord'):
                 br()
                 span(u'{title}  {year}  {resolution}  {rated}  {imdbid}  {videocodec}  {audiocodec}  {releasegroup}  {source}', cls='taglist')
                 br()

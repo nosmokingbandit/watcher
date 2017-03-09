@@ -723,6 +723,11 @@ class Postprocessing(object):
 
         Moves file to location specified in core.CONFIG
 
+        If target file already exists either:
+            Delete it prior to copying new file in (since os.rename in windows doesn't overwrite)
+                OR:
+            Create Recycle Bin directory (if neccesary) and move the old file there.
+
         Copies and renames additional files
 
         Returns str new file location or False on failure
@@ -743,11 +748,50 @@ class Postprocessing(object):
             logging.error(u'Mover failed: Could not create missing directory {}.'.format(target_folder), exc_info=True)
             return False
 
+        current_file_path = data['filename']
+
+        current_path, file_name = os.path.split(current_file_path)
+
+        # Check if target file already exists and move to recycle bin if neccesary
+        if os.path.isfile(os.path.join(target_folder, file_name)):
+            existing_movie_file = os.path.join(target_folder, file_name)
+            logging.info(u'Existing file {} found in {}'.format(file_name, target_folder))
+            if config['recyclebinenabled']:
+                logging.info(u'Moving existing movie file to Recycle Bin')
+                recycle_bin = self.compile_path(config['recyclebindirectory'], data)
+                if recycle_bin:
+                    try:
+                        if not os.path.exists(recycle_bin):
+                            os.makedirs(recycle_bin)
+                    except Exception, e:
+                        logging.error(u'Mover failed: Could not create Recycle Bin directory {}.'.format(recycle_bin), exc_info=True)
+                        return False
+                    logging.info(u'Moving {} to Recycle Bin directory {}'.format(existing_movie_file, recycle_bin))
+                    try:
+                        if os.path.isfile(os.path.join(recycle_bin, file_name)):
+                            os.remove(os.path.join(recycle_bin, file_name))
+                        shutil.copystat = self.null
+                        shutil.move(existing_movie_file, recycle_bin)
+                    except Exception, e: # noqa
+                        logging.error(u'Mover failed: Could not move file.', exc_info=True)
+                        return False
+                else:
+                    logging.info(u'Creating Recycle Bin directory failed.')
+                    return False
+            else:
+                logging.info('Removing existing movie file {}'.format(existing_movie_file))
+                try:
+                    os.remove(existing_movie_file)
+                    return True
+                except Exception, e: # noqa
+                    logging.error(u'Could not delete existing movie file.', exc_info=True)
+                    return False
+
         # Move Movie
-        logging.info(u'Moving {} to {}'.format(data['filename'], target_folder))
+        logging.info(u'Moving {} to {}'.format(current_file_path, target_folder))
         try:
             shutil.copystat = self.null
-            shutil.move(data['filename'], target_folder)
+            shutil.move(current_file_path, target_folder)
         except Exception, e: # noqa
             logging.error(u'Mover failed: Could not move file.', exc_info=True)
             return False

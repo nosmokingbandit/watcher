@@ -97,15 +97,15 @@ class Postprocessing(object):
 
             response = self.complete(data)
 
-            title = response.get('title')
-            year = response.get('year')
-            imdbid = response.get('imdbid')
-            resolution = response.get('resolution')
-            rated = response.get('rated')
-            original_file = response.get('orig_filename')
-            new_file_location = response.get('new_file_location')
-            downloadid = response.get('downloadid')
-            finished_date = response.get('finished_date')
+            title = response['data'].get('title')
+            year = response['data'].get('year')
+            imdbid = response['data'].get('imdbid')
+            resolution = response['data'].get('resolution')
+            rated = response['data'].get('rated')
+            original_file = response['data'].get('orig_filename')
+            new_file_location = response['data'].get('new_file_location')
+            downloadid = response['data'].get('downloadid')
+            finished_date = response['data'].get('finished_date')
 
             self.plugins.finished(title, year, imdbid, resolution, rated, original_file, new_file_location, downloadid, finished_date)
 

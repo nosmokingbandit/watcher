@@ -117,7 +117,7 @@ class Postprocessing(object):
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
-        logging.warning(json.dumps(response, indent=2, sort_keys=True))
+        logging.info(json.dumps(response, indent=2, sort_keys=True))
         logging.info(u'#################################')
 
         return json.dumps(response, indent=2, sort_keys=True)

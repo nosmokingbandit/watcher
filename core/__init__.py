@@ -32,7 +32,7 @@ CONFIG = None
 NOTIFICATIONS = []
 
 # Rate limiting
-TMDB_TOKENS = 40
+TMDB_TOKENS = 35
 TMDB_LAST_FILL = None
 
 # Global Media Constants

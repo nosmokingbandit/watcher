@@ -46,7 +46,7 @@ class ImportLibrary():
                     with div(id='browser', cls='hidden'):
                         div(os.getcwd(), id='current_dir')
                         with ul(id='file_list'):
-                            ImportLibrary.file_list(os.getcwd())
+                            ImportLibrary.file_list(core.PROG_PATH)
                         with div(id='browser_actions'):
                             i(id='select_dir', cls='fa fa-check-circle')
                             i(id='close_browser', cls='fa fa-times-circle')

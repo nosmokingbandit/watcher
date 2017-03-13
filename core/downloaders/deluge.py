@@ -104,6 +104,8 @@ class DelugeWeb(object):
     retry = False
     command_id = 0
 
+    headers = {'Content-Type': 'application/json', 'User-Agent': 'Watcher'}
+
     @staticmethod
     def test_connection(data):
         ''' Tests connectivity to deluge web client
@@ -173,7 +175,7 @@ class DelugeWeb(object):
         DelugeWeb.command_id += 1
 
         post_data = json.dumps(command)
-        request = Url.request(url, post_data=post_data)
+        request = Url.request(url, post_data=post_data, headers=DelugeWeb.headers)
         request.add_header('cookie', DelugeWeb.cookie)
 
         try:
@@ -200,7 +202,7 @@ class DelugeWeb(object):
 
         post_data = json.dumps(command)
 
-        request = Url.request(url, post_data=post_data)
+        request = Url.request(url, post_data=post_data, headers=DelugeWeb.headers)
         request.add_header('cookie', DelugeWeb.cookie)
 
         try:
@@ -230,7 +232,7 @@ class DelugeWeb(object):
 
         post_data = json.dumps(command)
 
-        request = Url.request(url, post_data, headers={'User-Agent': 'Mozilla/5.0'})
+        request = Url.request(url, post_data, headers=DelugeWeb.headers)
 
         try:
             response = urllib2.urlopen(request)

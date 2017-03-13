@@ -24,7 +24,7 @@ if sys.version_info < MIN_PYTHON:
     sys.stderr.write("Python 2.7.9 or later is required \n")
     sys.exit(1)
 
-core.PROG_PATH = os.path.dirname(os.path.realpath(__file__))
+core.PROG_PATH = unicode(os.path.dirname(os.path.realpath(__file__)))
 os.chdir(core.PROG_PATH)
 
 if __name__ == '__main__':
@@ -35,10 +35,10 @@ if __name__ == '__main__':
         locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     except Exception, e:
         try:
+            # for windows
             locale.setlocale(locale.LC_ALL, 'English_United States.1252')
         except Exception, e:
             print 'Unable to set locale. Date parsing may not work correctly.'
-
 
     # parse user-passed arguments
     parser = argparse.ArgumentParser(description="Watcher Server App")

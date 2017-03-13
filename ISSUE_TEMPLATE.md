@@ -4,9 +4,10 @@ Meanwhile, you can help us get this fixed more quickly by following this format:
 
 #### What happened?
 
-#### What was supposed to happen?
-
 #### How can I reproduce this?
+
+#### What else do I need to know?
+Operating system, python version, etc?
 
 Including logs of the event are often neccessary to find out exactly what is going on.
 If the log section is short feel free to post is here, but make sure to remove any personal information (ie IP address) and remove any references to movie or release titles.

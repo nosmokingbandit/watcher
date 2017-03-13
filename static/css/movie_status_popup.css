@@ -86,7 +86,7 @@ ul#result_list li.title{
 }
 
 ul#result_list li span.name{
-    width: 540px;
+    width: calc(100% - 4.5em);
     display: block;
     white-space: nowrap;
     overflow: hidden;

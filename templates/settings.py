@@ -656,10 +656,14 @@ class Settings():
             with li(cls='indent'):
                 i(id='cleanupenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['cleanupenabled']))
                 span(u'Clean up after move.')
-            with li(u'Replace illegal characters with: ', cls='indent bbord'):
+            with li(u'Replace illegal characters with: ', cls='indent'):
                 input(type='text', id='replaceillegal', value=c[c_s]['replaceillegal'], style='width: 2em')
                 with span(u'Cannot contain ', cls='tip'):
                     span('* ? " < > |', cls='charlist')
+            with li(cls='indent bbord'):
+                i(id='removeadditionalfiles', cls='fa fa-square-o checkbox', value=str(c[c_s]['removeadditionalfiles']))
+                span(u'Delete additional associated files')
+                span(u'Remove any files with identical name, ie MovieName.srt', cls='tip')
             with li():
                 i(id='recyclebinenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['recyclebinenabled']))
                 span(u'Use "Recycle Bin" folder when redownloading a movie.')

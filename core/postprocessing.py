@@ -786,6 +786,15 @@ class Postprocessing(object):
                 except Exception, e: # noqa
                     logging.error(u'Could not delete existing movie file.', exc_info=True)
                     return False
+            if config['removeadditionalfiles']:
+                logging.info('Removing additional files for {}'.format(file_name))
+                for i in os.listdir(target_folder):
+                    if os.path.splitext(i)[0] == os.path.splitext(file_name)[0]:
+                        logging.info('Removing additional file {}'.format(i))
+                        try:
+                            os.remove(os.path.join(target_folder, i))
+                        except Exception, e: #noqa
+                            logging.warning('Unable to remove {}'.format(i), exc_info=True)
 
         # Move Movie
         logging.info(u'Moving {} to {}'.format(current_file_path, target_folder))

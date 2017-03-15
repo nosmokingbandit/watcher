@@ -23,12 +23,12 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=02.28')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=02.28'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=03.15')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=03.15'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=03.01')
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=03.01')
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/save_settings.js?v=03.15')
 
         with doc:
             Header.insert_header(current="settings")
@@ -559,7 +559,46 @@ class Settings():
                     with span(cls='test_connection', mode='delugeweb'):
                         i(cls='fa fa-plug')
                         span(u'Test Connection')
-
+            with li():
+                i(id='rtorrentscgienabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='rtorrentscgi', value=str(c[c_s]['Torrent']['rTorrentSCGI']['enabled']))
+                span(u'rTorrent SCGI', cls='sub_cat')
+            with ul(id='rtorrentscgi', cls='torrent'):
+                with li(u'Host & Port: scgi://', cls='bbord'):
+                    input(type='text', id='host', value=c[c_s]['Torrent']['rTorrentSCGI']['host'], style='width: 25%', placeholder='localhost:5000')
+                    span(u' : ')
+                    input(type='number', id='port', value=c[c_s]['Torrent']['rTorrentSCGI']['port'], style='width: 25%')
+                with li(u'Label: ', cls='bbord'):
+                    input(type='text', id='label', value=c[c_s]['Torrent']['rTorrentSCGI']['label'], style='width: 50%')
+                    span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
+                with li(cls='bbord'):
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rTorrentSCGI']['addpaused']))
+                    span(u'Add Paused')
+                with li():
+                    with span(cls='test_connection', mode='rtorrentscgi'):
+                        i(cls='fa fa-plug')
+                        span(u'Test Connection')
+            with li():
+                i(id='rtorrenthttpenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='rtorrenthttp', value=str(c[c_s]['Torrent']['rTorrentHTTP']['enabled']))
+                span(u'rTorrent HTTP', cls='sub_cat')
+            with ul(id='rtorrenthttp', cls='torrent'):
+                with li(u'HTTP RPC address: ', cls='bbord'):
+                    input(type='text', id='address', value=c[c_s]['Torrent']['rTorrentHTTP']['address'], style='width: 65%', placeholder='http://localhost/rutorrent/plugins/httprpc/action.php')
+                with li(u'User Name: ', cls='bbord'):
+                    input(type='text', id='user', value=c[c_s]['Torrent']['rTorrentHTTP']['user'], style='width: 50%')
+                    span(u'Leave blank for none.', cls='tip')
+                with li(u'Password: ', cls='bbord'):
+                    input(type='text', id='pass', value=c[c_s]['Torrent']['rTorrentHTTP']['pass'], style='width: 50%')
+                    span(u'Leave blank for none.', cls='tip')
+                with li(u'Label: ', cls='bbord'):
+                    input(type='text', id='label', value=c[c_s]['Torrent']['rTorrentHTTP']['label'], style='width: 50%')
+                    span(u'i.e. \'movies\', \'watcher\'. ', cls='tip')
+                with li(cls='bbord'):
+                    i(id='addpaused', cls='fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rTorrentHTTP']['addpaused']))
+                    span(u'Add Paused')
+                with li():
+                    with span(cls='test_connection', mode='rtorrenthttp'):
+                        i(cls='fa fa-plug')
+                        span(u'Test Connection')
             with li():
                 i(id='transmissionenabled', cls='fa fa-circle-o radio', name='torrentdownloader', tog='transmission', value=str(c[c_s]['Torrent']['Transmission']['enabled']))
                 span(u'Transmission', cls='sub_cat')

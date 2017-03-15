@@ -295,7 +295,7 @@ ul#usenet, ul#torrent{
     margin: 0 0 2em 0;
 }
 
-ul#sabnzbd, ul#nzbget, ul#transmission, ul#delugerpc, ul#delugeweb, ul#qbittorrent{
+ul#sabnzbd, ul#nzbget, ul#transmission, ul#delugerpc, ul#delugeweb, ul#qbittorrent, ul#rtorrentscgi, ul#rtorrenthttp{
     margin: 0 0 1em 2em;
     display: none;
 }

@@ -3,7 +3,7 @@ from datetime import datetime
 import urllib2
 import core
 from core import plugins, sqldb, updatestatus
-from core.downloaders import deluge, qbittorrent, nzbget, sabnzbd, transmission
+from core.downloaders import deluge, qbittorrent, nzbget, sabnzbd, transmission, rtorrent
 
 logging = logging.getLogger(__name__)
 
@@ -248,6 +248,46 @@ class Snatcher():
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to DelugeWeb.'.format(title))
                     return {u'response': True, u'message': u'Sent to Deluge.', u'downloader': u'Deluge', u'downloadid': response['downloadid']}
+                else:
+                    return {u'response': False, u'error': u'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+        # If sending to rTorrentSCGI
+        rtorrent_conf = core.CONFIG['Downloader']['Torrent']['rTorrentSCGI']
+        if rtorrent_conf['enabled'] is True:
+            logging.info(u'Sending {} to rTorrent.'.format(kind))
+            response = rtorrent.rTorrentSCGI.add_torrent(data)
+
+            if response['response'] is True:
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to rTorrent.'.format(title))
+                    return {u'response': True, u'message': u'Sent to rTorrent.', u'downloader': u'rTorrent', u'downloadid': response['downloadid']}
+                else:
+                    return {u'response': False, u'error': u'Could not mark '
+                            'search result as Snatched.'}
+            else:
+                return response
+
+        # If sending to rTorrentSCGI
+        rtorrent_conf = core.CONFIG['Downloader']['Torrent']['rTorrentHTTP']
+        if rtorrent_conf['enabled'] is True:
+            logging.info(u'Sending {} to rTorrent.'.format(kind))
+            response = rtorrent.rTorrentHTTP.add_torrent(data)
+
+            if response['response'] is True:
+
+                # store downloadid in database
+                self.sql.update('SEARCHRESULTS', 'downloadid', response['downloadid'], guid=guid)
+
+                if self.update_status_snatched(guid, imdbid):
+                    logging.info(u'Successfully sent {} to rTorrent.'.format(title))
+                    return {u'response': True, u'message': u'Sent to rTorrent.', u'downloader': u'rTorrent', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}

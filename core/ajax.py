@@ -9,7 +9,7 @@ import cherrypy
 import core
 from core import config, library, plugins, poster, scoreresults, searcher, snatcher, sqldb, updatestatus, version
 from core.providers import torrent, newznab
-from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge
+from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge, rtorrent
 from core.movieinfo import TMDB
 from core.notification import Notification
 from core.rss import predb
@@ -456,6 +456,24 @@ class Ajax(object):
 
         if mode == u'qbittorrent':
             test = qbittorrent.QBittorrent.test_connection(data)
+            if test is True:
+                response['status'] = True
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = False
+                response['error'] = test
+
+        if mode == u'rtorrentscgi':
+            test = rtorrent.rTorrentSCGI.test_connection(data)
+            if test is True:
+                response['status'] = True
+                response['message'] = u'Connection successful.'
+            else:
+                response['status'] = False
+                response['error'] = test
+
+        if mode == u'rtorrenthttp':
+            test = rtorrent.rTorrentHTTP.test_connection(data)
             if test is True:
                 response['status'] = True
                 response['message'] = u'Connection successful.'

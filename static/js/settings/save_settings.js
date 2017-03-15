@@ -452,6 +452,34 @@ $(document).ready(function () {
         });
         data["Downloader"]["Torrent"]["DelugeWeb"] = delugeweb;
 
+        var rtorrentscgi = {};
+        rtorrentscgi["enabled"] = is_checked($("i#rtorrentscgienabled"));
+        $("ul#rtorrentscgi li i.checkbox").each(function(){
+            $this = $(this);
+            rtorrentscgi[$this.attr("id")] = is_checked($this);
+        });
+        $("ul#rtorrentscgi li input").not("[type=button]").each(function(){
+            rtorrentscgi[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#rtorrentscgi li select").each(function(){
+            rtorrentscgi[$(this).attr("id")] = $(this).val()
+        });
+        data["Downloader"]["Torrent"]["rTorrentSCGI"] = rtorrentscgi;
+
+        var rtorrenthttp = {};
+        rtorrenthttp["enabled"] = is_checked($("i#rtorrenthttpenabled"));
+        $("ul#rtorrenthttp li i.checkbox").each(function(){
+            $this = $(this);
+            rtorrenthttp[$this.attr("id")] = is_checked($this);
+        });
+        $("ul#rtorrenthttp li input").not("[type=button]").each(function(){
+            rtorrenthttp[$(this).attr("id")] = $(this).val();
+        });
+        $("ul#rtorrenthttp li select").each(function(){
+            rtorrenthttp[$(this).attr("id")] = $(this).val()
+        });
+        data["Downloader"]["Torrent"]["rTorrentHTTP"] = rtorrenthttp;
+
         var qbittorrent = {};
         qbittorrent["enabled"] = is_checked($("i#qbittorrentenabled"));
         $("ul#qbittorrent li i.checkbox").each(function(){

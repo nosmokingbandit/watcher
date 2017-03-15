@@ -120,7 +120,11 @@ class Status(object):
         Returns bool on success/failure.
         '''
 
-        current_status = self.sql.get_movie_details('imdbid', imdbid).get('status')
+        local_details = self.sql.get_movie_details('imdbid', imdbid)
+        if local_details:
+            current_status = local_details.get('status')
+        else:
+            return True
 
         if current_status == 'Disabled':
             return True

@@ -233,7 +233,10 @@ class SQL(object):
 
         if result:
             data = result.fetchone()
-            return dict(data)
+            if data:
+                return dict(data)
+            else:
+                return False
         else:
             return False
 

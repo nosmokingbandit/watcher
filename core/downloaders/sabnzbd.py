@@ -45,7 +45,7 @@ class Sabnzbd():
         ''' Adds nzb file to sab to download
         :param data: dict of nzb information
 
-        Returns dict {'response': True, 'download_id': 'id'}
+        Returns dict {'response': True, 'downloadid': 'id'}
                      {'response': False, 'error': 'exception'}
 
         '''

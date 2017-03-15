@@ -113,13 +113,13 @@ class MovieStatusPopup():
                         span(kind, cls='bold')
                         span(u' Status:')
                         if status == 'Snatched':
-                            span(status, cls='status_text bold snatched')
+                            span(status, cls='status_text bold snatched', guid=guid)
                         elif status == 'Bad':
-                            span(status, cls='status_text bold bad')
+                            span(status, cls='status_text bold bad', guid=guid)
                         elif status == 'Finished':
-                            span(status, cls='status_text bold finished')
+                            span(status, cls='status_text bold finished', guid=guid)
                         else:
-                            span(status, cls='status_text bold')
+                            span(status, cls='status_text bold', guid=guid)
                         span(u' Size:')
                         span(size, cls='bold')
                         span(u' Score:')

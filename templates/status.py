@@ -34,8 +34,9 @@ class Status():
                     span('Order By: ')
                     with select(id='list_sort'):
                         options = ['Status', 'Title', 'Year']
-                        for opt in options:
-                            option(opt, value=opt.lower())
+                        option('Title', value='title')
+                        option('Year', value='year')
+                        option('Status', value='status_sort')
                 with div(id='key'):
                     span(cls='wanted')
                     span('Wanted')
@@ -76,14 +77,19 @@ class Status():
                         status = data['status']
                         if status == 'Wanted':
                             span(u'Wanted', cls='status wanted')
+                            span('1', cls='status_sort hidden')
                         elif status == 'Found':
                             span(u'Found', cls='status found')
+                            span('2', cls='status_sort hidden')
                         elif status == 'Snatched':
                             span(u'Snatched', cls='status snatched')
+                            span('3', cls='status_sort hidden')
                         elif status == 'Downloading':
                             span(u'Downloading', cls='status downloading')
+                            span('4', cls='status_sort hidden')
                         elif status in ['Finished', 'Disabled']:
                             span(u'Finished', cls='status finished')
+                            span('1', cls='status_sort hidden')
                         else:
                             span(u'Status Unknown', cls='status wanted')
 

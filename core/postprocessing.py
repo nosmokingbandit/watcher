@@ -9,7 +9,7 @@ import urllib2
 import cherrypy
 import core
 import PTN
-from core import plugins, movieinfo, snatcher, sqldb, updatestatus
+from core import plugins, movieinfo, snatcher, sqldb, updatestatus, ajax
 
 logging = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class Postprocessing(object):
         self.tmdb = movieinfo.TMDB()
         self.plugins = plugins.Plugins()
         self.sql = sqldb.SQL()
+        self.ajax = ajax.Ajax()
         self.snatcher = snatcher.Snatcher()
         self.update = updatestatus.Status()
 
@@ -540,6 +541,11 @@ class Postprocessing(object):
 
         # set movie status and add finished date/score
         if data['imdbid']:
+            if not self.sql.row_exists('MOVIES', imdbid=data['imdbid']):
+                logging.info('{} not found in library, adding now.'.format(data.get('title')))
+                data['status'] = 'Disabled'
+                self.ajax.add_wanted_movie(data)
+
             logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
             self.sql.update('MOVIES', 'finished_date', result['data']['finished_date'],

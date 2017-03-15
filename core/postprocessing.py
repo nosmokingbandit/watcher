@@ -544,7 +544,7 @@ class Postprocessing(object):
             if not self.sql.row_exists('MOVIES', imdbid=data['imdbid']):
                 logging.info('{} not found in library, adding now.'.format(data.get('title')))
                 data['status'] = 'Disabled'
-                self.ajax.add_wanted_movie(data)
+                self.ajax.add_wanted_movie(json.dumps(data))
 
             logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()

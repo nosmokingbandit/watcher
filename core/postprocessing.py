@@ -357,10 +357,6 @@ class Postprocessing(object):
                 data['imdbid'] = self.tmdb.get_imdbid(tmdbdata['id'])
 
         if data:
-            # remove unnecessary info
-            data.pop('plot', None)
-            data.pop('overview', None)
-
             if not data.get('quality'):
                 data['quality'] = 'Default'
 

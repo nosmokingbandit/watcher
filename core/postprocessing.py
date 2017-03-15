@@ -350,8 +350,10 @@ class Postprocessing(object):
             logging.info(u'Searching TMDB for {}'.format(search_term))
 
             tmdbdata = self.tmdb.search(search_term, single=True)
-            data['year'] = tmdbdata['release_date'][:4]
-            data['imdbid'] = self.tmdb.get_imdbid(tmdbdata['id'])
+            if tmdbdata:
+                data = tmdbdata
+                data['year'] = tmdbdata['release_date'][:4]
+                data['imdbid'] = self.tmdb.get_imdbid(tmdbdata['id'])
 
         if data:
             # remove unnecessary info

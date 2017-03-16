@@ -17,9 +17,9 @@ class ImportLibrary():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=02.22')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}import_library.css?v=02.22'.format(core.CONFIG['Server']['theme']))
-            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=03.03')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/import_library.css?v=03.16')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}import_library.css?v=03.16'.format(core.CONFIG['Server']['theme']))
+            script(type='text/javascript', src=core.URL_BASE + '/static/js/import_library/main.js?v=03.16')
 
         with doc:
             Header.insert_header(current=None)
@@ -55,6 +55,39 @@ class ImportLibrary():
                     span('Scanning library for new movies.')
                     br()
                     span('This may take several minutes.')
+                    br()
+                    span(id='progress_report')
+
+                with div(id='list_files'):
+                    span(json.dumps(core.RESOLUTIONS), cls='hidden', id='resolution_list')
+                    with div(id='review'):
+                        span('The following movies have been found.', cls='title')
+                        br()
+                        span('Review and un-check any unwanted files.')
+                        with table(cls='files', id='complete'):
+                            with tr():
+                                th('Import')
+                                th('File Path')
+                                th('Title')
+                                th('IMDB ID')
+                                th('Source')
+                                th('Size')
+
+                        span('The following movies are missing key data.', cls='title')
+                        br()
+                        span('Please fill out or correct IMDB ID and source, or uncheck to ignore.')
+                        with table(cls='files', id='incomplete'):
+                            with tr():
+                                th('Import')
+                                th('File Path')
+                                th('Title')
+                                th('IMDB ID')
+                                th('Source')
+                                th('Size')
+
+                    with span(id='import'):
+                        i(cls='fa fa-check-circle')
+                        span('Import')
 
                 with div(id='wait_importing', cls='hidden'):
                     span('Importing selected movies.')
@@ -90,7 +123,7 @@ class ImportLibrary():
             else:
                 if review_movies:
                     with div(id='review'):
-                        span('The following files have been found.', cls='title')
+                        span('The following movies have been found.', cls='title')
                         br()
                         span('Review and un-check any unwanted files.', cls='title')
                         with table(cls='files'):

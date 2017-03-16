@@ -24,7 +24,7 @@ class ImportDirectory(object):
         minsize: int minimum filesize in MB <default 500>
         recursive: bool scan recursively or just root directory <default True>
 
-        Returns dict of movie info {'filepath': {'meta': 'data'}}
+        Returns list of files
         '''
 
         logging.info(u'Scanning {} for movies.'.format(directory))
@@ -36,26 +36,17 @@ class ImportDirectory(object):
             else:
                 files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
         except Exception, e: #noqa
-            return {'error': e}
+            return {'error': str(e)}
 
         files = [unicode(i) for i in files if os.path.getsize(i) >= (minsize * 1024**2)]
 
-        movies = {}
-        for i in files:
-            size = os.path.getsize(i)
-            if size < (minsize * 1024**2):
-                continue
-
-            movies[i] = self.get_metadata(i)
-            movies[i]['size'] = size
-
-        return movies
+        return {'files': files}
 
     def get_metadata(self, filepath):
         ''' Gets video metadata using hachoir_parser
         filepath: str absolute path to movie file
 
-        On failure, can return empty dict
+        On failure can return empty dict
 
         Returns dict
         '''
@@ -71,7 +62,8 @@ class ImportDirectory(object):
             'videocodec': '',
             'source': '',
             'imdbid': '',
-            'size': ''
+            'size': '',
+            'path': filepath
             }
 
         titledata = PTN.parse(os.path.basename(filepath))
@@ -91,22 +83,22 @@ class ImportDirectory(object):
 
         data.update(titledata)
 
-        metadata = None
+        filedata = None
         try:
             parser = createParser(filepath)
             extractor = extractMetadata(parser)
-            metadata = extractor.exportDictionary(human=False)
+            filedata = extractor.exportDictionary(human=False)
             parser.stream._input.close()
-            data.update(metadata)
+            data.update(filedata)
 
         except Exception, e: #noqa
             logging.error(u'Unable to parse metadata from file header.', exc_info=True)
 
-        if metadata:
-            if metadata.get('Metadata'):
-                width = metadata['Metadata'].get('width')
-            elif metadata.get('video[1]'):
-                width = metadata['video[1]'].get('width')
+        if filedata:
+            if filedata.get('Metadata'):
+                width = filedata['Metadata'].get('width')
+            elif filedata.get('video[1]'):
+                width = filedata['video[1]'].get('width')
             else:
                 width = None
 
@@ -127,12 +119,12 @@ class ImportDirectory(object):
                 else:
                     data['resolution'] = 'DVD-SD'
 
-        if metadata and not data['audiocodec']:
-            if metadata.get('audio[1]'):
-                data['audiocodec'] = metadata['audio[1]'].get('compression').replace('A_', '')
-        if metadata and not data['videocodec']:
-            if metadata.get('video[1]'):
-                data['videocodec'] = metadata['video[1]'].get('compression').split('/')[0].replace('V_', '')
+        if filedata and not data['audiocodec']:
+            if filedata.get('audio[1]'):
+                data['audiocodec'] = filedata['audio[1]'].get('compression').replace('A_', '')
+        if filedata and not data['videocodec']:
+            if filedata.get('video[1]'):
+                data['videocodec'] = filedata['video[1]'].get('compression').split('/')[0].replace('V_', '')
 
         if data.get('title') and not data.get('imdbid'):
             data['imdbid'] = self.tmdb.get_imdbid(title=data['title'], year=data.get('year', ''))

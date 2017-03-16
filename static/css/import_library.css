@@ -24,7 +24,7 @@ table i{
 
 div#content{
     margin: 2em auto 0 auto;
-    width: 60%;
+    width: 100%;
     max-width: 1024px;
     min-width: 650px;
     text-align: center;
@@ -114,6 +114,7 @@ span#start_scan{
 
 div#wait{
     display: none;
+    margin-bottom: 2em;
 }
 
 a span{
@@ -123,6 +124,19 @@ a span{
 span#not_found{
     font-size: 1.5em;
     line-height: 2.0em;
+}
+
+/* Files list*/
+div#list_files{
+    display: none;
+}
+
+div#list_files .title{
+    font-size: 1.25em;
+}
+
+div#list_files tr{
+    height: 2em;
 }
 
 div#list_files span#import{

@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 import threading
-
 import cherrypy
 import core
 from core import config, library, plugins, poster, scoreresults, searcher, snatcher, sqldb, updatestatus, version
@@ -12,9 +11,9 @@ from core.providers import torrent, newznab
 from core.downloaders import nzbget, sabnzbd, transmission, qbittorrent, deluge, rtorrent
 from core.movieinfo import TMDB
 from core.notification import Notification
+from core.helpers import Conversions
 from core.rss import predb
 from templates import movie_info_popup, import_library, movie_status_popup, plugin_conf_popup, status
-
 logging = logging.getLogger(__name__)
 
 
@@ -22,7 +21,7 @@ class Ajax(object):
     ''' These are all the methods that handle
         ajax post/get requests from the browser.
 
-    Except in special circumstances, all should return a string
+    Except in special circumstances, all should return a JSON string
         since that is the only datatype sent over http
 
     '''
@@ -155,8 +154,7 @@ class Ajax(object):
             data['quality'] = 'Default'
 
         if self.sql.write(TABLE, data):
-            t2 = threading.Thread(target=self.poster.save_poster,
-                                  args=(data['imdbid'], poster_url))
+            t2 = threading.Thread(target=self.poster.save_poster, args=(data['imdbid'], poster_url))
             t2.start()
 
             # disable immediately grabbing new release for imports
@@ -165,16 +163,13 @@ class Ajax(object):
                 t.start()
 
             response['response'] = True
-            response['message'] = u'{} {} added to wanted list.' \
-                .format(title, year)
-
+            response['message'] = u'{} {} added to wanted list.'.format(title, year)
             self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
 
             return json.dumps(response)
         else:
             response['response'] = False
-            response['error'] = u'Could not write to database. ' \
-                'Check logs for more information.'
+            response['error'] = u'Could not write to database. Check logs for more information.'
             return json.dumps(response)
 
     @cherrypy.expose
@@ -322,7 +317,7 @@ class Ajax(object):
 
         if kind == 'nzb' and not usenet_enabled:
             return json.dumps({'response': False, 'error': 'Link is NZB but no Usent downloader is enabled.'})
-        if kind in ['torrent', 'magnet'] and not torrent_enabled:
+        elif kind in ('torrent', 'magnet') and not torrent_enabled:
             return json.dumps({'response': False, 'error': u'Link is {} but no Torrent downloader is enabled.'.format(kind)})
 
         data = dict(self.sql.get_single_search_result('guid', guid))
@@ -330,8 +325,7 @@ class Ajax(object):
             data['year'] = year
             return json.dumps(self.snatcher.snatch(data))
         else:
-            return json.dumps({'response': False, 'error': 'Unable to get download '
-                               'information from the database. Check logs for more information.'})
+            return json.dumps({'response': False, 'error': 'Unable to get download information from the database. Check logs for more information.'})
 
     @cherrypy.expose
     def mark_bad(self, guid, imdbid):
@@ -344,9 +338,7 @@ class Ajax(object):
         if self.update.mark_bad(guid, imdbid=imdbid):
             response = {'response': True, 'message': 'Marked as Bad.'}
         else:
-            response = {'response': False, 'error': 'Could not mark release as bad. '
-                        'Check logs for more information.'}
-
+            response = {'response': False, 'error': 'Could not mark release as bad. Check logs for more information.'}
         return json.dumps(response)
 
     @cherrypy.expose
@@ -567,7 +559,7 @@ class Ajax(object):
                 logging.info(u'Respawning process...')
                 cherrypy.engine.stop()
                 python = sys.executable
-                os.execl(python, python, * sys.argv)
+                os.execl(python, python, *sys.argv)
         else:
             return
 
@@ -657,37 +649,50 @@ class Ajax(object):
 
         Removes all movies already in library.
 
-        returns str html of review/incomplete tables
+        If error, yields {'error': reason} and stops Iteration
+        If movie has all metadata, yields:
+            {'complete': {<metadata>}}
+        If missing imdbid or resolution, yields:
+            {'incomplete': {<knownn metadata>}}
+
+        All metadata dicts include:
+            'path': 'absolute path to file'
+            'progress': '10 of 250'
+
+        Yeilds generator object of json objects
         '''
 
         recursive = bool(recursive)
         minsize = int(minsize)
-
-        movies = self.library.scan_dir(directory, minsize, recursive)
-
-        err_check = movies.get('error')
-        if err_check:
-            return unicode(err_check)
-
+        files = self.library.scan_dir(directory, minsize, recursive)
+        if files.get('error'):
+            yield json.dumps({'error': unicode(files['error'])})
+            raise StopIteration()
         library = [i['imdbid'] for i in self.sql.get_user_movies()]
-        new_movies = {k.replace(directory, ''): v for k, v in movies.iteritems() if v['imdbid'] not in library}
-
-        review_movies = {}
-        incomplete_movies = {}
-        for k, v in new_movies.iteritems():
-            if v.get('imdbid') and v.get('resolution'):
-                review_movies[k] = v
+        files = files['files']
+        length = len(files)
+        for index, path in enumerate(files):
+            metadata = self.library.get_metadata(path)
+            metadata['size'] = os.path.getsize(path)
+            metadata['human_size'] = Conversions.human_file_size(metadata['size'])
+            metadata['progress'] = '{} of {}'.format(index + 1, length)
+            if not metadata.get('imdbid'):
+                logging.info('IMDB unknown for import {}'.format(metadata['title']))
+                yield json.dumps({'incomplete': metadata})
+                continue
+            if metadata['imdbid'] in library:
+                logging.info('Import {} already in library, ignoring.'.format(metadata['title']))
+                yield json.dumps({'in_library': metadata})
+                continue
+            elif not metadata.get('resolution'):
+                logging.info('Resolution/Source unknown for import {}'.format(metadata['title']))
+                yield json.dumps({'incomplete': metadata})
+                continue
             else:
-                incomplete_movies[k] = v
+                logging.info('All data found for import {}'.format(metadata['title']))
+                yield json.dumps({'complete': metadata})
 
-        logging.debug('Sending import list to html template:')
-        logging.debug(json.dumps(review_movies, indent=2))
-        logging.debug(json.dumps(incomplete_movies, indent=2))
-
-        try:
-            return import_library.ImportLibrary.render_review(review_movies, incomplete_movies)
-        except Exception, e: #noqa
-            return 'Error {}'.format(str(e))
+    scan_library._cp_config = {'response.stream': True}
 
     @cherrypy.expose
     def submit_import(self, movie_data, corrected_movies):
@@ -736,7 +741,7 @@ class Ajax(object):
                     movie['error'] = response['error']
                     results['failed'].append(movie)
             else:
-                movie['error'] = "IMDB ID invalid or missing."
+                movie['error'] = 'IMDB ID invalid or missing.'
                 results['failed'].append(movie)
 
         fake_results = self.score.score(fake_results, quality_profile='import')
@@ -747,6 +752,7 @@ class Ajax(object):
                 if r['imdbid'] == i['imdbid']:
                     score = r['score']
                     break
+
             if score:
                 self.sql.update('MOVIES', 'finished_score', score, imdbid=i['imdbid'])
 
@@ -776,7 +782,7 @@ class Ajax(object):
 
         try:
             response['html'] = import_library.ImportLibrary.file_list(new_path)
-        except Exception, e:
+        except Exception, e: #noqa
             response = {'error': str(e)}
             logging.error('Error listing directory.', exc_info=True)
 

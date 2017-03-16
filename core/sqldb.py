@@ -2,7 +2,6 @@ import core
 import datetime
 import logging
 import time
-import json
 import os
 import shutil
 

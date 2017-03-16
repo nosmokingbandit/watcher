@@ -30,6 +30,7 @@ input, select{
     font-size: .85em;
     padding: 0.1em 0.5em;
     font-family: monospace;
+    border: 1px solid #080f18;
 }
 
 a{

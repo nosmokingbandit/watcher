@@ -22,7 +22,7 @@ class TMDB(object):
             now = time()
             if (now - core.TMDB_LAST_FILL) > 10:
                 core.TMDB_TOKENS = self.cap
-            core.TMDB_LAST_FILL = time()
+                core.TMDB_LAST_FILL = time()
         return core.TMDB_TOKENS
 
     def use_token(self):

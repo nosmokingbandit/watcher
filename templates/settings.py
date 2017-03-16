@@ -88,7 +88,7 @@ class Settings():
                                 item['selected'] = 'selected'
                         else:
                             item = option(opt, value='{}/'.format(opt))
-                        if item['value'] == '{}/'.format(c[c_s]['theme']):
+                        if item['value'] == c[c_s]['theme']:
                             item['selected'] = 'selected'
             with li():
                 i(id='authrequired', cls='fa fa-square-o checkbox', value=str(c[c_s]['authrequired']))

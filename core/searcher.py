@@ -74,7 +74,6 @@ class Searcher():
                     continue
                 imdbid = movie['imdbid']
                 title = movie['title']
-                finisheddate = movie['finished_date']
                 year = movie['year']
                 quality = movie['quality']
                 status = movie['status']
@@ -114,11 +113,11 @@ class Searcher():
                     continue
 
                 if status == u'Finished' and keepsearching is True:
-                    finisheddate = movie['finisheddate']
-                    finisheddateobj = datetime.datetime.strptime(finisheddate, '%Y-%m-%d').date()
-                    if finisheddateobj + keepsearchingdelta >= today:
+                    finished_date = movie['finished_date']
+                    finished_date_obj = datetime.datetime.strptime(finished_date, '%Y-%m-%d').date()
+                    if finished_date_obj + keepsearchingdelta >= today:
                         minscore = movie['finished_score'] + keepsearchingscore
-                        logging.info(u'{} {} was marked Finished on {}. Checking for a better release (min score {}).'.format(title, year, finisheddate, minscore))
+                        logging.info(u'{} {} was marked Finished on {}. Checking for a better release (min score {}).'.format(title, year, finished_date, minscore))
                         self.snatcher.auto_grab(movie, minscore=minscore)
                         continue
                     else:
@@ -432,9 +431,9 @@ class Searcher():
                 rss_movies.append(i)
                 logging.info('{} {} is {}. Will look for new releases in RSS feed.'.format(title, year, status))
             if status == 'Finished' and keepsearching is True:
-                finisheddateobj = datetime.datetime.strptime(i['finisheddate'], '%Y-%m-%d').date()
-                if finisheddateobj + keepsearchingdelta >= today:
-                    logging.info(u'{} {} was marked Finished on {}, will keep checking RSS feed for new releases.'.format(title, year, i['finisheddate']))
+                finished_date_obj = datetime.datetime.strptime(i['finished_date'], '%Y-%m-%d').date()
+                if finished_date_obj + keepsearchingdelta >= today:
+                    logging.info(u'{} {} was marked Finished on {}, will keep checking RSS feed for new releases.'.format(title, year, i['finished_date']))
                     rss_movies.append(i)
                 continue
 

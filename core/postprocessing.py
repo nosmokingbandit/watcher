@@ -477,7 +477,7 @@ class Postprocessing(object):
         In SEARCHRESULTS marks guid as Finished
         In MARKEDRESULTS:
             Creates or updates entry for guid and optional guid with status=bad
-        In MOVIES updates finishedscore and finisheddate
+        In MOVIES updates finished_score and finished_date
         Updates MOVIES status
 
         Checks to see if we found a movie file. If not, ends here.

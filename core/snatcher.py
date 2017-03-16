@@ -23,7 +23,7 @@ class Snatcher():
         self.update = updatestatus.Status()
         return
 
-    def auto_grab(self, title, year, imdbid, quality, minscore=0):
+    def auto_grab(self, movie, minscore=0):
         ''' Grabs the best scoring result that isn't 'Bad'
         title: str title of movie
         year: str year of movie release
@@ -35,6 +35,13 @@ class Snatcher():
 
         Returns True or False if movie is snatched
         '''
+
+        try:
+            imdbid = movie['imdbid']
+            quality = movie['quality']
+            year = movie['year']
+        except Exception, e: #noqa
+            logging.error('Invalid movie data.', exc_info=True)
 
         search_results = self.sql.get_search_results(imdbid, quality)
         if not search_results:

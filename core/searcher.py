@@ -110,7 +110,7 @@ class Searcher():
 
                 if status == u'Found':
                     logging.info(u'{} status is Found. Running automatic snatcher.'.format(title))
-                    self.snatcher.auto_grab(title, year, imdbid, quality)
+                    self.snatcher.auto_grab(movie)
                     continue
 
                 if status == u'Finished' and keepsearching is True:
@@ -119,7 +119,7 @@ class Searcher():
                     if finisheddateobj + keepsearchingdelta >= today:
                         minscore = movie['finished_score'] + keepsearchingscore
                         logging.info(u'{} {} was marked Finished on {}. Checking for a better release (min score {}).'.format(title, year, finisheddate, minscore))
-                        self.snatcher.auto_grab(title, year, imdbid, quality, minscore=minscore)
+                        self.snatcher.auto_grab(movie, minscore=minscore)
                         continue
                     else:
                         continue

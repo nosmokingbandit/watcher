@@ -110,9 +110,8 @@ class Ajax(object):
             if core.CONFIG['Search']['searchafteradd']:
                 if self.searcher.search(imdbid, title, year, quality):
                     # if we don't need to wait to grab the movie do it now.
-                    if core.CONFIG['Search']['autograb'] and \
-                            core.CONFIG['Search']['waitdays'] == 0:
-                        self.snatcher.auto_grab(title, year, imdbid, quality)
+                    if core.CONFIG['Search']['autograb']:
+                        self.snatcher.auto_grab(data)
 
         TABLE = u'MOVIES'
 
@@ -251,7 +250,7 @@ class Ajax(object):
         Returns json.dumps(dict)
         '''
 
-        orig_config = dict(core.CONFIG)
+        # orig_config = dict(core.CONFIG)
 
         logging.info(u'Saving settings.')
         data = json.loads(data)

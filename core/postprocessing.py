@@ -4,7 +4,6 @@ import logging
 import os
 import re
 import shutil
-import urllib2
 
 import cherrypy
 import core
@@ -453,7 +452,7 @@ class Postprocessing(object):
             result['tasks']['autograb'] = {'enabled': 'true'}
             logging.info('Grabbing the next best release.')
             if data.get('imdbid') and data.get('quality'):
-                if self.snatcher.auto_grab(data['title'], data['year'], data['imdbid'], data['quality']):
+                if self.snatcher.auto_grab(data):
                     r = u'true'
                 else:
                     r = u'false'

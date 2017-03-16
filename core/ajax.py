@@ -600,7 +600,7 @@ class Ajax(object):
     def get_log_text(self, logfile):
 
         with open(os.path.join(core.LOG_DIR, logfile), 'r') as f:
-            log_text = f.read()
+            log_text = ''.join(reversed(f.readlines()))
 
         return log_text
 

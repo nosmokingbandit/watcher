@@ -782,3 +782,38 @@ class Ajax(object):
             logging.error('Error listing directory.', exc_info=True)
 
         return json.dumps(response)
+
+    @cherrypy.expose
+    def update_metadata(self, imdbid):
+        movie_data = self.tmdb.search(imdbid, single=True)
+
+        if not movie_data:
+            return json.dumps({'response': False, 'error': 'Unable to find {} on TheMovieDatabase.'.format(imdbid)})
+
+        target_poster = os.path.join(self.poster.poster_folder, '{}.jpg'.format(imdbid))
+
+        if movie_data['poster_path']:
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(movie_data['poster_path'])
+        else:
+            poster_url = '{}/static/images/missing_poster.jpg'.format(core.PROG_PATH)
+
+        if os.path.isfile(target_poster):
+            try:
+                os.remove(target_poster)
+            except Exception, e: #noqa
+                logging.warning('Unable to remove existing poster.', exc_info=True)
+                return json.dumps({'response': False, 'error': 'Unable to remove existing poster.'})
+
+        movie_data['imdbid'] = imdbid
+        movie_data['plot'] = movie_data.pop('overview')
+        movie_data['year'] = movie_data['release_date'][:4]
+        movie_data['score'] = movie_data.pop('vote_average')
+        required_keys = ('added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate', 'backlog')
+        for i in movie_data.keys():
+            if i not in required_keys:
+                del movie_data[i]
+
+        self.sql.update_multiple('MOVIES', movie_data, imdbid=imdbid)
+
+        self.poster.save_poster(imdbid, poster_url)
+        return json.dumps({'response': True, 'message': 'Metadata updated.'})

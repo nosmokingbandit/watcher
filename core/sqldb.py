@@ -193,6 +193,41 @@ class SQL(object):
             logging.error(u'Unable to update database row.')
             return False
 
+    def update_multiple(self, TABLE, data, imdbid='', guid=''):
+        ''' Updates mulitple values in sql row
+        TABLE: str database table to access
+        data: dict key/value pairs to update in table
+        imdbid: str imdbid # of movie to update
+        guid: str guid of search result to update
+
+        Return bool.
+        '''
+
+        if imdbid:
+            idcol = u'imdbid'
+            idval = imdbid
+        elif guid:
+            idcol = u'guid'
+            idval = guid
+        else:
+            return 'ID ERROR'
+
+        logging.info(u'Updating {} in {}.'.format(idval, TABLE))
+
+        columns = '{}=?'.format('=?,'.join(data.keys()))
+
+        sql = u'UPDATE {} SET {} WHERE {}=?'.format(TABLE, columns, idcol)
+
+        vals = tuple(data.values() + [idval])
+
+        command = [sql, vals]
+
+        if self.execute(command):
+            return True
+        else:
+            logging.error(u'Unable to update database row.')
+            return False
+
     def get_user_movies(self):
         ''' Gets all info in MOVIES
 

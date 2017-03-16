@@ -83,6 +83,25 @@ $(document).ready(function() {
         });
     });
 
+    $('i#metadata').click(function(){
+        var $this = $(this);
+        var imdbid = $this.attr('imdbid');
+
+        $this.addClass('fa-circle faa-burst animated');
+
+        $.post(url_base + "/ajax/update_metadata", {"imdbid":imdbid})
+        .done(function(r){
+            response = JSON.parse(r);
+            if(response['response'] == true){
+                toastr.success(response['message'])
+            } else {
+                toastr.error(response['error'])
+            }
+            $this.removeClass('fa-circle faa-burst animated');
+        });
+
+    });
+
     $('i#search_now').click(function(e) {
         var $this = $(this);
         var imdbid = $this.attr('imdbid');
@@ -92,7 +111,7 @@ $(document).ready(function() {
 
         $('ul#result_list').hide();
         $('div#results_thinker').show();
-        $('i#search_now').addClass('fa-circle faa-burst animated');
+        $this.addClass('fa-circle faa-burst animated');
 
         $.post(url_base + "/ajax/search", {"imdbid":imdbid, "title":title, "year":year, "quality":quality})
         .done(function(r){
@@ -100,7 +119,7 @@ $(document).ready(function() {
             refresh_list('#movie_list')
 
             $('div#results_thinker').hide();
-            $('i#search_now').removeClass('fa-circle faa-burst animated');
+            $this.removeClass('fa-circle faa-burst animated');
         });
     });
 
@@ -130,7 +149,7 @@ $(document).ready(function() {
     });
 
 /* search result actions */
-    $('div#status_pop_up').on('click', 'i#manual_download', function(e){
+    $('div#search_results').on('click', 'i#manual_download', function(e){
         var $this = $(this);
         var title = $("div#title span#title").text();
         var year = $("div#title span#year").text();
@@ -161,7 +180,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $('div#status_pop_up').on('click', 'i#mark_bad', function(e) {
+    $('div#search_results').on('click', 'i#mark_bad', function(e) {
         var $this = $(this);
 
         $this.addClass('fa-circle faa-burst animated');

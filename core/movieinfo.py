@@ -12,8 +12,7 @@ logging = logging.getLogger(__name__)
 class TMDB(object):
 
     def __init__(self):
-        self.cap = 35
-        self.rate = 3.5
+        self.cap = 30
         if not core.TMDB_LAST_FILL:
             core.TMDB_LAST_FILL = time()
         return
@@ -21,8 +20,8 @@ class TMDB(object):
     def get_tokens(self):
         if core.TMDB_TOKENS < self.cap:
             now = time()
-            fill_amount = self.rate * (now - core.TMDB_LAST_FILL)
-            core.TMDB_TOKENS = min(self.cap, core.TMDB_TOKENS + fill_amount)
+            if (now - core.TMDB_LAST_FILL) > 10:
+                core.TMDB_TOKENS = self.cap
             core.TMDB_LAST_FILL = time()
         return core.TMDB_TOKENS
 
@@ -78,7 +77,7 @@ class TMDB(object):
         url = url + query
         request = Url.request(url)
 
-        while self.get_tokens() < 2:
+        while self.get_tokens() < 3:
             sleep(0.3)
         self.use_token()
 
@@ -99,8 +98,8 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 2:
-            sleep(0.3)
+        while self.get_tokens() < 3:
+            sleep(0.5)
         self.use_token()
 
         try:
@@ -122,7 +121,7 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 2:
+        while self.get_tokens() < 3:
             sleep(0.3)
         self.use_token()
 
@@ -161,7 +160,7 @@ class TMDB(object):
             url = u'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult=false'.format(_k('tmdb'), title, year)
             request = Url.request(url)
 
-            while self.get_tokens() < 2:
+            while self.get_tokens() < 3:
                 sleep(0.3)
             self.use_token()
 
@@ -181,7 +180,7 @@ class TMDB(object):
         url = u'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k('tmdb'))
         request = Url.request(url)
 
-        while self.get_tokens() < 2:
+        while self.get_tokens() < 3:
             sleep(0.3)
         self.use_token()
 

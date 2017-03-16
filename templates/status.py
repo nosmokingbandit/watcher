@@ -84,12 +84,9 @@ class Status():
                         elif status == 'Snatched':
                             span(u'Snatched', cls='status snatched')
                             span('3', cls='status_sort hidden')
-                        elif status == 'Downloading':
-                            span(u'Downloading', cls='status downloading')
-                            span('4', cls='status_sort hidden')
                         elif status in ['Finished', 'Disabled']:
                             span(u'Finished', cls='status finished')
-                            span('1', cls='status_sort hidden')
+                            span('4', cls='status_sort hidden')
                         else:
                             span(u'Status Unknown', cls='status wanted')
 

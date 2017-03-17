@@ -147,7 +147,6 @@ class ScoreResults():
         for r in self.results:
             if r['type'] == 'import' and r not in keep:
                 keep.append(r)
-                print 'appending keep DBUG1'
                 continue
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:

@@ -701,7 +701,7 @@ class Settings():
                     span('* ? " < > |', cls='charlist')
             with li(cls='indent bbord'):
                 i(id='removeadditionalfiles', cls='fa fa-square-o checkbox', value=str(c[c_s]['removeadditionalfiles']))
-                span(u'Delete additional associated files')
+                span(u'Delete associated files in target directory.')
                 span(u'Remove any files with identical name, ie MovieName.srt', cls='tip')
             with li():
                 i(id='recyclebinenabled', cls='fa fa-square-o checkbox', value=str(c[c_s]['recyclebinenabled']))

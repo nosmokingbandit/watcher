@@ -7,7 +7,7 @@ Meanwhile, you can help us get this fixed more quickly by following this format:
 #### How can I reproduce this?
 
 #### What else do I need to know?
-Operating system, python version, etc?
+Operating system, python version, etc? Don't be shy, if you think it could possibly have an affect let me know. The more I know the faster I can figure out exactly what the problem is.
 
 Including logs of the event are often neccessary to find out exactly what is going on.
 If the log section is short feel free to post is here, but make sure to remove any personal information (ie IP address) and remove any references to movie or release titles.

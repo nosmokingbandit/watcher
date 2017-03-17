@@ -535,7 +535,7 @@ class Postprocessing(object):
             result['tasks'][data['guid2']] = guid2_result
 
         # set movie status and add finished date/score
-        if data['imdbid']:
+        if data.get('imdbid'):
             if not self.sql.row_exists('MOVIES', imdbid=data['imdbid']):
                 logging.info('{} not found in library, adding now.'.format(data.get('title')))
                 data['status'] = 'Disabled'
@@ -579,6 +579,10 @@ class Postprocessing(object):
         else:
             logging.info(u'Mover disabled.')
             result['tasks']['mover'] = {'enabled': 'false'}
+
+        if data.get('imdbid'):
+            self.sql.update('MOVIES', 'finished_file', result['data'].get('new_file_location'),
+                            imdbid=data['imdbid'])
 
         # Delete leftover dir. Skip if createhardlinks enabled or if mover disabled/failed
         if config['cleanupenabled']:
@@ -720,6 +724,51 @@ class Postprocessing(object):
         # return the new name so the mover knows what our file is
         return new_name
 
+    def recycle(self, recycle_bin, abs_filepath):
+        file_dir, file_name = os.path.split(abs_filepath)
+        if not os.path.isdir(recycle_bin):
+            logging.info('Creating recycle bin direcotry {}'.format(recycle_bin))
+            try:
+                os.makedirs(recycle_bin)
+            except Exception, e: #noqa
+                logging.error(u'Recycling failed: Could not create Recycle Bin directory {}.'.format(recycle_bin), exc_info=True)
+                return False
+        logging.info('Recycling {} to recycle bin {}'.format(abs_filepath, recycle_bin))
+        try:
+            if os.path.isfile(os.path.join(recycle_bin, file_name)):
+                os.remove(os.path.join(recycle_bin, file_name))
+            shutil.copystat = self.null
+            shutil.move(abs_filepath, recycle_bin)
+            return True
+        except Exception, e: # noqa
+            logging.error(u'Recycling failed: Could not move file.', exc_info=True)
+            return False
+
+    def remove_additional_files(self, movie_file):
+        ''' Removes addtional associated file of movie_file
+        movie_file: str absolute file path of old movie file
+
+        Removes any file in movie_file's directory that share the same file name
+
+        Does not cause mover failure on error.
+        Returns bool
+        '''
+
+        logging.info('Removing additional files for {}'.format(movie_file))
+
+        path, file_name = os.path.split(movie_file)
+
+        fname = os.path.splitext(file_name)[0]
+
+        for i in os.listdir(path):
+            if os.path.splitext(i)[0] == fname:
+                logging.info('Removing additional file {}'.format(i))
+                try:
+                    os.remove(os.path.join(path, i))
+                except Exception, e: #noqa
+                    logging.warning('Unable to remove {}'.format(i), exc_info=True)
+        return
+
     def mover(self, data):
         '''Moves movie file to path constructed by moverstring
         :param data: dict of movie information.
@@ -737,69 +786,56 @@ class Postprocessing(object):
         '''
 
         config = core.CONFIG['Postprocessing']
-
-        # get target dir, remove illegal chars, and normalize
-        mover_path = config['moverpath']
-
-        target_folder = os.path.normpath(self.compile_path(mover_path, data))
+        recycle_bin = self.compile_path(config['recyclebindirectory'], data)
+        target_folder = os.path.normpath(self.compile_path(config['moverpath'], data))
         target_folder = os.path.join(target_folder, '')
+
         # if the new folder doesn't exist, make it
         try:
             if not os.path.exists(target_folder):
                 os.makedirs(target_folder)
         except Exception, e:
-            logging.error(u'Mover failed: Could not create missing directory {}.'.format(target_folder), exc_info=True)
+            logging.error(u'Mover failed: Could not create directory {}.'.format(target_folder), exc_info=True)
             return False
 
         current_file_path = data['filename']
-
         current_path, file_name = os.path.split(current_file_path)
+        # If finished_file exists, recycle or remove
+        if data.get('finished_file'):
+            old_movie = data['finished_file']
+            logging.info('Checking if old file {} exists.'.format(old_movie))
+            if os.path.isfile(old_movie):
 
-        # Check if target file already exists and move to recycle bin if neccesary
+                if config['recyclebinenabled']:
+                    logging.info('Old movie file found, recycling.')
+                    if not self.recycle(recycle_bin, old_movie):
+                        return False
+                else:
+                    logging.info('Deleting old file {}'.format(old_movie))
+                    try:
+                        os.remove(old_movie)
+                    except Exception, e: #noqa
+                        logging.error(u'Mover failed: Could not delete file.', exc_info=True)
+                        return False
+                if config['removeadditionalfiles']:
+                    self.remove_additional_files(old_movie)
+        # Check if the target file name exists in target dir, recycle or remove
         if os.path.isfile(os.path.join(target_folder, file_name)):
             existing_movie_file = os.path.join(target_folder, file_name)
             logging.info(u'Existing file {} found in {}'.format(file_name, target_folder))
             if config['recyclebinenabled']:
-                logging.info(u'Moving existing movie file to Recycle Bin')
-                recycle_bin = self.compile_path(config['recyclebindirectory'], data)
-                if recycle_bin:
-                    try:
-                        if not os.path.exists(recycle_bin):
-                            os.makedirs(recycle_bin)
-                    except Exception, e:
-                        logging.error(u'Mover failed: Could not create Recycle Bin directory {}.'.format(recycle_bin), exc_info=True)
-                        return False
-                    logging.info(u'Moving {} to Recycle Bin directory {}'.format(existing_movie_file, recycle_bin))
-                    try:
-                        if os.path.isfile(os.path.join(recycle_bin, file_name)):
-                            os.remove(os.path.join(recycle_bin, file_name))
-                        shutil.copystat = self.null
-                        shutil.move(existing_movie_file, recycle_bin)
-                    except Exception, e: # noqa
-                        logging.error(u'Mover failed: Could not move file.', exc_info=True)
-                        return False
-                else:
-                    logging.info(u'Creating Recycle Bin directory failed.')
+                if not self.recycle(recycle_bin, existing_movie_file):
                     return False
             else:
-                logging.info('Removing existing movie file {}'.format(existing_movie_file))
+                logging.info('Deleting old file {}'.format(existing_movie_file))
                 try:
                     os.remove(existing_movie_file)
-                    return True
-                except Exception, e: # noqa
-                    logging.error(u'Could not delete existing movie file.', exc_info=True)
+                except Exception, e: #noqa
+                    logging.error(u'Mover failed: Could not delete file.', exc_info=True)
                     return False
             if config['removeadditionalfiles']:
-                logging.info('Removing additional files for {}'.format(file_name))
-                for i in os.listdir(target_folder):
-                    if os.path.splitext(i)[0] == os.path.splitext(file_name)[0]:
-                        logging.info('Removing additional file {}'.format(i))
-                        try:
-                            os.remove(os.path.join(target_folder, i))
-                        except Exception, e: #noqa
-                            logging.warning('Unable to remove {}'.format(i), exc_info=True)
-
-        # Move Movie
+                self.remove_additional_files(existing_movie_file)
+        # Now to actually move the new Movie
         logging.info(u'Moving {} to {}'.format(current_file_path, target_folder))
         try:
             shutil.copystat = self.null
@@ -846,7 +882,6 @@ class Postprocessing(object):
                         shutil.copyfile(old_abs_path, target_file)
                     except Exception, e: # noqa
                         logging.error(u'Mover failed: Could not copy {}.'.format(old_abs_path), exc_info=True)
-
         return new_file_location
 
     def cleanup(self, path):

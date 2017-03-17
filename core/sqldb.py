@@ -45,6 +45,7 @@ class SQL(object):
                             Column('quality', TEXT),
                             Column('finished_date', TEXT),
                             Column('finished_score', SMALLINT),
+                            Column('finished_file', TEXT),
                             Column('backlog', SMALLINT)
                             )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,

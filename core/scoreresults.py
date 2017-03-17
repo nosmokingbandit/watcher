@@ -85,7 +85,6 @@ class ScoreResults():
         if quality['scoretitle']:
             self.fuzzy_title(title)
         self.score_preferred(preferred)
-
         logging.info('Finished scoring search results.')
         return self.results
 
@@ -113,7 +112,7 @@ class ScoreResults():
 
         logging.info(u'Filtering Ignored Words.')
         for r in self.results:
-            if r['type'] == 'import':
+            if r['type'] == 'import' and r not in keep:
                 keep.append(r)
                 continue
             cond = False
@@ -146,8 +145,9 @@ class ScoreResults():
 
         logging.info(u'Filtering Required Words.')
         for r in self.results:
-            if r['type'] == 'import':
+            if r['type'] == 'import' and r not in keep:
                 keep.append(r)
+                print 'appending keep DBUG1'
                 continue
             for word_group in group_list:
                 if all(word in r['title'].lower() for word in word_group) and r not in keep:
@@ -260,9 +260,10 @@ class ScoreResults():
         else:
             title = Url.encode(title)
             for result in self.results:
-                if result['type'] == 'import':
+                if result['type'] == 'import' and result not in lst:
                     result['score'] += 20
                     lst.append(result)
+                    continue
                 test = Url.encode(result['title'])
                 match = fuzz.partial_ratio(title, test)
                 if match > 60:

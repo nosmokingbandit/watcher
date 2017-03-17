@@ -66,13 +66,16 @@ class TMDB(object):
 
         title = Url.encode(title)
 
-        url = u'https://api.themoviedb.org/3/search/movie?api_key={}&page=1&include_adult=false&'.format(_k('tmdb'))
+        url = u'https://api.themoviedb.org/3/search/movie?page=1&include_adult=false&'
         if title[-4:].isdigit():
             query = u'query={}&year={}'.format(title[:-5], title[-4:])
         else:
             query = u'query={}'.format(title)
 
         url = url + query
+        logging.info('Searching TMDB {}'.format(url))
+        url = url + '&api_key={}'.format(_k('tmdb'))
+
         request = Url.request(url)
 
         while self.get_tokens() < 3:
@@ -93,7 +96,10 @@ class TMDB(object):
 
     def _search_imdbid(self, imdbid):
 
-        url = u'https://api.themoviedb.org/3/find/{}?api_key={}&language=en-US&external_source=imdb_id'.format(imdbid, _k('tmdb'))
+        url = u'https://api.themoviedb.org/3/find/{}?language=en-US&external_source=imdb_id'.format(imdbid)
+
+        logging.info('Searching TMDB {}'.format(url))
+        url = url + '&api_key={}'.format(_k('tmdb'))
         request = Url.request(url)
 
         while self.get_tokens() < 3:
@@ -116,7 +122,12 @@ class TMDB(object):
 
     def _search_tmdbid(self, tmdbid):
 
-        url = u'https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(tmdbid, _k('tmdb'))
+        url = u'https://api.themoviedb.org/3/movie/{}?language=en-US'.format(tmdbid)
+
+        logging.info('Searching TMDB {}'.format(url))
+        url = url + '&api_key={}'.format(_k('tmdb'))
+        request = Url.request(url)
+
         request = Url.request(url)
 
         while self.get_tokens() < 3:

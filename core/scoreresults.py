@@ -263,8 +263,8 @@ class ScoreResults():
                 if result['type'] == 'import':
                     result['score'] += 20
                     lst.append(result)
-                test = result['title'].replace(u' ', u'.').replace(u':', u'.').lower()
-                match = fuzz.token_set_ratio(title, test)
+                test = Url.encode(result['title'])
+                match = fuzz.partial_ratio(title, test)
                 if match > 60:
                     result['score'] += (match / 5)
                     lst.append(result)

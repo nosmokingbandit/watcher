@@ -41,8 +41,6 @@ class TMDB(object):
         If single==True, returns dict of single result
         '''
 
-        search_term = search_term.replace(" ", "+")
-
         if search_term[:2] == u'tt' and search_term[2:].isdigit():
             movies = self._search_imdbid(search_term)
         elif search_term.isdigit():

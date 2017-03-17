@@ -5,6 +5,7 @@ import urllib2
 import random
 import unicodedata
 from lib import bencode
+from string import punctuation
 
 
 class Url(object):
@@ -38,12 +39,10 @@ class Url(object):
         ''' URL-encode strings
         Do not use with full url, only passed params
         '''
-        s = unicode(s).replace(u'\xb7', '-')
-
-        ascii_s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
-
-        s = urllib2.quote(ascii_s.replace(' ', '+'), safe='+')
-
+        s = unicode(s).replace(u'\xb7', '-').replace('.', ' ')
+        s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
+        s = ''.join([i for i in s if i not in punctuation])
+        s = urllib2.quote(s.replace(' ', '+'), safe='+').lower()
         return s
 
 

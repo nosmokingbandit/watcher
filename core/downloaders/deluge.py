@@ -141,6 +141,12 @@ class DelugeWeb(object):
         port = conf['port']
         url = u'{}:{}/json'.format(host, port)
 
+        priority_keys = {
+            'Normal': 0,
+            'High': 128,
+            'Max': 255
+        }
+
         # check cookie validity while getting default download dir
         download_dir = DelugeWeb._get_download_dir(url)
 
@@ -157,11 +163,13 @@ class DelugeWeb(object):
 
         download_dir = u'{}/{}'.format(download_dir, conf['category'])
 
-        priority_keys = {
-            'Normal': 0,
-            'High': 128,
-            'Max': 255
-        }
+        # if file is a torrent, have deluge download it to a tmp dir
+        if data['type'] == 'torrent':
+            tmp_torrent_file = DelugeWeb._get_torrent_file(data['torrentfile'], url)
+            if tmp_torrent_file['response'] is True:
+                data['torrentfile'] = tmp_torrent_file['torrentfile']
+            else:
+                return {'response': False, 'error': tmp_torrent_file['error']}
 
         torrent = {'path': data['torrentfile'], 'options': {}}
         torrent['options']['add_paused'] = conf['addpaused']
@@ -189,6 +197,26 @@ class DelugeWeb(object):
             raise
         except Exception, e:
             logging.error(u'Delugeweb add_torrent', exc_info=True)
+            return {'response': False, 'error': str(e)}
+
+    @staticmethod
+    def _get_torrent_file(torrent_url, deluge_url):
+        command = {'method': 'web.download_torrent_from_url',
+                   'params': [torrent_url],
+                   'id': DelugeWeb.command_id
+                   }
+        DelugeWeb.command_id += 1
+        post_data = json.dumps(command)
+        request = Url.request(deluge_url, post_data=post_data, headers=DelugeWeb.headers)
+        request.add_header('cookie', DelugeWeb.cookie)
+        try:
+            response = DelugeWeb._read(urllib2.urlopen(request))
+            if response['error'] is None:
+                return {'response': True, 'torrentfile': response['result']}
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: #noqa
+            logging.error(u'Delugeweb download_torrent_from_url', exc_info=True)
             return {'response': False, 'error': str(e)}
 
     @staticmethod

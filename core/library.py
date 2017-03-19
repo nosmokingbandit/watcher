@@ -85,10 +85,9 @@ class ImportDirectory(object):
 
         filedata = None
         try:
-            parser = createParser(filepath)
-            extractor = extractMetadata(parser)
-            filedata = extractor.exportDictionary(human=False)
-            parser.stream._input.close()
+            with createParser(filepath) as parser:
+                extractor = extractMetadata(parser)
+                filedata = extractor.exportDictionary(human=False)
             data.update(filedata)
 
         except Exception, e: #noqa

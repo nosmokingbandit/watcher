@@ -28,7 +28,8 @@ div#title span#title{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80%;
+    display: inline-block;
+    max-width: 78%;
 }
 
 div#title span#year{

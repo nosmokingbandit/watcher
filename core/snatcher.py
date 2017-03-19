@@ -194,7 +194,7 @@ class Snatcher():
 
                 if self.update_status_snatched(guid, imdbid):
                     logging.info(u'Successfully sent {} to NZBGet.'.format(title))
-                    return {u'response': True, u'message': u'Sent to Tranmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
+                    return {u'response': True, u'message': u'Sent to Transmission.', u'downloader': u'Transmission', u'downloadid': response['downloadid']}
                 else:
                     return {u'response': False, u'error': u'Could not mark '
                             'search result as Snatched.'}

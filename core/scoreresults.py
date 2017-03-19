@@ -265,7 +265,7 @@ class ScoreResults():
                     continue
                 test = Url.encode(result['title'])
                 match = fuzz.partial_ratio(title, test)
-                if match > 60:
+                if match > 70:
                     result['score'] += (match / 5)
                     lst.append(result)
                 else:

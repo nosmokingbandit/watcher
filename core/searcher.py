@@ -366,7 +366,7 @@ class Searcher():
         else:
             resolution = u'SD'
 
-        delimiters = ['.', '_', ' ', '-']
+        delimiters = ['.', '_', ' ', '-', '+']
         brk = False
         for source, aliases in core.CONFIG['Quality']['Aliases'].iteritems():
             for a in aliases:

@@ -22,6 +22,8 @@ class Url(object):
                    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'
                    ]
 
+    trans = {i: u' ' for i in map(ord, '+.-_')}
+
     @staticmethod
     def request(url, post_data=None, headers={}):
 
@@ -39,7 +41,7 @@ class Url(object):
         ''' URL-encode strings
         Do not use with full url, only passed params
         '''
-        s = unicode(s).replace(u'\xb7', '-').replace('.', ' ')
+        s = unicode(s).translate(Url.trans)
         s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
         s = ''.join([i for i in s if i not in punctuation])
         s = urllib2.quote(s.replace(' ', '+'), safe='+').lower()

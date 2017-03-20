@@ -713,7 +713,7 @@ class ThePirateBay(object):
                 response = Url.open(request)
 
             if response:
-                return ThePirateBay.parse_html(response, imdbid)
+                return ThePirateBay.parse(response, imdbid)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -738,7 +738,7 @@ class ThePirateBay(object):
                 response = Url.open(request)
 
             if response:
-                return ThePirateBay.parse_html(response, None)
+                return ThePirateBay.parse(response, None)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -748,7 +748,7 @@ class ThePirateBay(object):
             return []
 
     @staticmethod
-    def parse_html(html, imdbid):
+    def parse(html, imdbid):
         logging.info(u'Parsing ThePirateBay results.')
 
         html = ' '.join(html.split())
@@ -790,7 +790,3 @@ class ThePirateBay(object):
 
         logging.info(u'Found {} results from ThePirateBay.'.format(len(results)))
         return results
-
-    @staticmethod
-    def parse_rss(xml):
-        return

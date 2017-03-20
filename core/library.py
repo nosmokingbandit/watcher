@@ -152,14 +152,10 @@ class Metadata(object):
             if tmdbdata:
                 data['year'] = tmdbdata['release_date'][:4]
                 data.update(tmdbdata)
+                data['imdbid'] = self.tmdb.get_imdbid(data['id'])
             else:
                 logging.warning('Unable to get data from TMDB for {}'.format(data['imdbid']))
                 return data
-        imdbid = self.tmdb.get_imdbid(data['id'])
-        if imdbid:
-            data['imdbid'] = imdbid
-        else:
-            logging.warning(u'Unable to find imdbid.')
 
         return data
 

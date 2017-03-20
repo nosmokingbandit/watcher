@@ -7,8 +7,8 @@ import shutil
 
 import cherrypy
 import core
-import PTN
 from core import plugins, movieinfo, snatcher, sqldb, updatestatus, ajax
+from core.library import Metadata
 
 logging = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ class Postprocessing(object):
         self.ajax = ajax.Ajax()
         self.snatcher = snatcher.Snatcher()
         self.update = updatestatus.Status()
+        self.metadata = Metadata()
 
     def null(*args, **kwargs): return
 
@@ -75,7 +76,7 @@ class Postprocessing(object):
 
         if data['filename']:
             logging.info(u'Parsing release name for information.')
-            data.update(self.parse_filename(data))
+            data.update(self.metadata.parse_filename(data['filename']))
 
         # Get possible local data or get TMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -169,7 +170,7 @@ class Postprocessing(object):
         data['filename'] = self.get_filename(data['path'])
 
         logging.info(u'Parsing release name for information.')
-        data.update(self.parse_filename(data))
+        data.update(self.metadata.parse_filename(data['filename']))
 
         # Get possible local data or get TMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -244,61 +245,6 @@ class Postprocessing(object):
 
             return biggestfile
 
-    def parse_filename(self, data):
-        ''' Parses filename for release information
-        :param data: dict movie info
-
-        PTN only returns information it finds, so we start with a blank dict
-            of keys that we NEED to have, then update it with PTN's data. This
-            way when we rename the file it will insert a blank string instead of
-            throwing a missing key exception.
-
-        Might eventually replace this with Hachoir-metadata
-
-        Returns dict of parsed data
-        '''
-
-        filename = data['filename']
-        path = data['path']
-
-        # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
-        metadata = {
-            'title': '',
-            'year': '',
-            'resolution': '',
-            'releasegroup': '',
-            'audiocodec': '',
-            'videocodec': '',
-            'source': '',
-            'imdbid': ''
-            }
-
-        titledata = PTN.parse(os.path.basename(filename))
-        # this key is useless
-        if 'excess' in titledata:
-            titledata.pop('excess')
-
-        if len(titledata) <= 2:
-            logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name.')
-            path_list = path.split(os.sep)
-            titledata = PTN.parse(path_list[-1])
-            logging.info(u'Found {} in parent folder.'.format(titledata))
-        else:
-            logging.info(u'Found {} in filname.'.format(titledata))
-
-        # Make sure this matches our key names
-        if 'codec' in titledata:
-            titledata['videocodec'] = titledata.pop('codec')
-        if 'audio' in titledata:
-            titledata['audiocodec'] = titledata.pop('audio')
-        if 'quality' in titledata:
-            titledata['source'] = titledata.pop('quality')
-        if 'group' in titledata:
-            titledata['releasegroup'] = titledata.pop('group')
-        metadata.update(titledata)
-
-        return metadata
-
     def get_movie_info(self, data):
         ''' Gets score, imdbid, and other information to help process
         :param data: dict url-passed params with any additional info
@@ -344,17 +290,8 @@ class Postprocessing(object):
 
         # Still no luck? Try to get the info from TMDB
         else:
-            logging.info(u'Unable to find local data for release. Searching TMDB.')
-
-            search_term = u'{} {}'.format(data['title'], data['year'])
-            logging.info(u'Searching TMDB for {}'.format(search_term))
-
-            tmdbdata = self.tmdb.search(search_term, single=True)
-            if tmdbdata:
-                data = tmdbdata
-                data['year'] = tmdbdata['release_date'][:4]
-                data['imdbid'] = self.tmdb.get_imdbid(tmdbdata['id'])
-
+            logging.info(u'Unable to find local data for release. Attempting to get info from file.')
+            data.update(self.metadata.get_metadata(data['filename']))
         if data:
             if not data.get('quality'):
                 data['quality'] = 'Default'
@@ -503,7 +440,7 @@ class Postprocessing(object):
         logging.info(u'Marking guid as Finished.')
         guid_result = {}
         if data['guid']:
-            if self.update.searchresults(data['guid'], 'Finished'):
+            if self.update.searchresults(data['guid'], 'Finished', movie_info=data):
                 guid_result['update_SEARCHRESULTS'] = u'true'
             else:
                 guid_result['update_SEARCHRESULTS'] = u'false'
@@ -520,7 +457,7 @@ class Postprocessing(object):
         if 'guid2' in data.keys():
             logging.info(u'Marking guid2 as Finished.')
             guid2_result = {}
-            if self.update.searchresults(data['guid2'], 'Finished'):
+            if self.update.searchresults(data['guid2'], 'Finished', movie_info=data):
                 guid2_result['update_SEARCHRESULTS'] = u'true'
             else:
                 guid2_result['update_SEARCHRESULTS'] = u'false'

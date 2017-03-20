@@ -30,6 +30,7 @@ class Ajax(object):
         self.tmdb = TMDB()
         self.config = config.Config()
         self.library = library.ImportDirectory()
+        self.metadata = library.Metadata()
         self.predb = predb.PreDB()
         self.plugins = plugins.Plugins()
         self.searcher = searcher.Searcher()
@@ -672,7 +673,7 @@ class Ajax(object):
         files = files['files']
         length = len(files)
         for index, path in enumerate(files):
-            metadata = self.library.get_metadata(path)
+            metadata = self.metadata.get_metadata(path)
             metadata['size'] = os.path.getsize(path)
             metadata['human_size'] = Conversions.human_file_size(metadata['size'])
             metadata['progress'] = '{} of {}'.format(index + 1, length)

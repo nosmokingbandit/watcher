@@ -294,6 +294,9 @@ class ScoreResults():
         for result in self.results:
             result_res = result['resolution']
             size = result['size'] / 1000000
+            if result['type'] == 'import' and result['resolution'] == 'Unknown':
+                lst.append(result)
+                continue
             for k, v in sources.iteritems():
                 if v[0] is False and result['type'] != 'import':
                     continue

@@ -1,6 +1,7 @@
 import logging
 
-from core import sqldb
+from core import sqldb, library, scoreresults
+import os
 
 logging = logging.getLogger(__name__)
 
@@ -9,13 +10,18 @@ class Status(object):
 
     def __init__(self):
         self.sql = sqldb.SQL()
+        self.library = library.ImportDirectory()
+        self.score = scoreresults.ScoreResults()
 
-    def searchresults(self, guid, status):
+    def searchresults(self, guid, status, movie_info=None):
         ''' Marks searchresults status
         :param guid: str download link guid
         :param status: str status to set
+        movie_info: dict of movie metadata
 
-        If guid is in SEARCHRESULTS table, marks it as Bad.
+        If guid is in SEARCHRESULTS table, marks it as status.
+
+        If guid not in SEARCHRESULTS, uses movie_info to create a result.
 
         Returns Bool on success/fail
         '''
@@ -35,8 +41,23 @@ class Status(object):
                 logging.info(u'Successfully marked {} as {} in SEARCHRESULTS.'.format(guid, status))
                 return True
         else:
-            logging.warning(u'Guid {} not found in SEARCHRESULTS.'.format(guid))
-            return False
+            logging.info(u'Guid {} not found in SEARCHRESULTS, attempting to create entry.'.format(guid))
+            if movie_info is None:
+                logging.warning('Metadata not supplied, unable to create SEARCHRESULTS entry.')
+                return False
+            search_result = self.library.fake_search_result(movie_info)
+            search_result['indexer'] = 'Post-Processing Import'
+            search_result['title'] = movie_info['title']
+            search_result['size'] = os.path.getsize(movie_info.get('orig_filename', '.'))
+            if not search_result['resolution']:
+                search_result['resolution'] = 'Unknown'
+
+            search_result = self.score.score([search_result], quality_profile='import')[0]
+
+            if self.sql.write('SEARCHRESULTS', search_result):
+                return True
+            else:
+                return False
 
     def markedresults(self, guid, status, imdbid=None):
         ''' Marks markedresults status

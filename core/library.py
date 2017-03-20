@@ -42,105 +42,6 @@ class ImportDirectory(object):
 
         return {'files': files}
 
-    def get_metadata(self, filepath):
-        ''' Gets video metadata using hachoir_parser
-        filepath: str absolute path to movie file
-
-        On failure can return empty dict
-
-        Returns dict
-        '''
-
-        logging.info(u'Gathering metada for {}.'.format(filepath))
-
-        data = {
-            'title': '',
-            'year': '',
-            'resolution': '',
-            'releasegroup': '',
-            'audiocodec': '',
-            'videocodec': '',
-            'source': '',
-            'imdbid': '',
-            'size': '',
-            'path': filepath
-            }
-
-        titledata = PTN.parse(os.path.basename(filepath))
-        # this key is useless
-        titledata.pop('excess', None)
-        # Make sure this matches our key names
-        if 'codec' in titledata:
-            titledata['videocodec'] = titledata.pop('codec')
-        if 'audio' in titledata:
-            titledata['audiocodec'] = titledata.pop('audio')
-        if 'quality' in titledata:
-            titledata['source'] = titledata.pop('quality')
-        if 'group' in titledata:
-            titledata['releasegroup'] = titledata.pop('group')
-        if 'resolution' in titledata:
-            titledata['resolution'] = titledata['resolution'].upper()
-
-        data.update(titledata)
-
-        filedata = None
-        try:
-            with createParser(filepath) as parser:
-                extractor = extractMetadata(parser)
-                filedata = extractor.exportDictionary(human=False)
-            data.update(filedata)
-
-        except Exception, e: #noqa
-            logging.error(u'Unable to parse metadata from file header.', exc_info=True)
-
-        if filedata:
-            if filedata.get('Metadata'):
-                width = filedata['Metadata'].get('width')
-            elif filedata.get('video[1]'):
-                width = filedata['video[1]'].get('width')
-            else:
-                width = None
-
-            if width:
-                width = int(width)
-                if width > 1920:
-                    data['resolution'] = 'BluRay-4K'
-                elif 1920 >= width > 1440:
-                    data['resolution'] = 'BluRay-1080P'
-                elif 1440 >= width > 720:
-                    data['resolution'] = 'BluRay-720P'
-                else:
-                    data['resolution'] = 'DVD-SD'
-        else:
-            if data.get('resolution'):
-                if data['resolution'].lower() in ['4k', '1080p', '720p']:
-                    data['resolution'] = u'BluRay-{}'.format(data['resolution'])
-                else:
-                    data['resolution'] = 'DVD-SD'
-
-        if filedata and not data['audiocodec']:
-            if filedata.get('audio[1]'):
-                data['audiocodec'] = filedata['audio[1]'].get('compression').replace('A_', '')
-        if filedata and not data['videocodec']:
-            if filedata.get('video[1]'):
-                data['videocodec'] = filedata['video[1]'].get('compression').split('/')[0].replace('V_', '')
-
-        if data.get('title') and not data.get('imdbid'):
-            data['imdbid'] = self.tmdb.get_imdbid(title=data['title'], year=data.get('year', ''))
-
-        if data['imdbid']:
-            tmdbdata = self.tmdb.search(data['imdbid'], single=True)
-            if tmdbdata:
-                data['year'] = tmdbdata['release_date'][:4]
-                data.update(tmdbdata)
-            else:
-                logging.warning('Unable to get data from TMDB for {}'.format(data['imdbid']))
-
-        else:
-            logging.warning(u'Unable to find imdbid.')
-
-        return data
-
     def fake_search_result(self, movie):
         ''' Generated fake search result for imported movies
         movie: dict of movie info
@@ -173,7 +74,7 @@ class ImportDirectory(object):
                                                movie['releasegroup']
                                                )
 
-        while title[-1] == '.':
+        while len(title) > 0 and title[-1] == '.':
             title = title[:-1]
 
         while '..' in title:
@@ -181,7 +82,7 @@ class ImportDirectory(object):
 
         result['title'] = title
 
-        result['guid'] = u'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
+        result['guid'] = movie.get('guid') or u'IMPORT{}'.format(title.encode("hex").zfill(16)[:16])
 
         return result
 
@@ -202,3 +103,161 @@ class ImportDirectory(object):
             else:
                 files.append(full_path)
         return files
+
+
+class Metadata(object):
+
+    def __init__(self):
+        self.tmdb = TMDB()
+        return
+
+    def get_metadata(self, filepath):
+        ''' Gets video metadata using hachoir_parser
+        filepath: str absolute path to movie file
+
+        On failure can return empty dict
+
+        Returns dict
+        '''
+
+        logging.info(u'Gathering metada for {}.'.format(filepath))
+
+        data = {
+            'title': '',
+            'year': '',
+            'resolution': '',
+            'releasegroup': '',
+            'audiocodec': '',
+            'videocodec': '',
+            'source': '',
+            'imdbid': '',
+            'size': '',
+            'path': filepath
+            }
+
+        titledata = self.parse_filename(filepath)
+        data.update(titledata)
+
+        filedata = self.parse_media(filepath)
+        data.update(filedata)
+
+        if data.get('resolution'):
+            if data['resolution'].lower() in ['4k', '1080p', '720p']:
+                data['resolution'] = u'{}-{}'.format(data['source'] or 'BluRay', data['resolution'])
+            else:
+                data['resolution'] = 'DVD-SD'
+
+        if data.get('title') and not data.get('imdbid'):
+            tmdbdata = self.tmdb.search('{} {}'.format(data['title'], data.get('year', '')), single=True)
+            if tmdbdata:
+                data['year'] = tmdbdata['release_date'][:4]
+                data.update(tmdbdata)
+            else:
+                logging.warning('Unable to get data from TMDB for {}'.format(data['imdbid']))
+                return data
+        imdbid = self.tmdb.get_imdbid(data['id'])
+        if imdbid:
+            data['imdbid'] = imdbid
+        else:
+            logging.warning(u'Unable to find imdbid.')
+
+        return data
+
+    def parse_media(self, filepath):
+        ''' Uses Hachoir-metadata to parse the file header to metadata
+        filepath: str absolute path to file
+
+        Attempts to get resolution from media width
+
+        Returns dict of metadata
+        '''
+
+        metadata = {}
+        try:
+            # with createParser(filepath) as parser:
+            parser = createParser(filepath)
+            extractor = extractMetadata(parser)
+            filedata = extractor.exportDictionary(human=False)
+            parser.stream._input.close()
+
+        except Exception, e: #noqa
+            logging.error(u'Unable to parse metadata from file header.', exc_info=True)
+            return metadata
+
+        if filedata:
+            if filedata.get('Metadata'):
+                width = filedata['Metadata'].get('width')
+            elif metadata.get('video[1]'):
+                width = filedata['video[1]'].get('width')
+            else:
+                width = None
+
+            if width:
+                width = int(width)
+                if width > 1920:
+                    filedata['resolution'] = '4K'
+                elif 1920 >= width > 1440:
+                    filedata['resolution'] = '1080P'
+                elif 1440 >= width > 720:
+                    filedata['resolution'] = '720P'
+                else:
+                    filedata['resolution'] = 'SD'
+
+            if filedata.get('audio[1]'):
+                metadata['audiocodec'] = filedata['audio[1]'].get('compression').replace('A_', '')
+            if filedata.get('video[1]'):
+                metadata['videocodec'] = filedata['video[1]'].get('compression').split('/')[0].replace('V_', '')
+
+        return metadata
+
+    def parse_filename(self, filepath):
+        ''' Uses PTN to get as much info as possible from path
+        filepath: str absolute path to file
+
+        Returns dict of Metadata
+        '''
+        logging.info(u'Parsing {} for movie information.'.format(filepath))
+
+        # This is our base dict. Contains all neccesary keys, though they can all be empty if not found.
+        metadata = {
+            'title': '',
+            'year': '',
+            'resolution': '',
+            'releasegroup': '',
+            'audiocodec': '',
+            'videocodec': '',
+            'source': '',
+            'imdbid': ''
+            }
+
+        titledata = PTN.parse(os.path.basename(filepath))
+        # this key is useless
+        if 'excess' in titledata:
+            titledata.pop('excess')
+
+        if len(titledata) < 2:
+            logging.info(u'Parsing filename doesn\'t look accurate. Parsing parent folder name.')
+
+            path_list = os.path.split(filepath)[0].split(os.sep)
+            titledata = PTN.parse(path_list[-1])
+            logging.info(u'Found {} in parent folder.'.format(titledata))
+        else:
+            logging.info(u'Found {} in filename.'.format(titledata))
+
+        title = titledata.get('title')
+        if title and title[-1] == '.':
+            print 'REMOVING PERIOD'
+            titledata['title'] = title[:-1]
+
+        # Make sure this matches our key names
+        if 'codec' in titledata:
+            titledata['videocodec'] = titledata.pop('codec')
+        if 'audio' in titledata:
+            titledata['audiocodec'] = titledata.pop('audio')
+        if 'quality' in titledata:
+            titledata['source'] = titledata.pop('quality')
+        if 'group' in titledata:
+            titledata['releasegroup'] = titledata.pop('group')
+        metadata.update(titledata)
+
+        return metadata

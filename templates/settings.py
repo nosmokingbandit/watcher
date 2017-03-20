@@ -23,8 +23,8 @@ def settings_page(page):
         with doc.head:
             meta(name='git_url', content=core.GIT_URL)
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=03.15')
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=03.15'.format(core.CONFIG['Server']['theme']))
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/settings.css?v=03.20')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}settings.css?v=03.20'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/plugin_conf_popup.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}plugin_conf_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
             script(type='text/javascript', src=core.URL_BASE + '/static/js/settings/main.js?v=03.16')
@@ -387,22 +387,25 @@ class Settings():
                         span(u'Torrent Indexers')
                     with li(cls='torrent_indexer', id='bitsnoop'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['bitsnoop']))
-                        span('Search BitSnoop')
+                        span('BitSnoop')
                     with li(cls='torrent_indexer', id='extratorrent'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['extratorrent']))
-                        span('Search ExtraTorrent')
+                        span('ExtraTorrent')
                     with li(cls='torrent_indexer', id='limetorrents'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['limetorrents']))
-                        span('Search LimeTorrents')
+                        span('LimeTorrents')
                     with li(cls='torrent_indexer', id='rarbg'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['rarbg']))
-                        span('Search Rarbg')
+                        span('Rarbg')
                     with li(cls='torrent_indexer', id='skytorrents'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['skytorrents']))
-                        span('Search SkyTorrents')
+                        span('SkyTorrents')
+                    with li(cls='torrent_indexer', id='thepiratebay'):
+                        i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['thepiratebay']))
+                        span('ThePirateBay')
                     with li(cls='torrent_indexer', id='torrentz2'):
                         i(cls='torrent_check fa fa-square-o checkbox', value=str(c[c_s]['Torrent']['torrentz2']))
-                        span('Search Torrentz2')
+                        span('Torrentz2')
 
         with div(id='save', cat='providers'):
             i(cls='fa fa-save')

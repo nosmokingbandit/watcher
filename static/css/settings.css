@@ -279,6 +279,11 @@ div.providers li.add_torznab_row{
     margin: 0 0 2em 0;
 }
 
+div.providers ul#torrentindexer_list li.torrent_indexer{
+    width: 49%;
+    display: inline-block;
+}
+
 
 /* downloader */
 

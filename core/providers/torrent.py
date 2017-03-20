@@ -88,6 +88,11 @@ class Torrent(NewzNabProvider):
             for i in torrentz_results:
                 if i not in results:
                     results.append(i)
+        if torrent_indexers['thepiratebay']:
+            tpb_results = ThePirateBay.search(imdbid, term)
+            for i in tpb_results:
+                if i not in results:
+                    results.append(i)
 
         self.imdbid = None
         return results
@@ -153,13 +158,13 @@ class Rarbg(object):
                 logging.error(u'Unable to get Rarbg token.')
                 return []
 
-        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token, imdbid)
+        url = u'https://www.torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token, imdbid)
 
         request = Url.request(url)
 
         Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
-            if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.torrentapi.org') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -193,13 +198,13 @@ class Rarbg(object):
                 logging.error(u'Unable to get Rarbg token.')
                 return []
 
-        url = u'https://torrentapi.org/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token)
+        url = u'https://www.torrentapi.org/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(Rarbg.token)
 
         request = Url.request(url)
 
         Rarbg.timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
         try:
-            if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.torrentapi.org') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -218,7 +223,7 @@ class Rarbg(object):
 
     @staticmethod
     def get_token():
-        url = u'https://torrentapi.org/pubapi_v2.php?get_token=get_token'
+        url = u'https://www.torrentapi.org/pubapi_v2.php?get_token=get_token'
 
         request = Url.request(url)
 
@@ -359,7 +364,7 @@ class ExtraTorrent(object):
 
         logging.info(u'Searching ExtraTorrent for {}.'.format(term))
 
-        url = u'https://extratorrent.cc/rss.xml?type=search&cid=4&search={}'.format(term)
+        url = u'https://www.extratorrent.cc/rss.xml?type=search&cid=4&search={}'.format(term)
 
         request = Url.request(url)
         try:
@@ -384,7 +389,7 @@ class ExtraTorrent(object):
 
         logging.info(u'Fetching latest RSS from ExtraTorrent.')
 
-        url = u'http://extratorrent.cc/rss.xml?cid=4&type=today'
+        url = u'https://www.extratorrent.cc/rss.xml?cid=4&type=today'
 
         request = Url.request(url)
         try:
@@ -518,11 +523,11 @@ class BitSnoop(object):
 
         logging.info(u'Searching BitSnoop for {}.'.format(term))
 
-        url = u'https://bitsnoop.com/search/video/{}/c/d/1/?fmt=rss'.format(term)
+        url = u'https://www.bitsnoop.com/search/video/{}/c/d/1/?fmt=rss'.format(term)
 
         request = Url.request(url)
         try:
-            if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.bitsnoop.com') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -543,11 +548,11 @@ class BitSnoop(object):
 
         logging.info(u'Fetching latest RSS from BitSnoop.')
 
-        url = u'https://bitsnoop.com/browse/video-movies/?sort=dt_reg&fmt=rss'
+        url = u'https://www.bitsnoop.com/browse/video-movies/?sort=dt_reg&fmt=rss'
 
         request = Url.request(url)
         try:
-            if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.bitsnoop.com') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -605,11 +610,11 @@ class Torrentz2(object):
 
         logging.info(u'Searching Torrentz2 for {}.'.format(term))
 
-        url = u'https://torrentz2.eu/feed?f={}'.format(term)
+        url = u'https://www.torrentz2.eu/feed?f={}'.format(term)
 
         request = Url.request(url)
         try:
-            if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.torrentz2.eu') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -630,11 +635,11 @@ class Torrentz2(object):
 
         logging.info(u'Fetching latest RSS from Torrentz2.')
 
-        url = u'https://torrentz2.eu/feed?f=movies'
+        url = u'https://www.torrentz2.eu/feed?f=movies'
 
         request = Url.request(url)
         try:
-            if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
+            if proxy_enabled and Proxy.whitelist('https://www.torrentz2.eu') is True:
                 response = Proxy.bypass(request)
             else:
                 response = Url.open(request)
@@ -687,3 +692,105 @@ class Torrentz2(object):
 
         logging.info(u'Found {} results from Torrentz2.'.format(len(results)))
         return results
+
+
+class ThePirateBay(object):
+
+    @staticmethod
+    def search(imdbid, term):
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Searching ThePirateBay for {}.'.format(term))
+
+        url = u'https://www.thepiratebay.org/search/{}/0/99/200'.format(term)
+
+        request = Url.request(url)
+        request.add_header('Cookie', 'lw=s')
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.thepiratebay.org') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = Url.open(request)
+
+            if response:
+                return ThePirateBay.parse_html(response, imdbid)
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'ThePirateBay search failed.', exc_info=True)
+            return []
+
+    @staticmethod
+    def get_rss():
+        proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
+
+        logging.info(u'Fetching latest RSS from ThePirateBay.')
+
+        url = u'https://www.thepiratebay.org/browse/201/0/3/0'
+
+        request = Url.request(url)
+        try:
+            if proxy_enabled and Proxy.whitelist('https://www.thepiratebay.org') is True:
+                response = Proxy.bypass(request)
+            else:
+                response = Url.open(request)
+
+            if response:
+                return ThePirateBay.parse_html(response, None)
+            else:
+                return []
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception, e: # noqa
+            logging.error(u'ThePirateBay RSS fetch failed.', exc_info=True)
+            return []
+
+    @staticmethod
+    def parse_html(html, imdbid):
+        logging.info(u'Parsing ThePirateBay results.')
+
+        html = ' '.join(html.split())
+        rows = []
+        for i in html.split('<tr>')[1:-1]:
+            rows = rows + i.split('<tr class="alt">')
+
+        rows = ['<tr>{}'.format(i.replace('&', '%26')) for i in rows]
+
+        results = []
+        for row in rows:
+            i = ET.fromstring(row)
+            result = {}
+            try:
+
+                desc = i[4].text
+                m = (1024 ** 3) if desc.split(';')[-1] == 'GiB' else (1024 ** 2)
+
+                size = float(desc.split('%')[0]) * m
+
+                result['score'] = 0
+                result['size'] = size
+                result['status'] = u'Available'
+                result['pubdate'] = None
+                result['title'] = i[1][0].text
+                result['imdbid'] = imdbid
+                result['indexer'] = 'www.thepiratebay.org'
+                result['info_link'] = u'https://www.thepiratebay.org{}'.format(i[1][0].attrib['href'])
+                result['torrentfile'] = i[3][0][0].attrib['href'].replace('%26', '&')
+                result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
+                result['type'] = 'magnet'
+                result['downloadid'] = None
+                result['seeders'] = int(i[5].text)
+
+                results.append(result)
+            except Exception, e: #noqa
+                logging.error(u'Error parsing ThePirateBay XML.', exc_info=True)
+                continue
+
+        logging.info(u'Found {} results from ThePirateBay.'.format(len(results)))
+        return results
+
+    @staticmethod
+    def parse_rss(xml):
+        return

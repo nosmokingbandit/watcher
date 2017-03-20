@@ -142,8 +142,8 @@ class Metadata(object):
         data.update(filedata)
 
         if data.get('resolution'):
-            if data['resolution'].lower() in ['4k', '1080p', '720p']:
-                data['resolution'] = u'{}-{}'.format(data['source'] or 'BluRay', data['resolution'])
+            if data['resolution'].upper() in ['4K', '1080P', '720P']:
+                data['resolution'] = u'{}-{}'.format(data['source'] or 'BluRay', data['resolution'].upper())
             else:
                 data['resolution'] = 'DVD-SD'
 

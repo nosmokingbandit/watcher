@@ -79,7 +79,7 @@ class QBittorrent(object):
         request.add_header('cookie', QBittorrent.cookie)
 
         try:
-            urllib2.urlopen(request)  # QBit returns an empty string
+            Url.open(request)  # QBit returns an empty string
             downloadid = Torrent.get_hash(data['torrentfile'])
             return {'response': True, 'downloadid': downloadid}
         except (SystemExit, KeyboardInterrupt):
@@ -94,7 +94,7 @@ class QBittorrent(object):
             url = u'{}query/preferences'.format(base_url)
             request = Url.request(url)
             request.add_header('cookie', QBittorrent.cookie)
-            response = json.loads(urllib2.urlopen(request).read())
+            response = json.loads(Url.open(request))
             return response['save_path']
         except urllib2.HTTPError:
             return False
@@ -107,7 +107,7 @@ class QBittorrent(object):
         url = u'{}query/torrents'.format(base_url)
         request = Url.request(url)
         request.add_header('cookie', QBittorrent.cookie)
-        return urllib2.urlopen(request).read()
+        return Url.open(request)
 
     @staticmethod
     def _login(url, username, password):
@@ -124,14 +124,15 @@ class QBittorrent(object):
         try:
             response = urllib2.urlopen(request)
             QBittorrent.cookie = response.headers.get('Set-Cookie')
-            response = response.read()
+            result = response.read()
+            response.close()
 
-            if response == 'Ok.':
+            if result == 'Ok.':
                 return True
-            elif response == 'Fails.':
+            elif result == 'Fails.':
                 return u'Incorrect usename or password'
             else:
-                return response
+                return result
 
         except (SystemExit, KeyboardInterrupt):
             raise

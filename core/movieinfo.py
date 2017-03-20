@@ -83,7 +83,8 @@ class TMDB(object):
         self.use_token()
 
         try:
-            results = json.load(urllib2.urlopen(request))
+            response = Url.open(request)
+            results = json.loads(response)
             if results.get('success') == 'false':
                 return None
             else:
@@ -107,7 +108,8 @@ class TMDB(object):
         self.use_token()
 
         try:
-            results = json.load(urllib2.urlopen(request))
+            response = Url.open(request)
+            results = json.loads(response)
             if results['movie_results'] == []:
                 return ['']
             else:
@@ -135,8 +137,10 @@ class TMDB(object):
         self.use_token()
 
         try:
-            response = json.load(urllib2.urlopen(request))
-            if response.get('status_code'):
+            response = Url.open(request)
+            results = json.loads(response)
+            response.close()
+            if results.get('status_code'):
                 return ['']
             else:
                 return [response]
@@ -174,8 +178,9 @@ class TMDB(object):
             self.use_token()
 
             try:
-                response = json.load(urllib2.urlopen(request))
-                results = response['results']
+                response = Url.open(request)
+                results = json.loads(response)
+                results = results['results']
                 if results:
                     tmdbid = results[0]['id']
                 else:
@@ -194,8 +199,9 @@ class TMDB(object):
         self.use_token()
 
         try:
-            response = json.load(urllib2.urlopen(request))
-            return response.get('imdb_id')
+            response = Url.open(request)
+            results = json.loads(response)
+            return results.get('imdb_id')
         except Exception, e: # noqa
             logging.error(u'Error attempting to get IMDBID from TMDB.', exc_info=True)
             return None
@@ -221,9 +227,9 @@ class Trailer(object):
         tries = 0
         while tries < 3:
             try:
-                data = urllib2.urlopen(request)
-                data = json.load(data)
-                return data['items'][0]['id']['videoId']
+                response = Url.open(request)
+                results = json.loads(response)
+                return results['items'][0]['id']['videoId']
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception, e: # noqa

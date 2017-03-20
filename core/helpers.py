@@ -47,6 +47,19 @@ class Url(object):
         s = urllib2.quote(s.replace(' ', '+'), safe='+').lower()
         return s
 
+    @staticmethod
+    def open(request, timeout=30):
+        ''' Opens and reads request
+        request: object urllib2 request
+
+        Returns... well... whatever the request read() is. Some kind of bytes.
+        '''
+
+        r = urllib2.urlopen(request, timeout=timeout)
+        response = r.read()
+        r.close()
+        return response
+
 
 class Conversions(object):
     ''' Coverts data formats. '''

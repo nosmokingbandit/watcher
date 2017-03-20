@@ -187,7 +187,7 @@ class DelugeWeb(object):
         request.add_header('cookie', DelugeWeb.cookie)
 
         try:
-            response = DelugeWeb._read(urllib2.urlopen(request))
+            response = DelugeWeb._read(Url.open(request))
             if response['result'] is True:
                 downloadid = Torrent.get_hash(data['torrentfile'])
                 return {'response': True, 'downloadid': downloadid}
@@ -210,7 +210,7 @@ class DelugeWeb(object):
         request = Url.request(deluge_url, post_data=post_data, headers=DelugeWeb.headers)
         request.add_header('cookie', DelugeWeb.cookie)
         try:
-            response = DelugeWeb._read(urllib2.urlopen(request))
+            response = DelugeWeb._read(Url.open(request))
             if response['error'] is None:
                 return {'response': True, 'torrentfile': response['result']}
         except (SystemExit, KeyboardInterrupt):
@@ -234,7 +234,7 @@ class DelugeWeb(object):
         request.add_header('cookie', DelugeWeb.cookie)
 
         try:
-            response = DelugeWeb._read(urllib2.urlopen(request))
+            response = DelugeWeb._read(Url.open(request))
             return response['result']
         except urllib2.HTTPError:
             return False
@@ -247,7 +247,7 @@ class DelugeWeb(object):
         ''' Reads gzipped json response into dict
         '''
 
-        return json.loads(zlib.decompress(response.read(), 16+zlib.MAX_WBITS))
+        return json.loads(zlib.decompress(response, 16+zlib.MAX_WBITS))
 
     @staticmethod
     def _login(url, password):
@@ -274,7 +274,6 @@ class DelugeWeb(object):
             else:
                 return response.msg
 
-            return True
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e:

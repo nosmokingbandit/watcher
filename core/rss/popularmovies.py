@@ -30,7 +30,8 @@ class PopularMoviesFeed(object):
         request = Url.request('https://s3.amazonaws.com/popular-movies/movies.json',
                               headers={'User-Agent': 'Mozilla/5.0'})
         try:
-            movies = json.load(urllib2.urlopen(request))
+            response = Url.open(request)
+            movies = json.loads(response)
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa

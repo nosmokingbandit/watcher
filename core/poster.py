@@ -40,7 +40,7 @@ class Poster():
             else:
                 request = Url.request(poster_url)
                 try:
-                    result = urllib2.urlopen(request).read()
+                    result = Url.open(request)
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e:
@@ -49,6 +49,7 @@ class Poster():
                 try:
                     with open(new_poster_path, 'wb') as output:
                         output.write(result)
+                    del result
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e: # noqa
@@ -71,45 +72,3 @@ class Poster():
             os.remove(path)
         else:
             logging.warning(u'{} doesn\'t exist, cannot remove.'.format(path))
-
-    def find_poster(self, search_term):
-        ''' Searches Yahoo images for movie poster.
-        :param search_term: str movie title and date ("Movie Title 2016").
-
-        Not used any more, but it doesn't hurt to keep it around.
-
-        Returns str poster url.
-        '''
-
-        lParser = parseImages()
-
-        search_term = search_term.replace(" ", "+")
-        search_string = u"https://images.search.yahoo.com/search/images?p={}{}".format(search_term, "+poster")
-
-        request = Url.request(search_string)
-
-        html = urllib2.urlopen(request)
-
-        lParser.feed(html.read().decode('utf-8'))
-        lParser.close()
-
-        return lParser.imgs[1]
-
-
-class parseImages(HTMLParser):
-    ''' Parse Yahoo html.
-
-    Used to parse image links from yahoo search. Not used any more.
-
-    '''
-
-    def handle_starttag(self, tag, attrs):
-        if tag == u'img':
-            attrs = dict(attrs)
-            if 'class' in attrs:
-                if 'process' in attrs['class']:
-                    self.imgs.append(attrs['data-src'])
-
-    def feed(self, data):
-        self.imgs = []
-        HTMLParser.feed(self, data)

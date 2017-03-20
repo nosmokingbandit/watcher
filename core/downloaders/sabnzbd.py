@@ -29,7 +29,7 @@ class Sabnzbd():
         request = Url.request(url)
 
         try:
-            response = urllib2.urlopen(request).read()
+            response = Url.open(request)
             if 'error' in response:
                 return response
             return True
@@ -78,7 +78,7 @@ class Sabnzbd():
         request = Url.request(url)
 
         try:
-            response = json.loads(urllib2.urlopen(request).read())
+            response = json.load(Url.open(request))
 
             if response['status'] is True and len(response['nzo_ids']) > 0:
                 downloadid = response['nzo_ids'][0]

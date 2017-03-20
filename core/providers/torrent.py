@@ -2,7 +2,6 @@ import json
 import logging
 import datetime
 import time
-import urllib2
 import xml.etree.cElementTree as ET
 import core
 from core.proxy import Proxy
@@ -163,13 +162,11 @@ class Rarbg(object):
             if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
-            response = json.loads(response).get('torrent_results')
-            if response:
-                results = Rarbg.parse(response)
-                return results
+            results = json.loads(response).get('torrent_results')
+            if results:
+                return Rarbg.parse(results)
             else:
                 logging.info(u'Nothing found on Rarbg.')
                 return []
@@ -205,13 +202,11 @@ class Rarbg(object):
             if proxy_enabled and Proxy.whitelist('https://torrentapi.org') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
-            response = json.loads(response).get('torrent_results')
-            if response:
-                results = Rarbg.parse(response)
-                return results
+            results = json.loads(response).get('torrent_results')
+            if results:
+                return Rarbg.parse(results)
             else:
                 logging.info(u'Nothing found in Rarbg RSS.')
                 return []
@@ -228,8 +223,9 @@ class Rarbg(object):
         request = Url.request(url)
 
         try:
-            response = json.loads(urllib2.urlopen(request, timeout=60).read())
-            token = response.get('token')
+            response = Url.open(request)
+            result = json.loads(response)
+            token = result.get('token')
             return token
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -276,12 +272,10 @@ class LimeTorrents(object):
             if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = LimeTorrents.parse(response, imdbid)
-                return results
+                return LimeTorrents.parse(response, imdbid)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -303,12 +297,10 @@ class LimeTorrents(object):
             if proxy_enabled and Proxy.whitelist('https://www.limetorrents.cc') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = LimeTorrents.parse(response, None)
-                return results
+                return LimeTorrents.parse(response, None)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -374,12 +366,10 @@ class ExtraTorrent(object):
             if proxy_enabled and Proxy.whitelist('https://www.extratorrent.cc') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = ExtraTorrent.parse(response, imdbid)
-                return results
+                return ExtraTorrent.parse(response, imdbid)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -401,12 +391,10 @@ class ExtraTorrent(object):
             if proxy_enabled and Proxy.whitelist('https://www.extratorrent.cc') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = ExtraTorrent.parse(response, None)
-                return results
+                return ExtraTorrent.parse(response, None)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -468,12 +456,10 @@ class SkyTorrents(object):
             if proxy_enabled and Proxy.whitelist('https://www.skytorrents.in') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = SkyTorrents.parse(response, imdbid)
-                return results
+                return SkyTorrents.parse(response, imdbid)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -539,14 +525,12 @@ class BitSnoop(object):
             if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
-            if response:
-                results = BitSnoop.parse(response, imdbid)
-                return results
-            else:
-                return []
+                if response:
+                    return BitSnoop.parse(response, imdbid)
+                else:
+                    return []
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception, e: # noqa
@@ -566,12 +550,10 @@ class BitSnoop(object):
             if proxy_enabled and Proxy.whitelist('https://bitsnoop.com') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = BitSnoop.parse(response, None)
-                return results
+                return BitSnoop.parse(response, None)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -630,12 +612,10 @@ class Torrentz2(object):
             if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = Torrentz2.parse(response, imdbid)
-                return results
+                return Torrentz2.parse(response, imdbid)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):
@@ -657,12 +637,10 @@ class Torrentz2(object):
             if proxy_enabled and Proxy.whitelist('https://torrentz2.eu') is True:
                 response = Proxy.bypass(request)
             else:
-                response = urllib2.urlopen(request)
+                response = Url.open(request)
 
-            response = urllib2.urlopen(request, timeout=60).read()
             if response:
-                results = Torrentz2.parse(response, None)
-                return results
+                return Torrentz2.parse(response, None)
             else:
                 return []
         except (SystemExit, KeyboardInterrupt):

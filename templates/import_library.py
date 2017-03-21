@@ -100,7 +100,7 @@ class ImportLibrary():
 
     @staticmethod
     def file_list(directory):
-        subdirs = [i for i in os.listdir(directory) if os.path.isdir(os.path.join(directory, i))]
+        subdirs = [i for i in os.listdir(directory) if os.path.isdir(os.path.join(directory, i).encode('utf-8'))]
 
         subdirs.insert(0, '..')
 

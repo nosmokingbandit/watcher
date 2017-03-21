@@ -33,15 +33,15 @@ class Status(object):
         if self.sql.row_exists(TABLE, guid=guid):
 
             # Mark bad in SEARCHRESULTS
-            logging.info(u'Marking {} as {} in SEARCHRESULTS.'.format(guid, status))
+            logging.info(u'Marking {} as {} in SEARCHRESULTS.'.format(guid.split('&')[0], status))
             if not self.sql.update(TABLE, 'status', status, guid=guid):
-                logging.error(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid, status))
+                logging.error(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid.split('&')[0], status))
                 return False
             else:
-                logging.info(u'Successfully marked {} as {} in SEARCHRESULTS.'.format(guid, status))
+                logging.info(u'Successfully marked {} as {} in SEARCHRESULTS.'.format(guid.split('&')[0], status))
                 return True
         else:
-            logging.info(u'Guid {} not found in SEARCHRESULTS, attempting to create entry.'.format(guid))
+            logging.info(u'Guid {} not found in SEARCHRESULTS, attempting to create entry.'.format(guid.split('&')[0]))
             if movie_info is None:
                 logging.warning('Metadata not supplied, unable to create SEARCHRESULTS entry.')
                 return False
@@ -77,25 +77,25 @@ class Status(object):
 
         if self.sql.row_exists(TABLE, guid=guid):
             # Mark bad in MARKEDRESULTS
-            logging.info(u'Marking {} as {} in MARKEDRESULTS.'.format(guid, status))
+            logging.info(u'Marking {} as {} in MARKEDRESULTS.'.format(guid.split('&')[0], status))
             if not self.sql.update(TABLE, 'status', status, guid=guid):
-                logging.info(u'Setting MARKEDRESULTS status of {} to {} failed.'.format(guid, status))
+                logging.info(u'Setting MARKEDRESULTS status of {} to {} failed.'.format(guid.split('&')[0], status))
                 return False
             else:
-                logging.info(u'Successfully marked {} as {} in MARKEDRESULTS.'.format(guid, status))
+                logging.info(u'Successfully marked {} as {} in MARKEDRESULTS.'.format(guid.split('&')[0], status))
                 return True
         else:
-            logging.info(u'Guid {} not found in MARKEDRESULTS, creating entry.'.format(guid))
+            logging.info(u'Guid {} not found in MARKEDRESULTS, creating entry.'.format(guid.split('&')[0]))
             if imdbid:
                 DB_STRING = {}
                 DB_STRING['imdbid'] = imdbid
                 DB_STRING['guid'] = guid
                 DB_STRING['status'] = status
                 if self.sql.write(TABLE, DB_STRING):
-                    logging.info(u'Successfully created entry in MARKEDRESULTS for {}.'.format(guid))
+                    logging.info(u'Successfully created entry in MARKEDRESULTS for {}.'.format(guid.split('&')[0]))
                     return True
                 else:
-                    logging.error(u'Unable to create entry in MARKEDRESULTS for {}.'.format(guid))
+                    logging.error(u'Unable to create entry in MARKEDRESULTS for {}.'.format(guid.split('&')[0]))
                     return False
             else:
                 logging.warning(u'Imdbid not supplied or found, unable to add entry to MARKEDRESULTS.')

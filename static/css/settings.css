@@ -75,8 +75,8 @@ div#content ul li.lbord{
     border-left: 1px solid #ccc;
 }
 
-.indent{
-    margin-left: 1.5em;
+div#content ul li.indent{
+    padding-left: 1.5em;
 }
 
 .sub_cat{

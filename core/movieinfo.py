@@ -1,6 +1,5 @@
 import json
 import logging
-import urllib2
 from time import time, sleep
 from core.helpers import Comparisons, Url
 import core
@@ -124,7 +123,7 @@ class TMDB(object):
 
     def _search_tmdbid(self, tmdbid):
 
-        url = u'https://api.themoviedb.org/3/movie/{}?language=en-US'.format(tmdbid)
+        url = u'https://api.themoviedb.org/3/movie/{}?language=en-US&append_to_response=alternative_titles,external_ids,release_dates'.format(tmdbid)
 
         logging.info('Searching TMDB {}'.format(url))
         url = url + '&api_key={}'.format(_k('tmdb'))

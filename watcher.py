@@ -38,6 +38,7 @@ if __name__ == '__main__':
             # for windows
             locale.setlocale(locale.LC_ALL, 'English_United States.1252')
         except Exception, e:
+            logging.warning('Unable to set locale. Date parsing may not work correctly.')
             print 'Unable to set locale. Date parsing may not work correctly.'
 
     # parse user-passed arguments

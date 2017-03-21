@@ -142,6 +142,7 @@ div#list_files tr{
 div#list_files span#import{
     font-size: 1.5em;
     margin-bottom: 2em;
+    display: inline-block;
 }
 
 div#results{

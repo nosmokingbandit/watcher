@@ -187,11 +187,16 @@ class Settings():
                 input(type='number', min='10', id='rsssyncfrequency', style='width: 2.5em', value=c[c_s]['rsssyncfrequency'])
                 span(u'minutes.')
                 span(u'Min 10 minutes. Requires Restart.', cls='tip')
-            with li(cls='bbord'):
+            with li():
                 span(u'Wait ')
                 input(type='number', min='0', max='14', id='waitdays', style='width: 2.0em', value=c[c_s]['waitdays'])
                 span(u' days for best release.')
                 span(u'After movie is found, wait to snatch in case better match is found.', cls='tip')
+            with li(cls='bbord indent'):
+                i(id='skipwait', cls='fa fa-square-o checkbox', value=str(c[c_s]['skipwait']))
+                span(u'Skip wait if release date is more than ')
+                input(type='number', min='0', id='skipwaitweeks', style='width: 2.5em', value=c[c_s]['skipwaitweeks'])
+                span(u' weeks ago.')
             with li():
                 i(id='keepsearching', cls='fa fa-square-o checkbox', value=str(c[c_s]['keepsearching']))
                 span(u'Continue searching for ')

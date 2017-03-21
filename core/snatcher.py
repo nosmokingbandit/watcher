@@ -40,6 +40,8 @@ class Snatcher():
             imdbid = movie['imdbid']
             quality = movie['quality']
             year = movie['year']
+            title = movie['title']
+            release_date = movie['release_date']
         except Exception, e: #noqa
             logging.error('Invalid movie data.', exc_info=True)
 
@@ -60,14 +62,21 @@ class Snatcher():
             return False
 
         # Check if we are past the 'waitdays'
-        wait_days = core.CONFIG['Search']['waitdays']
+        today = datetime.today()
+        release_weeks_old = (today - datetime.strptime(release_date, '%Y-%m-%d')).days / 7
 
-        earliest_found = min([x['date_found'] for x in search_results])
-        date_found = datetime.strptime(earliest_found, '%Y-%m-%d')
+        if core.CONFIG['Search']['skipwait'] and release_weeks_old < core.CONFIG['Search']['skipwaitweeks']:
+            logging.info('{} released {} weeks ago, checking age of search results.'.format(title, release_weeks_old))
+            wait_days = core.CONFIG['Search']['waitdays']
 
-        if (datetime.today() - date_found).days < wait_days:
-            logging.info(u'Earliest found result for {} is {}, waiting {} days to grab best result.'.format(imdbid, date_found, wait_days))
-            return False
+            earliest_found = min([x['date_found'] for x in search_results])
+            date_found = datetime.strptime(earliest_found, '%Y-%m-%d')
+
+            if (today - date_found).days < wait_days:
+                logging.info(u'Earliest found result for {} is {}, waiting {} days to grab best result.'.format(imdbid, date_found, wait_days))
+                return False
+        else:
+            logging.info('{} released {} weeks ago, grabbing immediately.'.format(title, release_weeks_old))
 
         # Since seach_results comes back in order of score we can go
         # through in order until we find the first Available result

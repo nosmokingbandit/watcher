@@ -139,7 +139,6 @@ class TMDB(object):
         try:
             response = Url.open(request)
             results = json.loads(response)
-            response.close()
             if results.get('status_code'):
                 return ['']
             else:

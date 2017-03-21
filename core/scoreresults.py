@@ -17,19 +17,19 @@ class ScoreResults():
         return
 
     # returns list of dictionary results after filtering and scoring
-    def score(self, results, imdbid=None, quality_profile=None):
+    def score(self, results, imdbid=None, imported=False):
         ''' Scores and filters search results.
         results: list of dicts of search results
-        imdbid: str imdb identification number (tt123456)   <optional*>
-        quality_profile: str quality profile name           <optional*>
+        imdbid: str imdb identification number (tt123456)       <optional*>
+        impored: bool indicate if search result is faked import <Default: False>
 
         Either imdbid or quality_profile MUST be passed.
 
         If imdbid passed, finds quality in database row.
         If profile_quality passed, uses that quality and ignores db.
 
-        quality_profile can be set to 'import', which uses 'Default' settings,
-            but doesn't allow the result to be filtered out.
+        If imported, uses modified 'Default' quality profile so results
+            cannot be filtered out.
 
         Iterates over the list and filters movies based on Words.
         Scores movie based on reslution priority, title match, and
@@ -41,27 +41,25 @@ class ScoreResults():
         Returns list of dicts.
         '''
 
-        if imdbid is None and quality_profile is None:
-            logging.warning(u'Neither imdbid or quality_profile passed. Unable to score results.')
+        if imdbid is None and imported is False:
+            logging.warning(u'Imdbid required if result is not library import.')
             return results
 
         self.results = results
 
-        if quality_profile is None:
+        if imported is False:
             movie_details = self.sql.get_movie_details('imdbid', imdbid)
             quality_profile = movie_details['quality']
             title = movie_details['title']
+            check_size = True
+            if quality_profile in core.CONFIG['Quality']['Profiles']:
+                quality = core.CONFIG['Quality']['Profiles'][quality_profile]
+            else:
+                quality = core.CONFIG['Quality']['Profiles']['Default']
         else:
-            title = None
-
-        check_size = True
-        if quality_profile == 'import':
-            quality = self.import_quality()
+            title = None  # flag to ignore title filtering
             check_size = False
-        elif quality_profile in core.CONFIG['Quality']['Profiles']:
-            quality = core.CONFIG['Quality']['Profiles'][quality_profile]
-        else:
-            quality = core.CONFIG['Quality']['Profiles']['Default']
+            quality = self.import_quality()
 
         sources = quality['Sources']
         retention = core.CONFIG['Search']['retention']

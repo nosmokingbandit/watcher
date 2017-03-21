@@ -718,7 +718,7 @@ class Ajax(object):
                 movie['error'] = 'IMDB ID invalid or missing.'
                 results['failed'].append(movie)
 
-        fake_results = self.score.score(fake_results, quality_profile='import')
+        fake_results = self.score.score(fake_results, imported=True)
 
         for i in results['success']:
             score = None

@@ -257,3 +257,60 @@ class Metadata(object):
         metadata.update(titledata)
 
         return metadata
+
+    def convert_to_db(self, movie):
+        ''' Takes movie data and converts to a database-writable dict
+        movie: dict of movie information
+
+        Used to prepare movie data for write into MOVIES
+        Makes sure all keys match and are present.
+        Sorts out alternative titles and digital release dates
+
+        Returns dict ready to sql.write into MOVIES
+        '''
+
+        if not movie.get('imdbid'):
+            movie['imdbid'] = movie.pop('imdb_id')
+
+        if movie.get('release_date'):
+            movie['year'] = movie['release_date'][:4]
+        else:
+            movie['year'] = 'N/A'
+
+        movie['poster'] = u'images/poster/{}.jpg'.format(movie['imdbid'])
+        movie['plot'] = movie['overview']
+        movie['url'] = u'https://www.themoviedb.org/movie/{}'.format(movie['id'])
+        movie['score'] = movie['vote_average']
+        if movie.get('status') != 'Disabled':
+            movie['status'] = u'Wanted'
+        movie['added_date'] = str(datetime.date.today())
+        movie['backlog'] = 0
+        movie['tmdbid'] = movie['id']
+
+        a_t = []
+        for i in movie['alternative_titles']['titles']:
+            if i['iso_3166_1'] == 'US':
+                a_t.append(i['title'])
+
+        movie['alternative_titles'] = ','.join(a_t)
+
+        dates = [None]
+        for i in movie['release_dates']['results']:
+            for d in i['release_dates']:
+                if d['type'] == 4:
+                    dates.append(d['release_date'])
+
+        digital_date = max(dates)
+        if digital_date:
+            movie['digital_release_date'] = digital_date[:10]
+
+        if movie.get('quality') is None:
+            movie['quality'] = 'Default'
+
+        required_keys = ('added_date', 'alternative_titles', 'digital_release_date', 'imdbid', 'tmdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate', 'backlog')
+
+        for i in movie.keys():
+            if i not in required_keys:
+                del movie[i]
+
+        return movie

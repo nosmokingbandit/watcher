@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import os
@@ -90,17 +89,6 @@ class Ajax(object):
         Returns str json.dumps(dict) of status and message
         '''
 
-        data = json.loads(data)
-        title = data['title']
-
-        if data.get('release_date'):
-            data['year'] = data['release_date'][:4]
-        else:
-            data['year'] = 'N/A'
-        year = data['year']
-
-        response = {}
-
         def thread_search_grab(data):
             imdbid = data['imdbid']
             title = data['title']
@@ -113,59 +101,44 @@ class Ajax(object):
                     if core.CONFIG['Search']['autograb']:
                         self.snatcher.auto_grab(data)
 
-        TABLE = u'MOVIES'
+        response = {}
+        data = json.loads(data)
+        tmdbid = data['id']
 
-        if data.get('imdbid') is None:
-            data['imdbid'] = self.tmdb.get_imdbid(data['id'])
-            if not data['imdbid']:
-                response['response'] = False
-                response['error'] = u'Could not find imdb id for {}. Unable to add.'.format(title)
-                return json.dumps(response)
+        movie = json.loads(self.tmdb._search_tmdbid(tmdbid)[0])
+        movie['imdbid'] = movie.pop('imdb_id')
 
-        if self.sql.row_exists(TABLE, imdbid=data['imdbid']):
-            logging.info(u'{} {} already exists as a wanted movie'.format(title, year))
-
-            response['response'] = False
-            movie = self.sql.get_movie_details('imdbid', data['imdbid'])
-            status = 'Finished' if movie['status'] == 'Disabled' else movie['status']
-            response['error'] = u'{} {} is {}, cannot add.'.format(title, year, status)
-            return json.dumps(response)
-
-        if data['poster_path']:
-            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(data['poster_path'])
+        if movie['poster_path']:
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(movie['poster_path'])
         else:
             poster_url = '{}/static/images/missing_poster.jpg'.format(core.PROG_PATH)
 
-        data['poster'] = u'images/poster/{}.jpg'.format(data['imdbid'])
-        data['plot'] = data['overview']
-        data['url'] = u'https://www.themoviedb.org/movie/{}'.format(data['id'])
-        data['score'] = data['vote_average']
-        if not data.get('status'):
-            data['status'] = u'Wanted'
-        data['added_date'] = str(datetime.date.today())
-        data['backlog'] = 0
+        if self.sql.row_exists('MOVIES', imdbid=movie['imdbid']):
+            logging.info(u'{} already exists in library.'.format(movie['title']))
 
-        required_keys = ('added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate', 'backlog')
+            response['response'] = False
 
-        for i in data.keys():
-            if i not in required_keys:
-                del data[i]
+            response['error'] = u'{} already exists in library.'.format(movie['title'])
+            return json.dumps(response)
 
-        if data.get('quality') is None:
-            data['quality'] = 'Default'
+        if movie['poster_path']:
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(movie['poster_path'])
+        else:
+            poster_url = '{}/static/images/missing_poster.jpg'.format(core.PROG_PATH)
 
-        if self.sql.write(TABLE, data):
-            t2 = threading.Thread(target=self.poster.save_poster, args=(data['imdbid'], poster_url))
+        movie = self.metadata.convert_to_db(movie)
+
+        if self.sql.write('MOVIES', movie):
+            t2 = threading.Thread(target=self.poster.save_poster, args=(movie['imdbid'], poster_url))
             t2.start()
 
-            # disable immediately grabbing new release for imports
-            if data['status'] != 'Disabled':
-                t = threading.Thread(target=thread_search_grab, args=(data,))
+            if movie['status'] != 'Disabled':  # disable immediately grabbing new release for imports
+                t = threading.Thread(target=thread_search_grab, args=(movie,))
                 t.start()
 
             response['response'] = True
-            response['message'] = u'{} {} added to wanted list.'.format(title, year)
-            self.plugins.added(data['title'], data['year'], data['imdbid'], data['quality'])
+            response['message'] = u'{} {} added to library.'.format(movie['title'], movie['year'])
+            self.plugins.added(movie['title'], movie['year'], movie['imdbid'], movie['quality'])
 
             return json.dumps(response)
         else:
@@ -791,15 +764,20 @@ class Ajax(object):
 
     @cherrypy.expose
     def update_metadata(self, imdbid):
-        movie_data = self.tmdb.search(imdbid, single=True)
+        tmdbid = self.sql.get_movie_details('imdbid', imdbid).get('tmdbid')
 
-        if not movie_data:
-            return json.dumps({'response': False, 'error': 'Unable to find {} on TheMovieDatabase.'.format(imdbid)})
+        if not tmdbid:
+            tmdbid = self.tmdb._search_imdbid(imdbid)[0].get('id')
+        if not tmdbid:
+            return json.dumps({'response': False, 'error': 'Unable to find {} on TMDB.'.format(imdbid)})
+
+        movie = json.loads(self.tmdb._search_tmdbid(tmdbid)[0])
+        movie['imdbid'] = movie.pop('imdb_id')
 
         target_poster = os.path.join(self.poster.poster_folder, '{}.jpg'.format(imdbid))
 
-        if movie_data['poster_path']:
-            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(movie_data['poster_path'])
+        if movie['poster_path']:
+            poster_url = u'http://image.tmdb.org/t/p/w300{}'.format(movie['poster_path'])
         else:
             poster_url = '{}/static/images/missing_poster.jpg'.format(core.PROG_PATH)
 
@@ -810,16 +788,9 @@ class Ajax(object):
                 logging.warning('Unable to remove existing poster.', exc_info=True)
                 return json.dumps({'response': False, 'error': 'Unable to remove existing poster.'})
 
-        movie_data['imdbid'] = imdbid
-        movie_data['plot'] = movie_data.pop('overview')
-        movie_data['year'] = movie_data['release_date'][:4]
-        movie_data['score'] = movie_data.pop('vote_average')
-        required_keys = ('added_date', 'imdbid', 'title', 'year', 'poster', 'plot', 'url', 'score', 'release_date', 'rated', 'status', 'quality', 'addeddate', 'backlog')
-        for i in movie_data.keys():
-            if i not in required_keys:
-                del movie_data[i]
+        movie = self.metadata.convert_to_db(movie)
 
-        self.sql.update_multiple('MOVIES', movie_data, imdbid=imdbid)
+        self.sql.update_multiple('MOVIES', movie, imdbid=imdbid)
 
         self.poster.save_poster(imdbid, poster_url)
         return json.dumps({'response': True, 'message': 'Metadata updated.'})

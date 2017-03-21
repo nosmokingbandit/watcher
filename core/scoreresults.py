@@ -50,14 +50,14 @@ class ScoreResults():
         if imported is False:
             movie_details = self.sql.get_movie_details('imdbid', imdbid)
             quality_profile = movie_details['quality']
-            title = movie_details['title']
+            titles = movie_details['alternative_titles'].split(',') + [movie_details['title']]
             check_size = True
             if quality_profile in core.CONFIG['Quality']['Profiles']:
                 quality = core.CONFIG['Quality']['Profiles'][quality_profile]
             else:
                 quality = core.CONFIG['Quality']['Profiles']['Default']
         else:
-            title = None  # flag to ignore title filtering
+            titles = []
             check_size = False
             quality = self.import_quality()
 
@@ -81,7 +81,7 @@ class ScoreResults():
         self.seed_check(seeds)
         self.score_sources(sources, check_size=check_size)
         if quality['scoretitle']:
-            self.fuzzy_title(title)
+            self.fuzzy_title(titles)
         self.score_preferred(preferred)
         logging.info('Finished scoring search results.')
         return self.results
@@ -234,9 +234,11 @@ class ScoreResults():
                 else:
                     continue
 
-    def fuzzy_title(self, title):
+    def fuzzy_title(self, titles):
         ''' Score and remove results based on title match
-        title: str title of movie   <optional*>
+        titles: list of titles to match against
+
+        If titles is an empty list every result is treated as a perfect match
 
         Iterates through self.results and removes any entry that does not
             fuzzy match 'title' > 60.
@@ -250,24 +252,23 @@ class ScoreResults():
         logging.info(u'Checking title match.')
 
         lst = []
-        if title is None:
+        if titles == []:
             for result in self.results:
                 result['score'] += 20
                 lst.append(result)
         else:
-            title = Url.encode(title)
             for result in self.results:
                 if result['type'] == 'import' and result not in lst:
                     result['score'] += 20
                     lst.append(result)
                     continue
                 test = Url.encode(result['title'])
-                match = fuzz.partial_ratio(title, test)
-                if match > 70:
-                    result['score'] += (match / 5)
+                matches = [fuzz.partial_ratio(Url.encode(title), test) for title in titles]
+                if any([match > 70 for match in matches]):
+                    result['score'] += (max(matches) / 5)
                     lst.append(result)
                 else:
-                    logging.debug(u'{} only matched {}\% of {}, removing search result.'.format(test, match, title))
+                    logging.debug(u'{} best title match was {}%, removing search result.'.format(test, max(matches)))
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))
 

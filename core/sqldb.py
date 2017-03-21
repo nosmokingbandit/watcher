@@ -46,7 +46,10 @@ class SQL(object):
                             Column('finished_date', TEXT),
                             Column('finished_score', SMALLINT),
                             Column('finished_file', TEXT),
-                            Column('backlog', SMALLINT)
+                            Column('backlog', SMALLINT),
+                            Column('tmdbid', TEXT),
+                            Column('alternative_titles', TEXT),
+                            Column('digital_release_date', TEXT)
                             )
         self.SEARCHRESULTS = Table('SEARCHRESULTS', self.metadata,
                                    Column('score', SMALLINT),

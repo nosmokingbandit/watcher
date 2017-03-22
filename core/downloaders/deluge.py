@@ -60,7 +60,7 @@ class DelugeRPC(object):
             if error:
                 return {'response': False, 'error': error}
         except Exception, e:
-            return {'response': False, 'error': str(e)}
+            return {'response': False, 'error': str(e)[1:-1]}
 
         try:
             def_download_path = client.call('core.get_config')['download_location']
@@ -87,14 +87,14 @@ class DelugeRPC(object):
                 return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error(u'Unable to send magnet.', exc_info=True)
-                return {'response': False, 'error': str(e)}
+                return {'response': False, 'error': str(e)[1:-1]}
         elif data['type'] == u'torrent':
             try:
                 download_id = client.call('core.add_torrent_url', data['torrentfile'], options)
                 return {'response': True, 'downloadid': download_id}
             except Exception, e:
                 logging.error(u'Unable to send magnet.', exc_info=True)
-                return {'response': False, 'error': str(e)}
+                return {'response': False, 'error': str(e)[1:-1]}
         return
 
 
@@ -197,7 +197,7 @@ class DelugeWeb(object):
             raise
         except Exception, e:
             logging.error(u'Delugeweb add_torrent', exc_info=True)
-            return {'response': False, 'error': str(e)}
+            return {'response': False, 'error': str(e)[1:-1]}
 
     @staticmethod
     def _get_torrent_file(torrent_url, deluge_url):
@@ -217,7 +217,7 @@ class DelugeWeb(object):
             raise
         except Exception, e: #noqa
             logging.error(u'Delugeweb download_torrent_from_url', exc_info=True)
-            return {'response': False, 'error': str(e)}
+            return {'response': False, 'error': str(e)[1:-1]}
 
     @staticmethod
     def _get_download_dir(url):
@@ -236,11 +236,9 @@ class DelugeWeb(object):
         try:
             response = DelugeWeb._read(Url.open(request))
             return response['result']
-        except urllib2.HTTPError:
-            return False
         except Exception, e:
             logging.error(u'delugeweb get_download_dir', exc_info=True)
-            return {'response': False, 'error': str(e.reason)}
+            return {'response': False, 'error': str(e.reason)[1:-1]}
 
     @staticmethod
     def _read(response):

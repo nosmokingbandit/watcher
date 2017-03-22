@@ -50,7 +50,8 @@ class ScoreResults():
         if imported is False:
             movie_details = self.sql.get_movie_details('imdbid', imdbid)
             quality_profile = movie_details['quality']
-            titles = movie_details['alternative_titles'].split(',') + [movie_details['title']]
+
+            titles = (movie_details['alternative_titles'] or '').split(',') + [movie_details['title']]
             check_size = True
             if quality_profile in core.CONFIG['Quality']['Profiles']:
                 quality = core.CONFIG['Quality']['Profiles'][quality_profile]

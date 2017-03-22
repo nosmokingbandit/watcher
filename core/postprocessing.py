@@ -107,8 +107,9 @@ class Postprocessing(object):
             new_file_location = response['data'].get('new_file_location')
             downloadid = response['data'].get('downloadid')
             finished_date = response['data'].get('finished_date')
+            quality = response['data'].get('quality')
 
-            self.plugins.finished(title, year, imdbid, resolution, rated, original_file, new_file_location, downloadid, finished_date)
+            self.plugins.finished(title, year, imdbid, resolution, rated, original_file, new_file_location, downloadid, finished_date, quality)
 
             logging.info(response)
         else:
@@ -146,9 +147,7 @@ class Postprocessing(object):
         logging.info(u'#################################')
 
         # check for required keys
-        required_keys = ['apikey', 'mode', 'guid', 'path']
-
-        for key in required_keys:
+        for key in ['apikey', 'mode', 'guid', 'path']:
             if key not in data:
                 logging.warning(u'Missing key {}'.format(key))
                 return json.dumps({'response': 'false',
@@ -166,11 +165,15 @@ class Postprocessing(object):
             return json.dumps({'response': 'false',
                               'error': 'invalid mode value'})
 
+        # modify path based on remote mapping
+        data['path'] = self.map_remote(data['path'])
+
         # get the actual movie file name
         data['filename'] = self.get_filename(data['path'])
 
-        logging.info(u'Parsing release name for information.')
-        data.update(self.metadata.parse_filename(data['filename']))
+        if data['filename']:
+            logging.info(u'Parsing release name for information.')
+            data.update(self.metadata.parse_filename(data['filename']))
 
         # Get possible local data or get TMDB data to merge with self.params.
         logging.info(u'Gathering release information.')
@@ -184,24 +187,39 @@ class Postprocessing(object):
 
         # At this point we have all of the information we're going to get.
         if data['mode'] == u'failed':
-            logging.info(u'Post-processing as Failed.')
-            response = json.dumps(self.failed(data), indent=2, sort_keys=True)
-            logging.info(response)
+            logging.warning(u'Post-processing as Failed.')
+            response = self.failed(data)
+            logging.warning(response)
         elif data['mode'] == u'complete':
             logging.info(u'Post-processing as Complete.')
-            response = json.dumps(self.complete(data), indent=2, sort_keys=True)
+
+            response = self.complete(data)
+
+            title = response['data'].get('title')
+            year = response['data'].get('year')
+            imdbid = response['data'].get('imdbid')
+            resolution = response['data'].get('resolution')
+            rated = response['data'].get('rated')
+            original_file = response['data'].get('orig_filename')
+            new_file_location = response['data'].get('new_file_location')
+            downloadid = response['data'].get('downloadid')
+            finished_date = response['data'].get('finished_date')
+            quality = response['data'].get('quality')
+
+            self.plugins.finished(title, year, imdbid, resolution, rated, original_file, new_file_location, downloadid, finished_date, quality)
+
             logging.info(response)
         else:
             logging.warning(u'Invalid mode value: {}.'.format(data['mode']))
             return json.dumps({'response': 'false',
-                               'error': 'invalid mode value'})
+                               'error': 'invalid mode value'}, indent=2, sort_keys=True)
 
         logging.info(u'#################################')
         logging.info(u'Post-processing complete.')
-        logging.debug(response)
+        logging.info(json.dumps(response, indent=2, sort_keys=True))
         logging.info(u'#################################')
 
-        return response
+        return json.dumps(response, indent=2, sort_keys=True)
 
     def get_filename(self, path):
         ''' Looks for the filename of the movie being processed
@@ -285,6 +303,8 @@ class Postprocessing(object):
             if data:
                 logging.info(u'Movie data found locally by imdbid.')
                 data['finished_score'] = result['score']
+                data['resolution'] = result['resolution']
+                data['downloadid'] = result['downloadid']
             else:
                 logging.info(u'Unable to find movie in local db.')
 

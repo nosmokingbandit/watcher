@@ -183,7 +183,7 @@ class SQL(object):
         else:
             return 'ID ERROR'
 
-        logging.info(u'Updating {} to {} in {}.'.format(idval, VALUE, TABLE))
+        logging.info(u'Updating {} to {} in {}.'.format(idval.split('&')[0], VALUE, TABLE))
 
         sql = u'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
         vals = (VALUE, idval)
@@ -215,7 +215,7 @@ class SQL(object):
         else:
             return 'ID ERROR'
 
-        logging.info(u'Updating {} in {}.'.format(idval, TABLE))
+        logging.info(u'Updating {} in {}.'.format(idval.split('&')[0], TABLE))
 
         columns = '{}=?'.format('=?,'.join(data.keys()))
 
@@ -368,7 +368,7 @@ class SQL(object):
         Returns Bool.
         '''
 
-        logging.info(u'Removing from {} where {} is {}.'.format(TABLE, idcol, idval))
+        logging.info(u'Removing from {} where {} is {}.'.format(TABLE, idcol, idval.split('&')[0]))
 
         command = u'DELETE FROM {} WHERE {}="{}"'.format(TABLE, idcol, idval)
 
@@ -413,7 +413,7 @@ class SQL(object):
         Returns list ['val1', 'val2', 'val3']
         '''
 
-        logging.info(u'Getting distinct values for {} in {}'.format(idval, TABLE))
+        logging.info(u'Getting distinct values for {} in {}'.format(idval.split('&')[0], TABLE))
 
         command = u'SELECT DISTINCT {} FROM {} WHERE {}="{}"'.format(column, TABLE, idcol, idval)
 
@@ -480,7 +480,7 @@ class SQL(object):
         Returns dict
         '''
 
-        logging.info(u'Retreving search result details for {}.'.format(idval))
+        logging.info(u'Retreving search result details for {}.'.format(idval.split('&')[0]))
 
         command = u'SELECT * FROM SEARCHRESULTS WHERE {}="{}"'.format(idcol, idval)
 

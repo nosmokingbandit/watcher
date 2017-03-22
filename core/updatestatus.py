@@ -28,7 +28,7 @@ class Status(object):
 
         TABLE = u'SEARCHRESULTS'
 
-        logging.info(u'Marking guid {} as {}.'.format(guid, status))
+        logging.info(u'Marking guid {} as {}.'.format(guid.split('&')[0], status))
 
         if self.sql.row_exists(TABLE, guid=guid):
 

@@ -49,7 +49,7 @@ class Torrent(NewzNabProvider):
                 url_base = url_base + '/'
             apikey = indexer[1]
 
-            r = self.search_newznab(url_base, apikey, term=term)
+            r = self.search_newznab(url_base, apikey, t='search', cat=2000, imdbid=imdbid)
             for i in r:
                 results.append(i)
 

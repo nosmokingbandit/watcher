@@ -180,6 +180,10 @@ class Searcher():
         for idx, result in enumerate(results):
             results[idx]['resolution'] = self.get_source(result)
 
+        if len(results) == 0:
+            logging.info('0 results found.')
+            return True
+
         scored_results = self.score.score(results, imdbid=imdbid)
 
         if len(scored_results) == 0:

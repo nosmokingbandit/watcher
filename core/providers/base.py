@@ -1,5 +1,5 @@
 import xml.etree.cElementTree as ET
-import urllib2
+import urllib
 import logging
 
 import core
@@ -24,29 +24,20 @@ class NewzNabProvider(object):
 
     '''
 
-    def search_newznab(self, url_base, apikey, imdbid=None, term=None):
+    def search_newznab(self, url_base, apikey, **params):
         ''' Searches Newznab for imdbid
         url_base: str base url for all requests (https://indexer.com/)
         apikey: str api key for indexer
-        imdbid: str imdbid *numbers only* ie 0055447    <optional*>
-        term: str title and year of movie to search     <optional*>
+        params: parameters to url encode and append to url
 
-        *Either imdbid or term MUST be passed.
-        Pass term for torznab searches, imdbid for newznab searches.
+        Creates url based off url_base. Appends url-encoded **params to url.
 
         Returns list of dicts of search results
         '''
 
-        if not imdbid and not term:
-            logging.warning('Neither imdbid or term supplied to search.')
-            return []
-        elif imdbid:
-            url = u'{}api?apikey={}&t=movie&imdbid={}'.format(url_base, apikey, imdbid)
-            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=movie&imdbid={}'.format(url_base, imdbid))
-        elif term:
-            term = Url.encode(term.replace(' ', '+'))
-            url = u'{}api?apikey={}&t=search&cat=2000&q={}'.format(url_base, apikey, term)
-            logging.info(u'SEARCHING: {}api?apikey=APIKEY&t=search&cat=2000&q={}'.format(url_base, term))
+        url = u'{}api?apikey={}&{}'.format(url_base, apikey, urllib.urlencode(params))
+
+        logging.info(u'SEARCHING: {}api?apikey=APIKEY&{}'.format(url_base, urllib.urlencode(params)))
 
         proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 

@@ -718,7 +718,7 @@ class Settings():
                 input(type='text', id='recyclebindirectory', value=c[c_s]['recyclebindirectory'], style='width: 15em')
             with li(u'Available tags:', cls='bbord'):
                 br()
-                span(u'{title}  {year}  {resolution}  {rated}  {imdbid}  {videocodec}  {audiocodec}  {releasegroup}  {source}', cls='taglist')
+                span(u'{title}  {year}  {resolution}  {rated}  {imdbid}  {videocodec}  {audiocodec}  {releasegroup}  {source}  {quality}', cls='taglist')
                 br()
                 span('Example: ')
                 span('{title} ({year}) - {resolution} = Night of the Living Dead (1968) - 1080P.mkv', cls='taglist')

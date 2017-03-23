@@ -548,7 +548,7 @@ class Ajax(object):
 
         logging.info(u'Updating quality profile to {} for {}.'.format(quality, imdbid))
 
-        if not self.sql.update('MOVIES', 'quality', quality, imdbid=imdbid):
+        if not self.sql.update('MOVIES', 'quality', quality, 'imdbid', imdbid):
             return json.dumps({'response': False})
 
         logging.info(u'Updating status to {} for {}.'.format(status, imdbid))
@@ -557,7 +557,7 @@ class Ajax(object):
             if not self.update.movie_status(imdbid):
                 return json.dumps({'response': False})
         elif status == 'Finished':
-            if not self.sql.update('MOVIES', 'status', 'Disabled', imdbid=imdbid):
+            if not self.sql.update('MOVIES', 'status', 'Disabled', 'imdbid', imdbid):
                 return json.dumps({'response': False})
 
         return json.dumps({'response': True})
@@ -728,7 +728,7 @@ class Ajax(object):
                     break
 
             if score:
-                self.sql.update('MOVIES', 'finished_score', score, imdbid=i['imdbid'])
+                self.sql.update('MOVIES', 'finished_score', score, 'imdbid', i['imdbid'])
 
         self.sql.write_search_results(fake_results)
 
@@ -794,3 +794,48 @@ class Ajax(object):
 
         self.poster.save_poster(imdbid, poster_url)
         return json.dumps({'response': True, 'message': 'Metadata updated.'})
+
+    @cherrypy.expose
+    def change_quality_profile(self, profiles, imdbid=None):
+        ''' Updates quality profile name
+        names: dict of profile names. k:v is currentname:newname
+        imdbid: str imdbid of movie to change   <default None>
+
+        Changes movie quality profiles from k in names to v in names
+
+        If imdbid is passed will change only one movie, otherwise changes
+            all movies where profile == k
+
+        If imdbid is passed and names contains more than one k:v pair, submits changes
+            using v from the first dict entry. This is unreliable, so just submit one.
+
+        Executes two loops.
+            First changes qualities to temporary value.
+            Then changes tmp values to target values.
+        This way you can swap two names without them all becoming one.
+
+        '''
+
+        profiles = json.loads(profiles)
+
+        if imdbid:
+            q = profiles.values()[0]
+
+            if not self.sql.update('MOVIES', 'quality', q, 'imdbid', imdbid):
+                return json.dumps({'response': False, 'error': 'Unable to update {} to quality {}'.format(imdbid, q)})
+            else:
+                return json.dumps({'response': True, 'Message': '{} changed to {}'.format(imdbid, q)})
+        else:
+            tmp_qualities = {}
+            for k, v in profiles.iteritems():
+                q = v.encode('hex')
+                if not self.sql.update('MOVIES', 'quality', q, 'quality', k):
+                    return json.dumps({'response': False, 'error': 'Unable to change {} to temporary quality {}'.format(k, q)})
+                else:
+                    tmp_qualities[q] = v
+
+            for k, v in tmp_qualities.iteritems():
+                if not self.sql.update('MOVIES', 'quality', v, 'quality', k):
+                    return json.dumps({'response': False, 'error': 'Unable to change temporary quality {} to {}'.format(k, v)})
+
+            return json.dumps({'response': True, 'message': 'Quality profiles updated.'})

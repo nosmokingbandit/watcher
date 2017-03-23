@@ -40,7 +40,6 @@ $(document).ready(function () {
         $.post(url_base + "/ajax/save_settings", {
             "data": post_data
         })
-
         .done(function(r) {
             response = JSON.parse(r);
             if(response["response"] == true){
@@ -212,11 +211,18 @@ $(document).ready(function () {
         var profile = {};
         var blanks = false;
         var names = [];
+        var change_names = {}
 
         $("div.quality_profile").each(function(){
             var $this = $(this);
             var tmp = {};
             var name = $this.find("div.name input.name").val();
+            var original_name = $this.find("div.name input.name").attr('value')
+
+            if(name != original_name){
+                change_names[original_name] = name
+                $this.find("div.name input.name").attr('value', name)
+            }
 
             if(name === undefined){
                 name = "Default"
@@ -276,6 +282,20 @@ $(document).ready(function () {
         if(blanks == true){
             return false;
         };
+
+        if(!$.isEmptyObject(change_names)){
+            $.post(url_base + "/ajax/change_quality_profile", {
+                profiles: JSON.stringify(change_names),
+                imdbid: null
+            })
+            .done(function(r){
+                response = JSON.parse(r)
+                if(response['response'] == false){
+                    toastr.error(response['error'])
+                }
+            })
+
+        }
 
         data["Quality"] = {}
         data["Quality"]["Profiles"] = {}

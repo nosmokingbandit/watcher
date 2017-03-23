@@ -60,7 +60,7 @@ class PreDB(object):
 
         if self.fuzzy_match(rss_titles, test):
             logging.info(u'{} {} found on predb.me.'.format(title, year))
-            if self.sql.update('MOVIES', 'predb', 'found', imdbid=imdbid):
+            if self.sql.update('MOVIES', 'predb', 'found', 'imdbid', imdbid):
                 return True
             else:
                 return False

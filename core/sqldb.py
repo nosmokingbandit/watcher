@@ -166,7 +166,7 @@ class SQL(object):
             logging.error(u'Unable to write search results.')
             return False
 
-    def update(self, TABLE, COLUMN, VALUE, imdbid='', guid=''):
+    def update(self, TABLE, COLUMN, VALUE, idcol, idval):
         '''
         Updates single value in existing table row.
         Selects row to update from imdbid or guid.
@@ -174,16 +174,7 @@ class SQL(object):
         Returns Bool.
         '''
 
-        if imdbid:
-            idcol = u'imdbid'
-            idval = imdbid
-        elif guid:
-            idcol = u'guid'
-            idval = guid
-        else:
-            return 'ID ERROR'
-
-        logging.info(u'Updating {} to {} in {}.'.format(idval.split('&')[0], VALUE, TABLE))
+        logging.info(u'Updating {}:{} to {} in {}.'.format(idcol, idval.split('&')[0], VALUE, TABLE))
 
         sql = u'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
         vals = (VALUE, idval)

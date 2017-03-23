@@ -204,7 +204,7 @@ class Searcher():
             logging.error(u'Unable to update movie status for {}'.format(imdbid))
             return False
 
-        if not self.sql.update('MOVIES', 'backlog', '1', imdbid=imdbid):
+        if not self.sql.update('MOVIES', 'backlog', '1', 'imdbid', imdbid):
             logging.error(u'Unable to flag backlog search as complete for {}'.format(imdbid))
             return False
 

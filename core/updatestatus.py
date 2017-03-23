@@ -34,7 +34,7 @@ class Status(object):
 
             # Mark bad in SEARCHRESULTS
             logging.info(u'Marking {} as {} in SEARCHRESULTS.'.format(guid.split('&')[0], status))
-            if not self.sql.update(TABLE, 'status', status, guid=guid):
+            if not self.sql.update(TABLE, 'status', status, 'guid', guid):
                 logging.error(u'Setting SEARCHRESULTS status of {} to {} failed.'.format(guid.split('&')[0], status))
                 return False
             else:
@@ -78,7 +78,7 @@ class Status(object):
         if self.sql.row_exists(TABLE, guid=guid):
             # Mark bad in MARKEDRESULTS
             logging.info(u'Marking {} as {} in MARKEDRESULTS.'.format(guid.split('&')[0], status))
-            if not self.sql.update(TABLE, 'status', status, guid=guid):
+            if not self.sql.update(TABLE, 'status', status, 'guid', guid):
                 logging.info(u'Setting MARKEDRESULTS status of {} to {} failed.'.format(guid.split('&')[0], status))
                 return False
             else:
@@ -167,7 +167,7 @@ class Status(object):
                 status = u'Wanted'
 
         logging.info(u'Setting MOVIES {} status to {}.'.format(imdbid, status))
-        if self.sql.update('MOVIES', 'status', status, imdbid=imdbid):
+        if self.sql.update('MOVIES', 'status', status, 'imdbid', imdbid):
             return True
         else:
             logging.error(u'Could not set {} to {}'.format(imdbid, status))

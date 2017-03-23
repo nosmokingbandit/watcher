@@ -500,10 +500,8 @@ class Postprocessing(object):
 
             logging.info(u'Setting MOVIE status.')
             r = str(self.update.movie_status(data['imdbid'])).lower()
-            self.sql.update('MOVIES', 'finished_date', result['data']['finished_date'],
-                            imdbid=data['imdbid'])
-            self.sql.update('MOVIES', 'finished_score', result['data'].get('finished_score'),
-                            imdbid=data['imdbid'])
+            self.sql.update('MOVIES', 'finished_date', result['data']['finished_date'], 'imdbid', data['imdbid'])
+            self.sql.update('MOVIES', 'finished_score', result['data'].get('finished_score'), 'imdbid', data['imdbid'])
         else:
             logging.info(u'Imdbid not supplied or found, unable to update Movie status.')
             r = u'false'
@@ -538,8 +536,7 @@ class Postprocessing(object):
             result['tasks']['mover'] = {'enabled': 'false'}
 
         if data.get('imdbid'):
-            self.sql.update('MOVIES', 'finished_file', result['data'].get('new_file_location'),
-                            imdbid=data['imdbid'])
+            self.sql.update('MOVIES', 'finished_file', result['data'].get('new_file_location'), 'imdbid', data['imdbid'])
 
         # Delete leftover dir. Skip if createhardlinks enabled or if mover disabled/failed
         if config['cleanupenabled']:

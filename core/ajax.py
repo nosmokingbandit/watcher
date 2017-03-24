@@ -648,6 +648,7 @@ class Ajax(object):
         for index, path in enumerate(files):
             metadata = self.metadata.get_metadata(path)
             metadata['size'] = os.path.getsize(path)
+            metadata['finished_file'] = path
             metadata['human_size'] = Conversions.human_file_size(metadata['size'])
             metadata['progress'] = '{} of {}'.format(index + 1, length)
             if not metadata.get('imdbid'):

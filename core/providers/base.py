@@ -152,10 +152,15 @@ class NewzNabProvider(object):
                 if ic.tag == u'guid' and ic.attrib.get('isPermaLink', 'false') == u'false':
                     permalink = False
                 d[ic.tag.lower()] = ic.text
+                continue
             if not d.get('size') and ('newznab' in ic.tag or 'torznab' in ic.tag) and ic.attrib['name'] == u'size':
                 d['size'] = ic.attrib['value']
             if 'torznab' in ic.tag and ic.attrib['name'] == 'seeders':
                 d['seeders'] = int(ic.attrib['value'])
+                continue
+            if 'torznab' in ic.tag and ic.attrib['name'] == 'downloadvolumefactor':
+                d['freeleech'] = 1 - int(ic.attrib['value'])
+                continue
             if 'newznab' in ic.tag and ic.attrib['name'] == u'imdb':
                 d['imdbid'] = 'tt{}'.format(ic.attrib['value'])
 

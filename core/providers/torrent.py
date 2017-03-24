@@ -258,6 +258,7 @@ class Rarbg(object):
             result['status'] = u'Available'
             result['score'] = 0
             result['downloadid'] = None
+            result['freeleech'] = 0
         logging.info(u'Found {} results from Rarbg.'.format(len(results)))
         return results
 
@@ -338,6 +339,7 @@ class LimeTorrents(object):
                 result['guid'] = result['torrentfile'].split('.')[1].split('/')[-1].lower()
                 result['type'] = 'torrent'
                 result['downloadid'] = None
+                result['freeleech'] = 0
 
                 s = i.find('description').text.split('Seeds: ')[1]
                 seed_str = ''
@@ -432,6 +434,7 @@ class ExtraTorrent(object):
                 result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
                 result['type'] = 'magnet'
                 result['downloadid'] = None
+                result['freeleech'] = 0
 
                 seeders = i.find('seeders').text
                 result['seeders'] = 0 if seeders == '---' else seeders
@@ -502,6 +505,7 @@ class SkyTorrents(object):
                 result['guid'] = result['torrentfile'].split('/')[4]
                 result['type'] = 'torrent'
                 result['downloadid'] = None
+                result['freeleech'] = 0
 
                 result['seeders'] = desc[0]
 
@@ -592,6 +596,7 @@ class BitSnoop(object):
                 result['type'] = 'magnet'
                 result['downloadid'] = None
                 result['seeders'] = int(i.find('numSeeders').text)
+                result['freeleech'] = 0
 
                 results.append(result)
             except Exception, e: #noqa
@@ -684,6 +689,7 @@ class Torrentz2(object):
                 result['type'] = 'magnet'
                 result['downloadid'] = None
                 result['seeders'] = int(desc[4])
+                result['freeleech'] = 0
 
                 results.append(result)
             except Exception, e: #noqa
@@ -782,6 +788,7 @@ class ThePirateBay(object):
                 result['type'] = 'magnet'
                 result['downloadid'] = None
                 result['seeders'] = int(i[5].text)
+                result['freeleech'] = 0
 
                 results.append(result)
             except Exception, e: #noqa

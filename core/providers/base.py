@@ -181,6 +181,8 @@ class NewzNabProvider(object):
         d['status'] = u'Available'
         d['torrentfile'] = None
         d['downloadid'] = None
+        if not d.get('freeleech'):
+            d['freeleech'] = 0
 
         if self.feed_type == 'nzb':
             d['type'] = u'nzb'

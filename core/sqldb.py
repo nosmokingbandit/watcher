@@ -295,7 +295,8 @@ class SQL(object):
         results = self.execute(command)
 
         if results:
-            return results.fetchall()
+            res = results.fetchall()
+            return [dict(i) for i in res]
         else:
             return False
 

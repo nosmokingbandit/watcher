@@ -127,7 +127,6 @@ class MovieStatusPopup():
                         span(res['score'], cls='bold')
                         span(u' Source:')
                         with span(res.get('indexer', ''), cls='bold'):
-                            print res['freeleech']
                             if res['freeleech'] == 1:
                                 span(cls='fa fa-asterisk', title='Freeleech')
                         if pubdate:

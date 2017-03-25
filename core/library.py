@@ -242,7 +242,6 @@ class Metadata(object):
 
         title = titledata.get('title')
         if title and title[-1] == '.':
-            print 'REMOVING PERIOD'
             titledata['title'] = title[:-1]
 
         # Make sure this matches our key names

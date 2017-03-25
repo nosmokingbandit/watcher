@@ -80,6 +80,7 @@ class ScoreResults():
         self.keep_required(required)
         self.retention_check(retention, today)
         self.seed_check(seeds)
+        self.freeleech(core.CONFIG['Search']['freeleechpoints'])
         self.score_sources(sources, check_size=check_size)
         if quality['scoretitle']:
             self.fuzzy_title(titles)
@@ -209,6 +210,11 @@ class ScoreResults():
                     logging.debug(u'{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
         self.results = lst
         logging.info(u'Keeping {} results.'.format(len(self.results)))
+
+    def freeleech(self, points):
+        for res in self.results:
+            if res['freeleech'] == 1:
+                res['score'] += points
 
     def score_preferred(self, group_list):
         ''' Increase score for each group of 'words' match

@@ -211,10 +211,14 @@ class Settings():
                 input(type='number', min='0', id='retention', value=c[c_s]['retention'])
                 span(' days.')
                 span('Use 0 for no limit.', cls='tip')
-            with li():
+            with li(cls='bbord'):
                 span(u'Torrents require a minimum of ')
                 input(type='number', min='0', id='mintorrentseeds', value=c[c_s]['mintorrentseeds'], style='width: 2.5em')
                 span(' seeds.')
+            with li():
+                span('Add ')
+                input(type='number', min='0', id='freeleechpoints', value=c[c_s]['freeleechpoints'], style='width: 3em')
+                span(' points to FreeLeech torrents.')
 
         h2(u'Watchlists')
         with ul(id='watchlists'):

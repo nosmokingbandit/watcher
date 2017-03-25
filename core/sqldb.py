@@ -291,7 +291,7 @@ class SQL(object):
         logging.info(u'Retreving Search Results for {}.'.format(imdbid))
         TABLE = u'SEARCHRESULTS'
 
-        command = u'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size {}'.format(TABLE, imdbid, sort)
+        command = u'SELECT * FROM {} WHERE imdbid="{}" ORDER BY score DESC, size {}, freeleech DESC'.format(TABLE, imdbid, sort)
 
         results = self.execute(command)
 

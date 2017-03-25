@@ -109,6 +109,8 @@ class Proxy(object):
 
         urllib2.socket.socket = Proxy.default_socket
 
-        return Proxy.bypass_opener.open(request)
+        response = Proxy.bypass_opener.open(request)
 
         urllib2.socket.socket = Proxy.proxy_socket
+
+        return response

@@ -6,6 +6,24 @@ div#content{
     text-align: center;
 }
 
+div#discontinued{
+    background: -moz-linear-gradient(top, #f4693b 0%, #de3e65 0%, #f4693b 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #f4693b 0%,#de3e65 0%,#f4693b 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #f4693b 0%,#de3e65 0%,#f4693b 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    padding: 0.25em 1em 0.5em 1em;
+    border-radius: 1em;
+    margin: 1em 0;
+    color: #212121;
+    font-size: 1.1em;
+}
+
+div#discontinued a{
+    font-weight: bold;
+    text-decoration: underline;
+    padding: none;
+    color: #212121;
+}
+
 div#view_config{
     height: 3em;
     line-height: 3em;

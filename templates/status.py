@@ -16,7 +16,7 @@ class Status():
 
         with doc.head:
             Head.insert()
-            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css?v=02.22')
+            link(rel='stylesheet', href=core.URL_BASE + '/static/css/status.css?v=03.28')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}status.css?v=02.22'.format(core.CONFIG['Server']['theme']))
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/movie_status_popup.css?v=02.22')
             link(rel='stylesheet', href=core.URL_BASE + '/static/css/{}movie_status_popup.css?v=02.22'.format(core.CONFIG['Server']['theme']))
@@ -25,6 +25,14 @@ class Status():
         with doc:
             Header.insert_header(current="status")
             with div(id='content'):
+                with div(id='discontinued'):
+                    h2('Important Notice')
+                    span('Watcher has moved to ')
+                    a('Watcher3', href='https://github.com/nosmokingbandit/watcher3')
+                    with p('Watcher has been ported to Python3 and this version will no longer be supported. \
+                            Migrating to the new repo is easy. For help and community discussion please see this '):
+                        a('Reddit post.', href='https://www.reddit.com/r/watcher/comments/620spa/watcher_has_moved_to_python3/')
+
                 with div(id='view_config'):
                     span('Display: ')
                     with select(id='list_style'):

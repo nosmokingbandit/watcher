@@ -1,3 +1,6 @@
+#### This repo is no longer supported
+Watcher has been ported to Python 3. Visit the new repo at https://github.com/nosmokingbandit/watcher/3
+
 ## Watcher
 
 Watcher is an automated movie NZB searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB to Sabnzbd or NZBGet. Watcher also has basic post-processing capabilities such as renaming and moving.

@@ -77,7 +77,7 @@ ul#result_list{
 
 ul#result_list li{
     overflow: hidden;
-	margin: 0 0 0 8px;
+	margin: 0 0 0 2px;
 }
 
 ul#result_list li.title{

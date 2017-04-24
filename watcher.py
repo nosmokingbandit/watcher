@@ -28,7 +28,14 @@ core.PROG_PATH = unicode(os.path.dirname(os.path.realpath(__file__)))
 os.chdir(core.PROG_PATH)
 
 if __name__ == '__main__':
-    ssl._create_default_https_context = ssl._create_unverified_context
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        # Legacy Python that doesn't verify HTTPS certificates by default
+        pass
+    else:
+        # Handle target environment that doesn't support HTTPS verification
+        ssl._create_default_https_context = _create_unverified_https_context 
 
     # have to set locale for date parsing
     try:
